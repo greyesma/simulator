@@ -1945,3 +1945,155 @@ AssessmentReport {
 - Tests pass (428/428)
 - Typecheck passes (exit 0)
 - UI verified in browser (homepage, sign-in render correctly)
+
+---
+
+## Issue #31: US-031: Admin Access Control
+
+**What was implemented:**
+- Admin role check utilities (`src/lib/admin.ts`) with:
+  - `isAdmin()` - checks if a user has ADMIN role
+  - `getSessionWithRole()` - gets current session with extended user info
+  - `requireAdmin()` - enforces admin role, redirects non-admins (to sign-in if unauthenticated, to home if not admin)
+  - `checkIsAdmin()` - returns boolean for conditional rendering
+- Admin layout (`src/app/admin/layout.tsx`) with:
+  - Role protection via `requireAdmin()` that redirects non-admins to home
+  - Neo-brutalist admin header with inverted colors (black bg, white text)
+  - Admin navigation links (Dashboard, Scenarios, Users)
+  - "Exit Admin" link back to main app
+  - User email displayed in header
+- Admin dashboard (`src/app/admin/page.tsx`) with:
+  - Stats grid showing: users, scenarios, assessments, completed assessments
+  - Quick actions: "Create Scenario" and "Manage Users" buttons
+  - Recent assessments table with user, scenario, status, date
+- Admin navigation component (`src/components/admin-nav.tsx`) that:
+  - Only renders for admin users (returns null for non-admins)
+  - Shows "Admin" link with neo-brutalist styling
+- Updated profile page to include AdminNav in header
+- 14 unit tests for admin utilities
+
+**Files created:**
+- `src/lib/admin.ts` - Admin role check utilities
+- `src/lib/admin.test.ts` - 14 unit tests for admin utilities
+- `src/app/admin/layout.tsx` - Admin layout with role protection
+- `src/app/admin/page.tsx` - Admin dashboard page
+- `src/components/admin-nav.tsx` - Conditional admin navigation component
+
+**Files changed:**
+- `src/app/profile/page.tsx` - Added AdminNav import and component to header
+
+**Learnings:**
+1. UserRole enum and role field already exist in Prisma schema - no migration needed
+2. Session callback in auth.ts already retrieves user role from database
+3. Use `redirect()` from "next/navigation" for server component redirects
+4. Admin layout protects all admin routes automatically via `requireAdmin()` in layout
+5. Conditional rendering via `checkIsAdmin()` is useful for AdminNav component
+6. Test mocking pattern: define mock functions BEFORE `vi.mock()` calls due to hoisting
+7. Redirect in tests throws error - use `expect().rejects.toThrow()` pattern
+
+**Architecture patterns:**
+- Admin layout applies role protection to ALL `/admin/*` routes automatically
+- AdminNav returns null for non-admins (conditional rendering)
+- requireAdmin returns user or redirects (never returns undefined)
+- Tests use throw + catch pattern to verify redirects
+
+**Data model (existing):**
+```prisma
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  role UserRole @default(USER)
+  // ... other fields
+}
+```
+
+**Gotchas:**
+- None - infrastructure was already in place from authentication implementation
+
+**Verification completed:**
+- Admin role in user table (existing UserRole enum) ✓
+- Admin routes protected by role check (requireAdmin in layout) ✓
+- Non-admins redirected to main app (redirect to "/") ✓
+- Admin nav visible only to admins (AdminNav component) ✓
+- Tests pass (442/442)
+- Typecheck passes (exit 0)
+- Build succeeds
+- UI verified in browser (admin route redirects unauthenticated users to /sign-in?callbackUrl=/admin)
+
+---
+
+## Issue #32: US-033: Scenario Data Model
+
+**What was implemented:**
+- Verified existing Scenario and Coworker tables in Prisma schema have all required fields
+- Admin API endpoints for scenario CRUD operations:
+  - `GET /api/admin/scenarios` - List all scenarios with coworker/assessment counts
+  - `POST /api/admin/scenarios` - Create new scenario
+  - `GET /api/admin/scenarios/[id]` - Get single scenario with coworkers
+  - `PUT /api/admin/scenarios/[id]` - Update scenario
+  - `DELETE /api/admin/scenarios/[id]` - Delete scenario (cascades to coworkers)
+- Admin API endpoints for coworker CRUD operations:
+  - `GET /api/admin/scenarios/[id]/coworkers` - List coworkers for scenario
+  - `POST /api/admin/scenarios/[id]/coworkers` - Create coworker
+  - `GET /api/admin/scenarios/[id]/coworkers/[coworkerId]` - Get single coworker
+  - `PUT /api/admin/scenarios/[id]/coworkers/[coworkerId]` - Update coworker
+  - `DELETE /api/admin/scenarios/[id]/coworkers/[coworkerId]` - Delete coworker
+- 48 unit tests for all admin scenario/coworker endpoints
+
+**Files created:**
+- `src/app/api/admin/scenarios/route.ts` - Scenario list and create endpoints
+- `src/app/api/admin/scenarios/route.test.ts` - 10 unit tests
+- `src/app/api/admin/scenarios/[id]/route.ts` - Single scenario CRUD endpoints
+- `src/app/api/admin/scenarios/[id]/route.test.ts` - 14 unit tests
+- `src/app/api/admin/scenarios/[id]/coworkers/route.ts` - Coworker list and create endpoints
+- `src/app/api/admin/scenarios/[id]/coworkers/route.test.ts` - 10 unit tests
+- `src/app/api/admin/scenarios/[id]/coworkers/[coworkerId]/route.ts` - Single coworker CRUD endpoints
+- `src/app/api/admin/scenarios/[id]/coworkers/[coworkerId]/route.test.ts` - 14 unit tests
+
+**Learnings:**
+1. Scenario and Coworker tables were already defined in schema from Issue #9 (Coworker Persona System)
+2. All required fields present: Scenario (id, name, companyName, companyDescription, taskDescription, repoUrl, techStack), Coworker (id, scenarioId, name, role, personaStyle, knowledge JSON)
+3. Cascade delete on Coworker.scenarioId ensures coworkers are deleted when scenario is deleted
+4. Admin endpoints follow same auth pattern: check session, check ADMIN role, return 401/403 if unauthorized
+5. Partial updates use "only update provided fields" pattern with conditional object building
+6. Coworker GET/PUT/DELETE verify scenarioId matches URL to prevent cross-scenario access
+
+**Data model (existing):**
+```prisma
+model Scenario {
+  id                 String     @id @default(cuid())
+  name               String
+  companyName        String
+  companyDescription String     @db.Text
+  taskDescription    String     @db.Text
+  repoUrl            String
+  techStack          String[]
+  isPublished        Boolean    @default(false)
+  coworkers          Coworker[]
+  assessments        Assessment[]
+}
+
+model Coworker {
+  id           String   @id @default(cuid())
+  scenarioId   String
+  name         String
+  role         String
+  personaStyle String   @db.Text
+  knowledge    Json
+  scenario     Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+}
+```
+
+**Gotchas:**
+- GET function in route.ts without request parameter causes TypeScript error in test when calling with argument
+
+**Verification completed:**
+- Scenario table: id, name, company_name, company_description, task_description, repo_url, tech_stack ✓
+- Coworker table: id, scenario_id, name, role, persona_style, knowledge (JSON) ✓
+- Relationships properly defined (FK with cascade delete) ✓
+- Created scenarios can be edited (PUT endpoint) ✓
+- Tests pass (490/490)
+- Typecheck passes (exit 0)
