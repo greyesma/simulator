@@ -2317,3 +2317,148 @@ model Coworker {
 - Tests pass (575/575)
 - Typecheck passes (exit 0)
 - UI verified in browser (homepage, sign-in render correctly)
+
+---
+
+## Issue #36: US-036: Basic Analytics
+
+**What was implemented:**
+- Analytics utility module (`src/lib/analytics.ts`) with:
+  - Zod schemas for time periods, daily counts, phase durations, status distribution, funnel steps
+  - Date utilities for period calculations
+  - `getSignupTrends()` - daily signup counts
+  - `getAssessmentStartTrends()` - daily assessment start counts
+  - `getAssessmentCompletionTrends()` - daily completion counts
+  - `getPhaseDurationStats()` - HR interview, working phase, and total assessment duration stats
+  - `getStatusDistribution()` - counts per assessment status with percentages
+  - `getCompletionFunnel()` - conversion funnel from start to completion
+  - `getOverviewMetrics()` - total users, assessments, completion rate, avg time
+  - `getAnalytics()` - main function aggregating all analytics data
+  - `logAnalyticsEvent()` - console logging for monitoring (no PII)
+- Analytics API endpoint (`/api/admin/analytics`) with:
+  - Admin-only access (role check)
+  - Period parameter validation (today, yesterday, last7days, last30days, last90days, all)
+  - Returns complete analytics data structure
+- Analytics dashboard client component (`src/app/admin/analytics-dashboard.tsx`) with:
+  - Period selector buttons (Today, 7 Days, 30 Days, 90 Days, All Time)
+  - Overview stats: signups, assessments, completed, completion rate, avg time
+  - Trend charts for signups, assessment starts, and completions (last 7 days)
+  - Phase duration stats with min/max/avg and sample size
+  - Completion funnel with dropoff rates
+  - Status distribution bar chart
+- Enhanced admin dashboard page with AnalyticsDashboard component
+- 53 unit tests (39 for analytics module, 14 for API endpoint)
+
+**Files created:**
+- `src/lib/analytics.ts` - Analytics utility module (400+ lines)
+- `src/lib/analytics.test.ts` - 39 unit tests for analytics functions
+- `src/app/api/admin/analytics/route.ts` - Admin analytics API endpoint
+- `src/app/api/admin/analytics/route.test.ts` - 14 unit tests for API
+- `src/app/admin/analytics-dashboard.tsx` - Client-side analytics dashboard
+
+**Files changed:**
+- `src/app/admin/page.tsx` - Integrated AnalyticsDashboard, added scenario count to quick actions
+
+**Learnings:**
+1. Existing data model is sufficient for analytics - no new tables needed
+2. User.createdAt tracks signups, Assessment.startedAt/completedAt tracks lifecycle
+3. HRInterviewAssessment.interviewDurationSeconds provides phase timing
+4. Privacy compliance: aggregate counts only, no PII (emails, names) in analytics
+5. Prisma `groupBy` is useful for status distribution counts
+6. Completion funnel counts assessments that reached each status level
+7. Time period filtering requires careful date range generation for trend charts
+8. Client component with period selector fetches fresh data on change
+
+**Architecture patterns:**
+- Server-side initial data load for fast page render
+- Client-side period switching with API calls
+- All analytics queries are aggregated (counts, averages, no individual records)
+- Console logging for analytics events enables log aggregation tools
+
+**Data tracked:**
+- Signups per day (User.createdAt)
+- Assessment starts per day (Assessment.startedAt)
+- Assessment completions per day (Assessment.completedAt)
+- Time per phase: HR Interview, Working, Total Assessment
+- Status distribution: HR_INTERVIEW, ONBOARDING, WORKING, FINAL_DEFENSE, PROCESSING, COMPLETED
+- Completion funnel: Started → HR Interview → Onboarding → Working → Completed
+
+**Gotchas:**
+- None - existing schema had all required timing data
+
+**Verification completed:**
+- Track: signups, assessment starts, completions ✓
+- Track: time spent per phase ✓
+- Basic dashboard (enhanced admin page) ✓
+- Privacy-respecting (no PII in analytics) ✓
+- Tests pass (614/614)
+- Typecheck passes (exit 0)
+- Build succeeds
+- UI verified in browser (auth redirect works, base pages render)
+
+---
+
+## Issue #37: US-037: Privacy & Consent
+
+**What was implemented:**
+- Consent screen at `/assessment/[id]/consent` explaining data collection (screen recording, voice recording, CV storage)
+- Privacy policy page at `/privacy` with comprehensive policy sections (11 sections covering information collection, AI processing, data rights, etc.)
+- Data deletion request API at `/api/user/delete-request` with POST (request), GET (status), DELETE (cancel) methods
+- Consent recording API at `/api/assessment/consent` with POST (record) and GET (check) methods
+- DataDeletionSection component on profile page with request/cancel deletion functionality
+- HR interview redirect to consent if `consentGivenAt` is null
+- Admin preview route updated to start at consent screen by default
+
+**Files created:**
+- `src/app/assessment/[id]/consent/page.tsx` - Server component with auth and redirect logic
+- `src/app/assessment/[id]/consent/client.tsx` - Client component with consent form UI
+- `src/app/privacy/page.tsx` - Full privacy policy page
+- `src/app/api/assessment/consent/route.ts` - Consent recording endpoint
+- `src/app/api/assessment/consent/route.test.ts` - 11 unit tests
+- `src/app/api/user/delete-request/route.ts` - Data deletion request endpoint
+- `src/app/api/user/delete-request/route.test.ts` - 14 unit tests
+- `src/components/data-deletion-section.tsx` - Profile page data deletion section
+
+**Files changed:**
+- `prisma/schema.prisma` - Added `consentGivenAt` to Assessment, `dataDeleteRequestedAt` to User
+- `src/app/assessment/[id]/hr-interview/page.tsx` - Added consent check redirect
+- `src/app/api/admin/scenarios/[id]/preview/route.ts` - Updated to start at consent, skip options
+- `src/app/profile/page.tsx` - Added DataDeletionSection import and component
+
+**Learnings:**
+1. Consent tracking needs both Assessment-level (for specific assessment) and User-level (for account deletion) fields
+2. HR interview redirect pattern: check consent first, then proceed or redirect
+3. Admin preview route can skip consent by passing `skipTo` parameter (coworkers, kickoff, hr-interview)
+4. Privacy policy structure follows standard GDPR-style sections (data collection, rights, retention, third parties)
+5. Data deletion uses "request + 30-day grace period" pattern for safety, not immediate deletion
+6. Prisma schema changes require `npx prisma db push` with env vars sourced
+7. Test mocking pattern: define mock functions BEFORE `vi.mock()` calls due to hoisting
+
+**Architecture patterns:**
+- Consent screen is step 0 in assessment flow (before HR Interview at step 1)
+- Consent stored at assessment level, not user level, for per-assessment tracking
+- Data deletion is a request (pending status) not immediate, with option to cancel
+- Privacy policy is static content page, no database interaction
+
+**Data model additions:**
+```prisma
+// Assessment model
+consentGivenAt DateTime? // When user accepted consent for this assessment
+
+// User model
+dataDeleteRequestedAt DateTime? // When user requested account deletion
+```
+
+**Gotchas:**
+- Prisma env vars need to be exported (`set -a && source .env.local`) before `prisma db push`
+- Consent checkbox uses custom styling with inline SVG for checkmark (neo-brutalist style)
+
+**Verification completed:**
+- Consent screen before assessment starts ✓
+- Explains: screen recording, voice recording, CV storage ✓
+- User must accept to proceed (checkbox + button) ✓
+- Privacy policy page ✓
+- User can request data deletion ✓
+- Tests pass (639/639)
+- Typecheck passes (exit 0)
+- UI verified in browser (privacy page, homepage, sign-in redirect)

@@ -6,6 +6,7 @@ import type { UserRole, AssessmentStatus, Prisma } from "@prisma/client";
 import { ProfileCVSection } from "@/components/profile-cv-section";
 import type { AssessmentReport } from "@/lib/assessment-aggregation";
 import { AdminNav } from "@/components/admin-nav";
+import { DataDeletionSection } from "@/components/data-deletion-section";
 
 interface ExtendedUser {
   id: string;
@@ -265,6 +266,7 @@ export default async function ProfilePage() {
       email: true,
       role: true,
       createdAt: true,
+      dataDeleteRequestedAt: true,
     },
   });
 
@@ -335,6 +337,11 @@ export default async function ProfilePage() {
 
         {/* CV Upload Section */}
         <ProfileCVSection />
+
+        {/* Data & Privacy Section */}
+        <DataDeletionSection
+          deletionRequestedAt={dbUser.dataDeleteRequestedAt}
+        />
 
         {/* Improvement Trends Section - only shows with 2+ completed assessments */}
         <ImprovementTrends assessments={assessments} />

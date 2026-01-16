@@ -53,15 +53,23 @@ export async function POST(request: Request, context: RouteContext) {
 
   // Determine starting status and URL based on skipTo
   let status: "HR_INTERVIEW" | "ONBOARDING" | "WORKING" = "HR_INTERVIEW";
-  let urlSuffix = "";
+  let urlSuffix = "/consent"; // Default: start at consent screen
+  let consentGivenAt: Date | null = null;
 
   if (skipTo === "coworkers") {
-    // Skip directly to the working/coworker chat phase
+    // Skip directly to the working/coworker chat phase (consent implied)
     status = "WORKING";
     urlSuffix = "/chat";
+    consentGivenAt = new Date();
   } else if (skipTo === "kickoff") {
+    // Skip to kickoff (consent implied)
     status = "ONBOARDING";
     urlSuffix = "/kickoff";
+    consentGivenAt = new Date();
+  } else if (skipTo === "hr-interview") {
+    // Skip consent, go directly to HR interview
+    urlSuffix = "/hr-interview";
+    consentGivenAt = new Date();
   }
 
   // Create a preview assessment for this admin
@@ -70,6 +78,7 @@ export async function POST(request: Request, context: RouteContext) {
       userId: user.id,
       scenarioId: id,
       status,
+      consentGivenAt,
     },
   });
 

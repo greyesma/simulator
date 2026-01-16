@@ -2,18 +2,18 @@ import { auth } from "@/auth";
 import { db } from "@/server/db";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { HRInterviewClient } from "./client";
+import { ConsentClient } from "./client";
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function HRInterviewPage({ params }: PageProps) {
+export default async function ConsentPage({ params }: PageProps) {
   const { id } = await params;
   const session = await auth();
 
   if (!session?.user?.id) {
-    redirect(`/sign-in?callbackUrl=/assessment/${id}/hr-interview`);
+    redirect(`/sign-in?callbackUrl=/assessment/${id}/consent`);
   }
 
   // Fetch the assessment
@@ -27,16 +27,6 @@ export default async function HRInterviewPage({ params }: PageProps) {
         select: {
           name: true,
           companyName: true,
-          companyDescription: true,
-        },
-      },
-      conversations: {
-        where: {
-          coworkerId: null,
-          type: "voice",
-        },
-        select: {
-          transcript: true,
         },
       },
     },
@@ -46,14 +36,10 @@ export default async function HRInterviewPage({ params }: PageProps) {
     notFound();
   }
 
-  // Check if consent was given, redirect to consent page if not
-  if (!assessment.consentGivenAt) {
-    redirect(`/assessment/${id}/consent`);
+  // If consent was already given, redirect to HR interview
+  if (assessment.consentGivenAt) {
+    redirect(`/assessment/${id}/hr-interview`);
   }
-
-  // Check if interview was already completed
-  const existingTranscript = assessment.conversations[0]?.transcript;
-  const hasCompletedInterview = existingTranscript && Array.isArray(existingTranscript) && existingTranscript.length > 0;
 
   return (
     <main className="min-h-screen bg-background text-foreground flex flex-col">
@@ -86,9 +72,16 @@ export default async function HRInterviewPage({ params }: PageProps) {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-secondary text-secondary-foreground flex items-center justify-center font-bold">
+                0
+              </div>
+              <span className="font-semibold">Consent</span>
+            </div>
+            <div className="h-px flex-1 bg-border" />
+            <div className="flex items-center gap-2 opacity-40">
+              <div className="w-8 h-8 border-2 border-border flex items-center justify-center font-bold">
                 1
               </div>
-              <span className="font-semibold">HR Interview</span>
+              <span>HR Interview</span>
             </div>
             <div className="h-px flex-1 bg-border" />
             <div className="flex items-center gap-2 opacity-40">
@@ -116,33 +109,12 @@ export default async function HRInterviewPage({ params }: PageProps) {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col">
-        {hasCompletedInterview ? (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center max-w-md">
-              <div className="w-20 h-20 bg-secondary border-2 border-foreground flex items-center justify-center mx-auto mb-6">
-                <span className="text-3xl">&#10003;</span>
-              </div>
-              <h2 className="text-2xl font-bold mb-4">Interview Completed</h2>
-              <p className="text-muted-foreground mb-6">
-                You&apos;ve already completed the HR interview for this assessment.
-                Continue to the next phase.
-              </p>
-              <Link
-                href={`/assessment/${id}/onboarding`}
-                className="inline-block bg-foreground text-background px-6 py-3 font-semibold border-2 border-foreground hover:bg-secondary hover:text-secondary-foreground hover:border-secondary"
-              >
-                Continue to Onboarding
-              </Link>
-            </div>
-          </div>
-        ) : (
-          <HRInterviewClient
-            assessmentId={id}
-            scenarioName={assessment.scenario.name}
-            companyName={assessment.scenario.companyName}
-          />
-        )}
+      <div className="flex-1 flex items-center justify-center p-6">
+        <ConsentClient
+          assessmentId={id}
+          scenarioName={assessment.scenario.name}
+          companyName={assessment.scenario.companyName}
+        />
       </div>
     </main>
   );
