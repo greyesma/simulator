@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { UserRole, AssessmentStatus, Prisma } from "@prisma/client";
 import { ProfileCVSection } from "@/components/profile-cv-section";
 import type { AssessmentReport } from "@/lib/assessment-aggregation";
+import { AdminNav } from "@/components/admin-nav";
 
 interface ExtendedUser {
   id: string;
@@ -293,6 +294,7 @@ export default async function ProfilePage() {
             Skillvee
           </Link>
           <nav className="flex items-center gap-4">
+            <AdminNav />
             <Link
               href="/"
               className="text-muted-foreground hover:text-foreground font-mono text-sm"
