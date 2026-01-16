@@ -2462,3 +2462,62 @@ dataDeleteRequestedAt DateTime? // When user requested account deletion
 - Tests pass (639/639)
 - Typecheck passes (exit 0)
 - UI verified in browser (privacy page, homepage, sign-in redirect)
+
+---
+
+## Issue #38: US-038: Data Deletion
+
+**What was implemented:**
+- Settings page at `/settings` with account management options
+- AccountDeletionSection component with two deletion modes:
+  - Schedule Deletion (30-day grace period): User can cancel within 30 days
+  - Delete Immediately: Requires typing "DELETE MY ACCOUNT" to confirm
+- Data deletion utility module (`src/lib/data-deletion.ts`) with:
+  - `deleteUserData()` - Deletes all user data (assessments, conversations, recordings, files)
+  - `hasGracePeriodPassed()` - Checks if 30-day grace period has elapsed
+  - `processImmediateDeletion()` - Executes immediate deletion
+  - Storage file cleanup from Supabase (resumes, recordings, screenshots buckets)
+- `/api/user/delete` endpoint for immediate account deletion with confirmation
+- Profile page updated with link to Settings page
+
+**Files created:**
+- `src/app/settings/page.tsx` - Settings page with account info and privacy sections
+- `src/app/settings/account-deletion-section.tsx` - Client component for deletion UI
+- `src/lib/data-deletion.ts` - Data deletion utilities
+- `src/lib/data-deletion.test.ts` - 10 unit tests for deletion module
+- `src/app/api/user/delete/route.ts` - Immediate deletion endpoint
+- `src/app/api/user/delete/route.test.ts` - 8 unit tests for deletion API
+
+**Files changed:**
+- `src/app/profile/page.tsx` - Added Settings link in navigation
+
+**Learnings:**
+1. Soft delete pattern: mark `deletedAt` on User, clear personal data (name, email, image, password), but hard delete related data (assessments, recordings)
+2. Cascade deletes in Prisma handle related records automatically (conversations, segments, etc.)
+3. Collect storage paths BEFORE deleting database records to ensure files can be cleaned up
+4. Supabase storage `remove()` accepts array of paths for batch deletion
+5. Confirmation via typed phrase ("DELETE MY ACCOUNT") adds friction for destructive operations
+6. Two-option deletion (schedule vs immediate) gives users flexibility while maintaining safety
+
+**Architecture patterns:**
+- Settings page is separate from profile for cleaner organization
+- Immediate deletion endpoint requires explicit confirmation in request body
+- Deletion result includes counts of deleted items for transparency
+- Storage file paths extracted from URLs using URL parsing
+
+**Data deleted:**
+- Profile: name, email, image, password set to null (soft delete preserves ID for audit)
+- Assessments: hard deleted (cascade deletes conversations, recordings, segments)
+- Storage files: CVs from `resumes` bucket, video chunks from `recordings` bucket, screenshots from `screenshots` bucket
+
+**Gotchas:**
+- None - infrastructure from Issue #37 provided good foundation
+
+**Verification completed:**
+- Delete account option in settings ✓
+- Deletes: profile, assessments, recordings, CV ✓
+- Confirmation required (typed phrase for immediate, checkbox for scheduled) ✓
+- Soft delete with grace period OR hard delete (both options available) ✓
+- Tests pass (657/657)
+- Typecheck passes (exit 0)
+- UI verified in browser (settings redirects to sign-in when unauthenticated)

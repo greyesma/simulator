@@ -298,6 +298,12 @@ export default async function ProfilePage() {
           <nav className="flex items-center gap-4">
             <AdminNav />
             <Link
+              href="/settings"
+              className="text-muted-foreground hover:text-foreground font-mono text-sm"
+            >
+              Settings
+            </Link>
+            <Link
               href="/"
               className="text-muted-foreground hover:text-foreground font-mono text-sm"
             >
