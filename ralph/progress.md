@@ -355,3 +355,53 @@ HRInterviewAssessment {
 - Typecheck passes (exit 0)
 - Tests pass (50/50)
 - Build succeeds (1.84 kB bundle)
+
+---
+
+## Issue #9: US-012: Coworker Persona System
+
+**What was implemented:**
+- TypeScript types for coworker persona knowledge structure (`CoworkerKnowledge`, `CoworkerPersona`)
+- System prompt builder (`buildCoworkerSystemPrompt()`) that generates AI prompts from persona data
+- Knowledge parsing utility (`parseCoworkerKnowledge()`) for JSON validation
+- Style guidelines generator (`getStyleGuidelines()`) mapping persona style to communication patterns
+- 4 example coworkers with distinct personalities and knowledge:
+  - Alex Chen (Engineering Manager): professional/supportive, knows team structure and processes
+  - Jordan Rivera (Senior Engineer): technical/detail-oriented, knows auth, database, testing
+  - Sam Patel (Product Manager): friendly/casual, knows requirements and user research
+  - Riley Kim (QA Lead): thorough/methodical, knows testing requirements and known issues
+- Database seed script (`prisma/seed.ts`) with example scenario and coworkers
+- 28 unit tests covering persona parsing, prompt building, and style guidelines
+
+**Files created/changed:**
+- `src/lib/coworker-persona.ts` - Types, interfaces, and prompt builder functions
+- `src/lib/coworker-persona.test.ts` - 28 unit tests for persona functionality
+- `prisma/seed.ts` - Database seed script for development/testing
+- `package.json` - Added `db:seed` script and tsx dependency
+
+**Learnings:**
+1. Coworker model already existed in schema with required fields (name, role, personaStyle, knowledge)
+2. Knowledge structure uses triggerKeywords for AI to know when to respond
+3. `isCritical` flag marks knowledge candidates MUST discover
+4. Persona style keywords map to specific communication guidelines (formal, casual, technical, supportive, busy)
+5. System prompt includes both knowledge and conversation rules for AI behavior
+6. Prisma `InputJsonValue` type needed for JSON field inserts
+
+**Architecture patterns:**
+- Knowledge is discoverable: AI responds when asked the right questions
+- Style affects tone: formal PM vs casual dev communication
+- Critical knowledge ensures candidates must ask the right coworkers
+- Example coworkers cover key roles (manager, senior dev, PM, QA)
+
+**Gotchas:**
+- None - schema already had correct structure, just needed type definitions and utilities
+
+**Verification completed:**
+- Each coworker has: name, role, personality style, specific knowledge ✓
+- Knowledge includes things candidate must discover by asking ✓
+- Coworker answers fully when asked the right question ✓
+- Persona style affects communication (formal PM vs. casual dev) ✓
+- Configured per scenario in database ✓
+- Tests pass (78/78)
+- Typecheck passes (exit 0)
+- Build succeeds
