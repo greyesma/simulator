@@ -26,6 +26,25 @@ vi.mock("@/lib/storage", () => ({
   },
 }));
 
+// Mock database
+const mockFindFirst = vi.fn();
+const mockUpdate = vi.fn();
+vi.mock("@/server/db", () => ({
+  db: {
+    assessment: {
+      findFirst: (...args: unknown[]) => mockFindFirst(...args),
+      update: (...args: unknown[]) => mockUpdate(...args),
+    },
+  },
+}));
+
+// Mock CV parser
+const mockParseCv = vi.fn();
+vi.mock("@/lib/cv-parser", () => ({
+  parseCv: (...args: unknown[]) => mockParseCv(...args),
+  profileToPrismaJson: (profile: unknown) => profile,
+}));
+
 import { POST } from "./route";
 
 // Constants that mirror route.ts for validation tests

@@ -142,6 +142,7 @@ model Assessment {
 
   // Deliverables
   cvUrl         String?
+  parsedProfile Json?            // Parsed CV content (summary, experience, education, skills)
   prUrl         String?
   prSnapshot    Json?            // PR content snapshot for historical reference
   ciStatus      Json?            // CI test pass/fail status from GitHub Actions

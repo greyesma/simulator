@@ -23,11 +23,26 @@ vi.mock("@/lib/gemini", () => ({
   HR_PERSONA_SYSTEM_PROMPT: "Mock HR prompt",
 }));
 
+// Mock storage
+vi.mock("@/lib/storage", () => ({
+  getSignedResumeUrl: vi.fn(),
+}));
+
+// Mock cv-parser
+const mockFormatProfileForPrompt = vi.fn();
+const mockProfileFromPrismaJson = vi.fn();
+vi.mock("@/lib/cv-parser", () => ({
+  formatProfileForPrompt: (...args: unknown[]) => mockFormatProfileForPrompt(...args),
+  profileFromPrismaJson: (...args: unknown[]) => mockProfileFromPrismaJson(...args),
+}));
+
 import { POST } from "./route";
 
 describe("POST /api/interview/token", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockProfileFromPrismaJson.mockReturnValue(null);
+    mockFormatProfileForPrompt.mockReturnValue("");
   });
 
   it("should return 401 when not authenticated", async () => {
@@ -110,14 +125,26 @@ describe("POST /api/interview/token", () => {
     expect(data.companyName).toBe("Test Company");
   });
 
-  it("should include CV context when CV is present", async () => {
+  it("should include parsed profile context when parsedProfile is present", async () => {
     mockAuth.mockResolvedValue({
       user: { id: "user-1" },
     });
+    const mockProfile = {
+      name: "John Doe",
+      summary: "Senior developer with 10 years experience",
+      workExperience: [],
+      education: [],
+      skills: [],
+      certifications: [],
+      languages: [],
+      parsedAt: new Date().toISOString(),
+      parseQuality: "high",
+    };
     mockAssessmentFindFirst.mockResolvedValue({
       id: "assessment-1",
       userId: "user-1",
       cvUrl: "https://storage.example.com/cv.pdf",
+      parsedProfile: mockProfile,
       scenario: {
         name: "Test Scenario",
         companyName: "Test Company",
@@ -128,6 +155,10 @@ describe("POST /api/interview/token", () => {
         email: "john@example.com",
       },
     });
+    mockProfileFromPrismaJson.mockReturnValue(mockProfile);
+    mockFormatProfileForPrompt.mockReturnValue(
+      "### Professional Summary\nSenior developer with 10 years experience"
+    );
     mockGenerateEphemeralToken.mockResolvedValue("mock-token-456");
 
     const request = new Request("http://localhost/api/interview/token", {
@@ -138,15 +169,54 @@ describe("POST /api/interview/token", () => {
     const response = await POST(request);
 
     expect(response.status).toBe(200);
-    // Verify generateEphemeralToken was called with system instruction containing CV info
+    expect(mockFormatProfileForPrompt).toHaveBeenCalledWith(mockProfile);
+    // Verify generateEphemeralToken was called with system instruction containing formatted profile
     expect(mockGenerateEphemeralToken).toHaveBeenCalledWith(
       expect.objectContaining({
-        systemInstruction: expect.stringContaining("John Doe"),
+        systemInstruction: expect.stringContaining("Senior developer with 10 years experience"),
+      })
+    );
+  });
+
+  it("should fall back to basic info when parsedProfile is null but cvUrl exists", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1" },
+    });
+    mockAssessmentFindFirst.mockResolvedValue({
+      id: "assessment-1",
+      userId: "user-1",
+      cvUrl: "https://storage.example.com/cv.pdf",
+      parsedProfile: null,
+      scenario: {
+        name: "Test Scenario",
+        companyName: "Test Company",
+        companyDescription: "A test company",
+      },
+      user: {
+        name: "John Doe",
+        email: "john@example.com",
+      },
+    });
+    mockProfileFromPrismaJson.mockReturnValue(null);
+    mockGenerateEphemeralToken.mockResolvedValue("mock-token-456");
+
+    const request = new Request("http://localhost/api/interview/token", {
+      method: "POST",
+      body: JSON.stringify({ assessmentId: "assessment-1" }),
+    });
+
+    const response = await POST(request);
+
+    expect(response.status).toBe(200);
+    // Verify generateEphemeralToken was called with fallback text
+    expect(mockGenerateEphemeralToken).toHaveBeenCalledWith(
+      expect.objectContaining({
+        systemInstruction: expect.stringContaining("CV content could not be parsed"),
       })
     );
     expect(mockGenerateEphemeralToken).toHaveBeenCalledWith(
       expect.objectContaining({
-        systemInstruction: expect.stringContaining("john@example.com"),
+        systemInstruction: expect.stringContaining("John Doe"),
       })
     );
   });

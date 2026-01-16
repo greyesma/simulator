@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { STORAGE_BUCKETS } from "@/lib/storage";
+import { db } from "@/server/db";
+import { parseCv, profileToPrismaJson } from "@/lib/cv-parser";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -25,6 +27,7 @@ export async function POST(request: Request) {
 
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
+    const assessmentId = formData.get("assessmentId") as string | null;
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -93,6 +96,41 @@ export async function POST(request: Request) {
         { error: "Failed to generate file URL" },
         { status: 500 }
       );
+    }
+
+    // If assessmentId is provided, update the assessment and trigger CV parsing
+    if (assessmentId) {
+      // Verify the assessment belongs to the user
+      const assessment = await db.assessment.findFirst({
+        where: {
+          id: assessmentId,
+          userId: session.user.id,
+        },
+      });
+
+      if (assessment) {
+        // Update assessment with CV URL
+        await db.assessment.update({
+          where: { id: assessmentId },
+          data: { cvUrl: signedUrlData.signedUrl },
+        });
+
+        // Trigger CV parsing asynchronously (don't block the response)
+        parseCv(path)
+          .then(async (parsedProfile) => {
+            await db.assessment.update({
+              where: { id: assessmentId },
+              data: { parsedProfile: profileToPrismaJson(parsedProfile) },
+            });
+            console.log(`CV parsed successfully for assessment ${assessmentId}`);
+          })
+          .catch((parseError) => {
+            console.error(
+              `CV parsing failed for assessment ${assessmentId}:`,
+              parseError
+            );
+          });
+      }
     }
 
     return NextResponse.json(

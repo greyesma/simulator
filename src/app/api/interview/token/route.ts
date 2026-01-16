@@ -6,6 +6,10 @@ import {
   HR_PERSONA_SYSTEM_PROMPT,
 } from "@/lib/gemini";
 import { getSignedResumeUrl } from "@/lib/storage";
+import {
+  formatProfileForPrompt,
+  profileFromPrismaJson,
+} from "@/lib/cv-parser";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -51,22 +55,36 @@ export async function POST(request: Request) {
 
     // Get CV content if available
     let cvContext = "";
-    if (assessment.cvUrl) {
+
+    // First, try to use the parsed profile (preferred - AI can read it directly)
+    if (assessment.parsedProfile) {
       try {
-        // The CV URL is already a signed URL from Supabase
-        // We'll include a note about it in the context
-        cvContext = `
+        const profile = profileFromPrismaJson(assessment.parsedProfile);
+        if (profile) {
+          cvContext = `
+
+## Candidate's CV/Resume
+The following is the parsed content from the candidate's CV. Use this information to ask specific questions about their experience, verify claims, and assess their background.
+
+${formatProfileForPrompt(profile)}
+
+Please reference specific details from their CV during the interview. Ask follow-up questions about their work experience, projects, and skills.`;
+        }
+      } catch (error) {
+        console.error("Error parsing stored profile:", error);
+      }
+    }
+
+    // Fallback to basic info if no parsed profile
+    if (!cvContext && assessment.cvUrl) {
+      cvContext = `
 
 ## Candidate's CV
-The candidate has uploaded their CV/resume. Key details from their application:
+The candidate has uploaded their CV/resume. Basic details from their application:
 - Candidate Name: ${assessment.user.name || "Not provided"}
 - Email: ${assessment.user.email || "Not provided"}
-- CV available at: ${assessment.cvUrl}
 
-Please refer to their CV during the interview and ask specific questions about their listed experience.`;
-      } catch (error) {
-        console.error("Error getting CV URL:", error);
-      }
+Note: The CV content could not be parsed. Please ask the candidate to describe their background and experience verbally.`;
     }
 
     // Build the full system instruction with scenario context
