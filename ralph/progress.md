@@ -1550,3 +1550,130 @@ CodeReviewData {
 - Results fed into final assessment (stored in codeReview field, injected into defense context) ✓
 - Tests pass (351/351)
 - Typecheck passes (exit 0)
+
+---
+
+## Issue #26: US-026: Assessment Data Aggregation
+
+**What was implemented:**
+- Assessment aggregation module (`src/lib/assessment-aggregation.ts`) with:
+  - Zod schemas for skill categories, skill scores, narrative feedback, recommendations, and full assessment report
+  - `AssessmentSignals` interface aggregating all data sources (HR interview, conversations, recording, code review, CI, timing)
+  - `calculateAllSkillScores()` - computes scores for 8 skill categories from signals
+  - `calculateOverallScore()` - weighted average of skill scores (code_quality weighted highest at 0.2)
+  - `generateNarrativeFeedback()` - uses Gemini to generate executive summary, strengths, and improvement areas
+  - `generateRecommendations()` - uses Gemini to create actionable recommendations with steps
+  - `generateAssessmentReport()` - main function assembling complete report
+  - `formatReportForDisplay()` - formats report as readable markdown
+  - `reportToPrismaJson()` - converts report for database storage
+- `/api/assessment/report` endpoint with:
+  - POST for generating report (with `forceRegenerate` option)
+  - GET for retrieving existing report
+  - Caches generated report in Assessment.report field
+  - Collects signals from: HRInterviewAssessment, Conversations, Recordings, codeReview, ciStatus
+- 8 skill categories scored (1-5 scale with evidence):
+  1. Communication - from HR interview scores and coworker interactions
+  2. Problem Decomposition - from code review and stuck moments
+  3. AI Leverage - from tool usage detection (Claude, Copilot, etc.)
+  4. Code Quality - from code review scores and CI status
+  5. XFN Collaboration - from coworker contact count
+  6. Time Management - from focus score and activity patterns
+  7. Technical Decision-Making - from pattern score and stuck moments
+  8. Presentation - from HR interview and defense call
+- 50 unit tests (37 for aggregation module, 13 for API endpoint)
+
+**Files created:**
+- `src/lib/assessment-aggregation.ts` - Assessment aggregation module (600+ lines)
+- `src/lib/assessment-aggregation.test.ts` - 37 unit tests for schemas and functions
+- `src/app/api/assessment/report/route.ts` - POST/GET endpoints for report generation
+- `src/app/api/assessment/report/route.test.ts` - 13 unit tests for API endpoints
+
+**Data model:**
+```typescript
+AssessmentReport {
+  // Metadata
+  generatedAt: string
+  assessmentId: string
+  candidateName?: string
+
+  // Overall scores
+  overallScore: number (1-5)
+  overallLevel: "exceptional" | "strong" | "adequate" | "developing" | "needs_improvement"
+
+  // Skill scores (8 categories)
+  skillScores: Array<{
+    category: SkillCategory
+    score: number
+    level: string
+    evidence: string[]
+    notes: string
+  }>
+
+  // Narrative feedback
+  narrative: {
+    overallSummary: string
+    strengths: string[]
+    areasForImprovement: string[]
+    notableObservations: string[]
+  }
+
+  // Actionable recommendations
+  recommendations: Array<{
+    category: SkillCategory
+    priority: "high" | "medium" | "low"
+    title: string
+    description: string
+    actionableSteps: string[]
+  }>
+
+  // Summary metrics
+  metrics: {
+    totalDurationMinutes: number | null
+    workingPhaseMinutes: number | null
+    coworkersContacted: number
+    aiToolsUsed: boolean
+    testsStatus: "passing" | "failing" | "none" | "unknown"
+    codeReviewScore: number | null
+  }
+}
+```
+
+**Learnings:**
+1. Prisma Json fields require `as unknown as Type` double cast for TypeScript
+2. Vitest mocks must define mock functions BEFORE `vi.mock()` calls due to hoisting
+3. Gemini 2.0 Flash is fast enough for generating narrative feedback
+4. Weighted scoring allows emphasizing important skills (code quality at 0.2)
+5. Signal collection via database includes requires careful typing for JSON fields
+6. Score-to-level mapping: 4.5+ = exceptional, 3.5+ = strong, 2.5+ = adequate, 1.5+ = developing
+7. Conversation type extends beyond "text" | "voice" to include "kickoff" | "defense"
+8. XFN collaboration scored by unique coworkers contacted (3+ = excellent)
+
+**Architecture patterns:**
+- Report generation triggered after assessment completion
+- Signals collected from multiple tables via Prisma includes
+- Gemini generates narrative and recommendations asynchronously
+- Report cached in Assessment.report field to avoid regeneration
+- Skill scoring uses evidence-based approach with source attribution
+
+**Skill scoring sources:**
+- Communication: HR interview communicationScore, professionalismScore, coworker interaction count
+- Problem Decomposition: codeQualityScore, patternScore, stuck moments count
+- AI Leverage: tool usage (Claude, ChatGPT, Copilot), aiToolUsageEvident flag
+- Code Quality: code review overallScore, CI status
+- XFN Collaboration: unique coworkers contacted (3+ = 5/5, 2 = 4/5, 1 = 3/5, 0 = 2/5)
+- Time Management: recording focusScore, active/idle time ratio
+- Technical Decision-Making: patternScore, maintainabilityScore, technical difficulties
+- Presentation: HR interview scores, defense transcript length
+
+**Gotchas:**
+- Need `as unknown as ChatMessage[]` for Prisma Json transcript fields
+- Mock functions in tests need wrapper functions for proper hoisting
+- Conversation types include "kickoff" and "defense" beyond standard "text" | "voice"
+
+**Verification completed:**
+- Collects: HR interview, chat transcripts, call transcripts, screen analysis, PR review, test results, timing data ✓
+- Scores 8 skill categories: Communication, Problem Decomposition, AI Leverage, Code Quality, XFN Collaboration, Time Management, Technical Decision-Making, Presentation ✓
+- Generates narrative feedback ✓
+- Creates actionable recommendations ✓
+- Tests pass (401/401)
+- Typecheck passes (exit 0)
