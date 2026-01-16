@@ -1891,3 +1891,57 @@ AssessmentReport {
 - Tests pass (428/428)
 - Typecheck passes (exit 0)
 - UI verified in browser (homepage, sign-in render correctly)
+
+---
+
+## Issue #30: US-030: Assessment History
+
+**What was implemented:**
+- Enhanced profile page (`/profile`) with comprehensive assessment history view
+- Each assessment now shows: date, time spent (calculated from startedAt to completedAt), overall score with visual score bar
+- Score bar visualization (5 segments) showing performance level at a glance
+- Performance level displayed with color coding (exceptional=gold, strong=green, adequate=blue, developing=yellow, needs_improvement=red)
+- Brief summary preview from report narrative (first 200 characters)
+- Fixed report link to go to `/results` instead of non-existent `/report`
+- Added "Continue Assessment" button for incomplete assessments
+- Improvement trends section showing:
+  - Visual chart with data points for each completed assessment
+  - Score progression over time
+  - Total improvement calculation (points and percentage)
+  - Latest score prominently displayed
+  - Only appears when user has 2+ completed assessments
+
+**Files changed:**
+- `src/app/profile/page.tsx` - Major enhancement (304 lines added) with new components and features
+
+**New helper functions:**
+- `formatDuration()` - Calculates and formats time spent (e.g., "1h 23m", "45m")
+- `getLevelColor()` - Returns color class for performance level
+- `getReportData()` - Safely extracts typed report data from Prisma JSON field
+- `ScoreBar` component - Visual 5-segment bar showing score
+- `ImprovementTrends` component - Full trends visualization with chart
+
+**Learnings:**
+1. Profile page already existed with basic assessment list - enhanced rather than created new
+2. Assessment report stored as JSON in Assessment.report field - needed type casting
+3. Results page is at `/assessment/[id]/results`, not `/report`
+4. Prisma JsonValue requires `as unknown as Type` pattern for type safety
+5. Server components can directly query database with Prisma
+6. Improvement trends only make sense with 2+ completed assessments
+
+**Architecture patterns:**
+- Server component fetches all data in one query with include
+- Helper functions extract and format data from complex JSON fields
+- Conditional rendering for improvement trends (only shows with multiple assessments)
+- Visual feedback through color-coded performance levels
+
+**Gotchas:**
+- None - followed established patterns from existing pages
+
+**Verification completed:**
+- List of past attempts with date, time spent, overall score/summary ✓
+- Can view full report for any past attempt (links to /results) ✓
+- Shows improvement trends if multiple attempts (chart with data points) ✓
+- Tests pass (428/428)
+- Typecheck passes (exit 0)
+- UI verified in browser (homepage, sign-in render correctly)
