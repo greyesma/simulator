@@ -2097,3 +2097,88 @@ model Coworker {
 - Created scenarios can be edited (PUT endpoint) ✓
 - Tests pass (490/490)
 - Typecheck passes (exit 0)
+
+---
+
+## Issue #33: US-032: Conversational Scenario Builder
+
+**What was implemented:**
+- Scenario builder module (`src/lib/scenario-builder.ts`) with:
+  - TypeScript types and Zod schemas for scenario data during building
+  - `getCompletionStatus()` - tracks which required fields are complete/missing
+  - `formatScenarioForPrompt()` - formats collected data for AI context
+  - `SCENARIO_BUILDER_SYSTEM_PROMPT` - comprehensive AI prompt for guided scenario creation
+  - `parseExtractionFromResponse()` - extracts structured data from AI responses
+  - `cleanResponseForDisplay()` - removes JSON extraction blocks before display
+  - `applyExtraction()` - applies extracted data to update scenario state
+  - `buildCompleteSystemPrompt()` - combines base prompt with current state
+- `/api/admin/scenarios/builder` endpoint with:
+  - GET for initial AI greeting
+  - POST for sending messages and receiving AI responses with data extraction
+  - Admin-only access (403 for non-admins)
+  - Returns updated scenario data with each response
+- Scenario builder page (`/admin/scenarios/builder`) with:
+  - Chat interface on left (similar to coworker chat)
+  - Real-time preview panel on right showing collected data
+  - "Save Scenario" button that creates scenario + coworkers via existing APIs
+  - Neo-brutalist design (square avatars, gold accents, no rounded corners)
+  - Typing indicator while AI responds
+  - Error handling with visual feedback
+- Scenarios listing page (`/admin/scenarios`) with:
+  - List of all scenarios with coworker/assessment counts
+  - "Create with AI" button linking to builder
+  - Empty state encouraging first scenario creation
+  - Tech stack badges and publish status
+- 37 unit tests (24 for scenario-builder module, 13 for builder API)
+
+**Files created:**
+- `src/lib/scenario-builder.ts` - Scenario builder utilities and AI prompt
+- `src/lib/scenario-builder.test.ts` - 24 unit tests for scenario builder module
+- `src/app/api/admin/scenarios/builder/route.ts` - Builder API endpoint
+- `src/app/api/admin/scenarios/builder/route.test.ts` - 13 unit tests for API
+- `src/app/admin/scenarios/builder/page.tsx` - Server component for builder page
+- `src/app/admin/scenarios/builder/client.tsx` - Client component with chat UI and preview
+- `src/app/admin/scenarios/page.tsx` - Scenarios listing page
+
+**Learnings:**
+1. Reused patterns from existing chat component (optimistic updates, typing indicator, message history)
+2. AI data extraction uses JSON block with specific format (`json:extraction`) that's parsed and removed from display
+3. Gemini 2.0 Flash is fast enough for conversational scenario building
+4. System prompt includes both instructions AND current collected state for context
+5. Split responsibilities: AI collects info, frontend displays preview, save uses existing CRUD APIs
+6. Two-panel layout (chat + preview) provides immediate feedback on what's been collected
+7. Coworker knowledge structure follows existing `CoworkerKnowledge` interface from coworker-persona.ts
+
+**Architecture patterns:**
+- Stateless API: client maintains all state (messages, scenarioData)
+- AI extracts structured data that's merged into client state
+- Preview component reads from state and updates in real-time
+- Save operation chains multiple API calls (create scenario, then create each coworker)
+- Completion status calculated from collected data, enables/disables save button
+
+**AI prompt design:**
+- Multi-phase collection: company setup → task definition → tech stack → coworkers → knowledge
+- One question at a time to avoid overwhelming admin
+- Example knowledge items included to guide format
+- Extraction instructions appended to ensure structured output
+- Current state included so AI knows what's already collected
+
+**Save workflow:**
+1. Validate all required fields (name, companyName, description, task, repoUrl, 1+ coworker with knowledge)
+2. POST to `/api/admin/scenarios` with scenario data
+3. For each coworker, POST to `/api/admin/scenarios/[id]/coworkers`
+4. Redirect to scenarios list on success
+
+**Gotchas:**
+- Browser automation (agent-browser) timed out on dev server - verified via build instead
+- Need to clean extraction JSON from AI response before display to user
+
+**Verification completed:**
+- Chat interface with AI (Gemini) ✓
+- AI asks clarifying questions about the scenario ✓
+- Collects: company name, lore, task description, tech stack ✓
+- Collects: coworker personas, their knowledge, communication styles ✓
+- Previews scenario before saving (right panel) ✓
+- Tests pass (526/526)
+- Typecheck passes (exit 0)
+- Build succeeds
