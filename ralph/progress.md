@@ -994,3 +994,63 @@ GET /api/recording/analyze?assessmentId=xxx&segmentId=yyy
 - Tests pass (209/209)
 - Typecheck passes (exit 0)
 - UI verified in browser (homepage, sign-in, protected routes redirect correctly)
+
+---
+
+## Issue #19: US-019: Ping Manager When Done
+
+**What was implemented:**
+- "I'm Done" button in Chat component that appears only when chatting with the manager
+- PR link prompt modal (`PrLinkModal`) with neo-brutalist design
+- `/api/assessment/complete` endpoint with:
+  - PR URL validation (GitHub, GitLab, Bitbucket patterns)
+  - Assessment status transition from WORKING to FINAL_DEFENSE
+  - Time tracking (calculates `workingDurationSeconds` from `startedAt`)
+  - Authorization checks (user must own the assessment)
+- PR validation utility (`src/lib/pr-validation.ts`) separated from route for Next.js compatibility
+- Updated chat client to show "I'm Done" button and handle completion flow
+- Navigation to `/assessment/[id]/defense` after successful submission
+- 18 unit tests for API endpoint (auth, validation, status transitions)
+
+**Files created:**
+- `src/app/api/assessment/complete/route.ts` - POST/GET endpoints for assessment completion
+- `src/app/api/assessment/complete/route.test.ts` - 18 unit tests
+- `src/components/pr-link-modal.tsx` - Modal for PR URL input with validation
+- `src/lib/pr-validation.ts` - `isValidPrUrl()` function for PR URL validation
+
+**Files changed:**
+- `src/components/chat.tsx` - Added `showDoneButton` and `onDoneClick` props
+- `src/app/assessment/[id]/chat/client.tsx` - Integrated PR modal and completion flow
+
+**Learnings:**
+1. Next.js API routes can only export HTTP methods - helper functions must be in separate files
+2. Manager detection uses `role.toLowerCase().includes("manager")` for flexible matching
+3. PR URL validation accepts GitHub PRs, GitLab MRs, and Bitbucket PRs
+4. Time tracking uses existing `startedAt` field - no schema changes needed
+5. Status transition enforces WORKING → FINAL_DEFENSE flow (prevents re-completion)
+
+**PR URL validation patterns:**
+- GitHub: `github.com/owner/repo/pull/123`
+- GitLab: `gitlab.com/owner/repo/-/merge_requests/123`
+- Bitbucket: `bitbucket.org/owner/repo/pull-requests/123`
+- Self-hosted GitLab also supported
+
+**Architecture patterns:**
+- Button visibility conditional on coworker role (manager check)
+- Modal component handles PR input and validation display
+- API returns timing data for potential display/analytics
+- Redirect to `/defense` page (to be implemented in future issue)
+
+**Gotchas:**
+- Initial implementation exported `isValidPrUrl` from route file - Next.js build error
+- Fixed by moving to separate `src/lib/pr-validation.ts` file
+
+**Verification completed:**
+- "I'm done" button in manager chat ✓
+- Prompts for PR link (modal with validation) ✓
+- Triggers transition to final defense phase (FINAL_DEFENSE status) ✓
+- Time tracked (workingDurationSeconds calculated) ✓
+- Tests pass (227/227)
+- Typecheck passes (exit 0)
+- Build succeeds
+- UI verified in browser (homepage, sign-in load correctly)
