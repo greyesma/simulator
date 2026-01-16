@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Neo-brutalist light mode */
+  --background: #ffffff;
+  --foreground: #000000;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --accent: #f7da50;
+  --accent-foreground: #000000;
+  --muted: #f5f5f5;
+  --muted-foreground: #666666;
+  --destructive: #ff0000;
+  --destructive-foreground: #ffffff;
+  --border: #000000;
+  --input: #000000;
+  --ring: #f7da50;
+
+  --font-dm-sans: 'DM Sans', system-ui, sans-serif;
+  --font-space-mono: 'Space Mono', monospace;
+}
+
+.dark {
+  /* Neo-brutalist dark mode */
+  --background: #000000;
+  --foreground: #ffffff;
+  --primary: #f7da50;
+  --primary-foreground: #000000;
+  --accent: #ffffff;
+  --accent-foreground: #000000;
+  --muted: #1a1a1a;
+  --muted-foreground: #999999;
+  --destructive: #ff4444;
+  --destructive-foreground: #000000;
+  --border: #ffffff;
+  --input: #ffffff;
+  --ring: #f7da50;
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-dm-sans);
+}
+
+/* Neo-brutalist: no smooth transitions on colors */
+button, a {
+  transition: none;
+}
+
+/* Instant hover state flip */
+button:hover, a:hover {
+  transition: none;
+}
+
+/* Code and technical text */
+code, pre, .font-mono {
+  font-family: var(--font-space-mono);
+}
