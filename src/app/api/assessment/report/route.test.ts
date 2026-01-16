@@ -41,7 +41,7 @@ vi.mock("@/lib/assessment-aggregation", () => ({
 
 // Mock recording analysis
 vi.mock("@/lib/recording-analysis", () => ({
-  aggregateSegmentAnalyses: (...args: unknown[]) => mockAggregateSegments(...args),
+  aggregateSegmentAnalyses: () => mockAggregateSegments(),
 }));
 
 describe("Assessment Report API", () => {
