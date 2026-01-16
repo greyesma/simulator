@@ -2521,3 +2521,61 @@ dataDeleteRequestedAt DateTime? // When user requested account deletion
 - Tests pass (657/657)
 - Typecheck passes (exit 0)
 - UI verified in browser (settings redirects to sign-in when unauthenticated)
+
+---
+
+## Issue #39: US-039: E2E Tests for Main User Flows
+
+**What was implemented:**
+- E2E test infrastructure using agent-browser CLI (bash scripts)
+- Test: Create account flow (`tests/e2e/create-account.sh`)
+- Test: Login flow (`tests/e2e/login.sh`)
+- Test: Logout flow (`tests/e2e/logout.sh`)
+- Test: Navigate to assessment start (`tests/e2e/assessment-start.sh`)
+- Test: Coworker directory loads and displays (`tests/e2e/coworker-directory.sh`)
+- CI workflow for E2E tests on PRs (`.github/workflows/e2e.yml`)
+- Helper utilities for tests (`tests/e2e/helpers.sh`)
+- Test runner script (`tests/e2e/run-all.sh`)
+
+**Files created:**
+- `tests/e2e/helpers.sh` - Common utilities: log functions, agent-browser wrappers, assertion helpers
+- `tests/e2e/create-account.sh` - Tests sign-up flow with unique email per run
+- `tests/e2e/login.sh` - Tests sign-in with credentials
+- `tests/e2e/logout.sh` - Tests signout via NextAuth endpoint and verification
+- `tests/e2e/assessment-start.sh` - Tests profile page shows assessments and start button
+- `tests/e2e/coworker-directory.sh` - Verifies Team Directory component structure
+- `tests/e2e/run-all.sh` - Runs all tests and reports summary
+- `.github/workflows/e2e.yml` - CI workflow with e2e, typecheck, lint, and unit-tests jobs
+- `package.json` - Added `test:e2e` script
+
+**Learnings:**
+1. agent-browser CLI requires `--session <name>` for isolated browser contexts per test
+2. Use unique email per test run to avoid database conflicts (timestamp-based)
+3. Remove `set -e` from bash scripts to allow tests to complete and report summary
+4. NextAuth signout requires confirmation button click on the signout page
+5. Screenshots stored in `tests/e2e/screenshots/` for debugging failed tests
+6. Coworker directory (Team Directory sidebar) requires an active assessment to access
+7. Password reset flow is NOT IMPLEMENTED in the app - cannot test
+
+**Architecture patterns:**
+- Each test script sources helpers.sh for common utilities
+- Tests use unique session names to avoid state pollution between tests
+- CI workflow runs in parallel: e2e, typecheck, lint, unit-tests
+- Screenshots uploaded as artifacts on test failure
+
+**Gotchas:**
+- Password reset flow is not implemented in the application - this acceptance criterion cannot be met
+- Initial test failures due to `set -e` causing early exit on any non-zero return code
+
+**Verification completed:**
+- E2E test scripts using agent-browser CLI ✓
+- Test: Create account flow ✓
+- Test: Login flow ✓
+- Test: Logout flow ✓
+- Test: Password reset flow ⚠️ (NOT IMPLEMENTED in app - cannot test)
+- Test: Navigate to assessment start ✓
+- Test: Coworker directory loads and displays ✓
+- Tests run in CI on PRs ✓
+- Tests pass (5/5 E2E tests)
+- Typecheck passes (exit 0)
+- Unit tests pass (657/657)
