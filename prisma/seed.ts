@@ -6,12 +6,54 @@
  */
 
 import { PrismaClient, Prisma } from "@prisma/client";
+import bcrypt from "bcryptjs";
 import { EXAMPLE_COWORKERS } from "../src/lib/coworker-persona";
 
 const prisma = new PrismaClient();
 
+// Test user credentials - used by AI agents for E2E testing
+const TEST_USERS = {
+  admin: {
+    email: "admin@test.com",
+    password: "testpassword123",
+    name: "Test Admin",
+    role: "ADMIN" as const,
+  },
+  user: {
+    email: "user@test.com",
+    password: "testpassword123",
+    name: "Test User",
+    role: "USER" as const,
+  },
+};
+
 async function main() {
   console.log("🌱 Starting database seed...\n");
+
+  // Create test users for E2E testing
+  console.log("👤 Creating test users...");
+  const hashedPassword = await bcrypt.hash(TEST_USERS.admin.password, 12);
+
+  for (const [key, userData] of Object.entries(TEST_USERS)) {
+    const user = await prisma.user.upsert({
+      where: { email: userData.email },
+      update: {
+        name: userData.name,
+        role: userData.role,
+        password: hashedPassword,
+        deletedAt: null, // Ensure not soft-deleted
+      },
+      create: {
+        email: userData.email,
+        password: hashedPassword,
+        name: userData.name,
+        role: userData.role,
+        emailVerified: new Date(),
+      },
+    });
+    console.log(`  ✅ ${key}: ${user.email} (${user.role})`);
+  }
+  console.log("");
 
   // Create a default scenario for development
   const defaultScenario = await prisma.scenario.upsert({
@@ -100,6 +142,149 @@ Acceptance Criteria:
   }
 
   console.log(`\n✅ Seeded ${EXAMPLE_COWORKERS.length} coworkers for scenario`);
+
+  // Create a test assessment with parsed profile for visual testing
+  const testUser = await prisma.user.findUnique({
+    where: { email: TEST_USERS.user.email },
+  });
+
+  if (testUser) {
+    // Create or update assessment with parsed profile for Test User
+    const testParsedProfile = {
+      name: "Test User",
+      email: "user@test.com",
+      phone: "+1 (555) 123-4567",
+      location: "San Francisco, CA",
+      linkedIn: "https://linkedin.com/in/testuser",
+      github: "https://github.com/testuser",
+      website: "https://testuser.dev",
+      summary:
+        "Senior software engineer with 7+ years of experience building scalable web applications. Passionate about clean code, developer experience, and mentoring junior engineers.",
+      workExperience: [
+        {
+          company: "TechCorp Inc.",
+          title: "Senior Software Engineer",
+          startDate: "Jan 2021",
+          duration: "3 years",
+          location: "San Francisco, CA",
+          description:
+            "Led development of real-time collaboration features serving 100K+ users.",
+          highlights: [
+            "Architected and shipped WebSocket-based real-time sync, reducing latency by 60%",
+            "Mentored team of 4 junior engineers",
+            "Improved CI/CD pipeline, cutting deploy time from 30min to 5min",
+          ],
+          technologies: ["TypeScript", "React", "Node.js", "PostgreSQL", "Redis"],
+        },
+        {
+          company: "StartupXYZ",
+          title: "Full Stack Developer",
+          startDate: "Mar 2018",
+          endDate: "Dec 2020",
+          duration: "2 years 10 months",
+          location: "Remote",
+          description: "Built core product features from MVP to Series A.",
+          highlights: [
+            "Implemented payment system processing $2M+ monthly",
+            "Built admin dashboard used by 50+ customer success reps",
+          ],
+          technologies: ["JavaScript", "Vue.js", "Python", "Django", "MySQL"],
+        },
+        {
+          company: "BigTech Co.",
+          title: "Software Engineer",
+          startDate: "Jun 2016",
+          endDate: "Feb 2018",
+          duration: "1 year 8 months",
+          location: "Seattle, WA",
+          highlights: [
+            "Developed internal tools used by 1000+ employees",
+            "Participated in on-call rotation for critical services",
+          ],
+          technologies: ["Java", "Spring Boot", "AWS", "Kubernetes"],
+        },
+      ],
+      education: [
+        {
+          institution: "University of California, Berkeley",
+          degree: "Bachelor of Science",
+          field: "Computer Science",
+          startDate: "2012",
+          endDate: "2016",
+          gpa: "3.7",
+          honors: ["Dean's List", "ACM Programming Contest - Regional Finalist"],
+        },
+      ],
+      skills: [
+        { name: "TypeScript", category: "programming_language" as const, proficiencyLevel: "expert" as const },
+        { name: "JavaScript", category: "programming_language" as const, proficiencyLevel: "expert" as const },
+        { name: "Python", category: "programming_language" as const, proficiencyLevel: "advanced" as const },
+        { name: "Java", category: "programming_language" as const, proficiencyLevel: "intermediate" as const },
+        { name: "React", category: "framework" as const, proficiencyLevel: "expert" as const },
+        { name: "Node.js", category: "framework" as const, proficiencyLevel: "expert" as const },
+        { name: "Next.js", category: "framework" as const, proficiencyLevel: "advanced" as const },
+        { name: "Vue.js", category: "framework" as const, proficiencyLevel: "advanced" as const },
+        { name: "PostgreSQL", category: "database" as const, proficiencyLevel: "expert" as const },
+        { name: "Redis", category: "database" as const, proficiencyLevel: "advanced" as const },
+        { name: "MongoDB", category: "database" as const, proficiencyLevel: "intermediate" as const },
+        { name: "AWS", category: "cloud" as const, proficiencyLevel: "advanced" as const },
+        { name: "Docker", category: "tool" as const, proficiencyLevel: "advanced" as const },
+        { name: "Git", category: "tool" as const, proficiencyLevel: "expert" as const },
+        { name: "Agile/Scrum", category: "methodology" as const },
+        { name: "Technical Leadership", category: "soft_skill" as const },
+        { name: "Mentoring", category: "soft_skill" as const },
+      ],
+      certifications: [
+        {
+          name: "AWS Solutions Architect - Associate",
+          issuer: "Amazon Web Services",
+          dateObtained: "Mar 2022",
+        },
+        {
+          name: "Professional Scrum Master I",
+          issuer: "Scrum.org",
+          dateObtained: "Jan 2021",
+        },
+      ],
+      languages: [
+        { language: "English", proficiency: "native" as const },
+        { language: "Spanish", proficiency: "conversational" as const },
+      ],
+      totalYearsOfExperience: 7,
+      seniorityLevel: "senior" as const,
+      parsedAt: new Date().toISOString(),
+      parseQuality: "high" as const,
+    };
+
+    // Check if assessment exists
+    const existingAssessment = await prisma.assessment.findFirst({
+      where: {
+        userId: testUser.id,
+        scenarioId: defaultScenario.id,
+      },
+    });
+
+    if (existingAssessment) {
+      await prisma.assessment.update({
+        where: { id: existingAssessment.id },
+        data: {
+          parsedProfile: testParsedProfile as unknown as Prisma.InputJsonValue,
+        },
+      });
+      console.log(`\n📋 Updated assessment with parsed profile for ${testUser.email}`);
+    } else {
+      await prisma.assessment.create({
+        data: {
+          userId: testUser.id,
+          scenarioId: defaultScenario.id,
+          status: "HR_INTERVIEW",
+          consentGivenAt: new Date(),
+          parsedProfile: testParsedProfile as unknown as Prisma.InputJsonValue,
+        },
+      });
+      console.log(`\n📋 Created assessment with parsed profile for ${testUser.email}`);
+    }
+  }
 
   // Print summary
   const coworkerCount = await prisma.coworker.count({
