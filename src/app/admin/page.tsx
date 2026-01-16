@@ -1,67 +1,47 @@
 import { db } from "@/server/db";
 import Link from "next/link";
+import { getAnalytics } from "@/lib/analytics";
+import { AnalyticsDashboard } from "./analytics-dashboard";
 
 export default async function AdminDashboard() {
-  // Fetch summary stats
-  const [userCount, scenarioCount, assessmentCount, completedAssessmentCount] =
-    await Promise.all([
-      db.user.count({ where: { deletedAt: null } }),
-      db.scenario.count(),
-      db.assessment.count(),
-      db.assessment.count({ where: { status: "COMPLETED" } }),
-    ]);
-
-  // Fetch recent assessments
-  const recentAssessments = await db.assessment.findMany({
-    take: 5,
-    orderBy: { createdAt: "desc" },
-    include: {
-      user: { select: { name: true, email: true } },
-      scenario: { select: { name: true } },
-    },
-  });
+  // Fetch analytics data with 30-day default
+  const [analyticsData, scenarioCount, recentAssessments] = await Promise.all([
+    getAnalytics("last30days"),
+    db.scenario.count(),
+    db.assessment.findMany({
+      take: 5,
+      orderBy: { createdAt: "desc" },
+      include: {
+        user: { select: { name: true, email: true } },
+        scenario: { select: { name: true } },
+      },
+    }),
+  ]);
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
       <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-        <div className="border-2 border-border p-6">
-          <p className="font-mono text-xs text-muted-foreground mb-2">USERS</p>
-          <p className="text-3xl font-bold">{userCount}</p>
-        </div>
-        <div className="border-2 border-border p-6">
-          <p className="font-mono text-xs text-muted-foreground mb-2">
-            SCENARIOS
-          </p>
-          <p className="text-3xl font-bold">{scenarioCount}</p>
-        </div>
-        <div className="border-2 border-border p-6">
-          <p className="font-mono text-xs text-muted-foreground mb-2">
-            ASSESSMENTS
-          </p>
-          <p className="text-3xl font-bold">{assessmentCount}</p>
-        </div>
-        <div className="border-2 border-border p-6">
-          <p className="font-mono text-xs text-muted-foreground mb-2">
-            COMPLETED
-          </p>
-          <p className="text-3xl font-bold text-secondary">
-            {completedAssessmentCount}
-          </p>
-        </div>
-      </div>
+      {/* Analytics Dashboard */}
+      <section className="mb-12">
+        <AnalyticsDashboard initialData={analyticsData} />
+      </section>
 
       {/* Quick Actions */}
       <section className="mb-12">
         <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
           <Link
             href="/admin/scenarios/new"
             className="bg-foreground text-background px-6 py-3 font-semibold border-2 border-foreground hover:bg-secondary hover:text-secondary-foreground hover:border-secondary"
           >
             Create Scenario
+          </Link>
+          <Link
+            href="/admin/scenarios"
+            className="bg-background text-foreground px-6 py-3 font-semibold border-2 border-foreground hover:bg-muted"
+          >
+            Manage Scenarios ({scenarioCount})
           </Link>
           <Link
             href="/admin/users"
