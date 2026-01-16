@@ -754,3 +754,80 @@ The `recordings` and `screenshots` Supabase storage buckets need to be created v
 - Tests pass (150/150)
 - Typecheck passes (exit 0)
 - UI verified in browser (homepage, sign-in page load correctly)
+
+---
+
+## Issue #16: US-016: Screen Recording Robustness
+
+**What was implemented:**
+- RecordingSegment Prisma model for tracking individual recording sessions
+- `/api/recording/session` endpoint with actions: start, addChunk, addScreenshot, complete, interrupt
+- `/api/recording/stitch` endpoint providing ordered segments with signed URLs for video stitching
+- Database-backed session persistence replacing sessionStorage-only approach
+- Automatic detection and marking of stale segments as "interrupted" on session restore
+- Updated ScreenRecordingProvider to:
+  - Start new segments via API when recording begins
+  - Track segmentId for all chunk/screenshot uploads
+  - Mark segments as interrupted when screen share stops
+  - Load session status on mount for persistence across page reloads/laptop close
+- 12 unit tests for session management API
+
+**Files created:**
+- `src/app/api/recording/session/route.ts` - Session management API (start, complete, interrupt segments)
+- `src/app/api/recording/session/route.test.ts` - 12 unit tests for session API
+- `src/app/api/recording/stitch/route.ts` - Stitching API with ordered segments and signed URLs
+
+**Files changed:**
+- `prisma/schema.prisma` - Added RecordingSegment model with chunkPaths, screenshotPaths arrays
+- `src/app/api/recording/route.ts` - Added segmentId support for tracking chunks in segments
+- `src/contexts/screen-recording-context.tsx` - Database session persistence, segment tracking
+
+**Data model:**
+```
+RecordingSegment {
+  id: String
+  recordingId: String
+  segmentIndex: Int
+  startTime: DateTime
+  endTime: DateTime?
+  status: String ("recording" | "completed" | "interrupted")
+  chunkPaths: String[]
+  screenshotPaths: String[]
+}
+```
+
+**Learnings:**
+1. sessionStorage alone insufficient for cross-session persistence (laptop close scenario)
+2. Database-backed segments enable recovery: on mount, check for active segments and mark as interrupted
+3. Segment stitching requires ordered list of chunk URLs for video concatenation tools
+4. Mock pattern for vitest: define mock functions BEFORE `vi.mock()` calls, not after
+5. Session loading should set state to "stopped" if database shows active segment but no stream exists
+6. Use `segmentIdRef` to track current segment across async callbacks
+
+**Architecture patterns:**
+- Each screen recording session is one segment (user presses "Share" to "Stop sharing")
+- Interruption creates a new segment on resume (segment index increments)
+- Stitching API provides flat ordered list of all chunk URLs across all segments
+- Summary includes interruption count for assessment analytics
+
+**Session recovery flow:**
+1. User closes laptop mid-recording
+2. Next page load: `getSessionStatus()` finds active segment in DB
+3. No stream exists → mark segment as interrupted
+4. State set to "stopped" → guard modal appears
+5. User clicks "Resume" → new segment started
+6. Chunks upload with new segmentId
+
+**Gotchas:**
+- Test file initially used `vi.mocked(auth)` pattern which doesn't work - need wrapper functions
+- Must check `state` in useEffect dependency array carefully to avoid stale closures
+
+**Verification completed:**
+- Detects when screen share stops ✓
+- Blocks further progress until re-shared ✓
+- Prompts user to re-enable ✓
+- Session persists indefinitely (close laptop, come back) ✓
+- Recording segments stitched for analysis ✓
+- Tests pass (162/162)
+- Typecheck passes (exit 0)
+- UI verified in browser (homepage, sign-in page load correctly)
