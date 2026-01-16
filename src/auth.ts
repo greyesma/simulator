@@ -16,7 +16,7 @@ interface ExtendedSessionUser {
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(db),
-  session: { strategy: "database" },
+  session: { strategy: "jwt" },
   pages: {
     signIn: "/sign-in",
     error: "/auth-error",
@@ -57,16 +57,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async session({ session, user }) {
-      const dbUser = await db.user.findUnique({
-        where: { id: user.id, deletedAt: null },
-        select: { id: true, role: true },
-      });
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token?.id) {
+        const dbUser = await db.user.findUnique({
+          where: { id: token.id as string, deletedAt: null },
+          select: { id: true, role: true, name: true, email: true, image: true },
+        });
 
-      if (dbUser) {
-        const extendedUser = session.user as ExtendedSessionUser;
-        extendedUser.id = dbUser.id;
-        extendedUser.role = dbUser.role;
+        if (dbUser) {
+          const extendedUser = session.user as ExtendedSessionUser;
+          extendedUser.id = dbUser.id;
+          extendedUser.role = dbUser.role;
+          if (dbUser.name) extendedUser.name = dbUser.name;
+          if (dbUser.email) extendedUser.email = dbUser.email;
+          if (dbUser.image) extendedUser.image = dbUser.image;
+        }
       }
       return session;
     },

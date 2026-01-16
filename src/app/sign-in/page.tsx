@@ -1,0 +1,223 @@
+"use client";
+
+import { signIn } from "next-auth/react";
+import Link from "next/link";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+
+function GeometricDecoration() {
+  return (
+    <div
+      className="absolute inset-0 overflow-hidden pointer-events-none"
+      aria-hidden="true"
+    >
+      {/* Triangle - top left */}
+      <div
+        className="absolute -top-16 -left-16 w-64 h-64 bg-secondary"
+        style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
+      />
+      {/* Small triangle - bottom right */}
+      <div
+        className="absolute -bottom-8 -right-8 w-32 h-32 bg-foreground"
+        style={{ clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }}
+      />
+    </div>
+  );
+}
+
+function SignInForm() {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const error = searchParams.get("error");
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [formError, setFormError] = useState("");
+
+  const handleCredentialsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setFormError("");
+
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        callbackUrl,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setFormError("Invalid email or password");
+      } else if (result?.ok) {
+        window.location.href = callbackUrl;
+      }
+    } catch {
+      setFormError("An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = () => {
+    signIn("google", { callbackUrl });
+  };
+
+  return (
+    <>
+      {/* Error messages */}
+      {(error || formError) && (
+        <div className="mb-6 p-4 border-2 border-destructive bg-destructive/10 text-destructive font-mono text-sm">
+          {error === "CredentialsSignin"
+            ? "Invalid email or password"
+            : error === "OAuthAccountNotLinked"
+              ? "Email already registered with different provider"
+              : formError || "Authentication failed"}
+        </div>
+      )}
+
+      {/* Google OAuth */}
+      <button
+        onClick={handleGoogleSignIn}
+        className="w-full bg-background text-foreground px-4 py-4 font-semibold border-2 border-foreground hover:bg-secondary hover:border-secondary flex items-center justify-center gap-3 mb-6"
+        type="button"
+      >
+        <svg className="w-5 h-5" viewBox="0 0 24 24">
+          <path
+            fill="currentColor"
+            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+          />
+          <path
+            fill="currentColor"
+            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+          />
+          <path
+            fill="currentColor"
+            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+          />
+          <path
+            fill="currentColor"
+            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+          />
+        </svg>
+        Continue with Google
+      </button>
+
+      {/* Divider */}
+      <div className="relative mb-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-border" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="px-4 bg-background font-mono text-sm text-muted-foreground">
+            OR
+          </span>
+        </div>
+      </div>
+
+      {/* Email/Password Form */}
+      <form onSubmit={handleCredentialsSubmit}>
+        <div className="mb-4">
+          <label
+            htmlFor="email"
+            className="block font-mono text-sm mb-2 text-muted-foreground"
+          >
+            EMAIL
+          </label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+            className="w-full px-4 py-3 bg-background border-2 border-border focus:border-secondary focus:outline-none font-mono"
+            placeholder="you@example.com"
+          />
+        </div>
+
+        <div className="mb-6">
+          <label
+            htmlFor="password"
+            className="block font-mono text-sm mb-2 text-muted-foreground"
+          >
+            PASSWORD
+          </label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+            className="w-full px-4 py-3 bg-background border-2 border-border focus:border-secondary focus:outline-none font-mono"
+            placeholder="Enter your password"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full bg-foreground text-background px-4 py-4 font-semibold border-2 border-foreground hover:bg-secondary hover:text-secondary-foreground hover:border-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isLoading ? "Signing in..." : "Sign in with Email"}
+        </button>
+      </form>
+
+      {/* Sign up link */}
+      <p className="mt-6 text-center text-muted-foreground">
+        Don&apos;t have an account?{" "}
+        <Link
+          href="/sign-up"
+          className="text-foreground font-semibold border-b-2 border-secondary hover:text-secondary"
+        >
+          Sign up
+        </Link>
+      </p>
+    </>
+  );
+}
+
+function SignInFormFallback() {
+  return (
+    <div className="animate-pulse">
+      <div className="h-14 bg-muted mb-6" />
+      <div className="h-px bg-border mb-6" />
+      <div className="space-y-4">
+        <div className="h-4 bg-muted w-16" />
+        <div className="h-12 bg-muted" />
+        <div className="h-4 bg-muted w-20" />
+        <div className="h-12 bg-muted" />
+        <div className="h-14 bg-muted mt-2" />
+      </div>
+    </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <main className="min-h-screen bg-background text-foreground flex items-center justify-center px-6 py-12">
+      <div className="relative w-full max-w-md">
+        <GeometricDecoration />
+
+        <div className="relative z-10 border-2 border-border bg-background p-8">
+          {/* Header */}
+          <div className="mb-8">
+            <Link href="/" className="font-bold text-2xl block mb-6">
+              Skillvee
+            </Link>
+            <h1 className="text-3xl font-bold">Sign in</h1>
+            <p className="text-muted-foreground mt-2">
+              Continue your assessment journey
+            </p>
+          </div>
+
+          <Suspense fallback={<SignInFormFallback />}>
+            <SignInForm />
+          </Suspense>
+        </div>
+      </div>
+    </main>
+  );
+}
