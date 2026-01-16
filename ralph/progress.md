@@ -405,3 +405,41 @@ HRInterviewAssessment {
 - Tests pass (78/78)
 - Typecheck passes (exit 0)
 - Build succeeds
+
+---
+
+## Issue #10: US-009: Coworker Directory
+
+**What was implemented:**
+- Sidebar component (`CoworkerSidebar`) showing team directory with available coworkers
+- Each coworker displays: name, role, avatar (initials in gold square)
+- All coworkers show as "online" with gold status indicator
+- Click handlers for both "Chat" and "Call" actions per coworker
+- Neo-brutalist design: square avatars, gold accent, no shadows/rounded corners
+
+**Files created:**
+- `src/components/coworker-sidebar.tsx` - Reusable sidebar component with coworker list
+
+**Learnings:**
+1. Component follows existing patterns from welcome page (square avatars, initials, online indicator)
+2. Two action buttons per coworker: "Chat" (default bg) and "Call" (gold bg)
+3. `onSelectCoworker(coworkerId, action)` callback provides flexibility for parent to handle navigation
+4. Sidebar width of 64 (w-64 = 256px) fits well with chat interfaces
+5. Uses `selectedCoworkerId` prop for highlight state when viewing a specific coworker
+
+**Design patterns:**
+- Square avatars with gold background and initials (like welcome page manager avatar)
+- Online status: small gold square positioned at avatar corner
+- Buttons have hover states: bg-foreground text-background
+- Footer shows count of available coworkers
+
+**Gotchas:**
+- None - followed established patterns from welcome page and theme.css
+
+**Verification completed:**
+- Sidebar shows coworkers (designed for 3-4) ✓
+- Each shows name, role, and avatar/icon ✓
+- All show as "available" (always online) ✓
+- Click to open chat or start call ✓
+- Typecheck passes (exit 0)
+- Tests pass (78/78)
