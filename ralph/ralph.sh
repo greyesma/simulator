@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Use Max subscription, not API credits
+unset ANTHROPIC_API_KEY
+
 # Configuration
 LABEL="${RALPH_LABEL:-task}"
 MAX_ITERATIONS="${1:-10}"
