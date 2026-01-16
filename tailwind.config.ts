@@ -17,6 +17,10 @@ const config: Config = {
           DEFAULT: "var(--primary)",
           foreground: "var(--primary-foreground)",
         },
+        secondary: {
+          DEFAULT: "var(--secondary)",
+          foreground: "var(--secondary-foreground)",
+        },
         accent: {
           DEFAULT: "var(--accent)",
           foreground: "var(--accent-foreground)",
