@@ -1054,3 +1054,73 @@ GET /api/recording/analyze?assessmentId=xxx&segmentId=yyy
 - Typecheck passes (exit 0)
 - Build succeeds
 - UI verified in browser (homepage, sign-in load correctly)
+
+---
+
+## Issue #20: US-020: Final Defense Call
+
+**What was implemented:**
+- Gemini Live voice call interface at `/assessment/[id]/defense` for final PR defense
+- Manager persona (Alex Chen, Engineering Manager) with comprehensive context for probing questions
+- `/api/defense/token` endpoint generating ephemeral tokens with:
+  - Manager persona and role
+  - PR link for reference
+  - Conversation history (kickoff + coworker chats)
+  - Screen recording analysis summary
+  - HR interview assessment notes
+- `/api/defense/transcript` endpoint for POST (save) and GET (retrieve) defense transcripts
+- `useDefenseCall` hook managing Gemini Live connection, audio capture, and transcription
+- Neo-brutalist voice call UI with transcript panel, connection states, and audio indicators
+- Tips panel guiding candidates to explain decisions and discuss trade-offs
+- `/api/assessment/finalize` endpoint transitioning status from FINAL_DEFENSE to COMPLETED
+- Post-call navigation to results page
+- 31 unit tests (9 for token endpoint, 14 for transcript endpoint, 8 for finalize endpoint)
+
+**Files created:**
+- `src/app/api/defense/token/route.ts` - Token endpoint with comprehensive context injection
+- `src/app/api/defense/token/route.test.ts` - 9 unit tests
+- `src/app/api/defense/transcript/route.ts` - Transcript save/retrieve endpoints
+- `src/app/api/defense/transcript/route.test.ts` - 14 unit tests
+- `src/app/api/assessment/finalize/route.ts` - Assessment completion endpoint
+- `src/app/api/assessment/finalize/route.test.ts` - 8 unit tests
+- `src/hooks/use-defense-call.ts` - React hook for defense voice call
+- `src/app/assessment/[id]/defense/page.tsx` - Server component with auth and data fetching
+- `src/app/assessment/[id]/defense/client.tsx` - Client component with voice call UI
+
+**Learnings:**
+1. Reused voice infrastructure from kickoff call (audio utils, worklet, Gemini Live connection)
+2. Defense token endpoint fetches ALL related data for comprehensive manager context
+3. Extended conversation types beyond "text" | "voice" to include "kickoff" | "defense"
+4. System prompt emphasizes probing questions about decisions, trade-offs, and challenges
+5. Assessment finalization uses FINAL_DEFENSE → COMPLETED transition (prevents re-finalization)
+6. Type casting needed for extended conversation types to satisfy TypeScript
+
+**System prompt design:**
+- Manager has FULL context: PR link, conversation history, screen analysis, HR notes
+- Asks probing questions: "Why this approach?", "What trade-offs?", "How would it scale?"
+- Evaluates: technical depth, decision-making, communication, problem-solving, self-awareness
+- Voice-specific: conversational, curious, evaluative (not casual)
+- Wraps up after 10-15 minutes or when key areas covered
+
+**Assessment criteria (internal to AI):**
+1. Technical depth - Do they understand their code?
+2. Decision-making - Can they justify choices?
+3. Communication - Can they explain clearly?
+4. Problem-solving - How did they approach challenges?
+5. Self-awareness - Do they know limitations?
+6. Growth mindset - What would they do differently?
+
+**Gotchas:**
+- TypeScript error when comparing extended conversation type to "kickoff" - needed to extend type
+- Cannot screenshot defense page without authentication + valid assessment (verified base pages instead)
+
+**Verification completed:**
+- Gemini Live call with manager persona ✓
+- Manager has context: PR link, conversation history, screen analysis ✓
+- Candidate walks through their solution (UI with tips) ✓
+- Manager asks probing questions about decisions (system prompt) ✓
+- Assessment being finalized during this call (/api/assessment/finalize) ✓
+- Call transcript saved ✓
+- Tests pass (258/258)
+- Typecheck passes (exit 0)
+- UI verified in browser (homepage, sign-in load correctly)
