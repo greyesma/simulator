@@ -1,0 +1,381 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+// Mock auth
+const mockAuth = vi.fn();
+vi.mock("@/auth", () => ({
+  auth: () => mockAuth(),
+}));
+
+// Mock db
+const mockAssessmentFindFirst = vi.fn();
+const mockCoworkerFindFirst = vi.fn();
+const mockConversationFindFirst = vi.fn();
+const mockConversationCreate = vi.fn();
+const mockConversationUpdate = vi.fn();
+vi.mock("@/server/db", () => ({
+  db: {
+    assessment: {
+      findFirst: (...args: unknown[]) => mockAssessmentFindFirst(...args),
+    },
+    coworker: {
+      findFirst: (...args: unknown[]) => mockCoworkerFindFirst(...args),
+    },
+    conversation: {
+      findFirst: (...args: unknown[]) => mockConversationFindFirst(...args),
+      create: (...args: unknown[]) => mockConversationCreate(...args),
+      update: (...args: unknown[]) => mockConversationUpdate(...args),
+    },
+  },
+}));
+
+// Mock Gemini
+const mockGenerateContent = vi.fn();
+vi.mock("@/lib/gemini", () => ({
+  gemini: {
+    models: {
+      generateContent: (...args: unknown[]) => mockGenerateContent(...args),
+    },
+  },
+}));
+
+import { POST, GET } from "./route";
+
+describe("POST /api/chat", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should return 401 when not authenticated", async () => {
+    mockAuth.mockResolvedValue(null);
+
+    const request = new Request("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({
+        assessmentId: "test-id",
+        coworkerId: "coworker-1",
+        message: "Hello",
+      }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(401);
+  });
+
+  it("should return 400 when required fields are missing", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1" },
+    });
+
+    const request = new Request("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({
+        assessmentId: "test-id",
+        // missing coworkerId and message
+      }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(400);
+  });
+
+  it("should return 404 when assessment not found", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1" },
+    });
+    mockAssessmentFindFirst.mockResolvedValue(null);
+
+    const request = new Request("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({
+        assessmentId: "test-id",
+        coworkerId: "coworker-1",
+        message: "Hello",
+      }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(404);
+  });
+
+  it("should return 404 when coworker not found", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1" },
+    });
+    mockAssessmentFindFirst.mockResolvedValue({
+      id: "assessment-1",
+      userId: "user-1",
+      scenario: {
+        companyName: "Test Corp",
+        taskDescription: "Build a feature",
+        techStack: ["typescript", "react"],
+      },
+    });
+    mockCoworkerFindFirst.mockResolvedValue(null);
+
+    const request = new Request("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({
+        assessmentId: "assessment-1",
+        coworkerId: "coworker-1",
+        message: "Hello",
+      }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(404);
+  });
+
+  it("should send message to Gemini and return response", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1", name: "Test User" },
+    });
+    mockAssessmentFindFirst.mockResolvedValue({
+      id: "assessment-1",
+      userId: "user-1",
+      scenario: {
+        companyName: "Test Corp",
+        taskDescription: "Build a feature",
+        techStack: ["typescript", "react"],
+      },
+    });
+    mockCoworkerFindFirst.mockResolvedValue({
+      id: "coworker-1",
+      name: "Jordan Rivera",
+      role: "Senior Engineer",
+      personaStyle: "Technical and helpful",
+      knowledge: [],
+    });
+    mockConversationFindFirst.mockResolvedValue(null);
+    mockConversationCreate.mockResolvedValue({ id: "conv-1" });
+    mockGenerateContent.mockResolvedValue({
+      text: "Hi there! How can I help you?",
+    });
+
+    const request = new Request("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({
+        assessmentId: "assessment-1",
+        coworkerId: "coworker-1",
+        message: "Hello",
+      }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.response).toBe("Hi there! How can I help you?");
+    expect(data.timestamp).toBeDefined();
+  });
+
+  it("should include conversation history in Gemini request", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1", name: "Test User" },
+    });
+    mockAssessmentFindFirst.mockResolvedValue({
+      id: "assessment-1",
+      userId: "user-1",
+      scenario: {
+        companyName: "Test Corp",
+        taskDescription: "Build a feature",
+        techStack: ["typescript", "react"],
+      },
+    });
+    mockCoworkerFindFirst.mockResolvedValue({
+      id: "coworker-1",
+      name: "Jordan Rivera",
+      role: "Senior Engineer",
+      personaStyle: "Technical and helpful",
+      knowledge: [],
+    });
+    const existingHistory = [
+      { role: "user", text: "Previous message", timestamp: "2025-01-01T00:00:00Z" },
+      { role: "model", text: "Previous response", timestamp: "2025-01-01T00:00:01Z" },
+    ];
+    mockConversationFindFirst.mockResolvedValue({
+      id: "conv-1",
+      transcript: existingHistory,
+    });
+    mockConversationUpdate.mockResolvedValue({});
+    mockGenerateContent.mockResolvedValue({
+      text: "Follow-up response",
+    });
+
+    const request = new Request("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({
+        assessmentId: "assessment-1",
+        coworkerId: "coworker-1",
+        message: "Follow-up question",
+      }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+
+    // Verify Gemini was called with contents including history
+    expect(mockGenerateContent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        model: "gemini-2.0-flash",
+        contents: expect.arrayContaining([
+          // System prompt
+          expect.objectContaining({
+            role: "user",
+            parts: expect.arrayContaining([
+              expect.objectContaining({ text: expect.stringContaining("SYSTEM INSTRUCTIONS") }),
+            ]),
+          }),
+          // History messages
+          expect.objectContaining({
+            role: "user",
+            parts: expect.arrayContaining([
+              expect.objectContaining({ text: "Previous message" }),
+            ]),
+          }),
+          expect.objectContaining({
+            role: "model",
+            parts: expect.arrayContaining([
+              expect.objectContaining({ text: "Previous response" }),
+            ]),
+          }),
+          // New message
+          expect.objectContaining({
+            role: "user",
+            parts: expect.arrayContaining([
+              expect.objectContaining({ text: "Follow-up question" }),
+            ]),
+          }),
+        ]),
+      })
+    );
+  });
+
+  it("should persist messages to conversation", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1", name: "Test User" },
+    });
+    mockAssessmentFindFirst.mockResolvedValue({
+      id: "assessment-1",
+      userId: "user-1",
+      scenario: {
+        companyName: "Test Corp",
+        taskDescription: "Build a feature",
+        techStack: ["typescript", "react"],
+      },
+    });
+    mockCoworkerFindFirst.mockResolvedValue({
+      id: "coworker-1",
+      name: "Jordan Rivera",
+      role: "Senior Engineer",
+      personaStyle: "Technical and helpful",
+      knowledge: [],
+    });
+    mockConversationFindFirst.mockResolvedValue(null);
+    mockConversationCreate.mockResolvedValue({ id: "conv-1" });
+    mockGenerateContent.mockResolvedValue({
+      text: "Response text",
+    });
+
+    const request = new Request("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({
+        assessmentId: "assessment-1",
+        coworkerId: "coworker-1",
+        message: "Hello",
+      }),
+    });
+
+    await POST(request);
+
+    // Verify conversation was created with messages
+    expect(mockConversationCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        assessmentId: "assessment-1",
+        coworkerId: "coworker-1",
+        type: "text",
+        transcript: expect.arrayContaining([
+          expect.objectContaining({ role: "user", text: "Hello" }),
+          expect.objectContaining({ role: "model", text: "Response text" }),
+        ]),
+      }),
+    });
+  });
+});
+
+describe("GET /api/chat", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should return 401 when not authenticated", async () => {
+    mockAuth.mockResolvedValue(null);
+
+    const request = new Request(
+      "http://localhost/api/chat?assessmentId=test-id&coworkerId=coworker-1"
+    );
+
+    const response = await GET(request);
+    expect(response.status).toBe(401);
+  });
+
+  it("should return 400 when assessmentId or coworkerId is missing", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1" },
+    });
+
+    const request = new Request("http://localhost/api/chat?assessmentId=test-id");
+
+    const response = await GET(request);
+    expect(response.status).toBe(400);
+  });
+
+  it("should return chat history for valid request", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1" },
+    });
+    mockAssessmentFindFirst.mockResolvedValue({
+      id: "assessment-1",
+      userId: "user-1",
+    });
+    mockConversationFindFirst.mockResolvedValue({
+      id: "conv-1",
+      transcript: [
+        { role: "user", text: "Hello", timestamp: "2025-01-01T00:00:00Z" },
+        { role: "model", text: "Hi there!", timestamp: "2025-01-01T00:00:01Z" },
+      ],
+    });
+
+    const request = new Request(
+      "http://localhost/api/chat?assessmentId=assessment-1&coworkerId=coworker-1"
+    );
+
+    const response = await GET(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.messages).toHaveLength(2);
+    expect(data.messages[0].text).toBe("Hello");
+    expect(data.messages[1].text).toBe("Hi there!");
+  });
+
+  it("should return empty array when no conversation exists", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1" },
+    });
+    mockAssessmentFindFirst.mockResolvedValue({
+      id: "assessment-1",
+      userId: "user-1",
+    });
+    mockConversationFindFirst.mockResolvedValue(null);
+
+    const request = new Request(
+      "http://localhost/api/chat?assessmentId=assessment-1&coworkerId=coworker-1"
+    );
+
+    const response = await GET(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.messages).toEqual([]);
+  });
+});

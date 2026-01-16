@@ -1,0 +1,52 @@
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
+import { db } from "@/server/db";
+import { ChatPageClient } from "./client";
+
+interface ChatPageProps {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ coworkerId?: string }>;
+}
+
+export default async function ChatPage({ params, searchParams }: ChatPageProps) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/sign-in");
+  }
+
+  const { id } = await params;
+  const { coworkerId: selectedCoworkerId } = await searchParams;
+
+  const assessment = await db.assessment.findUnique({
+    where: { id },
+    include: {
+      scenario: {
+        include: {
+          coworkers: true,
+        },
+      },
+    },
+  });
+
+  if (!assessment || assessment.userId !== session.user.id) {
+    redirect("/profile");
+  }
+
+  const coworkers = assessment.scenario.coworkers.map((c) => ({
+    id: c.id,
+    name: c.name,
+    role: c.role,
+    avatarUrl: c.avatarUrl,
+  }));
+
+  // If no coworker selected, default to first coworker
+  const defaultCoworkerId = coworkers[0]?.id || null;
+
+  return (
+    <ChatPageClient
+      assessmentId={id}
+      coworkers={coworkers}
+      selectedCoworkerId={selectedCoworkerId || defaultCoworkerId}
+    />
+  );
+}
