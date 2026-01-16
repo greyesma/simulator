@@ -16,7 +16,7 @@ echo "🚀 Ralph starting (max $MAX_ITERATIONS iterations, label: $LABEL)"
 
 for i in $(seq 1 $MAX_ITERATIONS); do
   # Fetch oldest open issue with label
-  ISSUE=$(gh issue list --label "$LABEL" --state open --json number,title,body --limit 1 | jq '.[0] // empty')
+  ISSUE=$(gh issue list --label "$LABEL" --state open --json number,title,body --limit 100 | jq 'sort_by(.number) | .[0] // empty')
 
   # If no issues, we're done
   if [ -z "$ISSUE" ]; then
