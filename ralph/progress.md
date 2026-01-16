@@ -1342,3 +1342,95 @@ PrSnapshot {
 - Tests pass (277/277)
 - Typecheck passes (exit 0)
 - Build succeeds
+
+---
+
+## Issue #24: US-024: Automated Test Verification
+
+**What was implemented:**
+- CI status fetching from GitHub Checks API:
+  - `fetchPrCiStatus()` - fetches check runs for PR's head commit
+  - `formatCiStatusForPrompt()` - formats CI status for AI prompts
+  - `CheckRun` and `PrCiStatus` interfaces for type safety
+- `/api/ci/status` endpoint with:
+  - GET for retrieving CI status (with 30-second caching)
+  - POST for force-refreshing CI status
+  - Authorization checks (user must own assessment)
+- Updated defense token endpoint to include CI status:
+  - Fetches CI status before generating token
+  - Caches status in assessment record
+  - Includes test-related questions for manager to ask
+  - CI status summary injected into manager's system prompt
+- Updated assessment finalize endpoint to capture final CI status:
+  - Fetches CI status before closing PR (to capture final state)
+  - Stores CI status in assessment record for final assessment
+  - Returns CI status in API response
+- Prisma schema updated with `ciStatus Json?` field on Assessment model
+- flowboard-task repo already has GitHub Actions CI workflow that runs on PRs
+- 27 new unit tests for CI functionality
+
+**Files created:**
+- `src/app/api/ci/status/route.ts` - GET/POST endpoints for CI status
+- `src/app/api/ci/status/route.test.ts` - 14 unit tests for CI status endpoint
+
+**Files changed:**
+- `src/lib/github.ts` - Added `fetchPrCiStatus()`, `formatCiStatusForPrompt()`, CI types
+- `src/lib/github.test.ts` - Added 13 tests for CI status functions
+- `prisma/schema.prisma` - Added `ciStatus Json?` field to Assessment model
+- `src/app/api/defense/token/route.ts` - Integrated CI status into manager context
+- `src/app/api/defense/token/route.test.ts` - Updated mocks for CI status
+- `src/app/api/assessment/finalize/route.ts` - Added CI status capture before cleanup
+
+**Data model:**
+```
+PrCiStatus {
+  prUrl: string
+  fetchedAt: string
+  overallStatus: "pending" | "success" | "failure" | "unknown"
+  checksCount: number
+  checksCompleted: number
+  checksPassed: number
+  checksFailed: number
+  checks: CheckRun[]
+  testResults?: {
+    totalTests?: number
+    passedTests?: number
+    failedTests?: number
+    skippedTests?: number
+    testSummary?: string
+  }
+  fetchError?: string
+}
+```
+
+**Learnings:**
+1. GitHub Checks API requires fetching PR first to get head SHA, then fetching check runs for that commit
+2. CI status can be extracted from check run outputs (test counts parsed from summary text)
+3. 30-second cache prevents excessive GitHub API calls during polling
+4. flowboard-task repo already had GitHub Actions CI configured (lint, typecheck, tests, build)
+5. Manager system prompt can include CI status for probing questions about test coverage
+6. Test mocking for env module requires defining mocks BEFORE `vi.mock()` calls
+
+**Architecture patterns:**
+- CI status cached in assessment record for quick access
+- Status fetched fresh when defense call starts (most up-to-date context)
+- Final CI status captured before PR cleanup (preserves last known state)
+- formatCiStatusForPrompt() provides consistent text format for AI prompts
+
+**Manager questions about tests:**
+- "I see the CI tests [passed/failed] - can you walk me through your test coverage?"
+- "Did you add any new tests? What scenarios did you test for?"
+- "If tests failed, what was the issue and how would you fix it?"
+
+**Gotchas:**
+- GitHub Checks API returns `check_runs` under the commit endpoint, not the PR endpoint
+- Test output parsing uses regex patterns - may need tuning for different CI tools
+- Defense token test needed mocks for both `fetchPrCiStatus` and `formatCiStatusForPrompt`
+
+**Verification completed:**
+- CI runs on PR (GitHub Actions) ✓ (flowboard-task has `.github/workflows/ci.yml`)
+- Test pass/fail status captured (`fetchPrCiStatus()` gets check runs) ✓
+- Test results included in assessment (stored in `ciStatus` field, injected into defense context) ✓
+- Candidate expected to add their own tests (also evaluated via manager questions) ✓
+- Tests pass (305/305)
+- Typecheck passes (exit 0)

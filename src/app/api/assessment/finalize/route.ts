@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
 import { AssessmentStatus, Prisma } from "@prisma/client";
-import { cleanupPrAfterAssessment, type PrCleanupResult } from "@/lib/github";
+import {
+  cleanupPrAfterAssessment,
+  fetchPrCiStatus,
+  type PrCleanupResult,
+  type PrCiStatus,
+} from "@/lib/github";
 
 /**
  * POST /api/assessment/finalize
@@ -70,6 +75,18 @@ export async function POST(request: Request) {
     const totalDurationMs = now.getTime() - assessment.startedAt.getTime();
     const totalDurationSeconds = Math.floor(totalDurationMs / 1000);
 
+    // Fetch final CI status before cleanup (to capture test pass/fail status)
+    // This is the authoritative CI status used in the final assessment
+    let finalCiStatus: PrCiStatus | null = null;
+    if (assessment.prUrl) {
+      try {
+        finalCiStatus = await fetchPrCiStatus(assessment.prUrl);
+      } catch (error) {
+        console.warn(`CI status fetch warning for assessment ${assessmentId}:`, error);
+        // Continue without CI status - don't block finalization
+      }
+    }
+
     // Clean up PR after assessment (close it to prevent scenario leakage)
     // This is done gracefully - failure doesn't block finalization
     let prCleanupResult: PrCleanupResult | null = null;
@@ -88,7 +105,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // Update assessment status to COMPLETED and store PR snapshot
+    // Update assessment status to COMPLETED and store PR snapshot + CI status
     const updatedAssessment = await db.assessment.update({
       where: { id: assessmentId },
       data: {
@@ -99,6 +116,10 @@ export async function POST(request: Request) {
           prSnapshot:
             prCleanupResult.prSnapshot as unknown as Prisma.InputJsonValue,
         }),
+        // Store final CI status for assessment
+        ...(finalCiStatus && {
+          ciStatus: finalCiStatus as unknown as Prisma.InputJsonValue,
+        }),
       },
       select: {
         id: true,
@@ -106,6 +127,7 @@ export async function POST(request: Request) {
         startedAt: true,
         completedAt: true,
         prUrl: true,
+        ciStatus: true,
       },
     });
 
@@ -122,6 +144,15 @@ export async function POST(request: Request) {
             success: prCleanupResult.success,
             action: prCleanupResult.action,
             message: prCleanupResult.message,
+          }
+        : null,
+      ciStatus: finalCiStatus
+        ? {
+            overallStatus: finalCiStatus.overallStatus,
+            checksCount: finalCiStatus.checksCount,
+            checksPassed: finalCiStatus.checksPassed,
+            checksFailed: finalCiStatus.checksFailed,
+            testResults: finalCiStatus.testResults,
           }
         : null,
     });

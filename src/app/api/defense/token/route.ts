@@ -8,6 +8,12 @@ import {
   type ConversationWithMeta,
   type ChatMessage,
 } from "@/lib/conversation-memory";
+import {
+  fetchPrCiStatus,
+  formatCiStatusForPrompt,
+  type PrCiStatus,
+} from "@/lib/github";
+import { Prisma } from "@prisma/client";
 
 /**
  * Defense Call Token Endpoint
@@ -28,6 +34,7 @@ interface DefenseContext {
   conversationSummary: string;
   screenAnalysisSummary: string;
   hrInterviewNotes: string;
+  ciStatusSummary: string;
 }
 
 function buildDefenseSystemPrompt(context: DefenseContext): string {
@@ -46,6 +53,9 @@ Repo: ${context.repoUrl}
 
 ## Their PR
 PR Link: ${context.prUrl}
+
+### CI/Test Status
+${context.ciStatusSummary}
 
 ## Your Knowledge About This Candidate
 
@@ -81,13 +91,17 @@ Your goal is to EVALUATE the candidate's solution by asking probing questions. T
 - "If you had more time, what would you improve?"
 - "How would this scale if we had 10x the users?"
 - "Tell me about your testing strategy"
+- "I see the CI tests [passed/failed] - can you walk me through your test coverage?"
+- "Did you add any new tests? What scenarios did you test for?"
+- "If tests failed, what was the issue and how would you fix it?"
 
 ### Things to Probe:
 - Code organization and architecture decisions
 - Performance considerations
 - Error handling approach
 - Security considerations (if relevant)
-- Testing approach
+- Testing approach and test coverage
+- Whether they added their own tests (this is important!)
 - Trade-offs between different solutions
 - Communication with team members
 - Use of AI tools and how they leveraged them
@@ -290,6 +304,25 @@ export async function POST(request: Request) {
 ${hr.communicationNotes ? `- Notes: ${hr.communicationNotes}` : ""}`;
     }
 
+    // Fetch CI status for the PR
+    let ciStatusSummary = "CI Status: Not available (PR not yet submitted or CI not configured)";
+    if (assessment.prUrl) {
+      try {
+        const ciStatus = await fetchPrCiStatus(assessment.prUrl);
+        ciStatusSummary = formatCiStatusForPrompt(ciStatus);
+        // Cache the CI status in the assessment
+        await db.assessment.update({
+          where: { id: assessmentId },
+          data: {
+            ciStatus: ciStatus as unknown as Prisma.InputJsonValue,
+          },
+        });
+      } catch (error) {
+        console.warn("Failed to fetch CI status:", error);
+        ciStatusSummary = "CI Status: Failed to fetch from GitHub";
+      }
+    }
+
     // Build the defense system prompt
     const systemInstruction = buildDefenseSystemPrompt({
       managerName: manager.name,
@@ -303,6 +336,7 @@ ${hr.communicationNotes ? `- Notes: ${hr.communicationNotes}` : ""}`;
       conversationSummary,
       screenAnalysisSummary,
       hrInterviewNotes,
+      ciStatusSummary,
     });
 
     // Generate ephemeral token for client-side connection

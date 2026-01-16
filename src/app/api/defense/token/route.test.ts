@@ -8,10 +8,12 @@ vi.mock("@/auth", () => ({
 
 // Mock db
 const mockAssessmentFindFirst = vi.fn();
+const mockAssessmentUpdate = vi.fn();
 vi.mock("@/server/db", () => ({
   db: {
     assessment: {
       findFirst: (...args: unknown[]) => mockAssessmentFindFirst(...args),
+      update: (...args: unknown[]) => mockAssessmentUpdate(...args),
     },
   },
 }));
@@ -32,6 +34,15 @@ vi.mock("@/lib/conversation-memory", () => ({
     mockFormatMemoryForPrompt(...args),
 }));
 
+// Mock github module for CI status
+const mockFetchPrCiStatus = vi.fn();
+const mockFormatCiStatusForPrompt = vi.fn();
+vi.mock("@/lib/github", () => ({
+  fetchPrCiStatus: (...args: unknown[]) => mockFetchPrCiStatus(...args),
+  formatCiStatusForPrompt: (...args: unknown[]) =>
+    mockFormatCiStatusForPrompt(...args),
+}));
+
 import { POST } from "./route";
 
 describe("POST /api/defense/token", () => {
@@ -44,6 +55,19 @@ describe("POST /api/defense/token", () => {
       hasPriorConversations: false,
     });
     mockFormatMemoryForPrompt.mockReturnValue("");
+    // Mock CI status functions
+    mockFetchPrCiStatus.mockResolvedValue({
+      prUrl: "https://github.com/owner/repo/pull/123",
+      fetchedAt: new Date().toISOString(),
+      overallStatus: "success",
+      checksCount: 1,
+      checksCompleted: 1,
+      checksPassed: 1,
+      checksFailed: 0,
+      checks: [],
+    });
+    mockFormatCiStatusForPrompt.mockReturnValue("CI Status: SUCCESS");
+    mockAssessmentUpdate.mockResolvedValue({});
   });
 
   it("should return 401 when not authenticated", async () => {

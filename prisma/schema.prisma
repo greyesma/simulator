@@ -138,6 +138,7 @@ model Assessment {
   cvUrl         String?
   prUrl         String?
   prSnapshot    Json?            // PR content snapshot for historical reference
+  ciStatus      Json?            // CI test pass/fail status from GitHub Actions
 
   // Results
   report        Json?            // Final assessment report

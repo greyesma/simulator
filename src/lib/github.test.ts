@@ -4,6 +4,10 @@ import {
   fetchGitHubPrContent,
   closeGitHubPr,
   cleanupPrAfterAssessment,
+  fetchPrCiStatus,
+  formatCiStatusForPrompt,
+  type PrCiStatus,
+  type CheckRun,
 } from "./github";
 
 // Mock env module
@@ -338,5 +342,390 @@ describe("fetchGitHubPrContent without token", () => {
     );
 
     expect(result.fetchError).toContain("GITHUB_TOKEN not configured");
+  });
+});
+
+// ============================================================================
+// CI STATUS TESTS
+// ============================================================================
+
+describe("fetchPrCiStatus", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    global.fetch = vi.fn();
+  });
+
+  it("should return error for non-GitHub PR URL", async () => {
+    const result = await fetchPrCiStatus(
+      "https://gitlab.com/owner/repo/-/merge_requests/123"
+    );
+    expect(result.fetchError).toBe("Not a valid GitHub PR URL");
+    expect(result.overallStatus).toBe("unknown");
+  });
+
+  it("should fetch CI status successfully with all checks passing", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            head: { sha: "abc123" },
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            check_runs: [
+              {
+                id: 1,
+                name: "test",
+                status: "completed",
+                conclusion: "success",
+                started_at: "2024-01-01T00:00:00Z",
+                completed_at: "2024-01-01T00:05:00Z",
+                html_url: "https://github.com/owner/repo/runs/1",
+              },
+              {
+                id: 2,
+                name: "lint",
+                status: "completed",
+                conclusion: "success",
+                started_at: "2024-01-01T00:00:00Z",
+                completed_at: "2024-01-01T00:02:00Z",
+                html_url: "https://github.com/owner/repo/runs/2",
+              },
+            ],
+          }),
+      });
+
+    const result = await fetchPrCiStatus(
+      "https://github.com/owner/repo/pull/123"
+    );
+
+    expect(result.overallStatus).toBe("success");
+    expect(result.checksCount).toBe(2);
+    expect(result.checksCompleted).toBe(2);
+    expect(result.checksPassed).toBe(2);
+    expect(result.checksFailed).toBe(0);
+    expect(result.fetchError).toBeUndefined();
+  });
+
+  it("should detect pending status when checks are in progress", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            head: { sha: "abc123" },
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            check_runs: [
+              {
+                id: 1,
+                name: "test",
+                status: "in_progress",
+                conclusion: null,
+              },
+            ],
+          }),
+      });
+
+    const result = await fetchPrCiStatus(
+      "https://github.com/owner/repo/pull/123"
+    );
+
+    expect(result.overallStatus).toBe("pending");
+    expect(result.checksCompleted).toBe(0);
+  });
+
+  it("should detect failure when any check fails", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            head: { sha: "abc123" },
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            check_runs: [
+              {
+                id: 1,
+                name: "test",
+                status: "completed",
+                conclusion: "success",
+              },
+              {
+                id: 2,
+                name: "lint",
+                status: "completed",
+                conclusion: "failure",
+              },
+            ],
+          }),
+      });
+
+    const result = await fetchPrCiStatus(
+      "https://github.com/owner/repo/pull/123"
+    );
+
+    expect(result.overallStatus).toBe("failure");
+    expect(result.checksFailed).toBe(1);
+    expect(result.checksPassed).toBe(1);
+  });
+
+  it("should handle GitHub API errors gracefully", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: false,
+      status: 404,
+      statusText: "Not Found",
+    });
+
+    const result = await fetchPrCiStatus(
+      "https://github.com/owner/repo/pull/123"
+    );
+
+    expect(result.fetchError).toBe("GitHub API error: 404 Not Found");
+    expect(result.overallStatus).toBe("unknown");
+  });
+
+  it("should extract test results from check output", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            head: { sha: "abc123" },
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            check_runs: [
+              {
+                id: 1,
+                name: "test",
+                status: "completed",
+                conclusion: "success",
+                output: {
+                  title: "Tests passed",
+                  summary: "45 passed, 2 failed, 3 skipped. Total: 50 tests",
+                },
+              },
+            ],
+          }),
+      });
+
+    const result = await fetchPrCiStatus(
+      "https://github.com/owner/repo/pull/123"
+    );
+
+    expect(result.testResults).toBeDefined();
+    expect(result.testResults?.passedTests).toBe(45);
+    expect(result.testResults?.failedTests).toBe(2);
+    expect(result.testResults?.skippedTests).toBe(3);
+    expect(result.testResults?.totalTests).toBe(50);
+  });
+
+  it("should handle missing head SHA", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({}), // No head.sha
+    });
+
+    const result = await fetchPrCiStatus(
+      "https://github.com/owner/repo/pull/123"
+    );
+
+    expect(result.fetchError).toBe("Could not determine PR head commit SHA");
+  });
+
+  it("should handle Checks API error", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            head: { sha: "abc123" },
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        statusText: "Forbidden",
+      });
+
+    const result = await fetchPrCiStatus(
+      "https://github.com/owner/repo/pull/123"
+    );
+
+    expect(result.fetchError).toBe("GitHub Checks API error: 403 Forbidden");
+  });
+
+  it("should return unknown status when no checks exist", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            head: { sha: "abc123" },
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            check_runs: [],
+          }),
+      });
+
+    const result = await fetchPrCiStatus(
+      "https://github.com/owner/repo/pull/123"
+    );
+
+    expect(result.overallStatus).toBe("unknown");
+    expect(result.checksCount).toBe(0);
+  });
+});
+
+describe("formatCiStatusForPrompt", () => {
+  it("should format error status", () => {
+    const status: PrCiStatus = {
+      prUrl: "https://github.com/owner/repo/pull/123",
+      fetchedAt: new Date().toISOString(),
+      overallStatus: "unknown",
+      checksCount: 0,
+      checksCompleted: 0,
+      checksPassed: 0,
+      checksFailed: 0,
+      checks: [],
+      fetchError: "Token not configured",
+    };
+
+    const result = formatCiStatusForPrompt(status);
+    expect(result).toContain("Unable to fetch");
+    expect(result).toContain("Token not configured");
+  });
+
+  it("should format no checks status", () => {
+    const status: PrCiStatus = {
+      prUrl: "https://github.com/owner/repo/pull/123",
+      fetchedAt: new Date().toISOString(),
+      overallStatus: "unknown",
+      checksCount: 0,
+      checksCompleted: 0,
+      checksPassed: 0,
+      checksFailed: 0,
+      checks: [],
+    };
+
+    const result = formatCiStatusForPrompt(status);
+    expect(result).toContain("No CI checks found");
+  });
+
+  it("should format successful status with test results", () => {
+    const status: PrCiStatus = {
+      prUrl: "https://github.com/owner/repo/pull/123",
+      fetchedAt: new Date().toISOString(),
+      overallStatus: "success",
+      checksCount: 2,
+      checksCompleted: 2,
+      checksPassed: 2,
+      checksFailed: 0,
+      checks: [
+        {
+          id: 1,
+          name: "test",
+          status: "completed",
+          conclusion: "success",
+        },
+      ],
+      testResults: {
+        totalTests: 50,
+        passedTests: 48,
+        failedTests: 0,
+        skippedTests: 2,
+      },
+    };
+
+    const result = formatCiStatusForPrompt(status);
+    expect(result).toContain("SUCCESS");
+    expect(result).toContain("2/2 completed");
+    expect(result).toContain("Passed: 2");
+    expect(result).toContain("Total: 50 tests");
+    expect(result).toContain("Passed: 48");
+  });
+
+  it("should list failed checks", () => {
+    const failedCheck: CheckRun = {
+      id: 1,
+      name: "lint",
+      status: "completed",
+      conclusion: "failure",
+    };
+
+    const status: PrCiStatus = {
+      prUrl: "https://github.com/owner/repo/pull/123",
+      fetchedAt: new Date().toISOString(),
+      overallStatus: "failure",
+      checksCount: 2,
+      checksCompleted: 2,
+      checksPassed: 1,
+      checksFailed: 1,
+      checks: [
+        failedCheck,
+        {
+          id: 2,
+          name: "test",
+          status: "completed",
+          conclusion: "success",
+        },
+      ],
+    };
+
+    const result = formatCiStatusForPrompt(status);
+    expect(result).toContain("FAILURE");
+    expect(result).toContain("Failed Checks:");
+    expect(result).toContain("lint: failure");
+  });
+
+  it("should not show failed checks section when no failures", () => {
+    const status: PrCiStatus = {
+      prUrl: "https://github.com/owner/repo/pull/123",
+      fetchedAt: new Date().toISOString(),
+      overallStatus: "success",
+      checksCount: 1,
+      checksCompleted: 1,
+      checksPassed: 1,
+      checksFailed: 0,
+      checks: [
+        {
+          id: 1,
+          name: "test",
+          status: "completed",
+          conclusion: "success",
+        },
+      ],
+      testResults: {
+        totalTests: 50,
+        passedTests: 50,
+        failedTests: 0,
+      },
+    };
+
+    const result = formatCiStatusForPrompt(status);
+    // Should not have "Failed Checks:" section when no checks failed
+    expect(result).not.toContain("Failed Checks:");
+    // The summary line always shows "Passed: X, Failed: Y" format
+    expect(result).toContain("Passed: 1, Failed: 0");
   });
 });
