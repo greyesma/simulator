@@ -1434,3 +1434,119 @@ PrCiStatus {
 - Candidate expected to add their own tests (also evaluated via manager questions) ✓
 - Tests pass (305/305)
 - Typecheck passes (exit 0)
+
+---
+
+## Issue #25: US-025: AI Code Review
+
+**What was implemented:**
+- Code review analysis module (`src/lib/code-review.ts`) with:
+  - Zod schemas for code quality findings, pattern findings, security findings, and maintainability assessment
+  - `analyzeCodeReview()` - fetches PR diff and sends to Gemini 2.0 Flash for comprehensive analysis
+  - `buildCodeReviewData()` - formats analysis for database storage
+  - `formatCodeReviewForPrompt()` - formats review results for inclusion in AI system prompts
+  - `codeReviewToPrismaJson()` - converts typed data to Prisma JSON input
+- `/api/code-review` endpoint with:
+  - POST for triggering code review analysis
+  - GET for retrieving existing code review results
+  - Supports `forceReanalyze: true` to re-run analysis
+  - Uses existing PR snapshot if available, otherwise fetches fresh
+- Updated defense token endpoint to:
+  - Check for existing code review or run new analysis
+  - Include formatted code review summary in manager's system prompt
+  - Allows manager to ask informed questions about code quality
+- Updated finalize endpoint to:
+  - Ensure code review runs before marking assessment as COMPLETED
+  - Store code review results in assessment record
+  - Return code review summary in API response
+- Added `codeReview Json?` field to Assessment model in Prisma schema
+- 51 unit tests (32 for code-review module, 19 for API endpoint)
+
+**Files created:**
+- `src/lib/code-review.ts` - Code review analysis module with Gemini integration
+- `src/lib/code-review.test.ts` - 32 unit tests for schemas and functions
+- `src/app/api/code-review/route.ts` - POST/GET endpoints for code review
+- `src/app/api/code-review/route.test.ts` - 19 unit tests for API endpoints
+
+**Files changed:**
+- `prisma/schema.prisma` - Added `codeReview Json?` field to Assessment model
+- `src/app/api/defense/token/route.ts` - Integrated code review into manager context
+- `src/app/api/assessment/finalize/route.ts` - Added code review trigger and storage
+- `src/app/api/assessment/finalize/route.test.ts` - Added mocks for new dependencies
+
+**Data model:**
+```typescript
+CodeReviewData {
+  prUrl: string
+  analyzedAt: string
+
+  // Scores (1-5)
+  overallScore: number
+  codeQualityScore: number
+  patternScore: number
+  securityScore: number
+  maintainabilityScore: number
+
+  // Detailed findings
+  codeQualityFindings: CodeQualityFinding[] // naming, structure, complexity, etc.
+  patternFindings: PatternFinding[] // design patterns, architecture
+  securityFindings: SecurityFinding[] // injection, auth, data exposure, etc.
+  maintainability: MaintainabilityAssessment // readability, modularity, testability
+
+  // Summary
+  summary: {
+    strengths: string[]
+    areasForImprovement: string[]
+    overallAssessment: string
+    testCoverage: "comprehensive" | "adequate" | "minimal" | "none" | "unknown"
+    codeStyleConsistency: "excellent" | "good" | "fair" | "poor"
+    aiToolUsageEvident: boolean
+  }
+
+  // Metrics
+  filesAnalyzed: number
+  linesAdded: number
+  linesDeleted: number
+}
+```
+
+**Learnings:**
+1. Gemini 2.0 Flash is fast enough for real-time code review analysis
+2. Existing `fetchGitHubPrContent()` already fetches PR diff (truncated to 500KB)
+3. Prisma JSON fields require `as unknown as Type` double cast for type safety
+4. Code review runs during defense token generation to ensure manager has full context
+5. Finalize endpoint acts as safety net to ensure code review runs before completion
+6. Separate code review module allows independent triggering and reuse
+7. Test mocking pattern: add mocks for all new dependencies before importing route
+
+**Architecture patterns:**
+- Code review stored in Assessment.codeReview JSON field
+- Defense token endpoint fetches or runs code review for manager context
+- Finalize endpoint ensures code review exists before marking COMPLETED
+- formatCodeReviewForPrompt() provides consistent text format for AI prompts
+- Reuses existing GitHub integration for PR content fetching
+
+**Evaluation criteria in code review:**
+- **Code Quality**: naming, structure, complexity, duplication, error handling, documentation, performance, type safety, formatting
+- **Patterns/Architecture**: correct use of design patterns, abstraction levels, architectural decisions
+- **Security**: injection, authentication, authorization, data exposure, cryptography, input validation, dependencies, configuration
+- **Maintainability**: readability, modularity, testability, long-term maintenance
+
+**Scoring guidelines (1-5):**
+- 5: Exceptional - production-ready, excellent practices
+- 4: Good - minor improvements possible, solid work
+- 3: Adequate - functional with some issues
+- 2: Below expectations - significant issues
+- 1: Unacceptable - fundamental problems
+
+**Gotchas:**
+- Finalize route test needed mocks for both github and code-review modules
+- Prisma Json type requires double cast for typed interfaces
+
+**Verification completed:**
+- Gemini analyzes PR diff ✓
+- Evaluates: code quality, patterns, security, maintainability ✓
+- Identifies strengths and areas for improvement ✓
+- Results fed into final assessment (stored in codeReview field, injected into defense context) ✓
+- Tests pass (351/351)
+- Typecheck passes (exit 0)
