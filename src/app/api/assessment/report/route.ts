@@ -10,10 +10,12 @@ import {
   generateAssessmentReport,
   reportToPrismaJson,
   type AssessmentSignals,
+  type AssessmentReport,
   type HRSignals,
   type RecordingSignals,
   type ConversationSignals,
 } from "@/lib/assessment-aggregation";
+import { sendReportEmail, isEmailServiceConfigured } from "@/lib/email";
 
 /**
  * Collects all assessment signals from the database
@@ -251,7 +253,7 @@ export async function POST(request: Request) {
         status: true,
         report: true,
         user: {
-          select: { name: true },
+          select: { name: true, email: true },
         },
       },
     });
@@ -306,10 +308,45 @@ export async function POST(request: Request) {
       },
     });
 
+    // Send email notification if email service is configured
+    let emailResult: { success: boolean; error?: string } = { success: false };
+    if (isEmailServiceConfigured() && assessment.user?.email) {
+      // Construct app base URL from request headers
+      const host = request.headers.get("host") || "localhost:3000";
+      const protocol = host.includes("localhost") ? "http" : "https";
+      const appBaseUrl = `${protocol}://${host}`;
+
+      // Send email asynchronously (don't block response)
+      sendReportEmail({
+        to: assessment.user.email,
+        candidateName: assessment.user.name || undefined,
+        assessmentId,
+        report: report as AssessmentReport,
+        appBaseUrl,
+      })
+        .then((result) => {
+          if (result.success) {
+            console.log(`Report email sent successfully to ${assessment.user?.email}`);
+          } else {
+            console.warn(`Failed to send report email: ${result.error}`);
+          }
+        })
+        .catch((err) => {
+          console.error("Error sending report email:", err);
+        });
+
+      emailResult = { success: true }; // Mark as attempted
+    } else if (!isEmailServiceConfigured()) {
+      console.log("Email service not configured, skipping report email");
+    } else if (!assessment.user?.email) {
+      console.log("No user email available, skipping report email");
+    }
+
     return NextResponse.json({
       success: true,
       report,
       cached: false,
+      emailSent: emailResult.success,
     });
   } catch (error) {
     console.error("Error generating assessment report:", error);

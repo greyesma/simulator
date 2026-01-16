@@ -1819,3 +1819,75 @@ AssessmentReport {
 - Typecheck passes (exit 0)
 - Build succeeds (2.76 kB bundle)
 - UI verified in browser (homepage, sign-in, processing redirect)
+
+---
+
+## Issue #29: US-029: Email Report Delivery
+
+**What was implemented:**
+- Resend email service integration for transactional emails
+- Email service module (`src/lib/email.ts`) with:
+  - `getResendClient()` - creates Resend client if API key is configured
+  - `generateReportEmailHtml()` - generates HTML email with report summary
+  - `generateReportEmailText()` - generates plain text fallback
+  - `sendEmail()` - generic email sending function
+  - `sendReportEmail()` - sends assessment report notification to candidate
+  - `isEmailServiceConfigured()` - checks if email service is ready
+- HTML email template with neo-brutalist design:
+  - Overall score with performance level
+  - Top 3 skills with score bars
+  - Summary paragraph (truncated to 500 chars)
+  - Key strengths list
+  - Top recommendations
+  - "View Full Report" CTA button linking to `/assessment/[id]/results`
+- Plain text fallback for email clients without HTML support
+- Integration with `/api/assessment/report` endpoint:
+  - Email sent asynchronously after report is stored in database
+  - Graceful handling when email service is not configured
+  - Graceful handling when user has no email
+- RESEND_API_KEY environment variable (optional)
+- 27 unit tests for email module
+
+**Files created:**
+- `src/lib/email.ts` - Email service module (500+ lines)
+- `src/lib/email.test.ts` - 27 unit tests for email functionality
+
+**Files changed:**
+- `package.json` - Added `resend` dependency
+- `src/lib/env.ts` - Added RESEND_API_KEY environment variable
+- `src/app/api/assessment/report/route.ts` - Integrated email sending after report generation
+- `src/app/api/assessment/report/route.test.ts` - Added email module mock
+
+**Learnings:**
+1. Resend is a modern transactional email API with simple SDK
+2. Email HTML needs inline styles since many email clients strip `<style>` tags
+3. Both HTML and plain text versions improve deliverability
+4. Async email sending (non-blocking) prevents slowing down API response
+5. Vitest mock hoisting requires careful pattern with Proxy for dynamic env values
+6. Mock Resend constructor using class syntax for proper method access
+
+**Architecture patterns:**
+- Email sent after database write to ensure report is persisted
+- Async fire-and-forget pattern with `.then().catch()` for non-blocking
+- Graceful degradation: works without email service configured
+- App base URL constructed from request headers for correct links
+
+**Email template structure:**
+- Header: SKILLVEE branding (black background, white text)
+- Content: Greeting, score box (gold background), top skills, summary, strengths, recommendations
+- CTA: "View Full Report" button (black background)
+- Footer: Attribution and unsubscribe info
+
+**Gotchas:**
+- Resend requires domain verification for production (use onboarding@resend.dev for testing)
+- Email templates need inline CSS for cross-client compatibility
+- Long summaries should be truncated to avoid overly long emails
+
+**Verification completed:**
+- Email sent when report is ready (integrated in report endpoint) ✓
+- Link to view full report in app (CTA button with correct URL) ✓
+- Basic summary in email body (score, skills, narrative, recommendations) ✓
+- Transactional email service (Resend) ✓
+- Tests pass (428/428)
+- Typecheck passes (exit 0)
+- UI verified in browser (homepage, sign-in render correctly)

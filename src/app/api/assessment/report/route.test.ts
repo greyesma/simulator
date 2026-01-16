@@ -44,6 +44,12 @@ vi.mock("@/lib/recording-analysis", () => ({
   aggregateSegmentAnalyses: () => mockAggregateSegments(),
 }));
 
+// Mock email module
+vi.mock("@/lib/email", () => ({
+  sendReportEmail: vi.fn().mockResolvedValue({ success: true }),
+  isEmailServiceConfigured: vi.fn().mockReturnValue(false),
+}));
+
 describe("Assessment Report API", () => {
   beforeEach(() => {
     vi.clearAllMocks();
