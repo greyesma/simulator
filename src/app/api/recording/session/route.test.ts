@@ -13,9 +13,11 @@ const mockRecordingUpsert = vi.fn();
 const mockRecordingFindUnique = vi.fn();
 const mockRecordingUpdate = vi.fn();
 const mockSegmentFindFirst = vi.fn();
+const mockSegmentFindUnique = vi.fn();
 const mockSegmentCreate = vi.fn();
 const mockSegmentUpdate = vi.fn();
 const mockSegmentUpdateMany = vi.fn();
+const mockSegmentAnalysisUpsert = vi.fn();
 
 vi.mock("@/server/db", () => ({
   db: {
@@ -29,11 +31,54 @@ vi.mock("@/server/db", () => ({
     },
     recordingSegment: {
       findFirst: (...args: unknown[]) => mockSegmentFindFirst(...args),
+      findUnique: (...args: unknown[]) => mockSegmentFindUnique(...args),
       create: (...args: unknown[]) => mockSegmentCreate(...args),
       update: (...args: unknown[]) => mockSegmentUpdate(...args),
       updateMany: (...args: unknown[]) => mockSegmentUpdateMany(...args),
     },
+    segmentAnalysis: {
+      upsert: (...args: unknown[]) => mockSegmentAnalysisUpsert(...args),
+    },
   },
+}));
+
+// Mock supabaseAdmin for storage operations
+vi.mock("@/lib/supabase", () => ({
+  supabaseAdmin: {
+    storage: {
+      from: () => ({
+        createSignedUrl: () => Promise.resolve({ data: { signedUrl: "https://test.com/screenshot.png" } }),
+      }),
+    },
+  },
+}));
+
+// Mock recording-analysis module
+vi.mock("@/lib/recording-analysis", () => ({
+  analyzeSegmentScreenshots: vi.fn().mockResolvedValue({
+    activityTimeline: [],
+    toolUsage: [],
+    stuckMoments: [],
+    summary: {
+      totalActiveTimeSeconds: 300,
+      totalIdleTimeSeconds: 60,
+      focusScore: 4,
+      dominantActivity: "coding",
+      aiToolsUsed: false,
+      keyObservations: [],
+    },
+  }),
+  buildSegmentAnalysisData: vi.fn().mockReturnValue({
+    segmentId: "segment-1",
+    activityTimeline: [],
+    toolUsage: [],
+    stuckMoments: [],
+    totalActiveTime: 300,
+    totalIdleTime: 60,
+    focusScore: 4,
+    screenshotsAnalyzed: 1,
+    aiAnalysis: {},
+  }),
 }));
 
 import { POST, GET } from "./route";
@@ -194,6 +239,11 @@ describe("POST /api/recording/session", () => {
     });
     mockRecordingUpsert.mockResolvedValue({ id: "assessment-1-screen" });
     mockRecordingUpdate.mockResolvedValue({});
+    mockSegmentFindUnique.mockResolvedValue({
+      id: "segment-1",
+      startTime: new Date(),
+      screenshotPaths: [],
+    });
     mockSegmentUpdate.mockResolvedValue({ id: "segment-1" });
 
     const request = new NextRequest("http://localhost/api/recording/session", {
@@ -211,6 +261,40 @@ describe("POST /api/recording/session", () => {
       where: { id: "segment-1" },
       data: expect.objectContaining({ status: "completed" }),
     });
+  });
+
+  it("should trigger analysis when segment has screenshots", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1" },
+      expires: new Date(Date.now() + 86400000).toISOString(),
+    });
+    mockAssessmentFindFirst.mockResolvedValue({
+      id: "assessment-1",
+      userId: "user-1",
+    });
+    mockRecordingUpsert.mockResolvedValue({ id: "assessment-1-screen" });
+    mockRecordingUpdate.mockResolvedValue({});
+    mockSegmentFindUnique.mockResolvedValue({
+      id: "segment-1",
+      startTime: new Date(),
+      screenshotPaths: ["screenshot-1.png", "screenshot-2.png"],
+    });
+    mockSegmentUpdate.mockResolvedValue({ id: "segment-1" });
+    mockSegmentAnalysisUpsert.mockResolvedValue({});
+
+    const request = new NextRequest("http://localhost/api/recording/session", {
+      method: "POST",
+      body: JSON.stringify({
+        assessmentId: "assessment-1",
+        action: "complete",
+        segmentId: "segment-1",
+      }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data.analysisTriggered).toBe(true);
   });
 
   it("should return 400 for unknown action", async () => {

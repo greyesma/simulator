@@ -1,6 +1,84 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
+import { supabaseAdmin } from "@/lib/supabase";
+import { STORAGE_BUCKETS } from "@/lib/storage";
+import {
+  analyzeSegmentScreenshots,
+  buildSegmentAnalysisData,
+} from "@/lib/recording-analysis";
+
+/**
+ * Trigger incremental analysis for a completed segment
+ * Runs asynchronously to not block the response
+ */
+async function triggerIncrementalAnalysis(
+  segmentId: string,
+  screenshotPaths: string[],
+  startTime: Date,
+  endTime: Date
+): Promise<void> {
+  try {
+    if (screenshotPaths.length === 0) {
+      console.log(`Segment ${segmentId}: No screenshots to analyze`);
+      return;
+    }
+
+    // Generate signed URLs for screenshots
+    const screenshotUrls = await Promise.all(
+      screenshotPaths.map(async (path) => {
+        const { data } = await supabaseAdmin.storage
+          .from(STORAGE_BUCKETS.SCREENSHOTS)
+          .createSignedUrl(path, 60 * 60); // 1 hour expiry
+        return data?.signedUrl || null;
+      })
+    );
+
+    const validUrls = screenshotUrls.filter(
+      (url): url is string => url !== null
+    );
+
+    if (validUrls.length === 0) {
+      console.warn(`Segment ${segmentId}: No valid screenshot URLs`);
+      return;
+    }
+
+    // Calculate duration
+    const durationSeconds = Math.round(
+      (endTime.getTime() - startTime.getTime()) / 1000
+    );
+
+    // Analyze screenshots
+    const analysis = await analyzeSegmentScreenshots(
+      validUrls,
+      startTime,
+      durationSeconds
+    );
+
+    // Save to database
+    const analysisData = buildSegmentAnalysisData(
+      segmentId,
+      analysis,
+      validUrls.length
+    );
+
+    await db.segmentAnalysis.upsert({
+      where: { segmentId },
+      create: analysisData,
+      update: {
+        ...analysisData,
+        updatedAt: new Date(),
+      },
+    });
+
+    console.log(
+      `Segment ${segmentId}: Analysis complete (${validUrls.length} screenshots)`
+    );
+  } catch (error) {
+    console.error(`Failed to analyze segment ${segmentId}:`, error);
+    // Don't throw - this is a background task
+  }
+}
 
 // POST /api/recording/session - Start or update a recording segment
 export async function POST(request: NextRequest) {
@@ -156,21 +234,49 @@ export async function POST(request: NextRequest) {
           );
         }
 
+        // Get segment to access screenshot paths for analysis
+        const segmentToComplete = await db.recordingSegment.findUnique({
+          where: { id: segmentId },
+        });
+
+        if (!segmentToComplete) {
+          return NextResponse.json(
+            { error: "Segment not found" },
+            { status: 404 }
+          );
+        }
+
+        const endTime = new Date();
+
         await db.recordingSegment.update({
           where: { id: segmentId },
           data: {
             status: "completed",
-            endTime: new Date(),
+            endTime,
           },
         });
 
         // Update recording end time
         await db.recording.update({
           where: { id: recordingId },
-          data: { endTime: new Date() },
+          data: { endTime },
         });
 
-        return NextResponse.json({ success: true });
+        // Trigger incremental analysis asynchronously (don't await)
+        // This allows the response to return immediately while analysis runs
+        triggerIncrementalAnalysis(
+          segmentId,
+          segmentToComplete.screenshotPaths,
+          segmentToComplete.startTime,
+          endTime
+        ).catch((error) => {
+          console.error("Background analysis failed:", error);
+        });
+
+        return NextResponse.json({
+          success: true,
+          analysisTriggered: segmentToComplete.screenshotPaths.length > 0,
+        });
       }
 
       case "interrupt": {

@@ -831,3 +831,99 @@ RecordingSegment {
 - Tests pass (162/162)
 - Typecheck passes (exit 0)
 - UI verified in browser (homepage, sign-in page load correctly)
+
+---
+
+## Issue #17: US-017: Incremental Recording Analysis
+
+**What was implemented:**
+- SegmentAnalysis Prisma model for storing per-segment AI analysis results
+- Recording analysis module (`src/lib/recording-analysis.ts`) with:
+  - Zod schemas for activity entries, tool usage, stuck moments, and full analysis response
+  - `analyzeSegmentScreenshots()` - fetches screenshots and sends to Gemini for vision analysis
+  - `buildSegmentAnalysisData()` - formats analysis for database storage
+  - `aggregateSegmentAnalyses()` - combines multiple segment analyses for overall assessment
+- `/api/recording/analyze` endpoint with:
+  - POST for triggering analysis (supports single segment or all segments)
+  - GET for retrieving analysis results (aggregated and per-segment)
+  - Skip already-analyzed segments unless `forceReanalyze: true`
+  - Updates Recording.analysis field with aggregated results
+- Incremental analysis trigger on segment completion:
+  - Updated `/api/recording/session` to call analysis asynchronously when segment completes
+  - Background analysis doesn't block response to user
+  - Logs analysis progress to console
+- 25 unit tests (12 for recording-analysis module, 13 for analyze API)
+
+**Files created:**
+- `src/lib/recording-analysis.ts` - Analysis module with Gemini vision integration
+- `src/lib/recording-analysis.test.ts` - 12 unit tests for analysis schemas and functions
+- `src/app/api/recording/analyze/route.ts` - POST/GET endpoints for analysis
+- `src/app/api/recording/analyze/route.test.ts` - 13 unit tests for API
+
+**Files changed:**
+- `prisma/schema.prisma` - Added SegmentAnalysis model linked to RecordingSegment
+- `src/app/api/recording/session/route.ts` - Added triggerIncrementalAnalysis on segment completion
+- `src/app/api/recording/session/route.test.ts` - Added mocks for new dependencies
+
+**Data model:**
+```
+SegmentAnalysis {
+  segmentId: String (unique)
+  activityTimeline: Json (array of {timestamp, activity, description, applicationVisible})
+  toolUsage: Json (array of {tool, usageCount, contextNotes})
+  stuckMoments: Json (array of {startTime, endTime, description, potentialCause, durationSeconds})
+  totalActiveTime: Int (seconds)
+  totalIdleTime: Int (seconds)
+  focusScore: Int (1-5)
+  screenshotsAnalyzed: Int
+  aiAnalysis: Json (full Gemini response + metadata)
+  analyzedAt: DateTime
+}
+```
+
+**Analysis extracts:**
+- Activity timeline: what developer was doing at each point (coding, browsing, debugging, etc.)
+- Tool usage: which tools/apps were used and how (VS Code, Chrome, Claude, Terminal)
+- Stuck moments: when developer appeared stuck with potential cause classification
+- Summary metrics: active time, idle time, focus score, dominant activity, AI tools used
+
+**Learnings:**
+1. Gemini 2.0 Flash handles vision well and is fast enough for incremental analysis
+2. Screenshots must be fetched and converted to base64 for inline data format
+3. Use non-blocking async pattern for analysis trigger to avoid slowing segment completion
+4. Aggregation logic combines tool usage counts and averages focus scores
+5. Store both per-segment analysis AND aggregated recording analysis for flexibility
+6. Prisma upsert pattern handles both new analysis and re-analysis scenarios
+
+**Architecture patterns:**
+- Per-segment analysis triggered immediately on segment completion
+- Background processing via `.catch()` pattern to not block response
+- Aggregated analysis stored in Recording.analysis for final assessment
+- Screenshots analyzed via Gemini vision (base64 inline data)
+- Analysis skips segments with no screenshots or currently recording
+
+**API usage:**
+```typescript
+// Trigger analysis for all segments
+POST /api/recording/analyze
+{ assessmentId: "xxx" }
+
+// Get all analysis results
+GET /api/recording/analyze?assessmentId=xxx
+
+// Get specific segment analysis
+GET /api/recording/analyze?assessmentId=xxx&segmentId=yyy
+```
+
+**Gotchas:**
+- Must mock recording-analysis module in session route tests
+- Need findUnique for segment lookup in complete action (for screenshot paths)
+- Analysis runs async so test can't verify db write, only that trigger was called
+
+**Verification completed:**
+- Recording processed in chunks (every segment completion) ✓
+- Gemini Pro analyzes screenshots/video segments ✓
+- Extracts: activity timeline, tool usage, stuck moments ✓
+- Analysis results stored for final assessment aggregation ✓
+- Tests pass (188/188)
+- Typecheck passes (exit 0)

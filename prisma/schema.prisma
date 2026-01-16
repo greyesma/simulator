@@ -200,6 +200,40 @@ model RecordingSegment {
   updatedAt     DateTime @updatedAt
 
   recording     Recording @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+  analysis      SegmentAnalysis?
+}
+
+// ============================================================================
+// SEGMENT ANALYSIS (incremental recording analysis)
+// ============================================================================
+
+model SegmentAnalysis {
+  id              String   @id @default(cuid())
+  segmentId       String   @unique // One analysis per segment
+
+  // Activity Timeline
+  activityTimeline Json?   // Array of {timestamp, activity, description}
+
+  // Tool Usage
+  toolUsage        Json?   // Array of {tool, usageCount, contextNotes}
+
+  // Stuck Moments
+  stuckMoments     Json?   // Array of {startTime, endTime, description, potentialCause}
+
+  // Summary Metrics
+  totalActiveTime  Int?    // Active coding/working time in seconds
+  totalIdleTime    Int?    // Idle/thinking time in seconds
+  focusScore       Int?    // 1-5 score based on tool switching and activity patterns
+
+  // AI Analysis Metadata
+  aiAnalysis       Json?   // Full raw AI analysis response
+  analyzedAt       DateTime @default(now())
+  screenshotsAnalyzed Int?  // Number of screenshots analyzed
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  segment          RecordingSegment @relation(fields: [segmentId], references: [id], onDelete: Cascade)
 }
 
 // ============================================================================
