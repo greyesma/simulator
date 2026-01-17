@@ -52,3 +52,11 @@ export {
   CONVERSATION_SUMMARY_PROMPT,
   buildConversationSummaryPrompt,
 } from "./analysis/assessment";
+export {
+  VIDEO_EVALUATION_PROMPT,
+  EVALUATION_PROMPT_VERSION,
+  ASSESSMENT_DIMENSIONS,
+  buildVideoEvaluationPrompt,
+  type VideoEvaluationOutput,
+  type AssessmentDimensionType,
+} from "./analysis/video-evaluation";
