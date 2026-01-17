@@ -1214,3 +1214,51 @@ startCall(managerId, "kickoff");
 - Did not move code files or restructure directories (documentation-only changes)
 - Used relative paths in E2E tests (`../fixtures/`) to keep scripts portable
 
+---
+
+## Issue #58: US-002: Create Assessment Database Schema
+
+**What was implemented:**
+- Added `VideoAssessment` table for video-based candidate assessments
+- Added `DimensionScore` table with 8 assessment dimensions (COMMUNICATION, PROBLEM_SOLVING, TECHNICAL_KNOWLEDGE, COLLABORATION, ADAPTABILITY, LEADERSHIP, CREATIVITY, TIME_MANAGEMENT)
+- Added `VideoAssessmentSummary` table for AI-generated summaries
+- Created enums: `VideoAssessmentStatus` (PENDING, PROCESSING, COMPLETED, FAILED), `AssessmentDimension`
+- Added foreign key constraints with cascade deletes
+- Added indexes on candidateId, assessmentId, and status for efficient querying
+- Added unique constraint on (assessmentId, dimension) to ensure one score per dimension
+- Created RLS policies for row-level security (candidates see own, admins see all completed)
+
+**Files changed:**
+- `prisma/schema.prisma` - Added VideoAssessment, DimensionScore, VideoAssessmentSummary models, enums, and updated User model
+
+**Files created:**
+- `supabase/migrations/20260116_video_assessment_rls.sql` - RLS policies for video assessment tables
+
+**Schema design:**
+```
+VideoAssessment (id, candidateId, videoUrl, status, createdAt, completedAt)
+  └── DimensionScore (id, assessmentId, dimension, score 1-5, observableBehaviors, timestamps[], trainableGap)
+  └── VideoAssessmentSummary (id, assessmentId, overallSummary, rawAiResponse)
+```
+
+**RLS Policy Summary:**
+- `VideoAssessment`: Candidates view own, admins view all completed
+- `DimensionScore`: Candidates view own via assessment join, admins view completed via assessment join
+- `VideoAssessmentSummary`: Same pattern as DimensionScore
+- All tables: service_role has full access for API operations
+
+**Learnings:**
+1. Named new tables `VideoAssessment` (not `assessments`) to avoid conflict with existing `Assessment` model which serves a different purpose
+2. Used `@@unique([assessmentId, dimension])` to ensure one score per dimension per assessment
+3. RLS policies require joins to parent tables for child record access control
+4. Supabase RLS uses `auth.uid()::text` to cast the UUID to match Prisma's cuid() strings
+5. `service_role` policies enable API routes to bypass RLS for system operations
+6. Enum values in Prisma use SCREAMING_SNAKE_CASE convention
+7. `timestamps Json` field stores array of timestamps where behaviors were observed
+8. `trainableGap Boolean` flag identifies skill gaps that can be improved through training
+
+**Gotchas:**
+- Existing `Assessment` model handles work simulation flow, new `VideoAssessment` is separate
+- RLS policies need to be run directly on Supabase (migration file created but must be executed manually)
+- User model needed relation update for `videoAssessments VideoAssessment[]`
+

@@ -76,9 +76,10 @@ model User {
   cvUrl         String?   // Signed URL to uploaded CV
   parsedProfile Json?     // Parsed CV content (summary, experience, education, skills)
 
-  accounts      Account[]
-  sessions      Session[]
-  assessments   Assessment[]
+  accounts         Account[]
+  sessions         Session[]
+  assessments      Assessment[]
+  videoAssessments VideoAssessment[]
 }
 
 // ============================================================================
@@ -283,4 +284,79 @@ model HRInterviewAssessment {
   updatedAt     DateTime @updatedAt
 
   assessment    Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================================
+// VIDEO ASSESSMENT MODELS (US-002)
+// For video-based candidate assessments with dimension scoring
+// ============================================================================
+
+enum VideoAssessmentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum AssessmentDimension {
+  COMMUNICATION
+  PROBLEM_SOLVING
+  TECHNICAL_KNOWLEDGE
+  COLLABORATION
+  ADAPTABILITY
+  LEADERSHIP
+  CREATIVITY
+  TIME_MANAGEMENT
+}
+
+model VideoAssessment {
+  id            String                @id @default(cuid())
+  candidateId   String                // References User.id
+  videoUrl      String                // URL to the uploaded video
+  status        VideoAssessmentStatus @default(PENDING)
+
+  createdAt     DateTime              @default(now())
+  completedAt   DateTime?
+
+  // Relations
+  candidate     User                  @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  scores        DimensionScore[]
+  summary       VideoAssessmentSummary?
+
+  // Indexes for efficient querying
+  @@index([candidateId])
+  @@index([status])
+}
+
+model DimensionScore {
+  id                  String              @id @default(cuid())
+  assessmentId        String
+  dimension           AssessmentDimension
+  score               Int                 // 1-5 scale
+  observableBehaviors String              @db.Text // Description of observed behaviors
+  timestamps          Json                // Array of timestamps where behavior was observed
+  trainableGap        Boolean             @default(false) // Whether this is a trainable skill gap
+
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  // Relations
+  assessment          VideoAssessment     @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  // Ensure one score per dimension per assessment
+  @@unique([assessmentId, dimension])
+  @@index([assessmentId])
+}
+
+model VideoAssessmentSummary {
+  id              String          @id @default(cuid())
+  assessmentId    String          @unique // One summary per assessment
+  overallSummary  String          @db.Text // Human-readable summary
+  rawAiResponse   Json            // Internal: full AI response for debugging/auditing
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  // Relations
+  assessment      VideoAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
 }
