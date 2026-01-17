@@ -13,7 +13,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { ArrowUp, Briefcase, MapPin, Clock, Cpu, Building2, Factory } from "lucide-react";
+import { ArrowUp, Briefcase, MapPin, Clock, Cpu, Building2, Factory, Loader2 } from "lucide-react";
 import type { ExtractedIntent } from "@/lib/entity-extraction";
 import type { RoleArchetype } from "@/lib/archetype-weights";
 import type { SeniorityLevel } from "@/lib/seniority-thresholds";
@@ -44,6 +44,17 @@ const EXAMPLE_QUERY =
   "Software Engineers in NYC with 3+ years of experience, skilled in React and Node, has experience with ML / LLMs and working at an early stage VC backed startup";
 
 const DEBOUNCE_MS = 300;
+
+/**
+ * Sequential loading messages displayed during search
+ * Each message is shown for a minimum duration before transitioning to the next
+ */
+const LOADING_MESSAGES = [
+  "Processing your search criteria...",
+  "Looking for profiles that match your criteria...",
+] as const;
+
+const LOADING_MESSAGE_DURATION_MS = 2000; // 2 seconds per message
 
 // ============================================================================
 // Helper Functions
@@ -89,13 +100,48 @@ export function CandidateSearchClient() {
   const [extraction, setExtraction] = useState<ExtractionResult | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Focus input on mount
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  // Cycle through loading messages during search
+  useEffect(() => {
+    if (isSearching) {
+      // Reset to first message when search starts
+      setLoadingMessageIndex(0);
+
+      // Set up timer to advance through messages
+      loadingTimerRef.current = setInterval(() => {
+        setLoadingMessageIndex((prev) => {
+          // Stop at the last message (don't cycle back)
+          if (prev >= LOADING_MESSAGES.length - 1) {
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, LOADING_MESSAGE_DURATION_MS);
+    } else {
+      // Clear timer when search ends
+      if (loadingTimerRef.current) {
+        clearInterval(loadingTimerRef.current);
+        loadingTimerRef.current = null;
+      }
+      setLoadingMessageIndex(0);
+    }
+
+    return () => {
+      if (loadingTimerRef.current) {
+        clearInterval(loadingTimerRef.current);
+        loadingTimerRef.current = null;
+      }
+    };
+  }, [isSearching]);
 
   // Debounced entity extraction
   const extractEntities = useCallback(async (text: string) => {
@@ -145,8 +191,9 @@ export function CandidateSearchClient() {
 
     setIsSearching(true);
     // TODO: Implement actual search functionality when candidate search service is integrated
-    // For now, we'll just simulate a search
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // For now, we'll just simulate a search with a longer timeout to demonstrate loading states
+    // The loading state will persist and cycle through messages until this completes
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     setIsSearching(false);
 
     // In a real implementation, this would navigate to search results or display them
@@ -231,70 +278,121 @@ export function CandidateSearchClient() {
 
       {/* Main content */}
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
-        <div className="w-full max-w-3xl">
-          {/* Greeting */}
-          <div className="mb-8 text-center">
-            <h2 className="text-3xl font-bold mb-3">
-              Hi there, please describe the profile you&apos;re looking for.
-            </h2>
-            <p className="text-muted-foreground">
-              Type a natural language description of your ideal candidate
-            </p>
-          </div>
+        {isSearching ? (
+          /* Loading State */
+          <div className="w-full max-w-3xl" data-testid="loading-state">
+            <div className="flex flex-col items-center justify-center py-16">
+              {/* Animated loading indicator */}
+              <div
+                className="relative w-16 h-16 mb-8"
+                data-testid="loading-indicator"
+              >
+                {/* Outer spinning ring */}
+                <div className="absolute inset-0 border-4 border-muted animate-spin border-t-secondary" />
+                {/* Inner pulsing circle */}
+                <div className="absolute inset-3 bg-secondary animate-pulse" />
+              </div>
 
-          {/* Search input */}
-          <div className="relative mb-6">
-            <textarea
-              ref={inputRef}
-              value={query}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              placeholder={EXAMPLE_QUERY}
-              rows={4}
-              className="w-full px-4 py-4 pr-16 border-2 border-foreground bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-secondary resize-none font-sans"
-              disabled={isSearching}
-            />
-            {/* Send button - positioned inside the textarea */}
-            <button
-              onClick={handleSearch}
-              disabled={!query.trim() || isSearching}
-              className="absolute bottom-4 right-4 w-10 h-10 flex items-center justify-center bg-purple-600 text-white border-2 border-foreground hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label="Search"
-            >
-              {isSearching ? (
-                <span className="w-4 h-4 border-2 border-white border-t-transparent animate-spin" />
-              ) : (
-                <ArrowUp size={20} />
-              )}
-            </button>
-          </div>
+              {/* Sequential loading messages */}
+              <div className="text-center" data-testid="loading-messages">
+                <p
+                  className="text-xl font-medium text-foreground mb-2 transition-opacity duration-300"
+                  data-testid="current-loading-message"
+                >
+                  {LOADING_MESSAGES[loadingMessageIndex]}
+                </p>
+                <p className="text-sm text-muted-foreground font-mono">
+                  Please wait while we search our database
+                </p>
+              </div>
 
-          {/* Context tags */}
-          <div className="border-2 border-foreground bg-background p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
-                Detected Entities
-              </span>
-              {isExtracting && (
-                <span className="w-2 h-2 bg-secondary animate-pulse" />
-              )}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {contextTags.map((tag) => (
-                <ContextTagBadge key={tag.label} tag={tag} />
-              ))}
+              {/* Progress dots showing message sequence */}
+              <div
+                className="flex gap-2 mt-8"
+                data-testid="loading-progress-dots"
+              >
+                {LOADING_MESSAGES.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-2 h-2 transition-colors ${
+                      index <= loadingMessageIndex
+                        ? "bg-secondary"
+                        : "bg-muted"
+                    }`}
+                    data-testid={`progress-dot-${index}`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
-
-          {/* Processing time indicator */}
-          {extraction && (
-            <div className="mt-4 text-center">
-              <span className="text-xs font-mono text-muted-foreground">
-                Extracted in {extraction.processingTimeMs}ms
-              </span>
+        ) : (
+          /* Search Form */
+          <div className="w-full max-w-3xl">
+            {/* Greeting */}
+            <div className="mb-8 text-center">
+              <h2 className="text-3xl font-bold mb-3">
+                Hi there, please describe the profile you&apos;re looking for.
+              </h2>
+              <p className="text-muted-foreground">
+                Type a natural language description of your ideal candidate
+              </p>
             </div>
-          )}
-        </div>
+
+            {/* Search input */}
+            <div className="relative mb-6">
+              <textarea
+                ref={inputRef}
+                value={query}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                placeholder={EXAMPLE_QUERY}
+                rows={4}
+                className="w-full px-4 py-4 pr-16 border-2 border-foreground bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-secondary resize-none font-sans"
+                disabled={isSearching}
+              />
+              {/* Send button - positioned inside the textarea */}
+              <button
+                onClick={handleSearch}
+                disabled={!query.trim() || isSearching}
+                className="absolute bottom-4 right-4 w-10 h-10 flex items-center justify-center bg-purple-600 text-white border-2 border-foreground hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Search"
+                data-testid="search-button"
+              >
+                {isSearching ? (
+                  <Loader2 size={20} className="animate-spin" />
+                ) : (
+                  <ArrowUp size={20} />
+                )}
+              </button>
+            </div>
+
+            {/* Context tags */}
+            <div className="border-2 border-foreground bg-background p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+                  Detected Entities
+                </span>
+                {isExtracting && (
+                  <span className="w-2 h-2 bg-secondary animate-pulse" />
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {contextTags.map((tag) => (
+                  <ContextTagBadge key={tag.label} tag={tag} />
+                ))}
+              </div>
+            </div>
+
+            {/* Processing time indicator */}
+            {extraction && (
+              <div className="mt-4 text-center">
+                <span className="text-xs font-mono text-muted-foreground">
+                  Extracted in {extraction.processingTimeMs}ms
+                </span>
+              </div>
+            )}
+          </div>
+        )}
       </main>
 
       {/* Footer */}
