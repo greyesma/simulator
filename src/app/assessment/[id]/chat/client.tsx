@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CoworkerSidebar } from "@/components/coworker-sidebar";
+import { SlackLayout } from "@/components/slack-layout";
 import { Chat } from "@/components/chat";
 import { PrLinkModal } from "@/components/pr-link-modal";
 
@@ -37,14 +37,6 @@ export function ChatPageClient({
   // Find the manager for the modal
   const manager = coworkers.find(isManager) || selectedCoworker;
 
-  const handleSelectCoworker = (coworkerId: string, action: "chat" | "call") => {
-    if (action === "chat") {
-      router.push(`/assessment/${assessmentId}/chat?coworkerId=${coworkerId}`);
-    } else {
-      router.push(`/assessment/${assessmentId}/call?coworkerId=${coworkerId}`);
-    }
-  };
-
   const handleDoneClick = () => {
     setShowPrModal(true);
   };
@@ -73,16 +65,8 @@ export function ChatPageClient({
   const showDoneButton = selectedCoworker ? isManager(selectedCoworker) : false;
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <CoworkerSidebar
-        coworkers={coworkers}
-        onSelectCoworker={handleSelectCoworker}
-        selectedCoworkerId={selectedCoworkerId}
-      />
-
-      {/* Main chat area */}
-      <div className="flex-1 flex flex-col">
+    <>
+      <SlackLayout assessmentId={assessmentId} coworkers={coworkers}>
         {selectedCoworker ? (
           <Chat
             assessmentId={assessmentId}
@@ -100,7 +84,7 @@ export function ChatPageClient({
             </div>
           </div>
         )}
-      </div>
+      </SlackLayout>
 
       {/* PR Link Modal */}
       <PrLinkModal
@@ -109,6 +93,6 @@ export function ChatPageClient({
         onSubmit={handlePrSubmit}
         managerName={manager?.name || "your manager"}
       />
-    </div>
+    </>
   );
 }

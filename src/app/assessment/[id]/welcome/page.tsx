@@ -21,12 +21,7 @@ export default async function WelcomePage({ params }: WelcomePageProps) {
     include: {
       scenario: {
         include: {
-          coworkers: {
-            where: {
-              role: { contains: "Manager", mode: "insensitive" },
-            },
-            take: 1,
-          },
+          coworkers: true,
         },
       },
       hrAssessment: true,
@@ -44,12 +39,23 @@ export default async function WelcomePage({ params }: WelcomePageProps) {
 
   const userName = session.user.name?.split(" ")[0] || "there";
 
-  // Get manager or use default
-  const manager = assessment.scenario.coworkers[0] || {
+  // Find the manager coworker or use default
+  const manager = assessment.scenario.coworkers.find((c) =>
+    c.role.toLowerCase().includes("manager")
+  ) || {
+    id: "default-manager",
     name: "Alex Chen",
     role: "Engineering Manager",
     avatarUrl: null,
   };
+
+  // Get all coworkers for the sidebar
+  const coworkers = assessment.scenario.coworkers.map((c) => ({
+    id: c.id,
+    name: c.name,
+    role: c.role,
+    avatarUrl: c.avatarUrl,
+  }));
 
   return (
     <AssessmentScreenWrapper assessmentId={id} companyName={assessment.scenario.companyName}>
@@ -62,6 +68,7 @@ export default async function WelcomePage({ params }: WelcomePageProps) {
         companyName={assessment.scenario.companyName}
         repoUrl={assessment.scenario.repoUrl}
         taskDescription={assessment.scenario.taskDescription}
+        coworkers={coworkers}
       />
     </AssessmentScreenWrapper>
   );

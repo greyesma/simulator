@@ -989,3 +989,59 @@ src/prompts/
 3. Tailwind's color palette (`bg-green-500`, `bg-red-500`) provides consistent, recognizable status colors
 4. The Slack-like bottom-right positioning of status dots was already implemented in issue #52
 5. Small visual changes (color updates) can have significant UX impact for status communication
+
+---
+
+## Issue #54: US-003: Create unified Slack-like layout component
+
+**What was implemented:**
+- Created new `SlackLayout` component (`src/components/slack-layout.tsx`) that provides a unified Slack-like layout
+- Component includes sidebar (team directory) on left + main content area on right
+- Sidebar shows online coworkers (interactive) and offline decorative team members
+- Header displays "Team" label
+- Clicking online coworker navigates to their chat page
+- Selected coworker highlighted with gold left border + background accent
+- Responsive design: sidebar collapses on mobile with hamburger menu toggle
+- Loading skeleton shown during Suspense boundary resolution
+
+**Files created:**
+- `src/components/slack-layout.tsx` - Unified Slack-like layout with sidebar + main content
+
+**Files changed:**
+- `src/app/assessment/[id]/welcome/page.tsx` - Fetch all coworkers and pass to client
+- `src/app/assessment/[id]/welcome/client.tsx` - Use SlackLayout instead of custom layout
+- `src/app/assessment/[id]/chat/client.tsx` - Use SlackLayout instead of CoworkerSidebar
+- `src/app/assessment/[id]/call/client.tsx` - Use SlackLayout instead of CoworkerSidebar
+
+**Component features:**
+1. **Sidebar** - Fixed width (w-64), shows online and offline team members
+2. **Header** - "Team" label with neo-brutalist styling
+3. **Footer** - Shows "X online · Y total" count
+4. **Selection** - Gold left border (border-l-4 border-l-secondary) + bg-accent
+5. **Mobile** - Hamburger menu with overlay, slide-in animation
+6. **Suspense** - Built-in Suspense boundary for useSearchParams()
+
+**Architecture decisions:**
+- Wrapped component in Suspense boundary since useSearchParams() requires it in Next.js 15
+- Created skeleton component for loading state
+- Layout only used on "working" pages (welcome, chat, call) - not kickoff, defense, etc.
+- Kept existing CoworkerSidebar component for backwards compatibility
+
+**Responsive behavior:**
+- Desktop (md+): Sidebar always visible
+- Mobile: Sidebar hidden by default, hamburger button in top-left
+- Click hamburger → sidebar slides in from left with overlay
+- Click overlay or select coworker → sidebar closes
+
+**Learnings:**
+1. `useSearchParams()` requires Suspense boundary in Next.js 15
+2. Transform + transition provides smooth slide-in animation for mobile sidebar
+3. Fixed positioning (fixed inset-y-0 left-0) keeps sidebar full height on mobile
+4. Overlay (fixed inset-0 bg-black/50) blocks interaction with main content when sidebar open
+5. z-index layering: overlay (z-30) < sidebar (z-40) < hamburger button (z-50)
+6. Neo-brutalist mobile menu button: border-2, bg-background, hover:bg-accent
+
+**Gotchas:**
+- Remember to add spacer element in main content header on mobile to account for fixed hamburger button
+- Sidebar height should be `h-screen` on mobile (fixed) but `h-auto` on desktop (in flow)
+- Close sidebar after navigation on mobile for better UX

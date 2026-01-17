@@ -2,6 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { SlackLayout } from "@/components/slack-layout";
+
+interface Coworker {
+  id: string;
+  name: string;
+  role: string;
+  avatarUrl: string | null;
+}
 
 interface WelcomeClientProps {
   assessmentId: string;
@@ -12,6 +20,7 @@ interface WelcomeClientProps {
   companyName: string;
   repoUrl: string;
   taskDescription: string;
+  coworkers: Coworker[];
 }
 
 interface Message {
@@ -29,6 +38,7 @@ export function WelcomeClient({
   companyName,
   repoUrl,
   taskDescription,
+  coworkers,
 }: WelcomeClientProps) {
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -115,100 +125,104 @@ export function WelcomeClient({
     .slice(0, 2);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header - Slack-like channel header */}
-      <header className="border-b-2 border-foreground bg-background">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
-          {/* Manager avatar */}
-          <div className="w-10 h-10 bg-secondary border-2 border-foreground flex items-center justify-center">
-            <span className="font-bold text-secondary-foreground text-sm font-mono">
-              {managerInitials}
-            </span>
+    <SlackLayout assessmentId={assessmentId} coworkers={coworkers}>
+      <div className="flex-1 flex flex-col">
+        {/* Header - Slack-like channel header */}
+        <header className="border-b-2 border-foreground bg-background">
+          <div className="px-4 md:px-6 py-3 flex items-center gap-3">
+            {/* Spacer for mobile menu button */}
+            <div className="w-10 md:hidden" />
+            {/* Manager avatar */}
+            <div className="w-10 h-10 bg-secondary border-2 border-foreground flex items-center justify-center">
+              <span className="font-bold text-secondary-foreground text-sm font-mono">
+                {managerInitials}
+              </span>
+            </div>
+            <div>
+              <h1 className="font-bold text-lg">{managerName}</h1>
+              <p className="text-sm text-muted-foreground">{managerRole}</p>
+            </div>
+            {/* Online indicator */}
+            <div className="ml-auto flex items-center gap-2">
+              <div className="w-3 h-3 bg-green-500 border border-foreground" />
+              <span className="text-sm text-muted-foreground font-mono">
+                online
+              </span>
+            </div>
           </div>
-          <div>
-            <h1 className="font-bold text-lg">{managerName}</h1>
-            <p className="text-sm text-muted-foreground">{managerRole}</p>
-          </div>
-          {/* Online indicator */}
-          <div className="ml-auto flex items-center gap-2">
-            <div className="w-3 h-3 bg-secondary border border-foreground" />
-            <span className="text-sm text-muted-foreground font-mono">
-              online
-            </span>
-          </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Chat area */}
-      <main className="flex-1 overflow-auto">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          {/* Date divider */}
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex-1 h-px bg-border" />
-            <span className="text-sm font-mono text-muted-foreground px-2 border border-foreground bg-background">
-              Today
-            </span>
-            <div className="flex-1 h-px bg-border" />
-          </div>
+        {/* Chat area */}
+        <main className="flex-1 overflow-auto">
+          <div className="px-4 md:px-6 py-6">
+            {/* Date divider */}
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-sm font-mono text-muted-foreground px-2 border border-foreground bg-background">
+                Today
+              </span>
+              <div className="flex-1 h-px bg-border" />
+            </div>
 
-          {/* Messages */}
-          <div className="space-y-4">
-            {messages.map((message) => (
-              <div key={message.id} className="flex gap-3">
-                {/* Avatar */}
-                <div className="w-10 h-10 bg-secondary border-2 border-foreground flex items-center justify-center flex-shrink-0">
-                  <span className="font-bold text-secondary-foreground text-sm font-mono">
-                    {managerInitials}
-                  </span>
-                </div>
-
-                {/* Message content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <span className="font-bold">{managerName}</span>
-                    {!message.isTyping && (
-                      <span className="text-sm text-muted-foreground font-mono">
-                        {message.timestamp}
-                      </span>
-                    )}
+            {/* Messages */}
+            <div className="space-y-4">
+              {messages.map((message) => (
+                <div key={message.id} className="flex gap-3">
+                  {/* Avatar */}
+                  <div className="w-10 h-10 bg-secondary border-2 border-foreground flex items-center justify-center flex-shrink-0">
+                    <span className="font-bold text-secondary-foreground text-sm font-mono">
+                      {managerInitials}
+                    </span>
                   </div>
 
-                  {message.isTyping ? (
-                    <TypingIndicator />
-                  ) : (
-                    <div className="text-foreground whitespace-pre-wrap">
-                      {formatMessageContent(message.content, repoUrl)}
+                  {/* Message content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <span className="font-bold">{managerName}</span>
+                      {!message.isTyping && (
+                        <span className="text-sm text-muted-foreground font-mono">
+                          {message.timestamp}
+                        </span>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </main>
 
-      {/* Footer - Action area */}
-      <footer className="border-t-2 border-foreground bg-background">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div
-            style={{
-              opacity: showContinue ? 1 : 0,
-              pointerEvents: showContinue ? "auto" : "none",
-            }}
-          >
-            <button
-              onClick={handleScheduleCall}
-              className="w-full bg-foreground text-background px-6 py-4 font-bold text-lg border-4 border-foreground hover:bg-secondary hover:text-secondary-foreground"
-            >
-              Join Kickoff Call
-            </button>
-            <p className="mt-2 text-center text-sm text-muted-foreground font-mono">
-              Your manager is waiting to brief you on your first task
-            </p>
+                    {message.isTyping ? (
+                      <TypingIndicator />
+                    ) : (
+                      <div className="text-foreground whitespace-pre-wrap">
+                        {formatMessageContent(message.content, repoUrl)}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </footer>
-    </div>
+        </main>
+
+        {/* Footer - Action area */}
+        <footer className="border-t-2 border-foreground bg-background">
+          <div className="px-4 md:px-6 py-4">
+            <div
+              style={{
+                opacity: showContinue ? 1 : 0,
+                pointerEvents: showContinue ? "auto" : "none",
+              }}
+            >
+              <button
+                onClick={handleScheduleCall}
+                className="w-full bg-foreground text-background px-6 py-4 font-bold text-lg border-4 border-foreground hover:bg-secondary hover:text-secondary-foreground"
+              >
+                Join Kickoff Call
+              </button>
+              <p className="mt-2 text-center text-sm text-muted-foreground font-mono">
+                Your manager is waiting to brief you on your first task
+              </p>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </SlackLayout>
   );
 }
 
