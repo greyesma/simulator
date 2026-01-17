@@ -1393,3 +1393,79 @@ Assessment
 - Prompt should return ONLY JSON without markdown code blocks for easier parsing
 - `evaluation_confidence` field helps downstream consumers gauge reliability
 
+---
+
+## Issue #61: US-003: Build Gemini Video Evaluation Service
+
+**What was implemented:**
+- Created `src/lib/video-evaluation.ts` service for evaluating videos with Gemini 3 Pro
+- Sends video URL to `gemini-3-pro-preview` model for evaluation
+- Uses the 8-dimension rubric from US-004 (video-evaluation prompt)
+- Parses JSON response into `DimensionScore` and `VideoAssessmentSummary` database records
+- Extracts and validates timestamps (MM:SS or HH:MM:SS format) for each observable behavior
+- Retry logic with exponential backoff (max 3 attempts, 1s base, 30s max)
+- Stores raw AI response in `rawAiResponse` field for auditing
+- Updates assessment status through PROCESSING → COMPLETED/FAILED lifecycle
+- 25 unit tests covering success, error handling, and edge cases
+
+**Files created:**
+- `src/lib/video-evaluation.ts` - Video evaluation service with Gemini integration
+- `src/lib/video-evaluation.test.ts` - 25 unit tests
+
+**Key Functions:**
+- `evaluateVideo(options)` - Main function: sends video to Gemini, stores results
+- `getEvaluationStatus(assessmentId)` - Check evaluation progress and completion
+- `getEvaluationResults(assessmentId)` - Retrieve full evaluation with scores and summary
+- `parseEvaluationResponse(responseText)` - Parse and validate Gemini JSON response
+- `formatTimestamps(timestamps)` - Validate and filter timestamps to MM:SS format
+
+**Service Flow:**
+```
+1. Update status to PROCESSING
+2. Build evaluation prompt (with optional video context)
+3. Call Gemini 3 Pro with video URL and prompt (with retry)
+4. Parse JSON response
+5. Upsert DimensionScore for each non-null dimension
+6. Upsert VideoAssessmentSummary with raw response
+7. Update status to COMPLETED
+```
+
+**Error Handling:**
+- Uses `withRetry()` from error-recovery module (max 3 attempts)
+- Exponential backoff: 1s base delay, up to 30s max delay
+- Invalid JSON responses caught and returned as error
+- Status set to FAILED on any unrecoverable error
+- Error message returned in result for debugging
+
+**Timestamp Validation:**
+```typescript
+// Regex: /^(\d{1,2}:)?\d{1,2}:\d{2}$/
+// Valid: "01:23", "5:45", "1:23:45"
+// Invalid: "invalid", "not-a-time"
+```
+
+**Learnings:**
+1. Use `fileData` with `fileUri` for video input to Gemini (not inlineData for large files)
+2. Gemini responses often include markdown code blocks - clean with `cleanJsonResponse()`
+3. `withRetry()` from error-recovery handles exponential backoff automatically
+4. Map dimensions from string keys to Prisma enum using explicit mapping
+5. Only upsert scores for non-null dimensions - null means insufficient evidence
+6. Cast Prisma JSON fields with double cast: `evaluation as unknown as Prisma.InputJsonValue`
+7. Test mocking pattern: import mocked modules after `vi.mock()` calls, then cast to `vi.fn()`
+
+**Architecture patterns:**
+- Service pattern: single module exports all related functions
+- Result type with `success: boolean` and optional `error` for graceful failure handling
+- Map type for dimension scores allows easy lookup by dimension enum
+- Upsert pattern ensures idempotent operations (can retry without duplicates)
+
+**Model used:**
+```typescript
+const VIDEO_EVALUATION_MODEL = "gemini-3-pro-preview";
+```
+
+**Gotchas:**
+- Issue mentioned "6-dimension rubric" but we correctly use 8 dimensions from database schema
+- Timestamp regex allows both MM:SS and HH:MM:SS formats
+- mimeType is hardcoded to "video/mp4" - may need to be configurable for other formats
+- The `rawAiResponse` field stores the full evaluation (never exposed to users)
