@@ -969,3 +969,23 @@ src/prompts/
 3. The existing `EXAMPLE_COWORKERS` pattern made it easy to add a parallel `DECORATIVE_TEAM_MEMBERS` array
 4. Utility functions like `getInitials()` can be reused across components when extracted to lib
 5. Neo-brutalist styling applies to offline elements too - just with muted variants of the color palette
+
+---
+
+## Issue #53: US-002: Add online/offline status indicators to sidebar
+
+**What was implemented:**
+- Changed online status dot from gold (`bg-secondary`) to green (`bg-green-500`) for interactive coworkers
+- Changed offline status dot from gray (`bg-muted-foreground/30`) to red (`bg-red-500`) for decorative members
+- Added native HTML `title="Unavailable"` tooltip on hover for offline coworkers
+- Added `cursor-default` class to offline members to indicate they are not clickable
+
+**Files changed:**
+- `src/components/coworker-sidebar.tsx` - Updated status dot colors and added tooltip
+
+**Learnings:**
+1. Native HTML `title` attribute provides a simple, accessible tooltip without additional dependencies
+2. `cursor-default` class communicates non-interactive state visually
+3. Tailwind's color palette (`bg-green-500`, `bg-red-500`) provides consistent, recognizable status colors
+4. The Slack-like bottom-right positioning of status dots was already implemented in issue #52
+5. Small visual changes (color updates) can have significant UX impact for status communication
