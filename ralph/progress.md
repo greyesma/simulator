@@ -2601,3 +2601,103 @@ useEffect(() => {
 - Clean up `setInterval` in useEffect cleanup to prevent memory leaks
 - Message index should stop at last message (not wrap around)
 - Use `data-testid` attributes for reliable browser automation testing
+
+---
+
+## Issue #74: US-012 - Create Candidate Search Result Card
+
+**What was implemented:**
+- `CandidateSearchResultCard` component for displaying candidates in search results
+- Card displays: candidate name, fit score (0-100), archetype match
+- 6 dimension scores shown as compact visual bars (TECH, PROB, COMM, COLLAB, ADAPT, LEAD)
+- Threshold highlighting: green for scores exceeding seniority threshold, amber for below
+- 1-sentence summary excerpt with line-clamp truncation
+- "View Profile" button linking to `/candidate/[id]`
+- `CandidateSearchResultGrid` container with responsive grid (1/2/3/4 columns)
+- 36 unit tests covering all acceptance criteria
+
+**Files created:**
+- `src/components/candidate-search-result-card.tsx` - Card and grid components
+- `src/components/candidate-search-result-card.test.tsx` - 36 unit tests
+
+**Component structure:**
+```typescript
+interface CandidateSearchResult {
+  id: string;                    // VideoAssessment ID
+  candidate: { id, name, email };
+  fitScore: number;              // 0-100 normalized score
+  archetype: RoleArchetype;
+  seniorityLevel: SeniorityLevel | null;
+  dimensionScores: DimensionScoreData[];
+  summaryExcerpt: string | null;
+  completedAt: Date | null;
+}
+```
+
+**Dimension Score Bar Visual:**
+- 5 segments per dimension (1-5 scale)
+- Short labels: TECH, PROB, COMM, COLLAB, ADAPT, LEAD
+- Key dimensions (VERY_HIGH weight) shown in bold
+- Color-coded based on threshold status:
+  - Green (`bg-green-500`): Score exceeds seniority threshold
+  - Amber (`bg-amber-500`): Score below threshold
+  - Gold (`bg-secondary`): Default for non-key dimensions
+
+**Fit Score Badge Styling:**
+- High scores (>=80): Gold background
+- Medium scores (60-79): Green tint background
+- Low scores (<60): Muted background
+
+**Grid Layout:**
+```css
+grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4
+```
+- 1 column on mobile
+- 2 columns on small screens
+- 3 columns on large screens
+- 4 columns on extra-large screens
+
+**Neo-Brutalist Design Compliance:**
+- No rounded corners (0px radius)
+- No shadows
+- 2px black borders
+- Gold (#f7da50) for avatar initials and fit score badge
+- High contrast throughout
+- DM Sans for text, Space Mono for labels
+
+**Learnings:**
+1. Use TypeScript's `Record<EnumType, ValueType>` for mapping enums to display values
+2. `line-clamp-2` Tailwind class truncates text to 2 lines with ellipsis
+3. Flex with `h-full` and `mt-auto` on footer keeps footer at bottom of card
+4. `data-testid` attributes enable reliable testing without coupling to implementation
+5. Grid with responsive breakpoints provides optimal card layout across screen sizes
+6. Threshold highlighting only applies to key dimensions (VERY_HIGH weight level)
+7. Map data structure useful for O(1) dimension score lookup
+
+**Test patterns:**
+```typescript
+// Mock next/link for testing
+vi.mock("next/link", () => ({
+  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
+    <a href={href}>{children}</a>
+  ),
+}));
+
+// Test factory for creating mock candidates
+function createMockCandidate(overrides: Partial<CandidateSearchResult> = {}): CandidateSearchResult {
+  return { ...defaultCandidate, ...overrides };
+}
+```
+
+**Browser validation:**
+- Grid displays 4 cards per row on desktop viewport
+- Dimension scores render correctly with visual bars
+- Threshold highlighting shows green/amber/gold appropriately
+- View Profile button navigates to `/candidate/[id]`
+- Empty state shows "No candidates found" message
+
+**Gotchas:**
+- Initials extraction from email splits by `@` not `.` - "john@example.com" → "JE" not "JS"
+- Only 6 primary dimensions shown for compact display (excludes CREATIVITY and TIME_MANAGEMENT)
+- Missing dimension scores gracefully handled (component skips them)
+- Fit score is rounded to nearest integer for display
