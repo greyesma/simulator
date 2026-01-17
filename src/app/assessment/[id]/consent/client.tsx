@@ -63,8 +63,8 @@ export function ConsentClient({
         throw new Error(data.error || "Failed to record consent");
       }
 
-      // Redirect to HR interview
-      router.push(`/assessment/${assessmentId}/hr-interview`);
+      // Redirect to CV upload
+      router.push(`/assessment/${assessmentId}/cv-upload`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
       setIsAccepting(false);

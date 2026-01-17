@@ -2,18 +2,18 @@ import { auth } from "@/auth";
 import { db } from "@/server/db";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { HRInterviewClient } from "./client";
+import { CVUploadClient } from "./client";
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function HRInterviewPage({ params }: PageProps) {
+export default async function CVUploadPage({ params }: PageProps) {
   const { id } = await params;
   const session = await auth();
 
   if (!session?.user?.id) {
-    redirect(`/sign-in?callbackUrl=/assessment/${id}/hr-interview`);
+    redirect(`/sign-in?callbackUrl=/assessment/${id}/cv-upload`);
   }
 
   // Fetch the assessment and user data
@@ -27,16 +27,6 @@ export default async function HRInterviewPage({ params }: PageProps) {
         select: {
           name: true,
           companyName: true,
-          companyDescription: true,
-        },
-      },
-      conversations: {
-        where: {
-          coworkerId: null,
-          type: "voice",
-        },
-        select: {
-          transcript: true,
         },
       },
       user: {
@@ -56,15 +46,12 @@ export default async function HRInterviewPage({ params }: PageProps) {
     redirect(`/assessment/${id}/consent`);
   }
 
-  // Check if CV was uploaded, redirect to CV upload page if not
+  // Check if user already has CV (from assessment or user profile)
   const hasCv = assessment.cvUrl || assessment.user.cvUrl;
-  if (!hasCv) {
-    redirect(`/assessment/${id}/cv-upload`);
+  if (hasCv) {
+    // Auto-skip to HR interview if CV already exists
+    redirect(`/assessment/${id}/hr-interview`);
   }
-
-  // Check if interview was already completed
-  const existingTranscript = assessment.conversations[0]?.transcript;
-  const hasCompletedInterview = existingTranscript && Array.isArray(existingTranscript) && existingTranscript.length > 0;
 
   return (
     <main className="min-h-screen bg-background text-foreground flex flex-col">
@@ -95,11 +82,37 @@ export default async function HRInterviewPage({ params }: PageProps) {
       <div className="border-b-2 border-border">
         <div className="max-w-7xl mx-auto px-6 py-3">
           <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 opacity-40">
+              <div className="w-8 h-8 border-2 border-border flex items-center justify-center font-bold">
+                0
+              </div>
+              <span>Consent</span>
+            </div>
+            <div className="h-px flex-1 bg-border" />
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-secondary text-secondary-foreground flex items-center justify-center font-bold">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="square"
+                    strokeLinejoin="miter"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </div>
+              <span className="font-semibold">CV Upload</span>
+            </div>
+            <div className="h-px flex-1 bg-border" />
+            <div className="flex items-center gap-2 opacity-40">
+              <div className="w-8 h-8 border-2 border-border flex items-center justify-center font-bold">
                 1
               </div>
-              <span className="font-semibold">HR Interview</span>
+              <span>HR Interview</span>
             </div>
             <div className="h-px flex-1 bg-border" />
             <div className="flex items-center gap-2 opacity-40">
@@ -127,33 +140,12 @@ export default async function HRInterviewPage({ params }: PageProps) {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col">
-        {hasCompletedInterview ? (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center max-w-md">
-              <div className="w-20 h-20 bg-secondary border-2 border-foreground flex items-center justify-center mx-auto mb-6">
-                <span className="text-3xl">&#10003;</span>
-              </div>
-              <h2 className="text-2xl font-bold mb-4">Interview Completed</h2>
-              <p className="text-muted-foreground mb-6">
-                You&apos;ve already completed the HR interview for this assessment.
-                Continue to the next phase.
-              </p>
-              <Link
-                href={`/assessment/${id}/onboarding`}
-                className="inline-block bg-foreground text-background px-6 py-3 font-semibold border-2 border-foreground hover:bg-secondary hover:text-secondary-foreground hover:border-secondary"
-              >
-                Continue to Onboarding
-              </Link>
-            </div>
-          </div>
-        ) : (
-          <HRInterviewClient
-            assessmentId={id}
-            scenarioName={assessment.scenario.name}
-            companyName={assessment.scenario.companyName}
-          />
-        )}
+      <div className="flex-1 flex items-center justify-center p-6">
+        <CVUploadClient
+          assessmentId={id}
+          scenarioName={assessment.scenario.name}
+          companyName={assessment.scenario.companyName}
+        />
       </div>
     </main>
   );

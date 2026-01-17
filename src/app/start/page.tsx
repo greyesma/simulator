@@ -89,7 +89,8 @@ function getRedirectUrlForStatus(
 
   switch (status) {
     case AssessmentStatus.HR_INTERVIEW:
-      return `/assessment/${assessmentId}/hr-interview`;
+      // Route to cv-upload which will auto-skip to hr-interview if CV exists
+      return `/assessment/${assessmentId}/cv-upload`;
     case AssessmentStatus.ONBOARDING:
       return `/assessment/${assessmentId}/congratulations`;
     case AssessmentStatus.WORKING:

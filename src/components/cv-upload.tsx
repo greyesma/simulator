@@ -10,6 +10,7 @@ interface CVUploadProps {
   }) => void;
   onError?: (error: string) => void;
   currentFileName?: string;
+  assessmentId?: string;
 }
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -19,6 +20,7 @@ export function CVUpload({
   onUploadComplete,
   onError,
   currentFileName,
+  assessmentId,
 }: CVUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -55,6 +57,9 @@ export function CVUpload({
     try {
       const formData = new FormData();
       formData.append("file", file);
+      if (assessmentId) {
+        formData.append("assessmentId", assessmentId);
+      }
 
       // Simulate progress for better UX (actual progress tracking would need XHR)
       const progressInterval = setInterval(() => {

@@ -36,9 +36,9 @@ export default async function ConsentPage({ params }: PageProps) {
     notFound();
   }
 
-  // If consent was already given, redirect to HR interview
+  // If consent was already given, redirect to CV upload (which will auto-skip if CV exists)
   if (assessment.consentGivenAt) {
-    redirect(`/assessment/${id}/hr-interview`);
+    redirect(`/assessment/${id}/cv-upload`);
   }
 
   return (
