@@ -1045,3 +1045,60 @@ src/prompts/
 - Remember to add spacer element in main content header on mobile to account for fixed hamburger button
 - Sidebar height should be `h-screen` on mobile (fixed) but `h-auto` on desktop (in flow)
 - Close sidebar after navigation on mobile for better UX
+
+---
+
+## Issue #55: US-004: Refactor welcome page to unified layout with auto-select
+
+**What was implemented:**
+- Added `selectedCoworkerId` prop to `SlackLayout` component for auto-selection override
+- Auto-select Alex Chen (Engineering Manager) on welcome page load
+- Fixed typing indicator bug: indicator now disappears after all messages are displayed
+- Replaced "Join Kickoff Call" button with standard call icon in chat header
+- Call icon works same as other coworkers (initiates kickoff call with Alex)
+
+**Files changed:**
+- `src/components/slack-layout.tsx` - Added `selectedCoworkerId` optional prop, uses nullish coalescing to prefer prop over URL param
+- `src/app/assessment/[id]/welcome/page.tsx` - Extract manager info separately, pass `managerId` to client
+- `src/app/assessment/[id]/welcome/client.tsx` - Accept `managerId` prop, filter typing messages when done, replace footer button with header call icon
+
+**Key changes:**
+
+1. **SlackLayout selectedCoworkerId prop:**
+   ```typescript
+   interface SlackLayoutProps {
+     selectedCoworkerId?: string; // Optional override
+   }
+   // Use: prop ?? URL param ?? null
+   const selectedCoworkerId = overrideSelectedId ?? searchParams.get("coworkerId") ?? null;
+   ```
+
+2. **Typing indicator fix:**
+   ```typescript
+   const [allMessagesShown, setAllMessagesShown] = useState(false);
+
+   // In useEffect when all messages done:
+   setAllMessagesShown(true);
+
+   // Filter out typing indicators when done:
+   const displayMessages = allMessagesShown
+     ? messages.filter((m) => !m.isTyping)
+     : messages;
+   ```
+
+3. **Call icon in header:**
+   ```tsx
+   <button onClick={handleScheduleCall} className="p-2 border-2 ...">
+     <Phone size={20} />
+   </button>
+   ```
+
+**Learnings:**
+1. Nullish coalescing (`??`) is better than `||` for prop overrides since it only falls back on `null`/`undefined`, not empty strings
+2. Filtering out typing indicators when done is cleaner than trying to remove them from state during the typewriter effect
+3. The call icon in header matches Slack UI patterns better than a large footer button
+4. Passing the manager's ID from server component allows the sidebar to highlight the correct coworker
+
+**Gotchas:**
+- The `isTyping` messages get added and removed during the typewriter effect, but there can be a brief moment where a typing message remains in state. Using `allMessagesShown` flag + filtering is a reliable way to ensure no typing indicators show after completion.
+- Manager fallback defaults (`"default-manager"`, `"Alex Chen"`) are used when no coworker with "manager" in their role exists
