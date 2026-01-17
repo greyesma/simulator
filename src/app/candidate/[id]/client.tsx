@@ -14,7 +14,22 @@ import {
   ChevronUp,
   X,
   Clock,
+  Briefcase,
+  Target,
+  ToggleLeft,
+  ToggleRight,
+  Star,
+  TrendingUp,
 } from "lucide-react";
+import {
+  type RoleArchetype,
+  type WeightLevel,
+  calculateFitScore,
+  getArchetypeDisplayName,
+  getWeightLevelForDimension,
+  ARCHETYPE_CONFIGS,
+  WEIGHT_MULTIPLIERS,
+} from "@/lib/archetype-weights";
 
 // Map dimension enums to human-readable labels
 const dimensionLabels: Record<AssessmentDimension, string> = {
@@ -72,21 +87,41 @@ export function normalizeTimestamp(timestamp: unknown): string | null {
 function ScoreBar({
   score,
   maxScore = 5,
+  emphasized = false,
+  deemphasized = false,
 }: {
   score: number;
   maxScore?: number;
+  /** Emphasize this score (gold background, larger) */
+  emphasized?: boolean;
+  /** De-emphasize this score (muted styling) */
+  deemphasized?: boolean;
 }) {
   const segments = Array.from({ length: maxScore }, (_, i) => i + 1);
 
+  // Determine bar fill color based on emphasis
+  const getSegmentClass = (filled: boolean) => {
+    if (!filled) {
+      return deemphasized ? "bg-muted/50" : "bg-muted";
+    }
+    if (deemphasized) {
+      return "bg-muted-foreground/30";
+    }
+    return "bg-secondary";
+  };
+
   return (
-    <div className="flex gap-1" data-testid="score-bar">
+    <div
+      className={`flex gap-1 ${emphasized ? "h-4" : "h-3"}`}
+      data-testid="score-bar"
+    >
       {segments.map((segment) => (
         <div
           key={segment}
           data-testid="score-segment"
-          className={`h-3 flex-1 ${
-            segment <= score ? "bg-secondary" : "bg-muted"
-          } border border-foreground`}
+          className={`flex-1 ${getSegmentClass(segment <= score)} border ${
+            deemphasized ? "border-muted-foreground/30" : "border-foreground"
+          }`}
         />
       ))}
     </div>
@@ -116,6 +151,31 @@ function TimestampLink({
   );
 }
 
+/** Weight level badge for dimension cards */
+function WeightLevelBadge({ level }: { level: WeightLevel }) {
+  const labels: Record<WeightLevel, string> = {
+    VERY_HIGH: "Critical",
+    HIGH: "Important",
+    MEDIUM: "Standard",
+  };
+
+  const styles: Record<WeightLevel, string> = {
+    VERY_HIGH: "bg-secondary text-secondary-foreground border-secondary",
+    HIGH: "bg-secondary/20 text-foreground border-secondary",
+    MEDIUM: "bg-muted text-muted-foreground border-muted-foreground/30",
+  };
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 font-mono text-xs px-2 py-0.5 border ${styles[level]}`}
+      data-testid="weight-level-badge"
+    >
+      {level === "VERY_HIGH" && <Star size={10} className="fill-current" />}
+      {labels[level]}
+    </span>
+  );
+}
+
 function DimensionScoreCard({
   dimension,
   score,
@@ -123,6 +183,8 @@ function DimensionScoreCard({
   trainableGap,
   timestamps,
   onTimestampClick,
+  weightLevel,
+  showWeightLevel = false,
 }: {
   dimension: AssessmentDimension;
   score: number;
@@ -130,6 +192,10 @@ function DimensionScoreCard({
   trainableGap: boolean;
   timestamps: unknown[];
   onTimestampClick: (seconds: number) => void;
+  /** Weight level for this dimension (when viewing with archetype context) */
+  weightLevel?: WeightLevel;
+  /** Whether to show the weight level badge */
+  showWeightLevel?: boolean;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -138,25 +204,59 @@ function DimensionScoreCard({
     .map(normalizeTimestamp)
     .filter((t): t is string => t !== null);
 
+  // Determine emphasis based on weight level
+  const isEmphasized = weightLevel === "VERY_HIGH";
+  const isDeemphasized = weightLevel === "MEDIUM";
+
+  // Card styling based on emphasis
+  const cardBorderClass = isEmphasized
+    ? "border-secondary"
+    : isDeemphasized
+      ? "border-muted-foreground/30"
+      : "border-foreground";
+
+  const headerBgClass = isEmphasized
+    ? "hover:bg-secondary/10"
+    : isDeemphasized
+      ? "hover:bg-muted/30 opacity-70"
+      : "hover:bg-accent/50";
+
   return (
-    <div className="border-2 border-foreground" data-testid="dimension-card">
+    <div
+      className={`border-2 ${cardBorderClass} ${isEmphasized ? "ring-1 ring-secondary" : ""}`}
+      data-testid="dimension-card"
+      data-weight-level={weightLevel}
+    >
       {/* Header - always visible, clickable to expand */}
       <button
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full p-4 text-left hover:bg-accent/50 flex items-center justify-between"
+        className={`w-full p-4 text-left ${headerBgClass} flex items-center justify-between`}
         data-testid="dimension-header"
       >
         <div className="flex-1">
           <div className="flex items-center justify-between gap-4 mb-2">
-            <div className="font-bold">{dimensionLabels[dimension]}</div>
-            <div className="font-mono text-lg font-bold">{score}/5</div>
+            <div className="flex items-center gap-2">
+              <span className={`font-bold ${isDeemphasized ? "text-muted-foreground" : ""}`}>
+                {dimensionLabels[dimension]}
+              </span>
+              {showWeightLevel && weightLevel && (
+                <WeightLevelBadge level={weightLevel} />
+              )}
+            </div>
+            <div className={`font-mono text-lg font-bold ${isDeemphasized ? "text-muted-foreground" : ""}`}>
+              {score}/5
+            </div>
           </div>
           <div className="max-w-xs">
-            <ScoreBar score={score} />
+            <ScoreBar
+              score={score}
+              emphasized={isEmphasized}
+              deemphasized={isDeemphasized}
+            />
           </div>
         </div>
-        <div className="ml-4">
+        <div className={`ml-4 ${isDeemphasized ? "text-muted-foreground" : ""}`}>
           {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
         </div>
       </button>
@@ -164,7 +264,7 @@ function DimensionScoreCard({
       {/* Expandable details section */}
       {isExpanded && (
         <div
-          className="border-t-2 border-foreground p-4 bg-muted/10"
+          className={`border-t-2 ${cardBorderClass} p-4 bg-muted/10`}
           data-testid="dimension-details"
         >
           {/* Observable behaviors */}
@@ -331,6 +431,174 @@ function VideoPlayerModal({
   );
 }
 
+// ============================================================================
+// Role-Specific View Components
+// ============================================================================
+
+/**
+ * Banner showing the role being used to view the profile
+ */
+function RoleBanner({ archetype }: { archetype: RoleArchetype }) {
+  const displayName = getArchetypeDisplayName(archetype);
+
+  return (
+    <div
+      className="border-2 border-secondary bg-secondary/10 p-4 flex items-center gap-4"
+      data-testid="role-banner"
+    >
+      <div className="w-10 h-10 bg-secondary flex items-center justify-center">
+        <Briefcase size={20} className="text-secondary-foreground" />
+      </div>
+      <div>
+        <p className="font-mono text-xs text-muted-foreground uppercase tracking-wider">
+          Viewing as
+        </p>
+        <p className="font-bold text-lg" data-testid="role-name">
+          {displayName} role
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Fit score breakdown showing how the score was calculated
+ */
+function FitScoreBreakdown({
+  scores,
+  archetype,
+}: {
+  scores: Array<{ dimension: AssessmentDimension; score: number }>;
+  archetype: RoleArchetype;
+}) {
+  // Calculate fit score using the archetype weights
+  const dimensionScoreInputs = scores.map((s) => ({
+    dimension: s.dimension,
+    score: s.score,
+  }));
+  const result = calculateFitScore(dimensionScoreInputs, archetype);
+
+  // Sort breakdown by weighted contribution (highest first)
+  const sortedBreakdown = [...result.breakdown].sort(
+    (a, b) => b.weightedScore - a.weightedScore
+  );
+
+  // Get top 3 contributors
+  const topContributors = sortedBreakdown.slice(0, 3);
+
+  return (
+    <div
+      className="border-2 border-foreground p-6"
+      data-testid="fit-score-breakdown"
+    >
+      <div className="flex items-start justify-between gap-6 mb-6">
+        <div>
+          <h2 className="text-lg font-bold font-mono mb-1">FIT SCORE</h2>
+          <p className="text-sm text-muted-foreground">
+            How well this candidate matches the {getArchetypeDisplayName(archetype)} role
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div
+            className="w-20 h-20 bg-secondary border-2 border-foreground flex items-center justify-center"
+            data-testid="fit-score-value"
+          >
+            <span className="font-mono text-3xl font-bold text-secondary-foreground">
+              {Math.round(result.fitScore)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Score calculation explanation */}
+      <div className="mb-4">
+        <h3 className="font-mono text-xs font-bold mb-3 text-muted-foreground">
+          TOP CONTRIBUTING DIMENSIONS
+        </h3>
+        <div className="space-y-3">
+          {topContributors.map((item) => (
+            <div
+              key={item.dimension}
+              className="flex items-center gap-4"
+              data-testid="contribution-item"
+            >
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-medium">
+                    {dimensionLabels[item.dimension]}
+                  </span>
+                  <span className="font-mono text-xs text-muted-foreground">
+                    ({WEIGHT_MULTIPLIERS[item.weightLevel]}x weight)
+                  </span>
+                </div>
+                {/* Contribution bar */}
+                <div className="h-2 bg-muted border border-foreground overflow-hidden">
+                  <div
+                    className="h-full bg-secondary"
+                    style={{
+                      width: `${(item.weightedScore / result.maxPossible) * 100}%`,
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="font-mono text-sm">
+                {item.rawScore}/5 → {item.weightedScore.toFixed(1)} pts
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Formula explanation */}
+      <div className="pt-4 border-t border-muted">
+        <p className="font-mono text-xs text-muted-foreground">
+          Score = {result.weightedSum.toFixed(1)} / {result.maxPossible.toFixed(1)} × 100 = {result.fitScore.toFixed(1)}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Toggle button for switching between weighted and raw assessment view
+ */
+function ViewModeToggle({
+  showRawAssessment,
+  onToggle,
+}: {
+  showRawAssessment: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="inline-flex items-center gap-2 px-4 py-2 border-2 border-foreground hover:bg-accent/50"
+      data-testid="view-mode-toggle"
+    >
+      {showRawAssessment ? (
+        <>
+          <ToggleRight size={20} className="text-secondary" />
+          <span className="font-mono text-sm">Viewing: Raw Assessment</span>
+        </>
+      ) : (
+        <>
+          <ToggleLeft size={20} />
+          <span className="font-mono text-sm">Viewing: Role-Weighted</span>
+        </>
+      )}
+    </button>
+  );
+}
+
+/**
+ * Check if a string is a valid RoleArchetype
+ */
+function isValidArchetype(value: string | null): value is RoleArchetype {
+  if (!value) return false;
+  return Object.keys(ARCHETYPE_CONFIGS).includes(value);
+}
+
 // Types for the component props
 export interface CandidateProfileData {
   id: string;
@@ -373,8 +641,15 @@ function CandidateProfileInner({
     initialTime: number;
   }>({ isOpen: false, initialTime: 0 });
 
+  // Toggle for raw assessment view
+  const [showRawAssessment, setShowRawAssessment] = useState(false);
+
   const { candidate, scores, summary, assessment, completedAt, isSearchable, videoUrl } =
     data;
+
+  // Get archetype from URL parameters (if coming from search)
+  const archetypeParam = searchParams.get("archetype");
+  const archetype = isValidArchetype(archetypeParam) ? archetypeParam : null;
 
   // Check for timestamp URL parameter on mount
   useEffect(() => {
@@ -428,22 +703,53 @@ function CandidateProfileInner({
     .toUpperCase()
     .slice(0, 2);
 
+  // Determine if we should show role-specific view
+  const showRoleSpecificView = archetype !== null && !showRawAssessment;
+
+  // Get weight level for a dimension
+  const getWeightLevel = (dimension: AssessmentDimension): WeightLevel | undefined => {
+    if (!archetype || showRawAssessment) return undefined;
+    return getWeightLevelForDimension(archetype, dimension);
+  };
+
+  // Sort dimensions by weight level when in role-specific view
+  const sortedDimensionOrder = showRoleSpecificView
+    ? [...dimensionOrder].sort((a, b) => {
+        const weightA = getWeightLevel(a);
+        const weightB = getWeightLevel(b);
+        const order: Record<WeightLevel, number> = { VERY_HIGH: 0, HIGH: 1, MEDIUM: 2 };
+        return (weightA ? order[weightA] : 3) - (weightB ? order[weightB] : 3);
+      })
+    : dimensionOrder;
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b-2 border-foreground">
-        <div className="max-w-4xl mx-auto px-6 py-4">
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link
-            href="/"
+            href={archetype ? "/candidate_search" : "/"}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft size={16} />
-            Back to Home
+            {archetype ? "Back to Search" : "Back to Home"}
           </Link>
+          {/* View mode toggle (only show when viewing with archetype) */}
+          {archetype && (
+            <ViewModeToggle
+              showRawAssessment={showRawAssessment}
+              onToggle={() => setShowRawAssessment(!showRawAssessment)}
+            />
+          )}
         </div>
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-8 space-y-8">
+        {/* Role Banner (only when viewing with archetype context) */}
+        {showRoleSpecificView && archetype && (
+          <RoleBanner archetype={archetype} />
+        )}
+
         {/* Candidate Info Section */}
         <section className="border-2 border-foreground p-6">
           <div className="flex items-start gap-6">
@@ -486,6 +792,14 @@ function CandidateProfileInner({
           </div>
         </section>
 
+        {/* Fit Score Breakdown (only when viewing with archetype context) */}
+        {showRoleSpecificView && archetype && scores.length > 0 && (
+          <FitScoreBreakdown
+            scores={scores.map((s) => ({ dimension: s.dimension, score: s.score }))}
+            archetype={archetype}
+          />
+        )}
+
         {/* Overall Summary Section */}
         <section className="border-2 border-foreground p-6">
           <h2 className="text-lg font-bold mb-4 font-mono">OVERALL SUMMARY</h2>
@@ -500,13 +814,25 @@ function CandidateProfileInner({
 
         {/* Dimension Scores Section */}
         <section>
-          <h2 className="text-lg font-bold mb-4 font-mono">ASSESSMENT SCORES</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold font-mono">ASSESSMENT SCORES</h2>
+            {showRoleSpecificView && (
+              <p className="font-mono text-xs text-muted-foreground">
+                Sorted by importance for {archetype && getArchetypeDisplayName(archetype)}
+              </p>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground mb-4">
             Click on a dimension to expand details and view video evidence.
+            {showRoleSpecificView && (
+              <span className="block mt-1">
+                Emphasized dimensions are most critical for this role.
+              </span>
+            )}
           </p>
           {scores.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-2">
-              {dimensionOrder.map((dimension) => {
+              {sortedDimensionOrder.map((dimension) => {
                 const scoreData = scoreMap.get(dimension);
                 if (!scoreData) return null;
 
@@ -514,6 +840,8 @@ function CandidateProfileInner({
                 const timestamps = Array.isArray(scoreData.timestamps)
                   ? scoreData.timestamps
                   : [];
+
+                const weightLevel = getWeightLevel(dimension);
 
                 return (
                   <DimensionScoreCard
@@ -524,6 +852,8 @@ function CandidateProfileInner({
                     trainableGap={scoreData.trainableGap}
                     timestamps={timestamps}
                     onTimestampClick={handleTimestampClick}
+                    weightLevel={weightLevel}
+                    showWeightLevel={showRoleSpecificView}
                   />
                 );
               })}

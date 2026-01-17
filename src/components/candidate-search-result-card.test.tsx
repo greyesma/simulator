@@ -291,12 +291,12 @@ describe("CandidateSearchResultCard", () => {
   });
 
   describe("View Profile link", () => {
-    it("links to the correct candidate profile page", () => {
-      const candidate = createMockCandidate({ id: "va-456" });
+    it("links to the correct candidate profile page with archetype context", () => {
+      const candidate = createMockCandidate({ id: "va-456", archetype: "SENIOR_FRONTEND_ENGINEER" });
       render(<CandidateSearchResultCard candidate={candidate} />);
 
       const viewProfileLink = screen.getByTestId("view-profile-button");
-      expect(viewProfileLink).toHaveAttribute("href", "/candidate/va-456");
+      expect(viewProfileLink).toHaveAttribute("href", "/candidate/va-456?archetype=SENIOR_FRONTEND_ENGINEER");
     });
 
     it("displays View Profile button text", () => {
@@ -517,12 +517,12 @@ describe("Acceptance Criteria", () => {
     ).toBeInTheDocument();
   });
 
-  it('AC5: "View Profile" button links to full candidate profile', () => {
-    const candidate = createMockCandidate({ id: "test-va-123" });
+  it('AC5: "View Profile" button links to full candidate profile with archetype context', () => {
+    const candidate = createMockCandidate({ id: "test-va-123", archetype: "SENIOR_FRONTEND_ENGINEER" });
     render(<CandidateSearchResultCard candidate={candidate} />);
 
     const viewProfileButton = screen.getByTestId("view-profile-button");
-    expect(viewProfileButton).toHaveAttribute("href", "/candidate/test-va-123");
+    expect(viewProfileButton).toHaveAttribute("href", "/candidate/test-va-123?archetype=SENIOR_FRONTEND_ENGINEER");
     expect(viewProfileButton).toHaveTextContent("View Profile");
   });
 
