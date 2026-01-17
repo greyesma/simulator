@@ -16,6 +16,7 @@ vi.mock("@/server/db", () => ({
     videoAssessment: {
       update: vi.fn(),
       findUnique: vi.fn(),
+      create: vi.fn(),
     },
     dimensionScore: {
       upsert: vi.fn(),
@@ -55,6 +56,9 @@ import {
   evaluateVideo,
   getEvaluationStatus,
   getEvaluationResults,
+  triggerVideoAssessment,
+  getVideoAssessmentStatusByAssessment,
+  retryVideoAssessment,
   VIDEO_EVALUATION_MODEL,
 } from "./video-evaluation";
 import { gemini } from "@/lib/gemini";
@@ -64,6 +68,7 @@ import { db } from "@/server/db";
 const mockGenerateContent = gemini.models.generateContent as ReturnType<typeof vi.fn>;
 const mockVideoAssessmentUpdate = db.videoAssessment.update as ReturnType<typeof vi.fn>;
 const mockVideoAssessmentFindUnique = db.videoAssessment.findUnique as ReturnType<typeof vi.fn>;
+const mockVideoAssessmentCreate = db.videoAssessment.create as ReturnType<typeof vi.fn>;
 const mockDimensionScoreUpsert = db.dimensionScore.upsert as ReturnType<typeof vi.fn>;
 const mockVideoAssessmentSummaryUpsert = db.videoAssessmentSummary.upsert as ReturnType<typeof vi.fn>;
 const mockVideoAssessmentLogCreate = db.videoAssessmentLog.create as ReturnType<typeof vi.fn>;
@@ -895,5 +900,240 @@ describe("getEvaluationResults", () => {
     await expect(getEvaluationResults("non-existent")).rejects.toThrow(
       "Assessment not found: non-existent"
     );
+  });
+});
+
+// ============================================================================
+// triggerVideoAssessment Tests (US-001)
+// ============================================================================
+
+describe("triggerVideoAssessment", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockVideoAssessmentUpdate.mockResolvedValue({ id: "video-assessment-123" });
+    mockVideoAssessmentCreate.mockResolvedValue({ id: "video-assessment-123" });
+    mockDimensionScoreUpsert.mockResolvedValue({ id: "test-score-id" });
+    mockVideoAssessmentSummaryUpsert.mockResolvedValue({ id: "test-summary-id" });
+    mockVideoAssessmentLogCreate.mockResolvedValue({ id: "test-log-id" });
+    mockVideoAssessmentApiCallCreate.mockResolvedValue({ id: "test-api-call-id" });
+    mockVideoAssessmentApiCallUpdate.mockResolvedValue({ id: "test-api-call-id" });
+    mockGenerateContent.mockResolvedValue({
+      text: JSON.stringify(mockEvaluationResponse),
+    });
+  });
+
+  it("should create new VideoAssessment and trigger evaluation", async () => {
+    mockVideoAssessmentFindUnique.mockResolvedValue(null);
+
+    const result = await triggerVideoAssessment({
+      assessmentId: "simulation-123",
+      candidateId: "user-456",
+      videoUrl: "https://storage.example.com/recording.webm",
+      taskDescription: "Build a todo list feature",
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.videoAssessmentId).toBe("video-assessment-123");
+    expect(result.error).toBeUndefined();
+
+    // Should create new video assessment
+    expect(mockVideoAssessmentCreate).toHaveBeenCalledWith({
+      data: {
+        candidateId: "user-456",
+        assessmentId: "simulation-123",
+        videoUrl: "https://storage.example.com/recording.webm",
+        status: "PENDING",
+      },
+    });
+  });
+
+  it("should return existing VideoAssessment if already exists and not failed", async () => {
+    mockVideoAssessmentFindUnique.mockResolvedValue({
+      id: "existing-video-assessment",
+      status: "PROCESSING",
+    });
+
+    const result = await triggerVideoAssessment({
+      assessmentId: "simulation-123",
+      candidateId: "user-456",
+      videoUrl: "https://storage.example.com/recording.webm",
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.videoAssessmentId).toBe("existing-video-assessment");
+
+    // Should not create new video assessment
+    expect(mockVideoAssessmentCreate).not.toHaveBeenCalled();
+  });
+
+  it("should re-trigger evaluation for failed VideoAssessment", async () => {
+    mockVideoAssessmentFindUnique.mockResolvedValue({
+      id: "failed-video-assessment",
+      status: "FAILED",
+    });
+
+    const result = await triggerVideoAssessment({
+      assessmentId: "simulation-123",
+      candidateId: "user-456",
+      videoUrl: "https://storage.example.com/recording.webm",
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.videoAssessmentId).toBe("failed-video-assessment");
+
+    // Should reset status to PENDING
+    expect(mockVideoAssessmentUpdate).toHaveBeenCalledWith({
+      where: { id: "failed-video-assessment" },
+      data: { status: "PENDING" },
+    });
+  });
+
+  it("should handle database errors gracefully", async () => {
+    mockVideoAssessmentFindUnique.mockRejectedValue(new Error("DB error"));
+
+    const result = await triggerVideoAssessment({
+      assessmentId: "simulation-123",
+      candidateId: "user-456",
+      videoUrl: "https://storage.example.com/recording.webm",
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.videoAssessmentId).toBeNull();
+    expect(result.error).toBe("DB error");
+  });
+});
+
+// ============================================================================
+// getVideoAssessmentStatusByAssessment Tests (US-001)
+// ============================================================================
+
+describe("getVideoAssessmentStatusByAssessment", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should return status for existing video assessment", async () => {
+    mockVideoAssessmentFindUnique.mockResolvedValue({
+      id: "video-assessment-123",
+      status: "PROCESSING",
+      completedAt: null,
+    });
+
+    const result = await getVideoAssessmentStatusByAssessment("simulation-123");
+
+    expect(result).toEqual({
+      id: "video-assessment-123",
+      status: "PROCESSING",
+      completedAt: null,
+    });
+
+    expect(mockVideoAssessmentFindUnique).toHaveBeenCalledWith({
+      where: { assessmentId: "simulation-123" },
+      select: {
+        id: true,
+        status: true,
+        completedAt: true,
+      },
+    });
+  });
+
+  it("should return null when no video assessment exists", async () => {
+    mockVideoAssessmentFindUnique.mockResolvedValue(null);
+
+    const result = await getVideoAssessmentStatusByAssessment("simulation-456");
+
+    expect(result).toBeNull();
+  });
+
+  it("should return completed status with date", async () => {
+    const completedAt = new Date("2024-01-15T10:00:00Z");
+    mockVideoAssessmentFindUnique.mockResolvedValue({
+      id: "video-assessment-123",
+      status: "COMPLETED",
+      completedAt,
+    });
+
+    const result = await getVideoAssessmentStatusByAssessment("simulation-123");
+
+    expect(result?.status).toBe("COMPLETED");
+    expect(result?.completedAt).toEqual(completedAt);
+  });
+});
+
+// ============================================================================
+// retryVideoAssessment Tests (US-001)
+// ============================================================================
+
+describe("retryVideoAssessment", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockVideoAssessmentUpdate.mockResolvedValue({ id: "video-assessment-123" });
+    mockDimensionScoreUpsert.mockResolvedValue({ id: "test-score-id" });
+    mockVideoAssessmentSummaryUpsert.mockResolvedValue({ id: "test-summary-id" });
+    mockVideoAssessmentLogCreate.mockResolvedValue({ id: "test-log-id" });
+    mockVideoAssessmentApiCallCreate.mockResolvedValue({ id: "test-api-call-id" });
+    mockVideoAssessmentApiCallUpdate.mockResolvedValue({ id: "test-api-call-id" });
+    mockGenerateContent.mockResolvedValue({
+      text: JSON.stringify(mockEvaluationResponse),
+    });
+  });
+
+  it("should retry failed video assessment", async () => {
+    mockVideoAssessmentFindUnique.mockResolvedValue({
+      id: "video-assessment-123",
+      status: "FAILED",
+      videoUrl: "https://storage.example.com/recording.webm",
+      assessmentId: "simulation-123",
+      assessment: {
+        scenario: {
+          taskDescription: "Build a todo list feature",
+        },
+      },
+    });
+
+    const result = await retryVideoAssessment("video-assessment-123");
+
+    expect(result.success).toBe(true);
+    expect(result.videoAssessmentId).toBe("video-assessment-123");
+
+    // Should reset status to PENDING
+    expect(mockVideoAssessmentUpdate).toHaveBeenCalledWith({
+      where: { id: "video-assessment-123" },
+      data: { status: "PENDING" },
+    });
+  });
+
+  it("should return error for non-failed assessment", async () => {
+    mockVideoAssessmentFindUnique.mockResolvedValue({
+      id: "video-assessment-123",
+      status: "COMPLETED",
+      videoUrl: "https://storage.example.com/recording.webm",
+      assessmentId: "simulation-123",
+      assessment: null,
+    });
+
+    const result = await retryVideoAssessment("video-assessment-123");
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("Cannot retry assessment with status COMPLETED");
+    expect(result.error).toContain("Only FAILED assessments can be retried");
+  });
+
+  it("should return error for non-existent assessment", async () => {
+    mockVideoAssessmentFindUnique.mockResolvedValue(null);
+
+    const result = await retryVideoAssessment("non-existent-id");
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe("Video assessment not found");
+  });
+
+  it("should handle database errors gracefully", async () => {
+    mockVideoAssessmentFindUnique.mockRejectedValue(new Error("DB error"));
+
+    const result = await retryVideoAssessment("video-assessment-123");
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe("DB error");
   });
 });

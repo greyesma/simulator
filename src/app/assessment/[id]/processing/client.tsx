@@ -9,6 +9,8 @@ import {
   CheckCircle2,
   Mail,
   Loader2,
+  Video,
+  AlertCircle,
 } from "lucide-react";
 import type { ProcessingStats } from "./page";
 
@@ -192,6 +194,49 @@ export function ProcessingClient({ assessmentId, stats }: ProcessingClientProps)
             Our AI is analyzing your interview responses, code quality, collaboration
             patterns, and presentation skills.
           </p>
+
+          {/* Video Assessment Status */}
+          {stats.videoAssessment && (
+            <div className="border-t border-border pt-6 mb-6">
+              <div className="flex items-center justify-center gap-3 text-sm">
+                {stats.videoAssessment.status === "PENDING" && (
+                  <>
+                    <Video className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">
+                      Video assessment queued
+                    </span>
+                  </>
+                )}
+                {stats.videoAssessment.status === "PROCESSING" && (
+                  <>
+                    <div className="relative">
+                      <Video className="w-4 h-4 text-secondary" />
+                      <Loader2 className="w-3 h-3 text-secondary animate-spin absolute -top-1 -right-1" />
+                    </div>
+                    <span className="text-foreground font-medium">
+                      Video assessment in progress
+                    </span>
+                  </>
+                )}
+                {stats.videoAssessment.status === "COMPLETED" && (
+                  <>
+                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <span className="text-green-600">
+                      Video assessment complete
+                    </span>
+                  </>
+                )}
+                {stats.videoAssessment.status === "FAILED" && (
+                  <>
+                    <AlertCircle className="w-4 h-4 text-red-500" />
+                    <span className="text-red-500">
+                      Video assessment failed - will be retried
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Email notification */}
           <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground border-t border-border pt-6">

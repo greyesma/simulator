@@ -1584,3 +1584,83 @@ CREATE POLICY "service_role_full_access" ON "VideoAssessmentLog"
 - Vitest has trouble mocking Node.js built-in modules like crypto - use alternatives
 - RLS policies must be run manually on Supabase after schema push
 - First event in a sequence has null durationMs since there's no previous event
+
+---
+
+## Issue #63: US-001: Trigger Assessment on Simulation Completion
+
+**What was implemented:**
+- Added `assessmentId` optional field to `VideoAssessment` model linking it to work simulation `Assessment`
+- Created `triggerVideoAssessment()` function that creates VideoAssessment records and starts evaluation asynchronously
+- Created `getVideoAssessmentStatusByAssessment()` function to check video assessment status by simulation assessment ID
+- Created `retryVideoAssessment()` function to manually retry failed video assessments
+- Modified `/api/assessment/finalize` to automatically trigger video assessment when simulation completes
+- Added admin-only `/api/admin/video-assessment/retry` endpoint (GET lists failed, POST retries one)
+- Updated processing page to display video assessment status (PENDING, PROCESSING, COMPLETED, FAILED)
+- Added 22 new tests for video-evaluation functions
+- Added 8 tests for the admin retry endpoint
+- Added 3 tests for video assessment trigger in finalize route
+
+**Files created:**
+- `src/app/api/admin/video-assessment/retry/route.ts` - Admin retry endpoint
+- `src/app/api/admin/video-assessment/retry/route.test.ts` - 8 tests
+
+**Files changed:**
+- `prisma/schema.prisma` - Added `assessmentId` field to VideoAssessment, added relation to Assessment model
+- `src/lib/video-evaluation.ts` - Added triggerVideoAssessment, getVideoAssessmentStatusByAssessment, retryVideoAssessment
+- `src/lib/video-evaluation.test.ts` - Added 22 tests for new functions
+- `src/app/api/assessment/finalize/route.ts` - Added video assessment trigger logic
+- `src/app/api/assessment/finalize/route.test.ts` - Added 3 tests, updated mocks
+- `src/app/assessment/[id]/processing/page.tsx` - Added videoAssessment to ProcessingStats, fetch from database
+- `src/app/assessment/[id]/processing/client.tsx` - Display video assessment status with appropriate icons
+
+**VideoAssessment Status Flow:**
+```
+Simulation Completes (FINAL_DEFENSE → COMPLETED)
+  ↓
+triggerVideoAssessment() called
+  ↓
+VideoAssessment created (status: PENDING)
+  ↓
+evaluateVideo() runs asynchronously (status: PROCESSING)
+  ↓
+On success: status → COMPLETED
+On failure: status → FAILED (can be retried via admin endpoint)
+```
+
+**Processing Page Status Display:**
+- PENDING: "Video assessment queued" (gray Video icon)
+- PROCESSING: "Video assessment in progress" (gold Video + spinning Loader icon)
+- COMPLETED: "Video assessment complete" (green CheckCircle icon)
+- FAILED: "Video assessment failed - will be retried" (red AlertCircle icon)
+
+**Learnings:**
+1. Fire-and-forget pattern: `.catch()` on async function prevents unhandled rejection while allowing non-blocking execution
+2. Unique constraint on `assessmentId` ensures one-to-one mapping between Assessment and VideoAssessment
+3. Using `@unique` on optional relation field allows `findUnique({ where: { assessmentId } })` lookups
+4. TriggerVideoAssessmentResult type should be exported for proper typing in consuming code
+5. Admin retry endpoint provides diagnostic GET (lists failed) and action POST (retries one)
+6. Status display with icons provides clear visual feedback during processing phase
+7. Graceful degradation: finalize route succeeds even if video assessment trigger fails
+
+**Schema Pattern (one-to-one optional relation):**
+```prisma
+model VideoAssessment {
+  assessmentId  String?               @unique
+  assessment    Assessment?           @relation(fields: [assessmentId], references: [id], onDelete: SetNull)
+}
+
+model Assessment {
+  videoAssessment VideoAssessment?
+}
+```
+
+**Test Coverage:**
+- 68 total tests for modified files (46 video-evaluation + 14 finalize + 8 admin retry)
+- All acceptance criteria verified
+
+**Gotchas:**
+- Import type with `import type { X }` when only using for type annotations
+- Need both `success: boolean` and `error?: string` in result type for proper error reporting
+- Processing page Prisma query needs `include: { videoAssessment: { select: {...} } }` for nested relation
+- Lucide icons: Video, Loader2, CheckCircle2, AlertCircle for status display

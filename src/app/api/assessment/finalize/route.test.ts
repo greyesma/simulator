@@ -39,6 +39,12 @@ vi.mock("@/lib/code-review", () => ({
   codeReviewToPrismaJson: (...args: unknown[]) => mockCodeReviewToPrismaJson(...args),
 }));
 
+// Mock video-evaluation module
+const mockTriggerVideoAssessment = vi.fn();
+vi.mock("@/lib/video-evaluation", () => ({
+  triggerVideoAssessment: (...args: unknown[]) => mockTriggerVideoAssessment(...args),
+}));
+
 import { POST } from "./route";
 
 describe("POST /api/assessment/finalize", () => {
@@ -105,6 +111,8 @@ describe("POST /api/assessment/finalize", () => {
       userId: "other-user", // Different user
       status: AssessmentStatus.FINAL_DEFENSE,
       startedAt: new Date(),
+      scenario: { taskDescription: "Test task" },
+      recordings: [],
     });
 
     const request = new Request("http://localhost/api/assessment/finalize", {
@@ -128,6 +136,8 @@ describe("POST /api/assessment/finalize", () => {
       userId: "user-123",
       status: AssessmentStatus.WORKING, // Wrong status
       startedAt: new Date(),
+      scenario: { taskDescription: "Test task" },
+      recordings: [],
     });
 
     const request = new Request("http://localhost/api/assessment/finalize", {
@@ -154,6 +164,8 @@ describe("POST /api/assessment/finalize", () => {
       status: AssessmentStatus.FINAL_DEFENSE,
       startedAt,
       prUrl: null,
+      scenario: { taskDescription: "Test task" },
+      recordings: [],
     });
     mockAssessmentUpdate.mockResolvedValue({
       id: "test-id",
@@ -178,9 +190,16 @@ describe("POST /api/assessment/finalize", () => {
     expect(data.timing.completedAt).toBeDefined();
     expect(data.timing.totalDurationSeconds).toBeGreaterThan(0);
     expect(data.prCleanup).toBeNull(); // No PR to clean up
+    expect(data.videoAssessment).toEqual({
+      triggered: false,
+      videoAssessmentId: null,
+      hasRecording: false,
+    });
 
     // Should not call cleanup when no PR URL
     expect(mockCleanupPrAfterAssessment).not.toHaveBeenCalled();
+    // Should not call video assessment when no recording
+    expect(mockTriggerVideoAssessment).not.toHaveBeenCalled();
   });
 
   it("should finalize assessment and cleanup PR", async () => {
@@ -196,6 +215,8 @@ describe("POST /api/assessment/finalize", () => {
       status: AssessmentStatus.FINAL_DEFENSE,
       startedAt,
       prUrl,
+      scenario: { taskDescription: "Test task" },
+      recordings: [],
     });
     mockCleanupPrAfterAssessment.mockResolvedValue({
       success: true,
@@ -263,6 +284,8 @@ describe("POST /api/assessment/finalize", () => {
       status: AssessmentStatus.FINAL_DEFENSE,
       startedAt,
       prUrl,
+      scenario: { taskDescription: "Test task" },
+      recordings: [],
     });
     mockCleanupPrAfterAssessment.mockResolvedValue({
       success: false,
@@ -312,6 +335,8 @@ describe("POST /api/assessment/finalize", () => {
       status: AssessmentStatus.FINAL_DEFENSE,
       startedAt,
       prUrl,
+      scenario: { taskDescription: "Test task" },
+      recordings: [],
     });
     mockCleanupPrAfterAssessment.mockRejectedValue(new Error("Network error"));
     mockAssessmentUpdate.mockResolvedValue({
@@ -365,6 +390,8 @@ describe("POST /api/assessment/finalize", () => {
       userId: "user-123",
       status: AssessmentStatus.COMPLETED, // Already completed
       startedAt: new Date(),
+      scenario: { taskDescription: "Test task" },
+      recordings: [],
     });
 
     const request = new Request("http://localhost/api/assessment/finalize", {
@@ -377,5 +404,143 @@ describe("POST /api/assessment/finalize", () => {
 
     const data = await response.json();
     expect(data.error).toContain("COMPLETED");
+  });
+
+  it("should trigger video assessment when recording exists", async () => {
+    const startedAt = new Date("2024-01-01T10:00:00Z");
+    const recordingUrl = "https://storage.example.com/recording.webm";
+
+    mockAuth.mockResolvedValue({
+      user: { id: "user-123" },
+    });
+    mockAssessmentFindUnique.mockResolvedValue({
+      id: "test-id",
+      userId: "user-123",
+      status: AssessmentStatus.FINAL_DEFENSE,
+      startedAt,
+      prUrl: null,
+      scenario: { taskDescription: "Complete the todo list feature" },
+      recordings: [{ storageUrl: recordingUrl }],
+    });
+    mockAssessmentUpdate.mockResolvedValue({
+      id: "test-id",
+      status: AssessmentStatus.COMPLETED,
+      startedAt,
+      completedAt: new Date(),
+      prUrl: null,
+    });
+    mockTriggerVideoAssessment.mockResolvedValue({
+      success: true,
+      videoAssessmentId: "video-assessment-123",
+    });
+
+    const request = new Request("http://localhost/api/assessment/finalize", {
+      method: "POST",
+      body: JSON.stringify({ assessmentId: "test-id" }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+
+    const data = await response.json();
+    expect(data.success).toBe(true);
+    expect(data.videoAssessment).toEqual({
+      triggered: true,
+      videoAssessmentId: "video-assessment-123",
+      hasRecording: true,
+    });
+
+    // Verify video assessment was triggered with correct parameters
+    expect(mockTriggerVideoAssessment).toHaveBeenCalledWith({
+      assessmentId: "test-id",
+      candidateId: "user-123",
+      videoUrl: recordingUrl,
+      taskDescription: "Complete the todo list feature",
+    });
+  });
+
+  it("should finalize even if video assessment trigger fails", async () => {
+    const startedAt = new Date("2024-01-01T10:00:00Z");
+    const recordingUrl = "https://storage.example.com/recording.webm";
+
+    mockAuth.mockResolvedValue({
+      user: { id: "user-123" },
+    });
+    mockAssessmentFindUnique.mockResolvedValue({
+      id: "test-id",
+      userId: "user-123",
+      status: AssessmentStatus.FINAL_DEFENSE,
+      startedAt,
+      prUrl: null,
+      scenario: { taskDescription: "Test task" },
+      recordings: [{ storageUrl: recordingUrl }],
+    });
+    mockAssessmentUpdate.mockResolvedValue({
+      id: "test-id",
+      status: AssessmentStatus.COMPLETED,
+      startedAt,
+      completedAt: new Date(),
+      prUrl: null,
+    });
+    mockTriggerVideoAssessment.mockResolvedValue({
+      success: false,
+      videoAssessmentId: null,
+      error: "Failed to create video assessment",
+    });
+
+    const request = new Request("http://localhost/api/assessment/finalize", {
+      method: "POST",
+      body: JSON.stringify({ assessmentId: "test-id" }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+
+    const data = await response.json();
+    // Finalization should succeed even if video assessment fails
+    expect(data.success).toBe(true);
+    expect(data.assessment.status).toBe(AssessmentStatus.COMPLETED);
+    // Video assessment result should still be included
+    expect(data.videoAssessment.triggered).toBe(true);
+    expect(data.videoAssessment.hasRecording).toBe(true);
+  });
+
+  it("should finalize even if video assessment trigger throws", async () => {
+    const startedAt = new Date("2024-01-01T10:00:00Z");
+    const recordingUrl = "https://storage.example.com/recording.webm";
+
+    mockAuth.mockResolvedValue({
+      user: { id: "user-123" },
+    });
+    mockAssessmentFindUnique.mockResolvedValue({
+      id: "test-id",
+      userId: "user-123",
+      status: AssessmentStatus.FINAL_DEFENSE,
+      startedAt,
+      prUrl: null,
+      scenario: { taskDescription: "Test task" },
+      recordings: [{ storageUrl: recordingUrl }],
+    });
+    mockAssessmentUpdate.mockResolvedValue({
+      id: "test-id",
+      status: AssessmentStatus.COMPLETED,
+      startedAt,
+      completedAt: new Date(),
+      prUrl: null,
+    });
+    mockTriggerVideoAssessment.mockRejectedValue(new Error("Network error"));
+
+    const request = new Request("http://localhost/api/assessment/finalize", {
+      method: "POST",
+      body: JSON.stringify({ assessmentId: "test-id" }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+
+    const data = await response.json();
+    // Finalization should succeed even if video assessment throws
+    expect(data.success).toBe(true);
+    expect(data.assessment.status).toBe(AssessmentStatus.COMPLETED);
   });
 });

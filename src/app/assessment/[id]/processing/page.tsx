@@ -2,9 +2,15 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
 import { ProcessingClient } from "./client";
+import type { VideoAssessmentStatus } from "@prisma/client";
 
 interface ProcessingPageProps {
   params: Promise<{ id: string }>;
+}
+
+export interface VideoAssessmentInfo {
+  id: string;
+  status: VideoAssessmentStatus;
 }
 
 export interface ProcessingStats {
@@ -16,6 +22,7 @@ export interface ProcessingStats {
   userName: string;
   hasHRInterview: boolean;
   hasDefenseCall: boolean;
+  videoAssessment: VideoAssessmentInfo | null;
 }
 
 export default async function ProcessingPage({ params }: ProcessingPageProps) {
@@ -56,6 +63,12 @@ export default async function ProcessingPage({ params }: ProcessingPageProps) {
       hrAssessment: {
         select: {
           id: true,
+        },
+      },
+      videoAssessment: {
+        select: {
+          id: true,
+          status: true,
         },
       },
     },
@@ -105,6 +118,12 @@ export default async function ProcessingPage({ params }: ProcessingPageProps) {
     userName: assessment.user?.name || session.user.name || "there",
     hasHRInterview: !!assessment.hrAssessment,
     hasDefenseCall,
+    videoAssessment: assessment.videoAssessment
+      ? {
+          id: assessment.videoAssessment.id,
+          status: assessment.videoAssessment.status,
+        }
+      : null,
   };
 
   return <ProcessingClient assessmentId={id} stats={stats} />;

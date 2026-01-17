@@ -158,13 +158,14 @@ model Assessment {
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
 
-  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  scenario      Scenario         @relation(fields: [scenarioId], references: [id])
-  conversations Conversation[]
-  recordings    Recording[]
-  hrAssessment  HRInterviewAssessment?
-  logs          AssessmentLog[]
-  apiCalls      AssessmentApiCall[]
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scenario        Scenario         @relation(fields: [scenarioId], references: [id])
+  conversations   Conversation[]
+  recordings      Recording[]
+  hrAssessment    HRInterviewAssessment?
+  logs            AssessmentLog[]
+  apiCalls        AssessmentApiCall[]
+  videoAssessment VideoAssessment? // Auto-triggered video evaluation
 }
 
 model Conversation {
@@ -317,11 +318,15 @@ model VideoAssessment {
   videoUrl      String                // URL to the uploaded video
   status        VideoAssessmentStatus @default(PENDING)
 
+  // Optional link to work simulation assessment (for auto-triggered evaluations)
+  assessmentId  String?               @unique // One video assessment per simulation
+
   createdAt     DateTime              @default(now())
   completedAt   DateTime?
 
   // Relations
   candidate     User                  @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  assessment    Assessment?           @relation(fields: [assessmentId], references: [id], onDelete: SetNull)
   scores        DimensionScore[]
   summary       VideoAssessmentSummary?
   logs          VideoAssessmentLog[]
@@ -330,6 +335,7 @@ model VideoAssessment {
   // Indexes for efficient querying
   @@index([candidateId])
   @@index([status])
+  @@index([assessmentId])
 }
 
 model DimensionScore {

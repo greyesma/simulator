@@ -448,5 +448,227 @@ export async function getEvaluationResults(assessmentId: string): Promise<{
   };
 }
 
+// ============================================================================
+// Trigger Function (for auto-triggering from simulation completion)
+// ============================================================================
+
+export interface TriggerVideoAssessmentOptions {
+  /** The work simulation assessment ID */
+  assessmentId: string;
+  /** The user/candidate ID */
+  candidateId: string;
+  /** The video URL from the recording */
+  videoUrl: string;
+  /** Optional task description for context */
+  taskDescription?: string;
+}
+
+export interface TriggerVideoAssessmentResult {
+  success: boolean;
+  videoAssessmentId: string | null;
+  error?: string;
+}
+
+/**
+ * Triggers a video assessment for a completed simulation.
+ * Creates the VideoAssessment record and starts the evaluation asynchronously.
+ *
+ * This is designed to be called from the finalize endpoint when a simulation completes.
+ * The evaluation runs in the background - the function returns immediately after creating
+ * the VideoAssessment record with PENDING status.
+ *
+ * @param options - Options including assessment IDs and video URL
+ * @returns Result with the created VideoAssessment ID
+ */
+export async function triggerVideoAssessment(
+  options: TriggerVideoAssessmentOptions
+): Promise<TriggerVideoAssessmentResult> {
+  const { assessmentId, candidateId, videoUrl, taskDescription } = options;
+
+  try {
+    // Check if a video assessment already exists for this simulation
+    const existing = await db.videoAssessment.findUnique({
+      where: { assessmentId },
+      select: { id: true, status: true },
+    });
+
+    if (existing) {
+      // If it exists and failed, allow re-triggering
+      if (existing.status === VideoAssessmentStatus.FAILED) {
+        // Reset to PENDING for retry
+        await db.videoAssessment.update({
+          where: { id: existing.id },
+          data: { status: VideoAssessmentStatus.PENDING },
+        });
+
+        // Start evaluation asynchronously (fire and forget)
+        evaluateVideo({
+          assessmentId: existing.id,
+          videoUrl,
+          taskDescription,
+        }).catch((error) => {
+          console.error(
+            `[VideoEvaluation] Background evaluation failed for ${existing.id}:`,
+            error
+          );
+        });
+
+        return {
+          success: true,
+          videoAssessmentId: existing.id,
+        };
+      }
+
+      // Already in progress or completed
+      return {
+        success: true,
+        videoAssessmentId: existing.id,
+      };
+    }
+
+    // Create new VideoAssessment record
+    const videoAssessment = await db.videoAssessment.create({
+      data: {
+        candidateId,
+        assessmentId,
+        videoUrl,
+        status: VideoAssessmentStatus.PENDING,
+      },
+    });
+
+    // Start evaluation asynchronously (fire and forget)
+    // This ensures the finalize endpoint returns quickly
+    evaluateVideo({
+      assessmentId: videoAssessment.id,
+      videoUrl,
+      taskDescription,
+    }).catch((error) => {
+      console.error(
+        `[VideoEvaluation] Background evaluation failed for ${videoAssessment.id}:`,
+        error
+      );
+    });
+
+    return {
+      success: true,
+      videoAssessmentId: videoAssessment.id,
+    };
+  } catch (error) {
+    console.error("[VideoEvaluation] Failed to trigger video assessment:", error);
+    return {
+      success: false,
+      videoAssessmentId: null,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Gets the video assessment status for a simulation assessment.
+ * Used by the processing page to show "Assessment in progress" status.
+ *
+ * @param assessmentId - The work simulation assessment ID (NOT the VideoAssessment ID)
+ * @returns The video assessment status or null if not found
+ */
+export async function getVideoAssessmentStatusByAssessment(
+  assessmentId: string
+): Promise<{
+  id: string;
+  status: VideoAssessmentStatus;
+  completedAt: Date | null;
+} | null> {
+  const videoAssessment = await db.videoAssessment.findUnique({
+    where: { assessmentId },
+    select: {
+      id: true,
+      status: true,
+      completedAt: true,
+    },
+  });
+
+  return videoAssessment;
+}
+
+/**
+ * Retries a failed video assessment.
+ * Only works for assessments with FAILED status.
+ *
+ * @param videoAssessmentId - The VideoAssessment ID to retry
+ * @returns Result indicating success or failure
+ */
+export async function retryVideoAssessment(
+  videoAssessmentId: string
+): Promise<TriggerVideoAssessmentResult> {
+  try {
+    const videoAssessment = await db.videoAssessment.findUnique({
+      where: { id: videoAssessmentId },
+      select: {
+        id: true,
+        status: true,
+        videoUrl: true,
+        assessmentId: true,
+        assessment: {
+          select: {
+            scenario: {
+              select: {
+                taskDescription: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!videoAssessment) {
+      return {
+        success: false,
+        videoAssessmentId: null,
+        error: "Video assessment not found",
+      };
+    }
+
+    if (videoAssessment.status !== VideoAssessmentStatus.FAILED) {
+      return {
+        success: false,
+        videoAssessmentId: videoAssessmentId,
+        error: `Cannot retry assessment with status ${videoAssessment.status}. Only FAILED assessments can be retried.`,
+      };
+    }
+
+    // Reset status to PENDING
+    await db.videoAssessment.update({
+      where: { id: videoAssessmentId },
+      data: { status: VideoAssessmentStatus.PENDING },
+    });
+
+    // Get task description from linked assessment if available
+    const taskDescription = videoAssessment.assessment?.scenario?.taskDescription;
+
+    // Start evaluation asynchronously
+    evaluateVideo({
+      assessmentId: videoAssessmentId,
+      videoUrl: videoAssessment.videoUrl,
+      taskDescription,
+    }).catch((error) => {
+      console.error(
+        `[VideoEvaluation] Retry evaluation failed for ${videoAssessmentId}:`,
+        error
+      );
+    });
+
+    return {
+      success: true,
+      videoAssessmentId,
+    };
+  } catch (error) {
+    console.error("[VideoEvaluation] Failed to retry video assessment:", error);
+    return {
+      success: false,
+      videoAssessmentId,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
 // Export model constant for testing/configuration
 export { VIDEO_EVALUATION_MODEL };

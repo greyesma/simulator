@@ -14,6 +14,10 @@ import {
   codeReviewToPrismaJson,
   type CodeReviewData,
 } from "@/lib/code-review";
+import {
+  triggerVideoAssessment,
+  type TriggerVideoAssessmentResult,
+} from "@/lib/video-evaluation";
 
 /**
  * POST /api/assessment/finalize
@@ -50,6 +54,18 @@ export async function POST(request: Request) {
         startedAt: true,
         prUrl: true,
         codeReview: true,
+        scenario: {
+          select: {
+            taskDescription: true,
+          },
+        },
+        recordings: {
+          where: { type: "screen" },
+          select: {
+            storageUrl: true,
+          },
+          take: 1,
+        },
       },
     });
 
@@ -158,6 +174,31 @@ export async function POST(request: Request) {
       },
     });
 
+    // Trigger video assessment if recording exists (async, non-blocking)
+    let videoAssessmentResult: TriggerVideoAssessmentResult | null = null;
+    const recordingUrl = assessment.recordings[0]?.storageUrl;
+
+    if (recordingUrl) {
+      try {
+        videoAssessmentResult = await triggerVideoAssessment({
+          assessmentId,
+          candidateId: session.user.id,
+          videoUrl: recordingUrl,
+          taskDescription: assessment.scenario.taskDescription,
+        });
+
+        if (!videoAssessmentResult.success) {
+          console.warn(
+            `Video assessment trigger warning for ${assessmentId}:`,
+            videoAssessmentResult.error
+          );
+        }
+      } catch (error) {
+        console.warn(`Video assessment trigger error for ${assessmentId}:`, error);
+        // Don't fail the finalization if video assessment trigger fails
+      }
+    }
+
     return NextResponse.json({
       success: true,
       assessment: updatedAssessment,
@@ -192,6 +233,17 @@ export async function POST(request: Request) {
             summary: codeReviewData.summary,
           }
         : null,
+      videoAssessment: videoAssessmentResult
+        ? {
+            triggered: true,
+            videoAssessmentId: videoAssessmentResult.videoAssessmentId,
+            hasRecording: !!recordingUrl,
+          }
+        : {
+            triggered: false,
+            videoAssessmentId: null,
+            hasRecording: false,
+          },
     });
   } catch (error) {
     console.error("Error finalizing assessment:", error);
