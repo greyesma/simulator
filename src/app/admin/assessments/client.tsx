@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import {
   AlertCircle,
   CheckCircle2,
   ChevronDown,
   ChevronRight,
   Clock,
+  ExternalLink,
   Search,
   X,
 } from "lucide-react";
@@ -446,6 +448,15 @@ function AssessmentDetails({
               </p>
             )}
           </div>
+          {/* View Timeline Link */}
+          <Link
+            href={`/admin/assessments/${assessment.id}`}
+            className="inline-flex items-center gap-2 mt-4 px-4 py-2 border-2 border-foreground bg-foreground text-background hover:bg-background hover:text-foreground font-mono text-xs"
+            data-testid={`view-timeline-${assessment.id}`}
+          >
+            <ExternalLink className="w-3 h-3" />
+            View Full Timeline
+          </Link>
         </div>
 
         {/* Event Logs */}
