@@ -2314,3 +2314,122 @@ const handleLoadedMetadata = () => {
 - Empty timestamp arrays should hide the "VIDEO TIMESTAMPS" section entirely
 - Modal close button needs explicit `data-testid` for reliable testing
 - Server component Date objects need `new Date()` wrapper when passing to client
+
+---
+
+## Issue #71: US-014 - Video Player with Timestamp Navigation
+
+**What was implemented:**
+- URL parameter support for timestamp seeking (`?t=134` opens video at 2:14)
+- Current timestamp and total duration display in video player
+- Playback speed controls (0.5x, 0.75x, 1x, 1.25x, 1.5x, 2x)
+- URL updates when clicking timestamp links
+- URL cleared when closing modal
+- Suspense boundary for useSearchParams compatibility
+- Loading skeleton for Suspense fallback
+- Unit tests for formatTime utility and new features
+
+**Files changed:**
+- `src/app/candidate/[id]/client.tsx` - Added URL parameter handling, time display, speed controls
+- `src/app/candidate/[id]/page.test.tsx` - Added tests for new features
+
+**Key additions:**
+
+1. **URL Parameter Handling:**
+```typescript
+// Read from URL on mount
+useEffect(() => {
+  const timeParam = searchParams.get("t");
+  if (timeParam) {
+    const seconds = parseInt(timeParam, 10);
+    if (!isNaN(seconds) && seconds >= 0) {
+      setVideoModal({ isOpen: true, initialTime: seconds });
+    }
+  }
+}, [searchParams]);
+
+// Update URL when timestamp clicked
+const handleTimestampClick = useCallback((seconds: number) => {
+  const params = new URLSearchParams(searchParams.toString());
+  params.set("t", String(seconds));
+  router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  setVideoModal({ isOpen: true, initialTime: seconds });
+}, [searchParams, router, pathname]);
+```
+
+2. **Time Display with Duration:**
+```typescript
+export function formatTime(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+
+  if (hours > 0) {
+    return `${hours}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  }
+  return `${minutes}:${String(secs).padStart(2, "0")}`;
+}
+```
+
+3. **Playback Speed Controls:**
+```typescript
+const PLAYBACK_SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
+
+const handleSpeedChange = (speed: number) => {
+  setPlaybackSpeed(speed);
+  if (videoRef.current) {
+    videoRef.current.playbackRate = speed;
+  }
+};
+```
+
+4. **Suspense Boundary:**
+```typescript
+// Main exported component with Suspense boundary
+export function CandidateProfileClient({ data }) {
+  return (
+    <Suspense fallback={<CandidateProfileSkeleton />}>
+      <CandidateProfileInner data={data} />
+    </Suspense>
+  );
+}
+```
+
+**Learnings:**
+1. `useSearchParams()` in Next.js 15 requires Suspense boundary
+2. Use `router.replace()` with `{ scroll: false }` to update URL without scrolling
+3. HTML5 video `playbackRate` property controls speed (0.5 to 2.0 are standard supported values)
+4. Video `onTimeUpdate` event fires regularly during playback for time display updates
+5. Video `onLoadedMetadata` event is the right time to set initial time and get duration
+6. Use `useCallback` for handlers that depend on changing state/router to avoid stale closures
+7. Suspense fallback should be a skeleton that matches the expected layout
+
+**Test mocking pattern for navigation:**
+```typescript
+const mockGet = vi.fn();
+const mockReplace = vi.fn();
+const mockPathname = "/candidate/va-123";
+
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => ({
+    get: mockGet,
+    toString: () => "",
+  }),
+  useRouter: () => ({
+    replace: mockReplace,
+  }),
+  usePathname: () => mockPathname,
+}));
+```
+
+**Browser validation:**
+- URL parameter `?t=134` correctly opens modal at 2:14
+- All 6 speed buttons render and function
+- Time display updates during playback
+- Timestamp links update URL and seek video
+
+**Gotchas:**
+- Must wrap component in Suspense when using `useSearchParams()`
+- Export `formatTime` function for testing
+- Test navigation mocks need to define all hooks used (useSearchParams, useRouter, usePathname)
+- Clear `.next/` cache if encountering stale module errors after changes
