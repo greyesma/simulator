@@ -681,3 +681,65 @@ if (wasRecording === "active" && state === "stopped") {
 - Must clear `.next/` cache after removing Prisma fields (stale generated types)
 - Update all test files that reference removed field/routes
 - The "coding task" page refers to `/welcome` in the codebase (first page of WORKING phase)
+
+---
+
+## Issue #47: US-047: Redesign Homepage with Anti-LeetCode Messaging
+
+**What was implemented:**
+- Complete homepage redesign with anti-LeetCode messaging and value proposition
+- New Hero section with "Stop grinding LeetCode." headline (LeetCode in gold)
+- 3 bullet points with checkmark icons highlighting key benefits
+- Social Proof Banner showing "500+ professionals on early access" and Stanford StartX backing
+- Company Logos Section with 8 company logos (Airbnb, Microsoft, Google, Spotify, Netflix, Apple, Meta, Amazon)
+- Comparison Section with two-column layout: "The LeetCode Grind" vs "Skillvee Simulator"
+- FAQ Section with 5 common questions and answers
+- Final CTA Section with inverted colors and gold "Start Your Simulation" button
+- Updated Footer with Skillvee link and email contact
+
+**Files created:**
+- `public/airbnb.png` - Company logo
+- `public/amazon-small.png` - Company logo
+- `public/apple-small.png` - Company logo
+- `public/google-small.png` - Company logo
+- `public/meta-small.png` - Company logo
+- `public/microsoft-small.png` - Company logo
+- `public/netflix.png` - Company logo
+- `public/Spotify.png` - Company logo
+- `public/skillvee-logo.png` - Skillvee logo
+
+**Files changed:**
+- `src/app/page.tsx` - Complete homepage redesign with all new sections
+
+**Homepage Sections:**
+1. **Hero** - Badge, anti-LeetCode headline, subheadline, 3 bullet points, dual CTAs, geometric decorations
+2. **Social Proof Banner** - Full-width with border-y, background accent color
+3. **Company Logos** - 8-logo grid, grayscale with hover color effect
+4. **How It Works** - 4-step FeatureCard grid (kept from original)
+5. **Comparison** - Two-column: LeetCode problems (X icons, muted) vs Skillvee advantages (checkmarks, gold border)
+6. **FAQ** - 5 Q&A items in neo-brutalist card style
+7. **Final CTA** - Inverted colors (black bg, white text), gold button
+8. **Footer** - Skillvee branding, Part of Skillvee link, email, tagline
+
+**Design Compliance:**
+- Neo-brutalist style: 0px border-radius, no shadows, sharp borders
+- Gold (#f7da50) accent color for highlights
+- Black/white/gold palette throughout
+- CheckCircle and X icons from lucide-react
+- Next.js Image component for company logos with proper sizing
+- Grayscale logos that reveal color on hover
+
+**Learnings:**
+1. Use `gh api repos/{owner}/{repo}/contents/{path} --jq '.content' | base64 -d > {dest}` to download files from GitHub
+2. Next.js Image component requires explicit width/height, use `className="object-contain h-10 w-auto"` for flexible sizing
+3. Grayscale + opacity combo (`grayscale opacity-60`) creates muted logo effect
+4. `bg-secondary/10` creates subtle gold tint background for sections
+5. Inverted color sections use `bg-foreground text-background` for contrast
+6. Gold underline decoration: `underline decoration-secondary decoration-2 underline-offset-2`
+7. Keep inline components (FAQItem, FeatureCard) in same file for simplicity unless they exceed ~50 lines
+8. agent-browser `--viewport` flag sets window size when opening URL
+
+**Gotchas:**
+- Company logo files have different naming conventions (some have `-small` suffix)
+- Spotify.png has capital S - filename case matters
+- Use `&apos;` for apostrophes in JSX to avoid build warnings
