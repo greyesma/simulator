@@ -41,6 +41,8 @@ export async function POST(request: Request) {
           select: {
             name: true,
             email: true,
+            cvUrl: true,
+            parsedProfile: true,
           },
         },
       },
@@ -56,10 +58,13 @@ export async function POST(request: Request) {
     // Get CV content if available
     let cvContext = "";
 
-    // First, try to use the parsed profile (preferred - AI can read it directly)
-    if (assessment.parsedProfile) {
+    // First, try to use the parsed profile from Assessment (if CV was uploaded during assessment)
+    // Then fallback to User's parsed profile (if CV was uploaded from profile page)
+    const parsedProfileJson = assessment.parsedProfile || assessment.user.parsedProfile;
+
+    if (parsedProfileJson) {
       try {
-        const profile = profileFromPrismaJson(assessment.parsedProfile);
+        const profile = profileFromPrismaJson(parsedProfileJson);
         if (profile) {
           cvContext = `
 
@@ -76,7 +81,9 @@ Please reference specific details from their CV during the interview. Ask follow
     }
 
     // Fallback to basic info if no parsed profile
-    if (!cvContext && assessment.cvUrl) {
+    // Check both assessment.cvUrl and user.cvUrl
+    const cvUrl = assessment.cvUrl || assessment.user.cvUrl;
+    if (!cvContext && cvUrl) {
       cvContext = `
 
 ## Candidate's CV

@@ -2,8 +2,7 @@ import { auth } from "@/auth";
 import { db } from "@/server/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Prisma } from "@prisma/client";
-import type { UserRole, AssessmentStatus } from "@prisma/client";
+import type { Prisma, UserRole, AssessmentStatus } from "@prisma/client";
 import { ProfileCVSection } from "@/components/profile-cv-section";
 import { ParsedProfileDisplay } from "@/components/parsed-profile-display";
 import type { AssessmentReport } from "@/lib/assessment-aggregation";
@@ -270,6 +269,8 @@ export default async function ProfilePage() {
       role: true,
       createdAt: true,
       dataDeleteRequestedAt: true,
+      cvUrl: true,
+      parsedProfile: true,
     },
   });
 
@@ -290,18 +291,9 @@ export default async function ProfilePage() {
     orderBy: { createdAt: "desc" },
   });
 
-  // Get the most recent assessment with a parsed profile
-  const assessmentWithProfile = await db.assessment.findFirst({
-    where: {
-      userId: user.id,
-      parsedProfile: { not: Prisma.JsonNull },
-    },
-    orderBy: { createdAt: "desc" },
-    select: { parsedProfile: true },
-  });
-
-  const parsedProfile = assessmentWithProfile?.parsedProfile
-    ? profileFromPrismaJson(assessmentWithProfile.parsedProfile)
+  // Get parsed profile from User (not Assessment)
+  const parsedProfile = dbUser.parsedProfile
+    ? profileFromPrismaJson(dbUser.parsedProfile)
     : null;
 
   return (
@@ -359,7 +351,9 @@ export default async function ProfilePage() {
         </section>
 
         {/* CV Upload Section */}
-        <ProfileCVSection />
+        <ProfileCVSection
+          initialCvUrl={dbUser.cvUrl}
+        />
 
         {/* Parsed Profile Display - shows when profile exists */}
         <ParsedProfileDisplay profile={parsedProfile} />

@@ -72,6 +72,10 @@ model User {
   // Data deletion request tracking
   dataDeleteRequestedAt DateTime?
 
+  // CV/Resume data (stored at user level, not assessment level)
+  cvUrl         String?   // Signed URL to uploaded CV
+  parsedProfile Json?     // Parsed CV content (summary, experience, education, skills)
+
   accounts      Account[]
   sessions      Session[]
   assessments   Assessment[]
