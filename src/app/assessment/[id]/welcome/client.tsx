@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Phone } from "lucide-react";
 import { SlackLayout } from "@/components/slack-layout";
 
 interface Coworker {
@@ -14,6 +15,7 @@ interface Coworker {
 interface WelcomeClientProps {
   assessmentId: string;
   userName: string;
+  managerId: string;
   managerName: string;
   managerRole: string;
   managerAvatar: string | null;
@@ -33,6 +35,7 @@ interface Message {
 export function WelcomeClient({
   assessmentId,
   userName,
+  managerId,
   managerName,
   managerRole,
   companyName,
@@ -43,7 +46,7 @@ export function WelcomeClient({
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
-  const [showContinue, setShowContinue] = useState(false);
+  const [allMessagesShown, setAllMessagesShown] = useState(false);
 
   // Manager's welcome messages
   const welcomeMessages: Omit<Message, "id" | "isTyping">[] = [
@@ -76,8 +79,8 @@ export function WelcomeClient({
   // Typewriter effect for messages
   useEffect(() => {
     if (currentMessageIndex >= welcomeMessages.length) {
-      // All messages shown, enable continue button
-      setTimeout(() => setShowContinue(true), 500);
+      // All messages shown - set flag to hide typing indicator
+      setAllMessagesShown(true);
       return;
     }
 
@@ -124,8 +127,13 @@ export function WelcomeClient({
     .toUpperCase()
     .slice(0, 2);
 
+  // Filter out typing indicators if all messages have been shown
+  const displayMessages = allMessagesShown
+    ? messages.filter((m) => !m.isTyping)
+    : messages;
+
   return (
-    <SlackLayout assessmentId={assessmentId} coworkers={coworkers}>
+    <SlackLayout assessmentId={assessmentId} coworkers={coworkers} selectedCoworkerId={managerId}>
       <div className="flex-1 flex flex-col">
         {/* Header - Slack-like channel header */}
         <header className="border-b-2 border-foreground bg-background">
@@ -138,17 +146,18 @@ export function WelcomeClient({
                 {managerInitials}
               </span>
             </div>
-            <div>
+            <div className="flex-1">
               <h1 className="font-bold text-lg">{managerName}</h1>
               <p className="text-sm text-muted-foreground">{managerRole}</p>
             </div>
-            {/* Online indicator */}
-            <div className="ml-auto flex items-center gap-2">
-              <div className="w-3 h-3 bg-green-500 border border-foreground" />
-              <span className="text-sm text-muted-foreground font-mono">
-                online
-              </span>
-            </div>
+            {/* Call button - same as other coworkers */}
+            <button
+              onClick={handleScheduleCall}
+              className="p-2 border-2 border-foreground bg-secondary text-secondary-foreground hover:bg-foreground hover:text-background"
+              aria-label={`Call ${managerName}`}
+            >
+              <Phone size={20} />
+            </button>
           </div>
         </header>
 
@@ -166,7 +175,7 @@ export function WelcomeClient({
 
             {/* Messages */}
             <div className="space-y-4">
-              {messages.map((message) => (
+              {displayMessages.map((message) => (
                 <div key={message.id} className="flex gap-3">
                   {/* Avatar */}
                   <div className="w-10 h-10 bg-secondary border-2 border-foreground flex items-center justify-center flex-shrink-0">
@@ -199,28 +208,6 @@ export function WelcomeClient({
             </div>
           </div>
         </main>
-
-        {/* Footer - Action area */}
-        <footer className="border-t-2 border-foreground bg-background">
-          <div className="px-4 md:px-6 py-4">
-            <div
-              style={{
-                opacity: showContinue ? 1 : 0,
-                pointerEvents: showContinue ? "auto" : "none",
-              }}
-            >
-              <button
-                onClick={handleScheduleCall}
-                className="w-full bg-foreground text-background px-6 py-4 font-bold text-lg border-4 border-foreground hover:bg-secondary hover:text-secondary-foreground"
-              >
-                Join Kickoff Call
-              </button>
-              <p className="mt-2 text-center text-sm text-muted-foreground font-mono">
-                Your manager is waiting to brief you on your first task
-              </p>
-            </div>
-          </div>
-        </footer>
       </div>
     </SlackLayout>
   );

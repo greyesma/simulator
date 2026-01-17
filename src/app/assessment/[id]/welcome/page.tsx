@@ -42,12 +42,12 @@ export default async function WelcomePage({ params }: WelcomePageProps) {
   // Find the manager coworker or use default
   const manager = assessment.scenario.coworkers.find((c) =>
     c.role.toLowerCase().includes("manager")
-  ) || {
-    id: "default-manager",
-    name: "Alex Chen",
-    role: "Engineering Manager",
-    avatarUrl: null,
-  };
+  );
+
+  const managerId = manager?.id || "default-manager";
+  const managerName = manager?.name || "Alex Chen";
+  const managerRole = manager?.role || "Engineering Manager";
+  const managerAvatar = manager?.avatarUrl || null;
 
   // Get all coworkers for the sidebar
   const coworkers = assessment.scenario.coworkers.map((c) => ({
@@ -62,9 +62,10 @@ export default async function WelcomePage({ params }: WelcomePageProps) {
       <WelcomeClient
         assessmentId={id}
         userName={userName}
-        managerName={manager.name}
-        managerRole={manager.role}
-        managerAvatar={manager.avatarUrl}
+        managerId={managerId}
+        managerName={managerName}
+        managerRole={managerRole}
+        managerAvatar={managerAvatar}
         companyName={assessment.scenario.companyName}
         repoUrl={assessment.scenario.repoUrl}
         taskDescription={assessment.scenario.taskDescription}

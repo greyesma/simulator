@@ -19,6 +19,8 @@ interface SlackLayoutProps {
   assessmentId: string;
   coworkers: Coworker[];
   children: React.ReactNode;
+  /** Override the selected coworker (instead of getting from URL) */
+  selectedCoworkerId?: string;
 }
 
 /**
@@ -68,13 +70,14 @@ function SlackLayoutInner({
   assessmentId,
   coworkers,
   children,
+  selectedCoworkerId: overrideSelectedId,
 }: SlackLayoutProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Determine selected coworker from URL
-  const selectedCoworkerId = searchParams.get("coworkerId") || null;
+  // Determine selected coworker from prop override or URL
+  const selectedCoworkerId = overrideSelectedId ?? searchParams.get("coworkerId") ?? null;
   const totalTeamSize = coworkers.length + DECORATIVE_TEAM_MEMBERS.length;
 
   const handleSelectCoworker = (coworkerId: string, action: "chat" | "call") => {
