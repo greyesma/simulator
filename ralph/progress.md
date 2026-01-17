@@ -2433,3 +2433,88 @@ vi.mock("next/navigation", () => ({
 - Export `formatTime` function for testing
 - Test navigation mocks need to define all hooks used (useSearchParams, useRouter, usePathname)
 - Clear `.next/` cache if encountering stale module errors after changes
+
+---
+
+## Issue #72: US-007 - Build Conversational Search Interface
+
+**What was implemented:**
+- Created `/candidate_search` route with chat-centric search interface for hiring managers
+- Clean interface with greeting prompt: "Hi there, please describe the profile you're looking for."
+- Example placeholder text showing complex query (Software Engineers in NYC with experience...)
+- Large text entry box with purple send button (arrow icon)
+- Real-time entity extraction with context tags showing detected entities
+- 6 context tags: Job Title, Location, Years of Experience, Skills, Industry, Company Type
+- Tags highlight in gold when entities are detected from user's query
+- API route `/api/search/extract` for entity extraction
+- Fallback pattern-based extraction when AI extraction fails
+- Debounced extraction (300ms) for responsive UI without excessive API calls
+
+**Files created:**
+- `src/app/candidate_search/page.tsx` - Server component page
+- `src/app/candidate_search/client.tsx` - Client component with search UI
+- `src/app/api/search/extract/route.ts` - Entity extraction API endpoint
+
+**Files changed:**
+- `ralph/progress.md` - Added learnings for this issue
+
+**Key components:**
+
+1. **CandidateSearchClient** - Main client component with:
+   - State for query, extraction results, loading states
+   - Debounced entity extraction on input change
+   - Context tags that highlight based on extraction results
+
+2. **ContextTagBadge** - Individual tag component:
+   - Shows label, icon, and detected value
+   - Gold background when active, muted when not detected
+
+3. **Entity Extraction API** - `/api/search/extract`:
+   - Uses Gemini for AI extraction (from Issue #68)
+   - Falls back to pattern-based extraction when AI fails
+   - Returns structured intent, archetype, and seniority
+
+**Fallback extraction patterns:**
+```typescript
+// Job titles: matches "software engineer", "developer", "frontend", etc.
+/\b(senior|junior|...)?\s*(software engineers?|developers?|...)\b/i
+
+// Locations: matches common cities and abbreviations
+/\b(NYC|SF|LA|San Francisco|...)\b/i
+
+// Years: extracts from "5+ years", "3 years", etc.
+/(\d+)\+?\s*(?:years?|yrs?)/i
+
+// Skills: common programming keywords with normalization
+["python", "react", "node", "kubernetes", "aws", ...]
+```
+
+**Learnings:**
+1. TypeScript nullish coalescing (`??`) needed for optional chaining results in array context
+2. Debouncing with `useRef<NodeJS.Timeout>` provides clean debounce pattern
+3. Pattern-based fallback provides graceful degradation when AI extraction fails
+4. Gemini API can return malformed JSON - always have fallback strategy
+5. Context tags need visual distinction between "detected" (gold) and "not detected" (gray/muted)
+6. Purple button color provides visual differentiation from gold accent while maintaining neo-brutalist style
+7. Textarea with `resize-none` prevents user from breaking layout
+8. Processing time display gives users feedback on extraction speed
+
+**Neo-Brutalist Design Compliance:**
+- No rounded corners (0px radius)
+- No shadows
+- 2px black borders on inputs and tags
+- Gold (#f7da50) for detected/active states
+- Monospace font for labels ("DETECTED ENTITIES")
+- High contrast throughout
+
+**Architecture decisions:**
+- Separated page.tsx (server) from client.tsx for optimal Next.js patterns
+- Debounce on client side rather than server for immediate UI feedback
+- Fallback extraction ensures UI always shows something useful
+- Entity extraction depends on Issue #68 service but has fallback
+
+**Gotchas:**
+- Gemini can return truncated JSON causing parse errors - add fallback
+- Location patterns must check specific cities before generic patterns
+- Job title patterns need singular and plural forms (engineer/engineers)
+- TypeScript requires `?? null` for optional chains that could be undefined
