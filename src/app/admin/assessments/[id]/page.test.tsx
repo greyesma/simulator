@@ -98,6 +98,8 @@ const mockAssessment = {
       stackTrace: null,
       promptTokens: 100,
       responseTokens: 50,
+      promptText: "You are a helpful assistant evaluating a candidate.",
+      responseText: '{"result": "success", "score": 85}',
     },
   ],
   recordings: [
@@ -144,6 +146,8 @@ const mockAssessmentWithError = {
       stackTrace: "Error: Connection timeout\n  at fetchData (api.js:42)",
       promptTokens: null,
       responseTokens: null,
+      promptText: "You are a helpful assistant evaluating a candidate.",
+      responseText: null,
     },
   ],
   recordings: [],
@@ -189,6 +193,8 @@ describe("AssessmentTimelinePage", () => {
             stackTrace: true,
             promptTokens: true,
             responseTokens: true,
+            promptText: true,
+            responseText: true,
           },
         },
         recordings: {
@@ -530,14 +536,15 @@ describe("AssessmentTimelineClient", () => {
         <AssessmentTimelineClient assessment={serializedErrorAssessment} />
       );
 
-      const apiCallEvent = screen.getByTestId("timeline-event-api-2");
-      const clickableDiv = apiCallEvent.querySelector('[class*="cursor-pointer"]');
-      fireEvent.click(clickableDiv!);
-      expect(screen.getByTestId("error-details-api-2")).toBeInTheDocument();
+      // For log events with errors, use error-details
+      const logErrorEvent = screen.getByTestId("timeline-event-log-2");
+      const logClickableDiv = logErrorEvent.querySelector('[class*="cursor-pointer"]');
+      fireEvent.click(logClickableDiv!);
+      expect(screen.getByTestId("error-details-log-2")).toBeInTheDocument();
 
-      fireEvent.click(clickableDiv!);
+      fireEvent.click(logClickableDiv!);
       expect(
-        screen.queryByTestId("error-details-api-2")
+        screen.queryByTestId("error-details-log-2")
       ).not.toBeInTheDocument();
     });
 
@@ -591,5 +598,197 @@ describe("formatDuration utility", () => {
     expect(formatDuration(90000)).toBe("1m 30s");
     expect(formatDuration(3600000)).toBe("60m");
     expect(formatDuration(5400000)).toBe("90m");
+  });
+});
+
+describe("API Call Details", () => {
+  const serializedAssessment = {
+    ...mockAssessment,
+    startedAt: mockAssessment.startedAt.toISOString(),
+    completedAt: mockAssessment.completedAt?.toISOString() ?? null,
+    createdAt: mockAssessment.createdAt.toISOString(),
+    updatedAt: mockAssessment.updatedAt.toISOString(),
+    logs: mockAssessment.logs.map((log) => ({
+      ...log,
+      timestamp: log.timestamp.toISOString(),
+    })),
+    apiCalls: mockAssessment.apiCalls.map((call) => ({
+      ...call,
+      requestTimestamp: call.requestTimestamp.toISOString(),
+      responseTimestamp: call.responseTimestamp?.toISOString() ?? null,
+    })),
+    recordings: mockAssessment.recordings.map((rec) => ({
+      ...rec,
+      startTime: rec.startTime.toISOString(),
+      endTime: rec.endTime?.toISOString() ?? null,
+    })),
+  };
+
+  it("shows API calls as expandable events", () => {
+    render(<AssessmentTimelineClient assessment={serializedAssessment} />);
+    const apiEvent = screen.getByTestId("timeline-event-api-1");
+    expect(apiEvent).toBeInTheDocument();
+    // Should have cursor pointer because it has expandable content
+    const clickableDiv = apiEvent.querySelector('[class*="cursor-pointer"]');
+    expect(clickableDiv).toBeInTheDocument();
+  });
+
+  it("expands API call details when clicked", () => {
+    render(<AssessmentTimelineClient assessment={serializedAssessment} />);
+    const apiEvent = screen.getByTestId("timeline-event-api-1");
+    const clickableDiv = apiEvent.querySelector('[class*="cursor-pointer"]');
+    fireEvent.click(clickableDiv!);
+
+    // Should show API call details
+    expect(screen.getByTestId("api-call-details-api-1")).toBeInTheDocument();
+  });
+
+  it("displays model version in expanded details", () => {
+    render(<AssessmentTimelineClient assessment={serializedAssessment} />);
+    const apiEvent = screen.getByTestId("timeline-event-api-1");
+    const clickableDiv = apiEvent.querySelector('[class*="cursor-pointer"]');
+    fireEvent.click(clickableDiv!);
+
+    const details = screen.getByTestId("api-call-details-api-1");
+    expect(within(details).getByText("gemini-3-flash-preview")).toBeInTheDocument();
+  });
+
+  it("displays status code in expanded details", () => {
+    render(<AssessmentTimelineClient assessment={serializedAssessment} />);
+    const apiEvent = screen.getByTestId("timeline-event-api-1");
+    const clickableDiv = apiEvent.querySelector('[class*="cursor-pointer"]');
+    fireEvent.click(clickableDiv!);
+
+    const details = screen.getByTestId("api-call-details-api-1");
+    expect(within(details).getByText("200")).toBeInTheDocument();
+  });
+
+  it("displays token counts in expanded details", () => {
+    render(<AssessmentTimelineClient assessment={serializedAssessment} />);
+    const apiEvent = screen.getByTestId("timeline-event-api-1");
+    const clickableDiv = apiEvent.querySelector('[class*="cursor-pointer"]');
+    fireEvent.click(clickableDiv!);
+
+    const details = screen.getByTestId("api-call-details-api-1");
+    expect(within(details).getByText(/100 prompt/)).toBeInTheDocument();
+    expect(within(details).getByText(/50 response/)).toBeInTheDocument();
+  });
+
+  it("displays collapsible prompt section", () => {
+    render(<AssessmentTimelineClient assessment={serializedAssessment} />);
+    const apiEvent = screen.getByTestId("timeline-event-api-1");
+    const clickableDiv = apiEvent.querySelector('[class*="cursor-pointer"]');
+    fireEvent.click(clickableDiv!);
+
+    // Should show prompt section header
+    expect(screen.getByTestId("prompt-api-1-section")).toBeInTheDocument();
+    expect(screen.getByTestId("prompt-api-1-header")).toBeInTheDocument();
+  });
+
+  it("displays collapsible response section", () => {
+    render(<AssessmentTimelineClient assessment={serializedAssessment} />);
+    const apiEvent = screen.getByTestId("timeline-event-api-1");
+    const clickableDiv = apiEvent.querySelector('[class*="cursor-pointer"]');
+    fireEvent.click(clickableDiv!);
+
+    // Should show response section header
+    expect(screen.getByTestId("response-api-1-section")).toBeInTheDocument();
+    expect(screen.getByTestId("response-api-1-header")).toBeInTheDocument();
+  });
+
+  it("shows copy button for prompt text", () => {
+    render(<AssessmentTimelineClient assessment={serializedAssessment} />);
+    const apiEvent = screen.getByTestId("timeline-event-api-1");
+    const clickableDiv = apiEvent.querySelector('[class*="cursor-pointer"]');
+    fireEvent.click(clickableDiv!);
+
+    expect(screen.getByTestId("prompt-api-1-copy-button")).toBeInTheDocument();
+  });
+
+  it("shows copy button for response JSON", () => {
+    render(<AssessmentTimelineClient assessment={serializedAssessment} />);
+    const apiEvent = screen.getByTestId("timeline-event-api-1");
+    const clickableDiv = apiEvent.querySelector('[class*="cursor-pointer"]');
+    fireEvent.click(clickableDiv!);
+
+    expect(screen.getByTestId("response-api-1-copy-button")).toBeInTheDocument();
+  });
+
+  it("expands prompt text when header is clicked", () => {
+    render(<AssessmentTimelineClient assessment={serializedAssessment} />);
+    const apiEvent = screen.getByTestId("timeline-event-api-1");
+    const clickableDiv = apiEvent.querySelector('[class*="cursor-pointer"]');
+    fireEvent.click(clickableDiv!);
+
+    // Click on prompt header to expand
+    const promptHeader = screen.getByTestId("prompt-api-1-header");
+    fireEvent.click(promptHeader);
+
+    // Should show prompt content
+    expect(screen.getByTestId("prompt-api-1-content")).toBeInTheDocument();
+    expect(screen.getByText(/You are a helpful assistant/)).toBeInTheDocument();
+  });
+
+  it("expands response JSON when header is clicked", () => {
+    render(<AssessmentTimelineClient assessment={serializedAssessment} />);
+    const apiEvent = screen.getByTestId("timeline-event-api-1");
+    const clickableDiv = apiEvent.querySelector('[class*="cursor-pointer"]');
+    fireEvent.click(clickableDiv!);
+
+    // Click on response header to expand
+    const responseHeader = screen.getByTestId("response-api-1-header");
+    fireEvent.click(responseHeader);
+
+    // Should show response content with formatted JSON
+    expect(screen.getByTestId("response-api-1-content")).toBeInTheDocument();
+  });
+
+  it("collapses API call details when clicked again", () => {
+    render(<AssessmentTimelineClient assessment={serializedAssessment} />);
+    const apiEvent = screen.getByTestId("timeline-event-api-1");
+    const clickableDiv = apiEvent.querySelector('[class*="cursor-pointer"]');
+
+    // Expand
+    fireEvent.click(clickableDiv!);
+    expect(screen.getByTestId("api-call-details-api-1")).toBeInTheDocument();
+
+    // Collapse
+    fireEvent.click(clickableDiv!);
+    expect(screen.queryByTestId("api-call-details-api-1")).not.toBeInTheDocument();
+  });
+
+  it("displays request and response timestamps", () => {
+    render(<AssessmentTimelineClient assessment={serializedAssessment} />);
+    const apiEvent = screen.getByTestId("timeline-event-api-1");
+    const clickableDiv = apiEvent.querySelector('[class*="cursor-pointer"]');
+    fireEvent.click(clickableDiv!);
+
+    const details = screen.getByTestId("api-call-details-api-1");
+    expect(within(details).getByText("REQUEST TIMESTAMP")).toBeInTheDocument();
+    expect(within(details).getByText("RESPONSE TIMESTAMP")).toBeInTheDocument();
+  });
+
+  it("displays duration in expanded details", () => {
+    render(<AssessmentTimelineClient assessment={serializedAssessment} />);
+    const apiEvent = screen.getByTestId("timeline-event-api-1");
+    const clickableDiv = apiEvent.querySelector('[class*="cursor-pointer"]');
+    fireEvent.click(clickableDiv!);
+
+    const details = screen.getByTestId("api-call-details-api-1");
+    expect(within(details).getByText("1.0s")).toBeInTheDocument();
+  });
+
+  it("formats response as JSON with syntax highlighting", () => {
+    render(<AssessmentTimelineClient assessment={serializedAssessment} />);
+    const apiEvent = screen.getByTestId("timeline-event-api-1");
+    const clickableDiv = apiEvent.querySelector('[class*="cursor-pointer"]');
+    fireEvent.click(clickableDiv!);
+
+    const responseHeader = screen.getByTestId("response-api-1-header");
+    fireEvent.click(responseHeader);
+
+    // Should have language-json class for syntax highlighting
+    const content = screen.getByTestId("response-api-1-content");
+    expect(content.querySelector("code.language-json")).toBeInTheDocument();
   });
 });

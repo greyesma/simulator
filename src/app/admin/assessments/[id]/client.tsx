@@ -16,6 +16,8 @@ import {
   Timer,
   ExternalLink,
   Video,
+  Copy,
+  Check,
 } from "lucide-react";
 import type { AssessmentStatus, AssessmentLogEventType } from "@prisma/client";
 
@@ -39,6 +41,8 @@ interface SerializedApiCall {
   stackTrace: string | null;
   promptTokens: number | null;
   responseTokens: number | null;
+  promptText: string;
+  responseText: string | null;
 }
 
 interface SerializedRecording {
@@ -93,6 +97,9 @@ interface TimelineEvent {
   statusCode?: number | null;
   promptTokens?: number | null;
   responseTokens?: number | null;
+  promptText?: string;
+  responseText?: string | null;
+  responseTimestamp?: string | null;
 }
 
 // Format duration in human-readable format
@@ -161,9 +168,269 @@ function getEventIcon(event: TimelineEvent) {
   return <Clock className="w-4 h-4" />;
 }
 
+// Copy button component with visual feedback
+function CopyButton({
+  text,
+  label,
+  testId,
+}: {
+  text: string;
+  label: string;
+  testId: string;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        handleCopy();
+      }}
+      className={`inline-flex items-center gap-1.5 px-2 py-1 border text-xs font-mono ${
+        copied
+          ? "border-green-500 bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300"
+          : "border-border hover:bg-muted"
+      }`}
+      title={`Copy ${label}`}
+      data-testid={testId}
+    >
+      {copied ? (
+        <>
+          <Check className="w-3 h-3" />
+          Copied
+        </>
+      ) : (
+        <>
+          <Copy className="w-3 h-3" />
+          Copy {label}
+        </>
+      )}
+    </button>
+  );
+}
+
+// Collapsible code section component
+function CollapsibleCodeSection({
+  title,
+  content,
+  isExpanded,
+  onToggle,
+  copyLabel,
+  testIdPrefix,
+}: {
+  title: string;
+  content: string;
+  isExpanded: boolean;
+  onToggle: () => void;
+  copyLabel: string;
+  testIdPrefix: string;
+}) {
+  // Format JSON if possible
+  let displayContent = content;
+  let language = "text";
+  try {
+    const parsed = JSON.parse(content);
+    displayContent = JSON.stringify(parsed, null, 2);
+    language = "json";
+  } catch {
+    // Not valid JSON, display as-is
+  }
+
+  return (
+    <div
+      className="border-2 border-border"
+      data-testid={`${testIdPrefix}-section`}
+    >
+      <div
+        className="flex items-center justify-between p-3 bg-muted/30 cursor-pointer hover:bg-muted/50"
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggle();
+        }}
+        data-testid={`${testIdPrefix}-header`}
+      >
+        <div className="flex items-center gap-2">
+          {isExpanded ? (
+            <ChevronDown className="w-4 h-4" />
+          ) : (
+            <ChevronRight className="w-4 h-4" />
+          )}
+          <span className="font-mono text-xs text-muted-foreground uppercase tracking-wider">
+            {title}
+          </span>
+          <span className="font-mono text-xs text-muted-foreground">
+            ({content.length.toLocaleString()} chars)
+          </span>
+        </div>
+        <CopyButton
+          text={content}
+          label={copyLabel}
+          testId={`${testIdPrefix}-copy-button`}
+        />
+      </div>
+      {isExpanded && (
+        <div className="max-h-96 overflow-auto" data-testid={`${testIdPrefix}-content`}>
+          <pre className="p-4 bg-foreground text-background font-mono text-xs whitespace-pre-wrap overflow-x-auto">
+            <code className={`language-${language}`}>{displayContent}</code>
+          </pre>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// API Call Details component
+function ApiCallDetails({
+  event,
+  expandedSections,
+  onToggleSection,
+}: {
+  event: TimelineEvent;
+  expandedSections: Set<string>;
+  onToggleSection: (sectionId: string) => void;
+}) {
+  if (event.type !== "apiCall") return null;
+
+  const promptSectionId = `${event.id}-prompt`;
+  const responseSectionId = `${event.id}-response`;
+
+  return (
+    <div
+      className="mt-4 space-y-4"
+      data-testid={`api-call-details-${event.id}`}
+    >
+      {/* Metadata section */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 border-2 border-border bg-muted/10">
+        <div>
+          <p className="font-mono text-xs text-muted-foreground">MODEL</p>
+          <p className="font-mono text-sm">{event.modelVersion}</p>
+        </div>
+        <div>
+          <p className="font-mono text-xs text-muted-foreground">STATUS</p>
+          <p
+            className={`font-mono text-sm ${
+              event.isError
+                ? "text-red-600 dark:text-red-400"
+                : "text-green-600 dark:text-green-400"
+            }`}
+          >
+            {event.statusCode ?? (event.isError ? "Error" : "OK")}
+          </p>
+        </div>
+        <div>
+          <p className="font-mono text-xs text-muted-foreground">DURATION</p>
+          <p className="font-mono text-sm">
+            {event.durationMs ? formatDuration(event.durationMs) : "N/A"}
+          </p>
+        </div>
+        <div>
+          <p className="font-mono text-xs text-muted-foreground">TOKENS</p>
+          <p className="font-mono text-sm">
+            {event.promptTokens != null ? (
+              <>
+                {event.promptTokens?.toLocaleString()} prompt
+                {event.responseTokens != null && (
+                  <> / {event.responseTokens.toLocaleString()} response</>
+                )}
+              </>
+            ) : (
+              "N/A"
+            )}
+          </p>
+        </div>
+      </div>
+
+      {/* Timestamps section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border-2 border-border bg-muted/10">
+        <div>
+          <p className="font-mono text-xs text-muted-foreground">
+            REQUEST TIMESTAMP
+          </p>
+          <p className="font-mono text-sm">{formatDate(event.timestamp)}</p>
+        </div>
+        <div>
+          <p className="font-mono text-xs text-muted-foreground">
+            RESPONSE TIMESTAMP
+          </p>
+          <p className="font-mono text-sm">
+            {event.responseTimestamp
+              ? formatDate(event.responseTimestamp)
+              : "N/A"}
+          </p>
+        </div>
+      </div>
+
+      {/* Prompt section */}
+      {event.promptText && (
+        <CollapsibleCodeSection
+          title="Prompt Text"
+          content={event.promptText}
+          isExpanded={expandedSections.has(promptSectionId)}
+          onToggle={() => onToggleSection(promptSectionId)}
+          copyLabel="Prompt"
+          testIdPrefix={`prompt-${event.id}`}
+        />
+      )}
+
+      {/* Response section */}
+      {event.responseText && (
+        <CollapsibleCodeSection
+          title="Response JSON"
+          content={event.responseText}
+          isExpanded={expandedSections.has(responseSectionId)}
+          onToggle={() => onToggleSection(responseSectionId)}
+          copyLabel="Response"
+          testIdPrefix={`response-${event.id}`}
+        />
+      )}
+
+      {/* Error section (if applicable) */}
+      {event.isError && (event.errorMessage || event.stackTrace) && (
+        <div className="p-4 border-2 border-red-300 dark:border-red-700 bg-red-100 dark:bg-red-900/50">
+          {event.errorMessage && (
+            <div className="mb-3">
+              <p className="font-mono text-xs text-red-600 dark:text-red-400 mb-1">
+                ERROR MESSAGE
+              </p>
+              <p className="font-mono text-sm text-red-800 dark:text-red-200">
+                {event.errorMessage}
+              </p>
+            </div>
+          )}
+          {event.stackTrace && (
+            <div>
+              <p className="font-mono text-xs text-red-600 dark:text-red-400 mb-1">
+                STACK TRACE
+              </p>
+              <pre className="font-mono text-xs text-red-800 dark:text-red-200 whitespace-pre-wrap overflow-x-auto max-h-48 overflow-y-auto bg-red-50 dark:bg-red-900/30 p-2 border border-red-300 dark:border-red-700">
+                {event.stackTrace}
+              </pre>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function AssessmentTimelineClient({
   assessment,
 }: AssessmentTimelineClientProps) {
+  // Track expanded API call events (for showing details)
+  const [expandedApiCalls, setExpandedApiCalls] = useState<Set<string>>(new Set());
+  // Track expanded code sections within API call details (prompt/response)
+  const [expandedCodeSections, setExpandedCodeSections] = useState<Set<string>>(new Set());
+  // Track expanded error details (existing functionality)
   const [expandedErrors, setExpandedErrors] = useState<Set<string>>(new Set());
 
   // Build unified timeline from logs and API calls
@@ -189,6 +456,9 @@ export function AssessmentTimelineClient({
       statusCode: call.statusCode,
       promptTokens: call.promptTokens,
       responseTokens: call.responseTokens,
+      promptText: call.promptText,
+      responseText: call.responseText,
+      responseTimestamp: call.responseTimestamp,
     })),
   ].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
@@ -213,6 +483,32 @@ export function AssessmentTimelineClient({
         newSet.delete(id);
       } else {
         newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  // Toggle API call details expansion
+  const toggleApiCallExpansion = (id: string) => {
+    setExpandedApiCalls((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  // Toggle code section expansion (prompt/response within API call details)
+  const toggleCodeSection = (sectionId: string) => {
+    setExpandedCodeSections((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(sectionId)) {
+        newSet.delete(sectionId);
+      } else {
+        newSet.add(sectionId);
       }
       return newSet;
     });
@@ -411,10 +707,16 @@ export function AssessmentTimelineClient({
                   )
                 : null;
 
-              const isExpanded = expandedErrors.has(event.id);
-              const hasExpandableContent =
+              const isErrorExpanded = expandedErrors.has(event.id);
+              const isApiCallExpanded = expandedApiCalls.has(event.id);
+              const hasExpandableErrorContent =
                 event.isError &&
                 Boolean(event.errorMessage || event.stackTrace || event.metadata);
+              const hasExpandableApiContent =
+                event.type === "apiCall" &&
+                Boolean(event.promptText || event.responseText);
+              const hasExpandableContent = hasExpandableErrorContent || hasExpandableApiContent;
+              const isExpanded = event.type === "apiCall" ? isApiCallExpanded : isErrorExpanded;
 
               return (
                 <div
@@ -451,9 +753,13 @@ export function AssessmentTimelineClient({
                           ? ""
                           : "bg-muted/10"
                     } ${hasExpandableContent ? "cursor-pointer" : ""}`}
-                    onClick={() =>
-                      hasExpandableContent && toggleErrorExpansion(event.id)
-                    }
+                    onClick={() => {
+                      if (event.type === "apiCall" && hasExpandableApiContent) {
+                        toggleApiCallExpansion(event.id);
+                      } else if (hasExpandableErrorContent) {
+                        toggleErrorExpansion(event.id);
+                      }
+                    }}
                   >
                     {/* Timeline dot */}
                     <div
@@ -530,8 +836,8 @@ export function AssessmentTimelineClient({
                         </div>
                       )}
 
-                      {/* Expandable error content */}
-                      {isExpanded && hasExpandableContent && (
+                      {/* Expandable error content (for log events with errors) */}
+                      {isErrorExpanded && hasExpandableErrorContent && event.type === "log" && (
                         <div
                           className="mt-4 p-4 border-2 border-red-300 dark:border-red-700 bg-red-100 dark:bg-red-900/50"
                           data-testid={`error-details-${event.id}`}
@@ -567,6 +873,15 @@ export function AssessmentTimelineClient({
                             </div>
                           )}
                         </div>
+                      )}
+
+                      {/* Expandable API call details */}
+                      {isApiCallExpanded && event.type === "apiCall" && (
+                        <ApiCallDetails
+                          event={event}
+                          expandedSections={expandedCodeSections}
+                          onToggleSection={toggleCodeSection}
+                        />
                       )}
                     </div>
                   </div>

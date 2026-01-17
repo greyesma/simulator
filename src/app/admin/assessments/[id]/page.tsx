@@ -42,6 +42,8 @@ export default async function AssessmentTimelinePage({
           stackTrace: true,
           promptTokens: true,
           responseTokens: true,
+          promptText: true,
+          responseText: true,
         },
       },
       recordings: {
