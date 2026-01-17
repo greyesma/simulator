@@ -1262,3 +1262,54 @@ VideoAssessment (id, candidateId, videoUrl, status, createdAt, completedAt)
 - RLS policies need to be run directly on Supabase (migration file created but must be executed manually)
 - User model needed relation update for `videoAssessments VideoAssessment[]`
 
+---
+
+## Issue #59: US-016: Create Assessment Logs Database Schema
+
+**What was implemented:**
+- Added `AssessmentLog` table for event tracking with columns: id, assessmentId, eventType (enum), timestamp, durationMs (nullable), metadata (jsonb)
+- Added `AssessmentApiCall` table for API call tracking with columns: id, assessmentId, requestTimestamp, responseTimestamp, durationMs, promptText, promptTokens (nullable), responseText, responseTokens (nullable), modelVersion, statusCode, errorMessage (nullable), stackTrace (nullable)
+- Created `AssessmentLogEventType` enum with values: STARTED, PROMPT_SENT, RESPONSE_RECEIVED, PARSING_STARTED, PARSING_COMPLETED, ERROR, COMPLETED
+- Added indexes on assessmentId and timestamp for efficient querying
+- Added composite index on (assessmentId, timestamp) for common query patterns
+- Created RLS policies: only admins can view logs and API call records
+- Added relations from Assessment model to new log tables
+
+**Files changed:**
+- `prisma/schema.prisma` - Added AssessmentLog, AssessmentApiCall models, AssessmentLogEventType enum, updated Assessment relations
+
+**Files created:**
+- `supabase/migrations/20260116_assessment_logs_rls.sql` - RLS policies for admin-only access
+
+**Schema design:**
+```
+Assessment
+  └── AssessmentLog (id, assessmentId, eventType, timestamp, durationMs?, metadata?)
+  └── AssessmentApiCall (id, assessmentId, requestTimestamp, responseTimestamp?, durationMs?, promptText, promptTokens?, responseText?, responseTokens?, modelVersion, statusCode?, errorMessage?, stackTrace?)
+```
+
+**RLS Policy Summary:**
+- `AssessmentLog`: Only admins can SELECT
+- `AssessmentApiCall`: Only admins can SELECT
+- Both tables: service_role has full CRUD access for API operations
+
+**Learnings:**
+1. Enum values in Prisma use SCREAMING_SNAKE_CASE convention (PROMPT_SENT, not prompt_sent)
+2. Use `@db.Text` for long string fields like promptText, responseText, stackTrace
+3. Separate indexes on individual columns (assessmentId, timestamp) plus composite index provides flexibility
+4. Admin-only RLS is simpler than user-filtered RLS - just check role in User table
+5. Nullable fields for timing data allow logging to start before response is received
+6. `Json?` type maps to jsonb in PostgreSQL for efficient metadata storage
+7. Cascade deletes ensure logs are cleaned up when assessment is deleted
+
+**Architecture decisions:**
+- Logs are tied to existing Assessment model (work simulation), not VideoAssessment
+- service_role policies allow API routes to write logs without RLS restrictions
+- Timestamp with default `@default(now())` enables automatic logging without explicit timestamp setting
+- durationMs stored as Int (milliseconds) rather than float for consistency
+
+**Gotchas:**
+- RLS policies must be run manually on Supabase after schema push
+- Prisma env vars need `export $(grep -v '^#' .env.local | xargs)` before `prisma db push`
+- The `metadata Json?` field is nullable to keep logs lightweight when no extra context is needed
+

@@ -163,6 +163,8 @@ model Assessment {
   conversations Conversation[]
   recordings    Recording[]
   hrAssessment  HRInterviewAssessment?
+  logs          AssessmentLog[]
+  apiCalls      AssessmentApiCall[]
 }
 
 model Conversation {
@@ -359,4 +361,60 @@ model VideoAssessmentSummary {
 
   // Relations
   assessment      VideoAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================================
+// ASSESSMENT LOGS MODELS (US-016)
+// For admin diagnostics and system auditing
+// ============================================================================
+
+enum AssessmentLogEventType {
+  STARTED
+  PROMPT_SENT
+  RESPONSE_RECEIVED
+  PARSING_STARTED
+  PARSING_COMPLETED
+  ERROR
+  COMPLETED
+}
+
+model AssessmentLog {
+  id            String                  @id @default(cuid())
+  assessmentId  String
+  eventType     AssessmentLogEventType
+  timestamp     DateTime                @default(now())
+  durationMs    Int?                    // Duration in milliseconds (nullable)
+  metadata      Json?                   // Additional context (jsonb)
+
+  // Relations
+  assessment    Assessment              @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  // Indexes for efficient querying
+  @@index([assessmentId])
+  @@index([timestamp])
+  @@index([assessmentId, timestamp])
+}
+
+model AssessmentApiCall {
+  id                String    @id @default(cuid())
+  assessmentId      String
+  requestTimestamp  DateTime  @default(now())
+  responseTimestamp DateTime?
+  durationMs        Int?      // Duration in milliseconds
+  promptText        String    @db.Text
+  promptTokens      Int?      // Token count (nullable)
+  responseText      String?   @db.Text
+  responseTokens    Int?      // Token count (nullable)
+  modelVersion      String
+  statusCode        Int?
+  errorMessage      String?   @db.Text
+  stackTrace        String?   @db.Text
+
+  // Relations
+  assessment        Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  // Indexes for efficient querying
+  @@index([assessmentId])
+  @@index([requestTimestamp])
+  @@index([assessmentId, requestTimestamp])
 }
