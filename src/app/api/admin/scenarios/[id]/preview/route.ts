@@ -60,9 +60,9 @@ export async function POST(request: Request, context: RouteContext) {
     status = "WORKING";
     urlSuffix = "/chat";
   } else if (skipTo === "kickoff") {
-    // Skip to kickoff
-    status = "ONBOARDING";
-    urlSuffix = "/kickoff";
+    // Skip to welcome (kickoff call happens via floating bar there)
+    status = "WORKING";
+    urlSuffix = "/welcome";
   } else if (skipTo === "hr-interview") {
     // Go directly to HR interview
     urlSuffix = "/hr-interview";

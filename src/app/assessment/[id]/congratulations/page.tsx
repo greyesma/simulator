@@ -21,7 +21,15 @@ export default async function CongratulationsPage({
     where: { id },
     include: {
       scenario: true,
-      hrAssessment: true,
+      conversations: {
+        where: {
+          coworkerId: null, // HR interview
+          type: "voice",
+        },
+        select: {
+          transcript: true,
+        },
+      },
     },
   });
 
@@ -29,8 +37,13 @@ export default async function CongratulationsPage({
     redirect("/profile");
   }
 
-  // Only show congratulations if HR interview is complete
-  if (assessment.status === "HR_INTERVIEW" && !assessment.hrAssessment) {
+  // Only show congratulations if HR interview transcript exists
+  const hasCompletedInterview =
+    assessment.conversations[0]?.transcript &&
+    Array.isArray(assessment.conversations[0].transcript) &&
+    assessment.conversations[0].transcript.length > 0;
+
+  if (!hasCompletedInterview) {
     redirect(`/assessment/${id}/hr-interview`);
   }
 
