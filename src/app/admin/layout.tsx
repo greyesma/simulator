@@ -36,6 +36,12 @@ export default async function AdminLayout({
               Scenarios
             </Link>
             <Link
+              href="/admin/assessments"
+              className="font-mono text-sm hover:text-secondary transition-colors"
+            >
+              Assessments
+            </Link>
+            <Link
               href="/admin/users"
               className="font-mono text-sm hover:text-secondary transition-colors"
             >

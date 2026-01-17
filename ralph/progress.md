@@ -2978,3 +2978,92 @@ const result = calculateFitScore(dimensionScoreInputs, archetype);
 - Need to preserve archetype param when updating URL for timestamps
 - Fit score formula display uses `toFixed(1)` for consistent decimal places
 - `calculateFitScore` from archetype-weights returns breakdown for transparency
+
+---
+
+## Issue #78: US-017: Build Admin Assessment Diagnostics Page
+
+**What was implemented:**
+- Admin diagnostics page at `/admin/assessments` route (protected by `requireAdmin()`)
+- List view showing all assessments with: candidate name, status, created_at, duration, error indicator
+- Filter by status via dropdown (HR_INTERVIEW, ONBOARDING, WORKING, FINAL_DEFENSE, PROCESSING, COMPLETED)
+- Filter by date range via buttons (Last 24h, Last 7 days, Last 30 days, All time)
+- Search by candidate name, email, or assessment ID
+- Clickable rows expand to show detailed view with assessment info, event logs, and API calls
+- Aggregate stats at top: total assessments, success rate, avg duration, failed count
+- Added "Assessments" link to admin navigation header
+- 33 unit tests covering all functionality
+
+**Files created:**
+- `src/app/admin/assessments/page.tsx` - Server component that fetches assessments with logs and API calls
+- `src/app/admin/assessments/client.tsx` - Client component with filtering, search, and expandable rows
+- `src/app/admin/assessments/page.test.tsx` - 33 unit tests
+
+**Files changed:**
+- `src/app/admin/layout.tsx` - Added "Assessments" link to admin navigation
+
+**Component structure:**
+```typescript
+// Server component fetches and serializes data
+page.tsx → AssessmentsClient (client component)
+  └── StatCard (aggregate stats)
+  └── Filters (search, status dropdown, date range buttons)
+  └── AssessmentRow (clickable, expandable)
+      └── AssessmentDetails (expanded view)
+          └── LogEntry (event log items)
+          └── ApiCallRow (API call table rows)
+```
+
+**Key features:**
+
+1. **Aggregate Stats Grid:**
+   - Total Assessments
+   - Success Rate (% completed, highlighted when ≥80%)
+   - Avg Duration (calculated from completed assessments)
+   - Failed count (assessments with ERROR event, red styling)
+
+2. **Filtering:**
+   - Search: real-time filtering by name, email, or ID
+   - Status: dropdown with all AssessmentStatus enum values
+   - Date range: button group with instant selection
+
+3. **Expandable Rows:**
+   - Click to expand/collapse
+   - Shows: Assessment ID, Scenario name, Started/Completed times
+   - EVENT LOG section with timestamp, event type, duration
+   - API CALLS table with model version, duration, tokens, status
+
+4. **Error Indicators:**
+   - Red badge in ERRORS column for assessments with ERROR logs
+   - Red background for error log entries in expanded view
+   - Red styling for failed API calls
+
+**Learnings:**
+1. Server components can directly query Prisma and pass serialized data to client components
+2. Date serialization: convert `Date` to `toISOString()` strings before passing to client
+3. Prisma `user.email` can be null - handle in TypeScript interface and display
+4. Use `data-testid` attributes for reliable testing of expandable rows
+5. Neo-brutalist table styling: 2px borders, no rounded corners, monospace headers
+6. Aggregate stats calculated server-side to avoid sending unnecessary data to client
+7. `useMemo` for filtered assessments ensures efficient re-renders on filter changes
+8. Only one row expanded at a time by tracking `expandedId` state
+
+**Neo-Brutalist Design Compliance:**
+- No rounded corners (0px radius)
+- No shadows
+- 2px black borders on stats cards, table, and filters
+- Gold (#f7da50) for COMPLETED status badges and high success rate
+- Red variants for error states (red-500, red-100/900 backgrounds)
+- DM Sans for text, Space Mono for labels and data
+- Instant hover state changes
+
+**Schema used:**
+- `Assessment` model with `logs: AssessmentLog[]` and `apiCalls: AssessmentApiCall[]` relations
+- `AssessmentLog`: eventType (STARTED, PROMPT_SENT, RESPONSE_RECEIVED, PARSING_STARTED, PARSING_COMPLETED, ERROR, COMPLETED), timestamp, durationMs, metadata
+- `AssessmentApiCall`: requestTimestamp, responseTimestamp, durationMs, modelVersion, statusCode, errorMessage, promptTokens, responseTokens
+
+**Gotchas:**
+- Prisma User model has nullable email - need `email: string | null` in types
+- Test assertions with duplicate text (e.g., duration in both stats and row) need `within()` or `getAllByText()`
+- Format duration helper handles ms, seconds, and minutes formats
+- Error detection: check if any log has `eventType === "ERROR"`
