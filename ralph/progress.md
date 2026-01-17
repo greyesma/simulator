@@ -1183,3 +1183,34 @@ startCall(managerId, "kickoff");
 - `useCallContext()` throws if used outside `SlackLayout` - ensure all consumers are children
 - Call type must be specified when starting call ("coworker", "kickoff", or "defense")
 - The coworker being called must exist in the `coworkers` array passed to `SlackLayout`
+
+---
+
+## Issue #57: CHORE-001: Repository organization for AI agent navigation
+
+**What was implemented:**
+- Updated CLAUDE.md with comprehensive key directories listing (docs/, prisma/, ralph/, tests/, scripts/, screenshots/)
+- Fixed key docs references (was pointing to non-existent `tasks/prd-skillvee-simulator.md`)
+- Added "src/lib/ Organization" section explaining file domains (AI & Gemini, External Services, Recording, Other)
+- Added "API Routes Structure" section documenting endpoint organization
+- Added "Screenshots" section documenting the two screenshot locations and conventions
+- Moved `docs/test-resume.pdf` to `tests/fixtures/test-resume.pdf`
+- Updated E2E test to use new fixture path
+
+**Files changed:**
+- `CLAUDE.md` - Major documentation update
+- `tests/fixtures/test-resume.pdf` - Moved from docs/
+- `tests/e2e/hr-interview-flow.sh` - Updated CV path reference
+
+**Learnings:**
+1. Test fixtures belong in `tests/fixtures/`, not `docs/`
+2. AI agents benefit from explicit domain grouping in documentation (e.g., "AI & Gemini", "External Services")
+3. API routes should be documented by functional area (Assessment Flow, File Operations, etc.)
+4. Two screenshot directories serve different purposes: root `screenshots/` for issue verification, `tests/e2e/screenshots/` for E2E tests
+5. Key docs section should reference actual file paths - outdated references cause confusion
+
+**Architecture decisions:**
+- Kept both PRD files (`docs/prd.md` and `docs/prd-work-simulation.md`) since they serve different purposes
+- Did not move code files or restructure directories (documentation-only changes)
+- Used relative paths in E2E tests (`../fixtures/`) to keep scripts portable
+
