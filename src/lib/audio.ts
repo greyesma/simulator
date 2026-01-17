@@ -72,45 +72,189 @@ let audioContext: AudioContext | null = null;
 
 export function getAudioContext(): AudioContext {
   if (!audioContext) {
-    audioContext = new AudioContext({ sampleRate: 24000 }); // Gemini outputs at 24kHz
+    audioContext = new AudioContext(); // Use browser's default sample rate
   }
   return audioContext;
 }
 
-// Play audio from base64 PCM data
+/**
+ * AudioStreamer - Handles audio playback with proper buffering and scheduling
+ * Based on the working skillvee implementation
+ */
+export class AudioStreamer {
+  private context: AudioContext;
+  private audioQueue: Float32Array[] = [];
+  private isPlaying = false;
+  private sampleRate = 24000; // Gemini outputs at 24kHz
+  private bufferSize: number;
+  private processingBuffer = new Float32Array(0);
+  private scheduledTime = 0;
+  private gainNode: GainNode;
+  private isInitialized = false;
+  private scheduledSources = new Set<AudioBufferSourceNode>();
+
+  constructor(context: AudioContext) {
+    this.context = context;
+    this.bufferSize = Math.floor(this.sampleRate * 0.32); // 320ms buffer
+    this.gainNode = this.context.createGain();
+    this.gainNode.connect(this.context.destination);
+  }
+
+  async initialize(): Promise<void> {
+    if (this.context.state === "suspended") {
+      await this.context.resume();
+    }
+    this.scheduledTime = this.context.currentTime + 0.05; // 50ms initial delay
+    this.gainNode.gain.setValueAtTime(1, this.context.currentTime);
+    this.isInitialized = true;
+  }
+
+  // Stream audio from base64 PCM data
+  streamAudioBase64(base64Data: string): void {
+    if (!this.isInitialized) {
+      return;
+    }
+
+    // Decode base64 to Uint8Array
+    const binaryString = atob(base64Data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    this.streamAudio(bytes);
+  }
+
+  // Stream audio from Uint8Array (Int16 PCM)
+  streamAudio(chunk: Uint8Array): void {
+    if (!this.isInitialized || !chunk || chunk.length === 0) {
+      return;
+    }
+
+    try {
+      // Convert Int16 to Float32
+      const float32Array = new Float32Array(chunk.length / 2);
+      const dataView = new DataView(chunk.buffer, chunk.byteOffset, chunk.byteLength);
+
+      for (let i = 0; i < chunk.length / 2; i++) {
+        const int16 = dataView.getInt16(i * 2, true); // little-endian
+        float32Array[i] = int16 / 32768; // Scale to [-1.0, 1.0]
+      }
+
+      // Accumulate in processing buffer
+      const newBuffer = new Float32Array(this.processingBuffer.length + float32Array.length);
+      newBuffer.set(this.processingBuffer);
+      newBuffer.set(float32Array, this.processingBuffer.length);
+      this.processingBuffer = newBuffer;
+
+      // Split into playable chunks
+      while (this.processingBuffer.length >= this.bufferSize) {
+        const buffer = this.processingBuffer.slice(0, this.bufferSize);
+        this.audioQueue.push(buffer);
+        this.processingBuffer = this.processingBuffer.slice(this.bufferSize);
+      }
+
+      // Start playback if not already playing
+      if (!this.isPlaying) {
+        this.isPlaying = true;
+        this.scheduleNextBuffer();
+      }
+    } catch (error) {
+      console.error("Audio processing error:", error);
+    }
+  }
+
+  private scheduleNextBuffer(): void {
+    if (!this.isPlaying) return;
+
+    const SCHEDULE_AHEAD_TIME = 0.2;
+
+    try {
+      // Schedule buffers within look-ahead window
+      while (
+        this.audioQueue.length > 0 &&
+        this.scheduledTime < this.context.currentTime + SCHEDULE_AHEAD_TIME
+      ) {
+        const audioData = this.audioQueue.shift()!;
+        const audioBuffer = this.createAudioBuffer(audioData);
+        const source = this.context.createBufferSource();
+
+        // Track source
+        this.scheduledSources.add(source);
+        source.onended = () => {
+          this.scheduledSources.delete(source);
+        };
+
+        source.buffer = audioBuffer;
+        source.connect(this.gainNode);
+
+        const startTime = Math.max(this.scheduledTime, this.context.currentTime);
+        source.start(startTime);
+        this.scheduledTime = startTime + audioBuffer.duration;
+      }
+
+      // Schedule next check
+      if (this.audioQueue.length > 0) {
+        const nextCheckTime = (this.scheduledTime - this.context.currentTime) * 1000;
+        setTimeout(() => this.scheduleNextBuffer(), Math.max(0, nextCheckTime - 50));
+      } else {
+        this.isPlaying = false;
+      }
+    } catch (error) {
+      console.error("Audio scheduling error:", error);
+      this.isPlaying = false;
+    }
+  }
+
+  private createAudioBuffer(audioData: Float32Array): AudioBuffer {
+    const audioBuffer = this.context.createBuffer(1, audioData.length, this.sampleRate);
+    audioBuffer.getChannelData(0).set(audioData);
+    return audioBuffer;
+  }
+
+  stop(): void {
+    this.isPlaying = false;
+
+    // Stop all active sources
+    for (const source of this.scheduledSources) {
+      try {
+        source.stop();
+        source.disconnect();
+      } catch {
+        // Ignore errors from already stopped sources
+      }
+    }
+    this.scheduledSources.clear();
+
+    this.audioQueue = [];
+    this.processingBuffer = new Float32Array(0);
+    this.scheduledTime = this.context.currentTime;
+  }
+}
+
+// Singleton audio streamer instance
+let audioStreamer: AudioStreamer | null = null;
+
+export async function getAudioStreamer(): Promise<AudioStreamer> {
+  if (!audioStreamer) {
+    const ctx = getAudioContext();
+    audioStreamer = new AudioStreamer(ctx);
+    await audioStreamer.initialize();
+  }
+  return audioStreamer;
+}
+
+// Play audio from base64 PCM data using the streamer
 export async function playAudioChunk(base64Data: string): Promise<void> {
-  const ctx = getAudioContext();
+  const streamer = await getAudioStreamer();
+  streamer.streamAudioBase64(base64Data);
+}
 
-  // Resume context if suspended (required for autoplay policies)
-  if (ctx.state === "suspended") {
-    await ctx.resume();
+// Stop all audio playback
+export function stopAudioPlayback(): void {
+  if (audioStreamer) {
+    audioStreamer.stop();
   }
-
-  // Decode base64 to array buffer
-  const binaryString = atob(base64Data);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-
-  // Convert to Int16 PCM
-  const int16Array = new Int16Array(bytes.buffer);
-
-  // Convert to Float32 for Web Audio API
-  const float32Array = new Float32Array(int16Array.length);
-  for (let i = 0; i < int16Array.length; i++) {
-    float32Array[i] = int16Array[i] / 32768.0; // Normalize to -1.0 to 1.0
-  }
-
-  // Create audio buffer
-  const audioBuffer = ctx.createBuffer(1, float32Array.length, 24000);
-  audioBuffer.copyToChannel(float32Array, 0);
-
-  // Play the buffer
-  const source = ctx.createBufferSource();
-  source.buffer = audioBuffer;
-  source.connect(ctx.destination);
-  source.start();
 }
 
 // Audio worklet processor for capturing audio

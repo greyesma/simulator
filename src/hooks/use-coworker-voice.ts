@@ -275,13 +275,18 @@ export function useCoworkerVoice({
       const { token } = await tokenResponse.json();
 
       // Connect to Gemini Live using the ephemeral token as API key
+      // Note: Must use httpOptions.baseUrl WITHOUT trailing slash to avoid double slash bug in SDK
       const ai = new GoogleGenAI({
         apiKey: token,
+        httpOptions: {
+          apiVersion: "v1alpha",
+          baseUrl: "https://generativelanguage.googleapis.com",  // No trailing slash!
+        },
       });
 
       let sessionConnected = false;
       const session = await ai.live.connect({
-        model: "gemini-live-2.5-flash-preview",
+        model: "gemini-2.5-flash-native-audio-latest",
         config: {
           responseModalities: [Modality.AUDIO],
           inputAudioTranscription: {},

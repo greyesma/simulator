@@ -8,7 +8,8 @@ export const gemini = new GoogleGenAI({
 });
 
 // Model for live voice conversations
-export const LIVE_MODEL = "gemini-live-2.5-flash-preview";
+// Must match an available model from the Gemini API
+export const LIVE_MODEL = "gemini-2.5-flash-native-audio-latest";
 
 // HR Interview persona system prompt
 export const HR_PERSONA_SYSTEM_PROMPT = `You are an HR interviewer conducting a phone screen for a software engineering position. Your role is to verify the candidate's experience and assess their communication skills.

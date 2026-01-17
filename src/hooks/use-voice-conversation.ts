@@ -7,6 +7,7 @@ import {
   checkMicrophonePermission,
   requestMicrophoneAccess,
   playAudioChunk,
+  stopAudioPlayback,
   createAudioWorkletBlobUrl,
   type AudioPermissionState,
 } from "@/lib/audio";
@@ -192,6 +193,7 @@ export function useVoiceConversation({
       // Handle interruption
       if (message.serverContent?.interrupted) {
         audioQueueRef.current = [];
+        stopAudioPlayback();
         setIsSpeaking(false);
       }
     },
@@ -274,13 +276,18 @@ export function useVoiceConversation({
 
       // Connect to Gemini Live using the ephemeral token as API key
       // See: https://ai.google.dev/gemini-api/docs/live
+      // Note: Must use httpOptions.baseUrl WITHOUT trailing slash to avoid double slash bug in SDK
       const ai = new GoogleGenAI({
         apiKey: token,
+        httpOptions: {
+          apiVersion: "v1alpha",
+          baseUrl: "https://generativelanguage.googleapis.com",  // No trailing slash!
+        },
       });
 
       let sessionConnected = false;
       const session = await ai.live.connect({
-        model: "gemini-live-2.5-flash-preview",
+        model: "gemini-2.5-flash-native-audio-latest",
         config: {
           responseModalities: [Modality.AUDIO],
           inputAudioTranscription: {},
