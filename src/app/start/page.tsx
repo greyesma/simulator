@@ -7,7 +7,7 @@ import { AssessmentStatus } from "@prisma/client";
  * Smart redirect page that handles assessment start flow:
  * - If not authenticated → redirect to sign-in
  * - If authenticated with in-progress assessment → resume where they left off
- * - If authenticated with no in-progress assessment → create new assessment → redirect to consent
+ * - If authenticated with no in-progress assessment → create new assessment → redirect to CV upload
  * - If no published scenarios exist → show message
  */
 export default async function StartPage() {
@@ -40,8 +40,7 @@ export default async function StartPage() {
   if (existingAssessment) {
     const redirectUrl = getRedirectUrlForStatus(
       existingAssessment.id,
-      existingAssessment.status,
-      existingAssessment.consentGivenAt
+      existingAssessment.status
     );
     redirect(redirectUrl);
   }
@@ -70,23 +69,17 @@ export default async function StartPage() {
     },
   });
 
-  // Redirect to consent page for new assessment
-  redirect(`/assessment/${newAssessment.id}/consent`);
+  // Redirect to CV upload page for new assessment
+  redirect(`/assessment/${newAssessment.id}/cv-upload`);
 }
 
 /**
- * Determines the redirect URL based on assessment status and consent state
+ * Determines the redirect URL based on assessment status
  */
 function getRedirectUrlForStatus(
   assessmentId: string,
-  status: AssessmentStatus,
-  consentGivenAt: Date | null
+  status: AssessmentStatus
 ): string {
-  // If consent not given yet, always go to consent page first
-  if (!consentGivenAt) {
-    return `/assessment/${assessmentId}/consent`;
-  }
-
   switch (status) {
     case AssessmentStatus.HR_INTERVIEW:
       // Route to cv-upload which will auto-skip to hr-interview if CV exists
@@ -100,8 +93,8 @@ function getRedirectUrlForStatus(
     case AssessmentStatus.PROCESSING:
       return `/assessment/${assessmentId}/processing`;
     default:
-      // Fallback to consent if unknown status
-      return `/assessment/${assessmentId}/consent`;
+      // Fallback to CV upload if unknown status
+      return `/assessment/${assessmentId}/cv-upload`;
   }
 }
 

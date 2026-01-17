@@ -137,9 +137,6 @@ model Assessment {
   scenarioId    String
   status        AssessmentStatus @default(HR_INTERVIEW)
 
-  // Consent
-  consentGivenAt DateTime?       // When user accepted privacy/recording consent
-
   // Timing
   startedAt     DateTime         @default(now())
   completedAt   DateTime?

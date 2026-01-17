@@ -51,11 +51,6 @@ export default async function HRInterviewPage({ params }: PageProps) {
     notFound();
   }
 
-  // Check if consent was given, redirect to consent page if not
-  if (!assessment.consentGivenAt) {
-    redirect(`/assessment/${id}/consent`);
-  }
-
   // Check if CV was uploaded, redirect to CV upload page if not
   const hasCv = assessment.cvUrl || assessment.user.cvUrl;
   if (!hasCv) {

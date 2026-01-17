@@ -278,7 +278,6 @@ Acceptance Criteria:
           userId: testUser.id,
           scenarioId: defaultScenario.id,
           status: "HR_INTERVIEW",
-          consentGivenAt: new Date(),
           parsedProfile: testParsedProfile as unknown as Prisma.InputJsonValue,
         },
       });

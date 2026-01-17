@@ -56,30 +56,16 @@ describe("/start page", () => {
   });
 
   describe("Resume existing assessment", () => {
-    it("redirects to consent page when assessment has no consent", async () => {
+    it("redirects to cv-upload for HR_INTERVIEW status", async () => {
       mockAuth.mockResolvedValueOnce({ user: { id: "user-123" } });
       mockAssessmentFindFirst.mockResolvedValueOnce({
         id: "assessment-123",
         status: AssessmentStatus.HR_INTERVIEW,
-        consentGivenAt: null,
         scenario: { id: "scenario-1" },
       });
 
-      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/assessment-123/consent");
-      expect(mockRedirect).toHaveBeenCalledWith("/assessment/assessment-123/consent");
-    });
-
-    it("redirects to HR interview for HR_INTERVIEW status with consent", async () => {
-      mockAuth.mockResolvedValueOnce({ user: { id: "user-123" } });
-      mockAssessmentFindFirst.mockResolvedValueOnce({
-        id: "assessment-123",
-        status: AssessmentStatus.HR_INTERVIEW,
-        consentGivenAt: new Date(),
-        scenario: { id: "scenario-1" },
-      });
-
-      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/assessment-123/hr-interview");
-      expect(mockRedirect).toHaveBeenCalledWith("/assessment/assessment-123/hr-interview");
+      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/assessment-123/cv-upload");
+      expect(mockRedirect).toHaveBeenCalledWith("/assessment/assessment-123/cv-upload");
     });
 
     it("redirects to congratulations for ONBOARDING status", async () => {
@@ -87,7 +73,6 @@ describe("/start page", () => {
       mockAssessmentFindFirst.mockResolvedValueOnce({
         id: "assessment-123",
         status: AssessmentStatus.ONBOARDING,
-        consentGivenAt: new Date(),
         scenario: { id: "scenario-1" },
       });
 
@@ -100,7 +85,6 @@ describe("/start page", () => {
       mockAssessmentFindFirst.mockResolvedValueOnce({
         id: "assessment-123",
         status: AssessmentStatus.WORKING,
-        consentGivenAt: new Date(),
         scenario: { id: "scenario-1" },
       });
 
@@ -113,7 +97,6 @@ describe("/start page", () => {
       mockAssessmentFindFirst.mockResolvedValueOnce({
         id: "assessment-123",
         status: AssessmentStatus.FINAL_DEFENSE,
-        consentGivenAt: new Date(),
         scenario: { id: "scenario-1" },
       });
 
@@ -126,7 +109,6 @@ describe("/start page", () => {
       mockAssessmentFindFirst.mockResolvedValueOnce({
         id: "assessment-123",
         status: AssessmentStatus.PROCESSING,
-        consentGivenAt: new Date(),
         scenario: { id: "scenario-1" },
       });
 
@@ -141,7 +123,7 @@ describe("/start page", () => {
       mockScenarioFindFirst.mockResolvedValueOnce({ id: "scenario-1" });
       mockAssessmentCreate.mockResolvedValueOnce({ id: "new-assessment-123" });
 
-      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/new-assessment-123/consent");
+      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/new-assessment-123/cv-upload");
 
       // Verify the filter excludes COMPLETED status
       expect(mockAssessmentFindFirst).toHaveBeenCalledWith(
@@ -159,7 +141,6 @@ describe("/start page", () => {
       mockAssessmentFindFirst.mockResolvedValueOnce({
         id: "most-recent-assessment",
         status: AssessmentStatus.WORKING,
-        consentGivenAt: new Date(),
         scenario: { id: "scenario-1" },
       });
 
@@ -181,7 +162,7 @@ describe("/start page", () => {
       mockScenarioFindFirst.mockResolvedValueOnce({ id: "scenario-1" });
       mockAssessmentCreate.mockResolvedValueOnce({ id: "new-assessment-123" });
 
-      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/new-assessment-123/consent");
+      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/new-assessment-123/cv-upload");
 
       expect(mockScenarioFindFirst).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -198,17 +179,17 @@ describe("/start page", () => {
         },
       });
 
-      expect(mockRedirect).toHaveBeenCalledWith("/assessment/new-assessment-123/consent");
+      expect(mockRedirect).toHaveBeenCalledWith("/assessment/new-assessment-123/cv-upload");
     });
 
-    it("redirects new assessment to consent page", async () => {
+    it("redirects new assessment to cv-upload page", async () => {
       mockAuth.mockResolvedValueOnce({ user: { id: "user-123" } });
       mockAssessmentFindFirst.mockResolvedValueOnce(null);
       mockScenarioFindFirst.mockResolvedValueOnce({ id: "scenario-1" });
       mockAssessmentCreate.mockResolvedValueOnce({ id: "assessment-abc" });
 
-      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/assessment-abc/consent");
-      expect(mockRedirect).toHaveBeenCalledWith("/assessment/assessment-abc/consent");
+      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/assessment-abc/cv-upload");
+      expect(mockRedirect).toHaveBeenCalledWith("/assessment/assessment-abc/cv-upload");
     });
   });
 

@@ -41,11 +41,6 @@ export default async function CVUploadPage({ params }: PageProps) {
     notFound();
   }
 
-  // Check if consent was given, redirect to consent page if not
-  if (!assessment.consentGivenAt) {
-    redirect(`/assessment/${id}/consent`);
-  }
-
   // Check if user already has CV (from assessment or user profile)
   const hasCv = assessment.cvUrl || assessment.user.cvUrl;
   if (hasCv) {
@@ -82,13 +77,6 @@ export default async function CVUploadPage({ params }: PageProps) {
       <div className="border-b-2 border-border">
         <div className="max-w-7xl mx-auto px-6 py-3">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 opacity-40">
-              <div className="w-8 h-8 border-2 border-border flex items-center justify-center font-bold">
-                0
-              </div>
-              <span>Consent</span>
-            </div>
-            <div className="h-px flex-1 bg-border" />
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-secondary text-secondary-foreground flex items-center justify-center font-bold">
                 <svg
