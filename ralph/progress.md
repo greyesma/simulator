@@ -567,3 +567,46 @@ switch (status) {
 - `redirect()` throws an error (NEXT_REDIRECT) - don't try to catch it
 - Test mocks need to throw to simulate redirect: `throw new Error(\`REDIRECT:\${url}\`)`
 - Session may exist but have no user.id - check both
+
+---
+
+## Issue #45: US-043: Move parsedProfile from Assessment to User table
+
+**What was implemented:**
+- Added `cvUrl` and `parsedProfile` fields to User model in Prisma schema
+- Updated `/api/upload/cv` to always parse CV and save to User (not just Assessment)
+- Kept backwards compatibility by also saving to Assessment when assessmentId is provided
+- Updated `/profile` page to read `parsedProfile` from User instead of Assessment
+- Updated `ProfileCVSection` to pass initial CV URL from User
+- Updated HR interview token route to fallback to User's `parsedProfile` when Assessment doesn't have one
+
+**Problem solved:**
+CV uploads from `/profile` page were not being parsed because the endpoint only triggered parsing when `assessmentId` was provided. This caused the ParsedProfileDisplay to never show for users who uploaded their CV from the profile page.
+
+**Files changed:**
+- `prisma/schema.prisma` - Added `cvUrl` and `parsedProfile` fields to User model
+- `src/app/api/upload/cv/route.ts` - Always parse CV and save to User, plus backwards compatibility for Assessment
+- `src/app/profile/page.tsx` - Read `parsedProfile` from User instead of Assessment
+- `src/app/api/interview/token/route.ts` - Fallback to User's `parsedProfile` if Assessment doesn't have one
+
+**Data flow (after fix):**
+```
+User uploads CV on /profile → File stored in Supabase → CV parsed → parsedProfile saved to User → Profile displayed
+```
+
+**Key changes:**
+1. CV is always parsed and stored on User record (regardless of assessmentId)
+2. If assessmentId is provided, CV is also saved to Assessment (backwards compatibility)
+3. Profile page reads from User.parsedProfile (not Assessment.parsedProfile)
+4. HR interview token route checks Assessment.parsedProfile first, then User.parsedProfile as fallback
+
+**Learnings:**
+1. When moving data between models, maintain backwards compatibility by writing to both places during transition
+2. Use fallback pattern (`assessment.parsedProfile || assessment.user.parsedProfile`) for graceful migration
+3. The Prisma include with select works for getting related user fields: `include: { user: { select: { cvUrl: true, parsedProfile: true } } }`
+4. Async parsing pattern: trigger with `.then().catch()` to not block the upload response
+5. Keep Assessment model's `parsedProfile` for historical records - don't remove during migration
+
+**Gotchas:**
+- Remember to include user fields in the Prisma query when using fallback pattern
+- The `import type { Prisma }` import is sufficient for type usage but won't work for runtime value `Prisma.JsonNull`
