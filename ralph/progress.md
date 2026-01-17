@@ -3189,3 +3189,111 @@ const clickableDiv = element.querySelector('[class*="cursor-pointer"]');
 - Recordings relation needs explicit select in Prisma include
 - Stack trace should use `<pre>` with `whitespace-pre-wrap` for proper formatting
 - Timeline events include both logs and API calls - must handle both types
+
+## Issue #80: US-019: Display Gemini API Call Details
+
+**Objective:** Allow admins to see exact prompts sent to Gemini and responses received for debugging AI-related issues.
+
+**Key Features:**
+1. **Expandable API Call Details:**
+   - Click on API call event to expand detailed view
+   - Metadata grid: model version, status code, duration
+   - Token counts: prompt tokens, response tokens
+   - Request/response timestamps
+
+2. **Collapsible Prompt Section:**
+   - Header shows "Prompt" with character count
+   - Collapsed by default, expands on click
+   - Full prompt text displayed in monospace font
+   - Copy-to-clipboard button with "Copied!" feedback
+
+3. **Collapsible Response Section:**
+   - Header shows "Response" with character count
+   - JSON formatting with syntax highlighting
+   - Handles non-JSON gracefully (displays raw text)
+   - Copy-to-clipboard button
+
+**Implementation Details:**
+- Added `promptText` and `responseText` to Prisma query select
+- Three separate state variables for tracking expansions:
+  ```typescript
+  const [expandedApiCalls, setExpandedApiCalls] = useState<Set<string>>(new Set());
+  const [expandedCodeSections, setExpandedCodeSections] = useState<Set<string>>(new Set());
+  const [expandedErrors, setExpandedErrors] = useState<Set<string>>(new Set());
+  ```
+- API calls use `api-call-details-{id}` for expansion
+- Errors use `error-details-{id}` for expansion
+- Code sections use `{section}-{callId}` (e.g., `prompt-api-1`, `response-api-1`)
+
+**Copy Button Pattern:**
+```typescript
+function CopyButton({ text, label, testId }: { text: string; label: string; testId: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
+  return (
+    <button onClick={handleCopy} data-testid={testId}>
+      {copied ? "Copied!" : label}
+    </button>
+  );
+}
+```
+
+**JSON Formatting:**
+```typescript
+const formatJson = (text: string | null): string => {
+  if (!text) return "";
+  try {
+    return JSON.stringify(JSON.parse(text), null, 2);
+  } catch {
+    return text; // Return as-is if not valid JSON
+  }
+};
+```
+
+**Learnings:**
+1. Separate expansion states for different click behaviors (API details vs errors)
+2. Use `e.stopPropagation()` on nested clickable elements to prevent parent handlers
+3. JSON.parse + JSON.stringify with indent for pretty formatting
+4. `navigator.clipboard.writeText()` for modern clipboard API
+5. Timeout-based "Copied!" feedback resets with `setTimeout`
+6. Test IDs should be unique per component type (api-call-details, error-details)
+
+**Neo-Brutalist Design:**
+- Black 2px borders on all sections
+- No rounded corners (0px radius)
+- Gold (#f7da50) for icons and highlights
+- Space Mono for code/data display
+- Hover states use bg-black/5 (light) and bg-white/5 (dark)
+
+**Test Patterns:**
+```typescript
+// Click to expand nested content
+const apiCallEvent = screen.getByTestId("event-api-1");
+await user.click(apiCallEvent);
+expect(screen.getByTestId("api-call-details-api-1")).toBeInTheDocument();
+
+// Click copy button and verify feedback
+const copyButton = screen.getByTestId("copy-prompt-api-1");
+await user.click(copyButton);
+expect(screen.getByText("Copied!")).toBeInTheDocument();
+
+// Verify collapsible sections exist
+expect(screen.getByText(/Prompt/)).toBeInTheDocument();
+expect(screen.getByText(/Response/)).toBeInTheDocument();
+```
+
+**Gotchas:**
+1. API calls have different expansion pattern than error logs - separate state needed
+2. Test must use correct testId pattern (`api-call-details-{id}` vs `error-details-{id}`)
+3. When testing toggle behavior, use log events for error toggling, API events for API details
+4. `stopPropagation()` needed on collapsible header clicks to prevent parent collapse
