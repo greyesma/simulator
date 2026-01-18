@@ -3411,3 +3411,49 @@ it("navigates to new assessment after successful retry", async () => {
 - VideoAssessment trigger can fail silently without breaking the retry flow
 - Navigation delay allows toast to be visible before redirect
 - Need to pass `supersededBy` from server component to client for visibility check
+
+---
+
+## Issue #82: BUG: Admin Users page returns 404
+
+**What was implemented:**
+- Created `/admin/users` page that lists all users with name, email, role, and member since date
+- Shows assessment count per user via Prisma `_count` relation
+- Search/filter by name or email
+- Filter by role (USER/ADMIN) via dropdown
+- Filter by date range (Last 24h, 7 days, 30 days, All time)
+- Stats grid: total users, admins count, users with assessments, total assessments
+- Page protected by admin-only access (via layout's `requireAdmin()`)
+
+**Files created:**
+- `src/app/admin/users/page.tsx` - Server component that fetches users with assessment counts
+- `src/app/admin/users/client.tsx` - Client component with filtering, search, and table display
+
+**Key patterns reused from assessments page:**
+- Server/client component split for data fetching + interactivity
+- Serialized dates (ISO strings) passed from server to client
+- Stats grid with `StatCard` component
+- Filter bar with search input, dropdown, and date range toggle buttons
+- Table with column headers and data rows
+- Neo-brutalist styling: 2px borders, no shadows, gold accent, monospace labels
+
+**Learnings:**
+1. Prisma `_count` relation is efficient for getting related record counts: `include: { _count: { select: { assessments: true } } }`
+2. Admin navigation in layout.tsx already had the Users link - just needed the page
+3. Reusing patterns from existing admin pages (assessments) provides consistency
+4. `getInitials()` utility handles both name and email fallbacks for avatar display
+5. Date formatting with `Intl.DateTimeFormat` for locale-aware display
+6. `useMemo` for filtering ensures efficient re-renders on filter changes
+
+**Neo-Brutalist Design Compliance:**
+- No rounded corners (0px radius)
+- No shadows
+- 2px black borders on table, stats cards, inputs
+- Gold (#f7da50) for admin badge, avatar background
+- DM Sans for text, Space Mono for labels and table headers
+- High contrast throughout
+
+**Gotchas:**
+- The admin layout already calls `requireAdmin()`, so no need to repeat in page
+- User `email` and `name` fields can be null - handle in TypeScript interfaces and display
+- Assessment count shown directly in table row, not expandable details
