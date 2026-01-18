@@ -28,6 +28,7 @@ import {
   CheckCircle,
   ArrowLeft,
 } from "lucide-react";
+import { api } from "@/lib/api-client";
 import type { ExtractedIntent } from "@/lib/entity-extraction";
 import type { RoleArchetype } from "@/lib/archetype-weights";
 import type { SeniorityLevel } from "@/lib/seniority-thresholds";
@@ -360,18 +361,13 @@ export function CandidateSearchClient() {
 
     setIsExtracting(true);
     try {
-      const response = await fetch("/api/search/extract", {
+      const data = await api<ExtractionResult>("/api/search/extract", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: text }),
+        body: { query: text },
       });
-
-      if (response.ok) {
-        const data: ExtractionResult = await response.json();
-        setExtraction(data);
-      }
-    } catch (error) {
-      console.error("Entity extraction failed:", error);
+      setExtraction(data);
+    } catch (err) {
+      console.error("Entity extraction failed:", err);
     } finally {
       setIsExtracting(false);
     }

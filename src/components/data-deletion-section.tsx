@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { api, ApiClientError } from "@/lib/api-client";
 
 interface DataDeletionSectionProps {
   deletionRequestedAt: Date | null;
@@ -35,22 +36,21 @@ export function DataDeletionSection({
     setSuccess("");
 
     try {
-      const response = await fetch("/api/user/delete-request", {
-        method: "POST",
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to request deletion");
-      }
+      const data = await api<{ requestedAt: string; message: string }>(
+        "/api/user/delete-request",
+        { method: "POST" }
+      );
 
       setHasPendingRequest(true);
       setRequestDate(new Date(data.requestedAt));
       setSuccess(data.message);
       setShowConfirmation(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      if (err instanceof ApiClientError) {
+        setError(err.message);
+      } else {
+        setError("An error occurred");
+      }
     } finally {
       setIsRequesting(false);
     }
@@ -62,21 +62,19 @@ export function DataDeletionSection({
     setSuccess("");
 
     try {
-      const response = await fetch("/api/user/delete-request", {
+      const data = await api<{ message: string }>("/api/user/delete-request", {
         method: "DELETE",
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to cancel request");
-      }
 
       setHasPendingRequest(false);
       setRequestDate(null);
       setSuccess(data.message);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      if (err instanceof ApiClientError) {
+        setError(err.message);
+      } else {
+        setError("An error occurred");
+      }
     } finally {
       setIsCancelling(false);
     }

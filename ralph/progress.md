@@ -109,3 +109,44 @@ Learnings from autonomous issue resolution.
 5. **Schema location**: Keep Zod schemas in `src/lib/schemas/api.ts` and re-export from `src/lib/schemas/index.ts`. Each schema should export both the schema and the inferred TypeScript type.
 
 6. **TDD for helpers**: Writing tests first for utility functions (like `validateRequest`) ensures the API contract is well-defined before implementation.
+
+## Issue #96: REF-006 - Create API Client Wrapper
+
+### What was implemented
+- Created `src/lib/api-client.ts` with typed `api<T>(endpoint, options)` function
+- Created `src/lib/api-client.test.ts` with 14 comprehensive tests
+- Handles Content-Type headers automatically for JSON bodies
+- Parses response JSON and throws typed `ApiClientError` on failure
+- Supports all HTTP methods (GET, POST, PUT, DELETE, PATCH)
+- Migrated 5 client-side fetch calls to use the new api client:
+  - `src/components/chat.tsx` - GET chat history, POST send message
+  - `src/components/data-deletion-section.tsx` - POST request deletion, DELETE cancel request
+  - `src/app/candidate_search/client.tsx` - POST entity extraction
+
+### Files changed
+- `src/lib/api-client.ts` - New API client wrapper
+- `src/lib/api-client.test.ts` - Tests for API client
+- `src/components/chat.tsx` - Uses api client for chat operations
+- `src/components/data-deletion-section.tsx` - Uses api client for deletion requests
+- `src/app/candidate_search/client.tsx` - Uses api client for entity extraction
+
+### Learnings for future iterations
+
+1. **Standardized vs Legacy responses**: The api client handles both standardized responses (`{ success: true, data: T }`) and legacy responses (direct JSON). It extracts `data` from standardized responses automatically.
+
+2. **ApiClientError for typed errors**: Using a custom error class (`ApiClientError`) with `code` and `status` properties makes error handling more precise:
+   ```typescript
+   try {
+     await api('/api/endpoint');
+   } catch (err) {
+     if (err instanceof ApiClientError) {
+       console.log(err.message, err.code, err.status);
+     }
+   }
+   ```
+
+3. **Mock reuse in tests**: When a test needs to call the same endpoint multiple times (e.g., to check both `toThrow` and `toMatchObject`), use `mockResolvedValue` instead of `mockResolvedValueOnce` to avoid the mock being consumed.
+
+4. **Type inference with generics**: The `api<T>()` generic pattern allows callers to specify expected response types, improving type safety across the codebase.
+
+5. **Body handling**: The api client automatically stringifies object bodies and sets Content-Type header, simplifying call sites from verbose fetch patterns.

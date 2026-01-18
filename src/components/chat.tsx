@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { api, ApiClientError } from "@/lib/api-client";
 
 interface ChatMessage {
   role: "user" | "model";
@@ -48,15 +49,12 @@ export function Chat({
     async function loadHistory() {
       setIsLoading(true);
       try {
-        const response = await fetch(
+        const data = await api<{ messages: ChatMessage[] }>(
           `/api/chat?assessmentId=${assessmentId}&coworkerId=${coworker.id}`
         );
-        if (response.ok) {
-          const data = await response.json();
-          setMessages(data.messages || []);
-        }
-      } catch (error) {
-        console.error("Failed to load chat history:", error);
+        setMessages(data.messages || []);
+      } catch (err) {
+        console.error("Failed to load chat history:", err);
       } finally {
         setIsLoading(false);
       }
@@ -89,33 +87,31 @@ export function Chat({
     setIsSending(true);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          assessmentId,
-          coworkerId: coworker.id,
-          message: userMessage.text,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const modelMessage: ChatMessage = {
-          role: "model",
-          text: data.response,
-          timestamp: data.timestamp,
-        };
-        setMessages((prev) => [...prev, modelMessage]);
-      } else {
-        // Remove the optimistic message on error
-        setMessages((prev) => prev.slice(0, -1));
-        console.error("Failed to send message");
-      }
-    } catch (error) {
+      const data = await api<{ response: string; timestamp: string }>(
+        "/api/chat",
+        {
+          method: "POST",
+          body: {
+            assessmentId,
+            coworkerId: coworker.id,
+            message: userMessage.text,
+          },
+        }
+      );
+      const modelMessage: ChatMessage = {
+        role: "model",
+        text: data.response,
+        timestamp: data.timestamp,
+      };
+      setMessages((prev) => [...prev, modelMessage]);
+    } catch (err) {
       // Remove the optimistic message on error
       setMessages((prev) => prev.slice(0, -1));
-      console.error("Failed to send message:", error);
+      if (err instanceof ApiClientError) {
+        console.error("Failed to send message:", err.message);
+      } else {
+        console.error("Failed to send message:", err);
+      }
     } finally {
       setIsSending(false);
     }
