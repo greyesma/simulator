@@ -373,3 +373,25 @@ const mockDb = (await import("@/lib/db")).db as {
 - Used `e.stopPropagation()` on call button to prevent triggering chat navigation when clicking call
 - Files changed: `src/components/slack-layout.tsx`, `src/components/coworker-sidebar.tsx`
 - Imported `Headphones` icon from lucide-react
+
+## Issue #91: REF-001 Add Missing Configuration Files
+
+- Created explicit config files for linting and formatting tools
+- **Files created:**
+  - `.prettierrc.json` - Prettier config with semi, double quotes, tabWidth 2, es5 trailing comma, tailwind plugin
+  - `eslint.config.mjs` - Next.js 15 flat config format using FlatCompat for backwards compatibility
+  - `.editorconfig` - Cross-IDE settings (indent, charset, newlines, trailing whitespace)
+  - `.prettierignore` - Excludes node_modules, .next, .vercel, lock files, dist/build
+- **Scripts added to package.json:**
+  - `npm run format` - Format entire codebase with Prettier
+  - `npm run format:check` - CI check for formatting without modifying
+- **Lint fixes applied:**
+  - Unused imports removed across test files (beforeEach, fireEvent, etc.)
+  - Unused variables prefixed with `_` (e.g., `_transcript`, `_isLoading`)
+  - JSX entities escaped (e.g., `'` → `&apos;`)
+  - ESLint disable comments added where necessary (e.g., `<a href="/">` needing html link)
+- **Key learnings:**
+  - ESLint 9 requires flat config format for Next.js 15
+  - Use FlatCompat to extend legacy configs (`next/core-web-vitals`, `next/typescript`)
+  - Prettier plugin order matters - tailwind plugin should be last
+  - Prefix unused variables with `_` to satisfy `@typescript-eslint/no-unused-vars` rule
