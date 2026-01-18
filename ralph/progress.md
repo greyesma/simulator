@@ -418,3 +418,22 @@ const mockDb = (await import("@/lib/db")).db as {
   - Zod schemas in lib files define runtime validation, type files define compile-time interfaces
   - Keep both in sync but Zod schemas are source of truth for validation
   - Use `export type {}` syntax for type-only re-exports
+
+## Issue #92: REF-002 Create README.md
+
+- Created comprehensive README.md at project root
+- **Sections included:**
+  - Project name and one-line description
+  - Quick Start with 4 numbered setup steps (clone, env, db, run)
+  - Architecture section with `src/` directory overview
+  - Available Scripts table documenting all npm scripts
+  - Database section explaining Prisma + Supabase setup
+  - Environment Variables section referencing `.env.example`
+  - Documentation section linking to `docs/prd.md` and CLAUDE.md files
+  - Tech Stack summary
+  - Design System overview (neo-brutalist)
+- **Key learnings:**
+  - README should be concise but complete - developers should be able to onboard quickly
+  - Reference existing documentation (CLAUDE.md, progress.md, prd.md) rather than duplicating content
+  - Table format works well for scripts documentation
+  - Environment variables section should show structure but not actual values
