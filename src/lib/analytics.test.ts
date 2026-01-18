@@ -178,7 +178,9 @@ describe("Analytics Queries", () => {
 
   describe("getSignupTrends", () => {
     it("returns daily signup counts", async () => {
-      const today = new Date();
+      // Use midnight local time to match implementation's date range generation
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const todayString = toISODateString(today);
 
       mockUserFindMany.mockResolvedValue([
@@ -207,7 +209,9 @@ describe("Analytics Queries", () => {
 
   describe("getAssessmentStartTrends", () => {
     it("returns daily assessment start counts", async () => {
-      const today = new Date();
+      // Use midnight local time to match implementation's date range generation
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const todayString = toISODateString(today);
 
       mockAssessmentFindMany.mockResolvedValue([
@@ -226,7 +230,9 @@ describe("Analytics Queries", () => {
 
   describe("getAssessmentCompletionTrends", () => {
     it("returns daily completion counts", async () => {
-      const today = new Date();
+      // Use midnight local time to match implementation's date range generation
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const todayString = toISODateString(today);
 
       mockAssessmentFindMany.mockResolvedValue([{ completedAt: today }]);
