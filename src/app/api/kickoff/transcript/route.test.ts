@@ -8,6 +8,7 @@ vi.mock("@/auth", () => ({
 
 // Mock db
 const mockAssessmentFindFirst = vi.fn();
+const mockAssessmentUpdate = vi.fn();
 const mockConversationFindFirst = vi.fn();
 const mockConversationCreate = vi.fn();
 const mockConversationUpdate = vi.fn();
@@ -15,6 +16,7 @@ vi.mock("@/server/db", () => ({
   db: {
     assessment: {
       findFirst: (...args: unknown[]) => mockAssessmentFindFirst(...args),
+      update: (...args: unknown[]) => mockAssessmentUpdate(...args),
     },
     conversation: {
       findFirst: (...args: unknown[]) => mockConversationFindFirst(...args),
@@ -127,6 +129,7 @@ describe("POST /api/kickoff/transcript", () => {
     mockConversationCreate.mockResolvedValue({
       id: "conv-id",
     });
+    mockAssessmentUpdate.mockResolvedValue({ id: "test-id", status: "WORKING" });
 
     const transcript = [
       { role: "user", text: "Hi", timestamp: "2024-01-01T00:00:00Z" },
@@ -159,6 +162,47 @@ describe("POST /api/kickoff/transcript", () => {
     });
   });
 
+  it("should update assessment status to WORKING when transcript is saved", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-123" },
+    });
+    mockAssessmentFindFirst.mockResolvedValue({
+      id: "test-id",
+      status: "ONBOARDING",
+    });
+    mockConversationFindFirst.mockResolvedValue(null);
+    mockConversationCreate.mockResolvedValue({
+      id: "conv-id",
+    });
+    mockAssessmentUpdate.mockResolvedValue({
+      id: "test-id",
+      status: "WORKING",
+    });
+
+    const transcript = [
+      { role: "user", text: "Hi", timestamp: "2024-01-01T00:00:00Z" },
+      { role: "model", text: "Hello!", timestamp: "2024-01-01T00:00:01Z" },
+    ];
+
+    const request = new Request("http://localhost/api/kickoff/transcript", {
+      method: "POST",
+      body: JSON.stringify({
+        assessmentId: "test-id",
+        managerId: "manager-id",
+        transcript,
+      }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+
+    // Verify assessment status was updated to WORKING
+    expect(mockAssessmentUpdate).toHaveBeenCalledWith({
+      where: { id: "test-id" },
+      data: { status: "WORKING" },
+    });
+  });
+
   it("should append to existing conversation", async () => {
     mockAuth.mockResolvedValue({
       user: { id: "user-123" },
@@ -177,6 +221,7 @@ describe("POST /api/kickoff/transcript", () => {
     mockConversationUpdate.mockResolvedValue({
       id: "existing-conv-id",
     });
+    mockAssessmentUpdate.mockResolvedValue({ id: "test-id", status: "WORKING" });
 
     const newTranscript = [
       {
@@ -209,6 +254,12 @@ describe("POST /api/kickoff/transcript", () => {
           expect.objectContaining({ text: "New response" }),
         ]),
       }),
+    });
+
+    // Verify assessment status was updated to WORKING
+    expect(mockAssessmentUpdate).toHaveBeenCalledWith({
+      where: { id: "test-id" },
+      data: { status: "WORKING" },
     });
   });
 

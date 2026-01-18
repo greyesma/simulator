@@ -348,3 +348,37 @@ By removing the timer before it could fire, the typing indicator was never clean
      })),
    }));
    ```
+
+## Issue #87: BUG - Cannot Submit PR Link - Assessment Stuck in ONBOARDING Status
+
+### What was implemented
+- Fixed missing status transition from ONBOARDING to WORKING in the assessment flow
+- Added status update to `/api/kickoff/transcript` route when the kickoff call transcript is saved
+- Added unit tests for the status transition behavior
+
+### Root cause
+The assessment flow transitions through statuses: HR_INTERVIEW → ONBOARDING → WORKING → FINAL_DEFENSE → COMPLETED.
+
+The HR interview transcript save correctly updated status to ONBOARDING in `/api/interview/transcript/route.ts`. However, the kickoff call transcript save in `/api/kickoff/transcript/route.ts` never updated the status to WORKING. This left users stuck in ONBOARDING status, causing the PR submission endpoint to reject requests with "Cannot complete assessment in ONBOARDING status. Must be in WORKING status."
+
+### Files changed
+- `src/app/api/kickoff/transcript/route.ts` - Added assessment status update to WORKING when kickoff transcript is saved (both for new conversations and when appending to existing ones)
+- `src/app/api/kickoff/transcript/route.test.ts` - Added mock for `assessment.update` and tests verifying status transition
+
+### Learnings for future iterations
+
+1. **Consistent status transition pattern**: When saving call transcripts, always update the assessment status to the next phase. The pattern is:
+   - `/api/interview/transcript` → sets status to ONBOARDING
+   - `/api/kickoff/transcript` → sets status to WORKING (new!)
+   - `/api/assessment/complete` → sets status to FINAL_DEFENSE
+
+2. **Systematic debugging**: Following the 4-phase approach (Root Cause Investigation → Pattern Analysis → Hypothesis → Implementation) quickly identified the missing status update by:
+   - Tracing the error message to `/api/assessment/complete/route.ts`
+   - Searching for status transitions with `grep`
+   - Comparing the interview transcript route (which had the transition) to the kickoff transcript route (which was missing it)
+
+3. **TDD for bug fixes**: Writing a failing test first (`should update assessment status to WORKING when transcript is saved`) clearly defined the expected behavior before implementing the fix.
+
+4. **E2E testing limitations**: Browser-based testing for assessment pages is blocked by `ScreenRecordingGuard` which requires screen sharing permissions unavailable in headless browsers. For full E2E validation, use direct database/API testing scripts or manual testing.
+
+5. **Conditional status updates**: Only update status when there's actual content (transcript length > 0), following the same pattern as the interview transcript route.

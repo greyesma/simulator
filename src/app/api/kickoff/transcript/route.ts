@@ -75,6 +75,14 @@ export async function POST(request: Request) {
         },
       });
 
+      // Update assessment status to WORKING after kickoff call is complete
+      if (updatedTranscript.length > 0) {
+        await db.assessment.update({
+          where: { id: assessmentId },
+          data: { status: "WORKING" },
+        });
+      }
+
       return NextResponse.json({
         id: updated.id,
         messageCount: updatedTranscript.length,
@@ -89,6 +97,14 @@ export async function POST(request: Request) {
           transcript: transcript as unknown as Prisma.InputJsonValue,
         },
       });
+
+      // Update assessment status to WORKING after kickoff call is complete
+      if (transcript.length > 0) {
+        await db.assessment.update({
+          where: { id: assessmentId },
+          data: { status: "WORKING" },
+        });
+      }
 
       return NextResponse.json({
         id: created.id,
