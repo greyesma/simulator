@@ -16,7 +16,7 @@ If a decision needs to be made, make the reasonable choice and document it. You 
 ## Workflow
 
 1. **Understand the Task**: Read the issue title, body, and **acceptance criteria** carefully
-2. **Check Progress**: Review learnings from previous iterations
+2. **Check Progress**: Read `ralph/progress.md` for learnings from previous iterations (search for related issues)
 3. **Implement**: Write the code/changes needed
 4. **Quality Check**: Run tests, typecheck, lint as appropriate
 5. **Verify Acceptance Criteria**: Confirm ALL criteria are met before proceeding

@@ -37,7 +37,7 @@ while true; do
   echo "🔄 Iteration $ITERATION: Issue #$ISSUE_NUM - $ISSUE_TITLE"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-  # Build the prompt with context
+  # Build the prompt with context (keep it small - Claude reads progress.md directly)
   PROMPT="$(cat "$SCRIPT_DIR/prompt.md")
 
 ## Current Task
@@ -46,12 +46,24 @@ while true; do
 $ISSUE_BODY
 
 ## Previous Learnings
-$(cat "$SCRIPT_DIR/progress.md" 2>/dev/null || echo 'No previous learnings yet.')"
+Read \`ralph/progress.md\` for learnings from previous iterations."
 
-  # Spawn Claude with context
-  claude --dangerously-skip-permissions -p "$PROMPT"
+  # Spawn Claude with context (capture exit code for debugging)
+  LOG_FILE="/tmp/ralph-iteration-$ITERATION.log"
+  set +e  # Don't exit on error
+  claude --dangerously-skip-permissions --verbose -p "$PROMPT" 2>&1 | tee "$LOG_FILE"
+  EXIT_CODE=${PIPESTATUS[0]}
+  set -e
 
   echo ""
-  echo "✅ Iteration $ITERATION complete"
+  echo "📋 Claude exited with code: $EXIT_CODE"
+  echo "📝 Log saved to: $LOG_FILE"
+
+  if [ $EXIT_CODE -eq 0 ]; then
+    echo "✅ Iteration $ITERATION complete"
+  else
+    echo "⚠️  Iteration $ITERATION: Claude exited with error (work may still be done)"
+    echo "   Check $LOG_FILE for details"
+  fi
   sleep 2
 done
