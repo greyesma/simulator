@@ -1,6 +1,13 @@
 "use client";
 
-import { AlertTriangle, RefreshCw, WifiOff, ShieldOff, MessageSquare, ArrowRight } from "lucide-react";
+import {
+  AlertTriangle,
+  RefreshCw,
+  WifiOff,
+  ShieldOff,
+  MessageSquare,
+  ArrowRight,
+} from "lucide-react";
 import type { CategorizedError, ErrorCategory } from "@/lib/error-recovery";
 
 interface ErrorDisplayProps {
@@ -18,11 +25,11 @@ interface ErrorDisplayProps {
 function getErrorIcon(category: ErrorCategory) {
   switch (category) {
     case "network":
-      return <WifiOff className="w-8 h-8" />;
+      return <WifiOff className="h-8 w-8" />;
     case "permission":
-      return <ShieldOff className="w-8 h-8" />;
+      return <ShieldOff className="h-8 w-8" />;
     default:
-      return <AlertTriangle className="w-8 h-8" />;
+      return <AlertTriangle className="h-8 w-8" />;
   }
 }
 
@@ -56,25 +63,30 @@ export function ErrorDisplay({
   showFallbackOption = false,
   className = "",
 }: ErrorDisplayProps) {
-  const showRetryProgress = retryCount !== undefined && maxRetries !== undefined;
+  const showRetryProgress =
+    retryCount !== undefined && maxRetries !== undefined;
 
   return (
     <div className={`border-2 border-red-500 bg-background p-6 ${className}`}>
       <div className="flex flex-col items-center text-center">
         {/* Icon */}
-        <div className="text-red-500 mb-4">{getErrorIcon(error.category)}</div>
+        <div className="mb-4 text-red-500">{getErrorIcon(error.category)}</div>
 
         {/* Title */}
-        <h3 className="text-xl font-bold mb-2">{getErrorTitle(error.category)}</h3>
+        <h3 className="mb-2 text-xl font-bold">
+          {getErrorTitle(error.category)}
+        </h3>
 
         {/* User-friendly message */}
-        <p className="text-muted-foreground mb-4 max-w-md">{error.userMessage}</p>
+        <p className="mb-4 max-w-md text-muted-foreground">
+          {error.userMessage}
+        </p>
 
         {/* Retry progress indicator */}
         {showRetryProgress && isRetrying && (
           <div className="mb-4">
             <div className="flex items-center gap-2 text-secondary">
-              <RefreshCw className="w-4 h-4 animate-spin" />
+              <RefreshCw className="h-4 w-4 animate-spin" />
               <span className="font-mono text-sm">
                 Retrying... ({retryCount}/{maxRetries})
               </span>
@@ -83,22 +95,22 @@ export function ErrorDisplay({
         )}
 
         {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
           {/* Retry button */}
           {error.isRetryable && onRetry && (
             <button
               onClick={onRetry}
               disabled={isRetrying}
-              className="flex items-center justify-center gap-2 bg-foreground text-background px-6 py-3 font-semibold border-2 border-foreground hover:bg-secondary hover:text-secondary-foreground hover:border-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center justify-center gap-2 border-2 border-foreground bg-foreground px-6 py-3 font-semibold text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isRetrying ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <RefreshCw className="h-4 w-4 animate-spin" />
                   Retrying...
                 </>
               ) : (
                 <>
-                  <RefreshCw className="w-4 h-4" />
+                  <RefreshCw className="h-4 w-4" />
                   {error.recoveryAction || "Try Again"}
                 </>
               )}
@@ -109,9 +121,9 @@ export function ErrorDisplay({
           {showFallbackOption && onFallback && (
             <button
               onClick={onFallback}
-              className="flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-6 py-3 font-semibold border-2 border-secondary hover:bg-foreground hover:text-background hover:border-foreground"
+              className="flex items-center justify-center gap-2 border-2 border-secondary bg-secondary px-6 py-3 font-semibold text-secondary-foreground hover:border-foreground hover:bg-foreground hover:text-background"
             >
-              <MessageSquare className="w-4 h-4" />
+              <MessageSquare className="h-4 w-4" />
               {fallbackLabel}
             </button>
           )}
@@ -128,9 +140,9 @@ export function ErrorDisplay({
                   window.location.reload();
                 }
               }}
-              className="flex items-center justify-center gap-2 bg-foreground text-background px-6 py-3 font-semibold border-2 border-foreground hover:bg-secondary hover:text-secondary-foreground hover:border-secondary"
+              className="flex items-center justify-center gap-2 border-2 border-foreground bg-foreground px-6 py-3 font-semibold text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground"
             >
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="h-4 w-4" />
               {error.recoveryAction}
             </button>
           )}
@@ -139,10 +151,10 @@ export function ErrorDisplay({
         {/* Technical details (collapsed by default in production) */}
         {process.env.NODE_ENV === "development" && (
           <details className="mt-4 w-full text-left">
-            <summary className="cursor-pointer text-xs text-muted-foreground font-mono">
+            <summary className="cursor-pointer font-mono text-xs text-muted-foreground">
               Technical Details
             </summary>
-            <pre className="mt-2 p-2 bg-muted text-xs font-mono overflow-auto max-h-32">
+            <pre className="mt-2 max-h-32 overflow-auto bg-muted p-2 font-mono text-xs">
               {JSON.stringify(
                 {
                   category: error.category,
@@ -178,10 +190,10 @@ export function InlineError({
 }: InlineErrorProps) {
   return (
     <div
-      className={`flex items-center justify-between gap-4 p-3 border-2 border-red-500 bg-red-50 dark:bg-red-950 ${className}`}
+      className={`flex items-center justify-between gap-4 border-2 border-red-500 bg-red-50 p-3 dark:bg-red-950 ${className}`}
     >
       <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
-        <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+        <AlertTriangle className="h-4 w-4 flex-shrink-0" />
         <span className="text-sm font-medium">{message}</span>
       </div>
       {onRetry && (
@@ -190,7 +202,9 @@ export function InlineError({
           disabled={isRetrying}
           className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-secondary disabled:opacity-50"
         >
-          <RefreshCw className={`w-3 h-3 ${isRetrying ? "animate-spin" : ""}`} />
+          <RefreshCw
+            className={`h-3 w-3 ${isRetrying ? "animate-spin" : ""}`}
+          />
           {isRetrying ? "Retrying" : "Retry"}
         </button>
       )}
@@ -219,34 +233,34 @@ export function SessionRecoveryPrompt({
   return (
     <div className="border-2 border-secondary bg-background p-6">
       <div className="flex flex-col items-center text-center">
-        <div className="w-12 h-12 bg-secondary flex items-center justify-center mb-4">
-          <RefreshCw className="w-6 h-6 text-secondary-foreground" />
+        <div className="mb-4 flex h-12 w-12 items-center justify-center bg-secondary">
+          <RefreshCw className="h-6 w-6 text-secondary-foreground" />
         </div>
 
-        <h3 className="text-xl font-bold mb-2">Resume Your Session?</h3>
+        <h3 className="mb-2 text-xl font-bold">Resume Your Session?</h3>
 
-        <p className="text-muted-foreground mb-2">
+        <p className="mb-2 text-muted-foreground">
           We found a saved session from {formattedTime}.
         </p>
 
         {progressSummary && (
-          <p className="text-sm text-muted-foreground mb-4 font-mono">
+          <p className="mb-4 font-mono text-sm text-muted-foreground">
             {progressSummary}
           </p>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-3 mt-2">
+        <div className="mt-2 flex flex-col gap-3 sm:flex-row">
           <button
             onClick={onRecover}
-            className="flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-6 py-3 font-semibold border-2 border-secondary hover:bg-foreground hover:text-background hover:border-foreground"
+            className="flex items-center justify-center gap-2 border-2 border-secondary bg-secondary px-6 py-3 font-semibold text-secondary-foreground hover:border-foreground hover:bg-foreground hover:text-background"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="h-4 w-4" />
             Resume Session
           </button>
 
           <button
             onClick={onStartFresh}
-            className="flex items-center justify-center gap-2 bg-background text-foreground px-6 py-3 font-semibold border-2 border-foreground hover:bg-muted"
+            className="flex items-center justify-center gap-2 border-2 border-foreground bg-background px-6 py-3 font-semibold text-foreground hover:bg-muted"
           >
             Start Fresh
           </button>

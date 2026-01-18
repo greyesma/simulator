@@ -30,7 +30,10 @@ export type SeniorityLevel = "JUNIOR" | "MID" | "SENIOR";
 /**
  * Key dimensions for each archetype (dimensions with VERY_HIGH weight)
  */
-export type ArchetypeKeyDimensions = Record<RoleArchetype, AssessmentDimension[]>;
+export type ArchetypeKeyDimensions = Record<
+  RoleArchetype,
+  AssessmentDimension[]
+>;
 
 /**
  * Input for threshold check (same as archetype-weights for consistency)
@@ -238,7 +241,8 @@ export function meetsThreshold(
   }
 
   // For JUNIOR level, always pass (no threshold)
-  const meetsThresholdResult = threshold === 0 || failingDimensions.length === 0;
+  const meetsThresholdResult =
+    threshold === 0 || failingDimensions.length === 0;
 
   return {
     meetsThreshold: meetsThresholdResult,
@@ -340,7 +344,9 @@ export function getKeyDimensionsForArchetype(
  * @param archetype - The archetype to verify
  * @returns true if key dimensions match VERY_HIGH weights
  */
-export function verifyKeyDimensionsAlignment(archetype: RoleArchetype): boolean {
+export function verifyKeyDimensionsAlignment(
+  archetype: RoleArchetype
+): boolean {
   const keyDimensions = ARCHETYPE_KEY_DIMENSIONS[archetype];
   const weights = ARCHETYPE_CONFIGS[archetype];
 

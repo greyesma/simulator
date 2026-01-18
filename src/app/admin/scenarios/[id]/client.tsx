@@ -55,11 +55,15 @@ export function ScenarioDetailClient({ scenario }: ScenarioDetailClientProps) {
     setIsVerifyingRepo(true);
     setError(null);
     try {
-      const response = await fetch(`/api/admin/scenarios/${scenario.id}/verify-repo`);
+      const response = await fetch(
+        `/api/admin/scenarios/${scenario.id}/verify-repo`
+      );
       const data = await response.json();
       setRepoStatus(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to verify repository");
+      setError(
+        err instanceof Error ? err.message : "Failed to verify repository"
+      );
     } finally {
       setIsVerifyingRepo(false);
     }
@@ -70,9 +74,12 @@ export function ScenarioDetailClient({ scenario }: ScenarioDetailClientProps) {
     setIsPreviewLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/admin/scenarios/${scenario.id}/preview`, {
-        method: "POST",
-      });
+      const response = await fetch(
+        `/api/admin/scenarios/${scenario.id}/preview`,
+        {
+          method: "POST",
+        }
+      );
       const data = await response.json();
       if (data.previewUrl) {
         router.push(data.previewUrl);
@@ -90,11 +97,14 @@ export function ScenarioDetailClient({ scenario }: ScenarioDetailClientProps) {
     setIsPreviewLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/admin/scenarios/${scenario.id}/preview`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ skipTo: "coworkers" }),
-      });
+      const response = await fetch(
+        `/api/admin/scenarios/${scenario.id}/preview`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ skipTo: "coworkers" }),
+        }
+      );
       const data = await response.json();
       if (data.previewUrl) {
         router.push(data.previewUrl);
@@ -102,7 +112,9 @@ export function ScenarioDetailClient({ scenario }: ScenarioDetailClientProps) {
         setError("Failed to create test assessment");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to start coworker test");
+      setError(
+        err instanceof Error ? err.message : "Failed to start coworker test"
+      );
       setIsPreviewLoading(false);
     }
   };
@@ -125,7 +137,9 @@ export function ScenarioDetailClient({ scenario }: ScenarioDetailClientProps) {
         setError(data.error || "Failed to update scenario");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update scenario");
+      setError(
+        err instanceof Error ? err.message : "Failed to update scenario"
+      );
     } finally {
       setIsPublishing(false);
     }
@@ -153,18 +167,19 @@ export function ScenarioDetailClient({ scenario }: ScenarioDetailClientProps) {
       )}
 
       {/* Actions Section */}
-      <section className="border-2 border-foreground p-6 bg-background">
-        <h2 className="font-bold text-xl mb-4">Preview & Testing</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <section className="border-2 border-foreground bg-background p-6">
+        <h2 className="mb-4 text-xl font-bold">Preview & Testing</h2>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {/* Preview Full Flow */}
           <button
             onClick={startPreview}
             disabled={isPreviewLoading}
-            className="p-4 border-2 border-foreground bg-secondary text-secondary-foreground font-bold hover:bg-secondary/80 disabled:opacity-50 disabled:cursor-not-allowed text-left"
+            className="hover:bg-secondary/80 border-2 border-foreground bg-secondary p-4 text-left font-bold text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <div className="text-lg mb-1">Preview Full Flow</div>
+            <div className="mb-1 text-lg">Preview Full Flow</div>
             <p className="text-sm font-normal opacity-80">
-              Test as a candidate would experience it (HR → Kickoff → Work → Defense)
+              Test as a candidate would experience it (HR → Kickoff → Work →
+              Defense)
             </p>
           </button>
 
@@ -172,9 +187,9 @@ export function ScenarioDetailClient({ scenario }: ScenarioDetailClientProps) {
           <button
             onClick={testCoworkers}
             disabled={isPreviewLoading || scenario.coworkers.length === 0}
-            className="p-4 border-2 border-foreground bg-background font-bold hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed text-left"
+            className="border-2 border-foreground bg-background p-4 text-left font-bold hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <div className="text-lg mb-1">Test Coworkers</div>
+            <div className="mb-1 text-lg">Test Coworkers</div>
             <p className="text-sm font-normal text-muted-foreground">
               Jump directly to coworker chat/call testing
             </p>
@@ -184,9 +199,9 @@ export function ScenarioDetailClient({ scenario }: ScenarioDetailClientProps) {
           <button
             onClick={verifyRepo}
             disabled={isVerifyingRepo}
-            className="p-4 border-2 border-foreground bg-background font-bold hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed text-left"
+            className="border-2 border-foreground bg-background p-4 text-left font-bold hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <div className="text-lg mb-1">Verify Repository</div>
+            <div className="mb-1 text-lg">Verify Repository</div>
             <p className="text-sm font-normal text-muted-foreground">
               Check if the GitHub repo is accessible
             </p>
@@ -196,33 +211,39 @@ export function ScenarioDetailClient({ scenario }: ScenarioDetailClientProps) {
         {/* Repo verification result */}
         {repoStatus && (
           <div
-            className={`mt-4 p-4 border-2 ${
+            className={`mt-4 border-2 p-4 ${
               repoStatus.accessible
                 ? "border-green-600 bg-green-50"
                 : "border-red-600 bg-red-50"
             }`}
           >
-            <div className="flex items-center gap-2 mb-2">
+            <div className="mb-2 flex items-center gap-2">
               <span
-                className={`w-3 h-3 ${
+                className={`h-3 w-3 ${
                   repoStatus.accessible ? "bg-green-600" : "bg-red-600"
                 }`}
               />
               <span className="font-bold">
-                {repoStatus.accessible ? "Repository Accessible" : "Repository Not Accessible"}
+                {repoStatus.accessible
+                  ? "Repository Accessible"
+                  : "Repository Not Accessible"}
               </span>
             </div>
             {repoStatus.accessible && repoStatus.repoInfo && (
-              <div className="text-sm space-y-1">
+              <div className="space-y-1 text-sm">
                 <p>
-                  <span className="font-mono">{repoStatus.repoInfo.fullName}</span>
+                  <span className="font-mono">
+                    {repoStatus.repoInfo.fullName}
+                  </span>
                   {repoStatus.repoInfo.isPrivate && (
                     <span className="ml-2 text-yellow-700">(Private)</span>
                   )}
                 </p>
                 <p>Default branch: {repoStatus.repoInfo.defaultBranch}</p>
                 {repoStatus.hasReadme !== undefined && (
-                  <p>README.md: {repoStatus.hasReadme ? "Found" : "Not found"}</p>
+                  <p>
+                    README.md: {repoStatus.hasReadme ? "Found" : "Not found"}
+                  </p>
                 )}
               </div>
             )}
@@ -234,18 +255,20 @@ export function ScenarioDetailClient({ scenario }: ScenarioDetailClientProps) {
       </section>
 
       {/* Publish Section */}
-      <section className="border-2 border-foreground p-6 bg-background">
-        <h2 className="font-bold text-xl mb-4">Publication Status</h2>
+      <section className="border-2 border-foreground bg-background p-6">
+        <h2 className="mb-4 text-xl font-bold">Publication Status</h2>
         <div className="flex items-center justify-between">
           <div>
             <p className="mb-2">
               {isPublished ? (
                 <span className="text-green-700">
-                  This scenario is <strong>published</strong> and visible to candidates.
+                  This scenario is <strong>published</strong> and visible to
+                  candidates.
                 </span>
               ) : (
                 <span className="text-muted-foreground">
-                  This scenario is a <strong>draft</strong> and not visible to candidates.
+                  This scenario is a <strong>draft</strong> and not visible to
+                  candidates.
                 </span>
               )}
             </p>
@@ -258,52 +281,56 @@ export function ScenarioDetailClient({ scenario }: ScenarioDetailClientProps) {
           <button
             onClick={togglePublish}
             disabled={isPublishing}
-            className={`px-6 py-3 font-bold border-2 border-foreground disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={`border-2 border-foreground px-6 py-3 font-bold disabled:cursor-not-allowed disabled:opacity-50 ${
               isPublished
                 ? "bg-background hover:bg-muted"
                 : "bg-green-600 text-white hover:bg-green-700"
             }`}
           >
-            {isPublishing ? "Updating..." : isPublished ? "Unpublish" : "Publish Scenario"}
+            {isPublishing
+              ? "Updating..."
+              : isPublished
+                ? "Unpublish"
+                : "Publish Scenario"}
           </button>
         </div>
       </section>
 
       {/* Scenario Details */}
-      <section className="border-2 border-foreground p-6 bg-background">
-        <h2 className="font-bold text-xl mb-4">Scenario Details</h2>
+      <section className="border-2 border-foreground bg-background p-6">
+        <h2 className="mb-4 text-xl font-bold">Scenario Details</h2>
 
         <div className="space-y-4">
           {/* Company Description */}
           <div>
-            <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider mb-2">
+            <h3 className="mb-2 text-sm font-bold uppercase tracking-wider text-muted-foreground">
               Company Description
             </h3>
-            <div className="border border-foreground/20 p-4 bg-muted/10">
+            <div className="border-foreground/20 bg-muted/10 border p-4">
               <Markdown>{scenario.companyDescription}</Markdown>
             </div>
           </div>
 
           {/* Task Description */}
           <div>
-            <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider mb-2">
+            <h3 className="mb-2 text-sm font-bold uppercase tracking-wider text-muted-foreground">
               Task Description
             </h3>
-            <div className="border border-foreground/20 p-4 bg-muted/10">
+            <div className="border-foreground/20 bg-muted/10 border p-4">
               <Markdown>{scenario.taskDescription}</Markdown>
             </div>
           </div>
 
           {/* Repository */}
           <div>
-            <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider mb-2">
+            <h3 className="mb-2 text-sm font-bold uppercase tracking-wider text-muted-foreground">
               Repository URL
             </h3>
             <a
               href={scenario.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-sm text-secondary-foreground bg-secondary px-2 py-1 hover:underline"
+              className="bg-secondary px-2 py-1 font-mono text-sm text-secondary-foreground hover:underline"
             >
               {scenario.repoUrl}
             </a>
@@ -312,14 +339,14 @@ export function ScenarioDetailClient({ scenario }: ScenarioDetailClientProps) {
           {/* Tech Stack */}
           {scenario.techStack.length > 0 && (
             <div>
-              <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider mb-2">
+              <h3 className="mb-2 text-sm font-bold uppercase tracking-wider text-muted-foreground">
                 Tech Stack
               </h3>
               <div className="flex flex-wrap gap-2">
                 {scenario.techStack.map((tech, i) => (
                   <span
                     key={i}
-                    className="px-3 py-1 text-sm font-mono border border-foreground bg-muted"
+                    className="border border-foreground bg-muted px-3 py-1 font-mono text-sm"
                   >
                     {tech}
                   </span>
@@ -331,25 +358,23 @@ export function ScenarioDetailClient({ scenario }: ScenarioDetailClientProps) {
       </section>
 
       {/* Coworkers Section */}
-      <section className="border-2 border-foreground p-6 bg-background">
-        <h2 className="font-bold text-xl mb-4">
+      <section className="border-2 border-foreground bg-background p-6">
+        <h2 className="mb-4 text-xl font-bold">
           Coworkers ({scenario.coworkers.length})
         </h2>
 
         {scenario.coworkers.length === 0 ? (
           <p className="text-muted-foreground">
-            No coworkers configured. Add coworkers to enable team collaboration testing.
+            No coworkers configured. Add coworkers to enable team collaboration
+            testing.
           </p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {scenario.coworkers.map((coworker) => (
-              <div
-                key={coworker.id}
-                className="p-4 border border-foreground"
-              >
-                <div className="flex items-center gap-3 mb-2">
+              <div key={coworker.id} className="border border-foreground p-4">
+                <div className="mb-2 flex items-center gap-3">
                   {/* Avatar */}
-                  <div className="w-10 h-10 bg-secondary border border-foreground flex items-center justify-center font-bold">
+                  <div className="flex h-10 w-10 items-center justify-center border border-foreground bg-secondary font-bold">
                     {coworker.name
                       .split(" ")
                       .map((n) => n[0])
@@ -358,14 +383,16 @@ export function ScenarioDetailClient({ scenario }: ScenarioDetailClientProps) {
                   </div>
                   <div>
                     <h3 className="font-bold">{coworker.name}</h3>
-                    <p className="text-sm text-muted-foreground">{coworker.role}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {coworker.role}
+                    </p>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground mb-2">
+                <p className="mb-2 text-sm text-muted-foreground">
                   Style: {coworker.personaStyle.slice(0, 100)}
                   {coworker.personaStyle.length > 100 && "..."}
                 </p>
-                <p className="text-xs font-mono text-muted-foreground">
+                <p className="font-mono text-xs text-muted-foreground">
                   {getKnowledgeCount(coworker.knowledge)} knowledge items
                 </p>
               </div>

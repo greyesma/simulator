@@ -33,45 +33,49 @@ export function Markdown({ children, className = "" }: MarkdownProps) {
 const components: Components = {
   // Headings - bold, DM Sans, no margins on first heading
   h1: ({ children }) => (
-    <h1 className="text-2xl font-bold mb-4 mt-6 first:mt-0 border-b-2 border-foreground pb-2">
+    <h1 className="mb-4 mt-6 border-b-2 border-foreground pb-2 text-2xl font-bold first:mt-0">
       {children}
     </h1>
   ),
   h2: ({ children }) => (
-    <h2 className="text-xl font-bold mb-3 mt-5 first:mt-0">{children}</h2>
+    <h2 className="mb-3 mt-5 text-xl font-bold first:mt-0">{children}</h2>
   ),
   h3: ({ children }) => (
-    <h3 className="text-lg font-bold mb-2 mt-4 first:mt-0">{children}</h3>
+    <h3 className="mb-2 mt-4 text-lg font-bold first:mt-0">{children}</h3>
   ),
   h4: ({ children }) => (
-    <h4 className="text-base font-bold mb-2 mt-3 first:mt-0">{children}</h4>
+    <h4 className="mb-2 mt-3 text-base font-bold first:mt-0">{children}</h4>
   ),
   h5: ({ children }) => (
-    <h5 className="text-sm font-bold mb-1 mt-2 first:mt-0 uppercase tracking-wider">
+    <h5 className="mb-1 mt-2 text-sm font-bold uppercase tracking-wider first:mt-0">
       {children}
     </h5>
   ),
   h6: ({ children }) => (
-    <h6 className="text-sm font-bold mb-1 mt-2 first:mt-0 uppercase tracking-wider text-muted-foreground">
+    <h6 className="mb-1 mt-2 text-sm font-bold uppercase tracking-wider text-muted-foreground first:mt-0">
       {children}
     </h6>
   ),
 
   // Paragraph
-  p: ({ children }) => <p className="mb-3 last:mb-0 leading-relaxed">{children}</p>,
+  p: ({ children }) => (
+    <p className="mb-3 leading-relaxed last:mb-0">{children}</p>
+  ),
 
   // Lists - square bullets for brutalist style
   ul: ({ children }) => (
-    <ul className="mb-3 ml-4 space-y-1 list-none">{children}</ul>
+    <ul className="mb-3 ml-4 list-none space-y-1">{children}</ul>
   ),
   ol: ({ children }) => (
-    <ol className="mb-3 ml-4 space-y-1 list-none counter-reset-list">{children}</ol>
+    <ol className="counter-reset-list mb-3 ml-4 list-none space-y-1">
+      {children}
+    </ol>
   ),
   li: ({ children, ...props }) => {
     // Check if this is inside an ordered list by looking at parent
-    const isOrdered = props.node?.position?.start.column === 1;
+    const _isOrdered = props.node?.position?.start.column === 1;
     return (
-      <li className="relative pl-4 before:absolute before:left-0 before:content-['■'] before:text-secondary before:text-xs before:top-1.5">
+      <li className="relative pl-4 before:absolute before:left-0 before:top-1.5 before:text-xs before:text-secondary before:content-['■']">
         {children}
       </li>
     );
@@ -83,7 +87,7 @@ const components: Components = {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="underline decoration-2 decoration-secondary underline-offset-2 hover:bg-secondary hover:text-secondary-foreground transition-none"
+      className="underline decoration-secondary decoration-2 underline-offset-2 transition-none hover:bg-secondary hover:text-secondary-foreground"
     >
       {children}
     </a>
@@ -107,7 +111,7 @@ const components: Components = {
       );
     }
     return (
-      <code className="font-mono text-sm bg-secondary/30 px-1.5 py-0.5 border border-foreground/20">
+      <code className="bg-secondary/30 border-foreground/20 border px-1.5 py-0.5 font-mono text-sm">
         {children}
       </code>
     );
@@ -115,14 +119,14 @@ const components: Components = {
 
   // Code blocks - black background, white text, Space Mono
   pre: ({ children }) => (
-    <pre className="mb-4 p-4 bg-foreground text-background font-mono text-sm overflow-x-auto border-2 border-foreground">
+    <pre className="mb-4 overflow-x-auto border-2 border-foreground bg-foreground p-4 font-mono text-sm text-background">
       {children}
     </pre>
   ),
 
   // Blockquote - left border with gold
   blockquote: ({ children }) => (
-    <blockquote className="mb-3 pl-4 border-l-4 border-secondary italic text-muted-foreground">
+    <blockquote className="mb-3 border-l-4 border-secondary pl-4 italic text-muted-foreground">
       {children}
     </blockquote>
   ),
@@ -135,13 +139,13 @@ const components: Components = {
     <img
       src={src}
       alt={alt || ""}
-      className="max-w-full h-auto border-2 border-foreground my-4"
+      className="my-4 h-auto max-w-full border-2 border-foreground"
     />
   ),
 
   // Tables - brutalist style
   table: ({ children }) => (
-    <div className="overflow-x-auto mb-4">
+    <div className="mb-4 overflow-x-auto">
       <table className="w-full border-2 border-foreground">{children}</table>
     </div>
   ),
@@ -153,16 +157,18 @@ const components: Components = {
     <tr className="border-b border-foreground last:border-b-0">{children}</tr>
   ),
   th: ({ children }) => (
-    <th className="px-4 py-2 text-left font-bold font-mono text-sm uppercase tracking-wider">
+    <th className="px-4 py-2 text-left font-mono text-sm font-bold uppercase tracking-wider">
       {children}
     </th>
   ),
   td: ({ children }) => (
-    <td className="px-4 py-2 border-r border-foreground/20 last:border-r-0">
+    <td className="border-foreground/20 border-r px-4 py-2 last:border-r-0">
       {children}
     </td>
   ),
 
   // Delete/Strikethrough
-  del: ({ children }) => <del className="line-through opacity-60">{children}</del>,
+  del: ({ children }) => (
+    <del className="line-through opacity-60">{children}</del>
+  ),
 };

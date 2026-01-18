@@ -30,14 +30,16 @@ const mockCodeReviewToPrismaJson = vi.fn();
 vi.mock("@/lib/code-review", () => ({
   analyzeCodeReview: (...args: unknown[]) => mockAnalyzeCodeReview(...args),
   buildCodeReviewData: (...args: unknown[]) => mockBuildCodeReviewData(...args),
-  codeReviewToPrismaJson: (...args: unknown[]) => mockCodeReviewToPrismaJson(...args),
+  codeReviewToPrismaJson: (...args: unknown[]) =>
+    mockCodeReviewToPrismaJson(...args),
 }));
 
 // Mock github module
 const mockFetchGitHubPrContent = vi.fn();
 
 vi.mock("@/lib/github", () => ({
-  fetchGitHubPrContent: (...args: unknown[]) => mockFetchGitHubPrContent(...args),
+  fetchGitHubPrContent: (...args: unknown[]) =>
+    mockFetchGitHubPrContent(...args),
 }));
 
 import { POST, GET } from "./route";
@@ -178,7 +180,10 @@ describe("POST /api/code-review", () => {
 
     const request = new NextRequest("http://localhost/api/code-review", {
       method: "POST",
-      body: JSON.stringify({ assessmentId: "assessment-1", forceReanalyze: true }),
+      body: JSON.stringify({
+        assessmentId: "assessment-1",
+        forceReanalyze: true,
+      }),
     });
 
     const response = await POST(request);

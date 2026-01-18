@@ -60,31 +60,31 @@ export function CongratulationsClient({
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
       {/* Decorative geometric shapes - neo-brutalist style */}
       <div
-        className="absolute top-0 left-0 w-32 h-32 bg-secondary border-2 border-foreground"
+        className="absolute left-0 top-0 h-32 w-32 border-2 border-foreground bg-secondary"
         style={{
           clipPath: "polygon(0 0, 100% 0, 0 100%)",
           opacity: showContent ? 1 : 0,
         }}
       />
       <div
-        className="absolute top-0 right-0 w-24 h-24 bg-foreground"
+        className="absolute right-0 top-0 h-24 w-24 bg-foreground"
         style={{
           clipPath: "polygon(100% 0, 100% 100%, 0 0)",
           opacity: showContent ? 1 : 0,
         }}
       />
       <div
-        className="absolute bottom-0 right-0 w-40 h-40 bg-secondary border-2 border-foreground"
+        className="absolute bottom-0 right-0 h-40 w-40 border-2 border-foreground bg-secondary"
         style={{
           clipPath: "polygon(100% 0, 100% 100%, 0 100%)",
           opacity: showContent ? 1 : 0,
         }}
       />
       <div
-        className="absolute bottom-0 left-0 w-20 h-20 bg-foreground"
+        className="absolute bottom-0 left-0 h-20 w-20 bg-foreground"
         style={{
           clipPath: "polygon(0 0, 100% 100%, 0 100%)",
           opacity: showContent ? 1 : 0,
@@ -92,7 +92,7 @@ export function CongratulationsClient({
       />
 
       {/* Main content */}
-      <div className="relative z-10 text-center max-w-xl">
+      <div className="relative z-10 max-w-xl text-center">
         {/* Celebratory badge */}
         <div
           className="mb-8"
@@ -101,7 +101,7 @@ export function CongratulationsClient({
             transform: showBadge ? "scale(1)" : "scale(0)",
           }}
         >
-          <div className="inline-block bg-secondary border-4 border-foreground p-6">
+          <div className="inline-block border-4 border-foreground bg-secondary p-6">
             <div className="text-6xl font-bold text-secondary-foreground">
               &#10003;
             </div>
@@ -115,11 +115,11 @@ export function CongratulationsClient({
             transform: showMessage ? "translateY(0)" : "translateY(-20px)",
           }}
         >
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <h1 className="mb-4 text-4xl font-bold md:text-5xl">
             Congratulations, {userName}!
           </h1>
-          <p className="text-2xl md:text-3xl mb-2">
-            <span className="text-secondary bg-foreground px-3 py-1 inline-block">
+          <p className="mb-2 text-2xl md:text-3xl">
+            <span className="inline-block bg-foreground px-3 py-1 text-secondary">
               You got the job!
             </span>
           </p>
@@ -127,16 +127,16 @@ export function CongratulationsClient({
 
         {/* Job details */}
         <div
-          className="mt-8 mb-8"
+          className="mb-8 mt-8"
           style={{
             opacity: showDetails ? 1 : 0,
           }}
         >
-          <div className="inline-block bg-muted border-2 border-foreground p-6">
-            <p className="text-muted-foreground text-sm uppercase tracking-wider mb-2">
+          <div className="inline-block border-2 border-foreground bg-muted p-6">
+            <p className="mb-2 text-sm uppercase tracking-wider text-muted-foreground">
               Your new role
             </p>
-            <p className="text-xl font-bold mb-1">{scenarioName}</p>
+            <p className="mb-1 text-xl font-bold">{scenarioName}</p>
             <p className="text-muted-foreground">at {companyName}</p>
           </div>
         </div>
@@ -149,11 +149,11 @@ export function CongratulationsClient({
         >
           <button
             onClick={handleContinue}
-            className="bg-foreground text-background px-8 py-4 text-lg font-bold border-4 border-foreground hover:bg-secondary hover:text-secondary-foreground"
+            className="border-4 border-foreground bg-foreground px-8 py-4 text-lg font-bold text-background hover:bg-secondary hover:text-secondary-foreground"
           >
             Start Your First Day
           </button>
-          <p className="mt-4 text-sm text-muted-foreground font-mono">
+          <p className="mt-4 font-mono text-sm text-muted-foreground">
             Auto-advancing in {autoAdvanceTimer}s...
           </p>
         </div>

@@ -8,17 +8,17 @@ import { useSearchParams } from "next/navigation";
 function GeometricDecoration() {
   return (
     <div
-      className="absolute inset-0 overflow-hidden pointer-events-none"
+      className="pointer-events-none absolute inset-0 overflow-hidden"
       aria-hidden="true"
     >
       {/* Triangle - top left */}
       <div
-        className="absolute -top-16 -left-16 w-64 h-64 bg-secondary"
+        className="absolute -left-16 -top-16 h-64 w-64 bg-secondary"
         style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
       />
       {/* Small triangle - bottom right */}
       <div
-        className="absolute -bottom-8 -right-8 w-32 h-32 bg-foreground"
+        className="absolute -bottom-8 -right-8 h-32 w-32 bg-foreground"
         style={{ clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }}
       />
     </div>
@@ -68,7 +68,7 @@ function SignInForm() {
     <>
       {/* Error messages */}
       {(error || formError) && (
-        <div className="mb-6 p-4 border-2 border-destructive bg-destructive/10 text-destructive font-mono text-sm">
+        <div className="bg-destructive/10 mb-6 border-2 border-destructive p-4 font-mono text-sm text-destructive">
           {error === "CredentialsSignin"
             ? "Invalid email or password"
             : error === "OAuthAccountNotLinked"
@@ -80,10 +80,10 @@ function SignInForm() {
       {/* Google OAuth */}
       <button
         onClick={handleGoogleSignIn}
-        className="w-full bg-background text-foreground px-4 py-4 font-semibold border-2 border-foreground hover:bg-secondary hover:border-secondary flex items-center justify-center gap-3 mb-6"
+        className="mb-6 flex w-full items-center justify-center gap-3 border-2 border-foreground bg-background px-4 py-4 font-semibold text-foreground hover:border-secondary hover:bg-secondary"
         type="button"
       >
-        <svg className="w-5 h-5" viewBox="0 0 24 24">
+        <svg className="h-5 w-5" viewBox="0 0 24 24">
           <path
             fill="currentColor"
             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -110,7 +110,7 @@ function SignInForm() {
           <div className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center">
-          <span className="px-4 bg-background font-mono text-sm text-muted-foreground">
+          <span className="bg-background px-4 font-mono text-sm text-muted-foreground">
             OR
           </span>
         </div>
@@ -121,7 +121,7 @@ function SignInForm() {
         <div className="mb-4">
           <label
             htmlFor="email"
-            className="block font-mono text-sm mb-2 text-muted-foreground"
+            className="mb-2 block font-mono text-sm text-muted-foreground"
           >
             EMAIL
           </label>
@@ -132,7 +132,7 @@ function SignInForm() {
             onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="email"
-            className="w-full px-4 py-3 bg-background border-2 border-border focus:border-secondary focus:outline-none font-mono"
+            className="w-full border-2 border-border bg-background px-4 py-3 font-mono focus:border-secondary focus:outline-none"
             placeholder="you@example.com"
           />
         </div>
@@ -140,7 +140,7 @@ function SignInForm() {
         <div className="mb-6">
           <label
             htmlFor="password"
-            className="block font-mono text-sm mb-2 text-muted-foreground"
+            className="mb-2 block font-mono text-sm text-muted-foreground"
           >
             PASSWORD
           </label>
@@ -151,7 +151,7 @@ function SignInForm() {
             onChange={(e) => setPassword(e.target.value)}
             required
             autoComplete="current-password"
-            className="w-full px-4 py-3 bg-background border-2 border-border focus:border-secondary focus:outline-none font-mono"
+            className="w-full border-2 border-border bg-background px-4 py-3 font-mono focus:border-secondary focus:outline-none"
             placeholder="Enter your password"
           />
         </div>
@@ -159,7 +159,7 @@ function SignInForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-foreground text-background px-4 py-4 font-semibold border-2 border-foreground hover:bg-secondary hover:text-secondary-foreground hover:border-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full border-2 border-foreground bg-foreground px-4 py-4 font-semibold text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading ? "Signing in..." : "Sign in with Email"}
         </button>
@@ -170,7 +170,7 @@ function SignInForm() {
         Don&apos;t have an account?{" "}
         <Link
           href="/sign-up"
-          className="text-foreground font-semibold border-b-2 border-secondary hover:text-secondary"
+          className="border-b-2 border-secondary font-semibold text-foreground hover:text-secondary"
         >
           Sign up
         </Link>
@@ -182,14 +182,14 @@ function SignInForm() {
 function SignInFormFallback() {
   return (
     <div className="animate-pulse">
-      <div className="h-14 bg-muted mb-6" />
-      <div className="h-px bg-border mb-6" />
+      <div className="mb-6 h-14 bg-muted" />
+      <div className="mb-6 h-px bg-border" />
       <div className="space-y-4">
-        <div className="h-4 bg-muted w-16" />
+        <div className="h-4 w-16 bg-muted" />
         <div className="h-12 bg-muted" />
-        <div className="h-4 bg-muted w-20" />
+        <div className="h-4 w-20 bg-muted" />
         <div className="h-12 bg-muted" />
-        <div className="h-14 bg-muted mt-2" />
+        <div className="mt-2 h-14 bg-muted" />
       </div>
     </div>
   );
@@ -197,18 +197,18 @@ function SignInFormFallback() {
 
 export default function SignInPage() {
   return (
-    <main className="min-h-screen bg-background text-foreground flex items-center justify-center px-6 py-12">
+    <main className="flex min-h-screen items-center justify-center bg-background px-6 py-12 text-foreground">
       <div className="relative w-full max-w-md">
         <GeometricDecoration />
 
         <div className="relative z-10 border-2 border-border bg-background p-8">
           {/* Header */}
           <div className="mb-8">
-            <Link href="/" className="font-bold text-2xl block mb-6">
+            <Link href="/" className="mb-6 block text-2xl font-bold">
               Skillvee
             </Link>
             <h1 className="text-3xl font-bold">Sign in</h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="mt-2 text-muted-foreground">
               Continue your assessment journey
             </p>
           </div>

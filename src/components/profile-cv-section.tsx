@@ -31,14 +31,14 @@ export function ProfileCVSection({
 
   return (
     <section className="mb-12">
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <h2 className="text-2xl font-bold">CV / Resume</h2>
         {cvUrl && (
           <a
             href={cvUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-sm text-foreground hover:text-secondary border-b-2 border-secondary"
+            className="border-b-2 border-secondary font-mono text-sm text-foreground hover:text-secondary"
           >
             View Current CV
           </a>
@@ -46,7 +46,7 @@ export function ProfileCVSection({
       </div>
 
       {uploadSuccess && (
-        <div className="mb-4 p-3 border-2 border-secondary bg-secondary/10 font-mono text-sm">
+        <div className="bg-secondary/10 mb-4 border-2 border-secondary p-3 font-mono text-sm">
           CV uploaded successfully!
         </div>
       )}

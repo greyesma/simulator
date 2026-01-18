@@ -200,7 +200,9 @@ describe("POST /api/kickoff/token", () => {
     );
     expect(mockGenerateEphemeralToken).toHaveBeenCalledWith(
       expect.objectContaining({
-        systemInstruction: expect.stringContaining("Only give details IF they ask"),
+        systemInstruction: expect.stringContaining(
+          "Only give details IF they ask"
+        ),
       })
     );
   });

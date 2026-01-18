@@ -19,7 +19,8 @@ vi.mock("@/server/db", () => ({
 // Mock gemini
 const mockGenerateEphemeralToken = vi.fn();
 vi.mock("@/lib/gemini", () => ({
-  generateEphemeralToken: (...args: unknown[]) => mockGenerateEphemeralToken(...args),
+  generateEphemeralToken: (...args: unknown[]) =>
+    mockGenerateEphemeralToken(...args),
   HR_PERSONA_SYSTEM_PROMPT: "Mock HR prompt",
 }));
 
@@ -32,8 +33,10 @@ vi.mock("@/lib/storage", () => ({
 const mockFormatProfileForPrompt = vi.fn();
 const mockProfileFromPrismaJson = vi.fn();
 vi.mock("@/lib/cv-parser", () => ({
-  formatProfileForPrompt: (...args: unknown[]) => mockFormatProfileForPrompt(...args),
-  profileFromPrismaJson: (...args: unknown[]) => mockProfileFromPrismaJson(...args),
+  formatProfileForPrompt: (...args: unknown[]) =>
+    mockFormatProfileForPrompt(...args),
+  profileFromPrismaJson: (...args: unknown[]) =>
+    mockProfileFromPrismaJson(...args),
 }));
 
 import { POST } from "./route";
@@ -173,7 +176,9 @@ describe("POST /api/interview/token", () => {
     // Verify generateEphemeralToken was called with system instruction containing formatted profile
     expect(mockGenerateEphemeralToken).toHaveBeenCalledWith(
       expect.objectContaining({
-        systemInstruction: expect.stringContaining("Senior developer with 10 years experience"),
+        systemInstruction: expect.stringContaining(
+          "Senior developer with 10 years experience"
+        ),
       })
     );
   });
@@ -211,7 +216,9 @@ describe("POST /api/interview/token", () => {
     // Verify generateEphemeralToken was called with fallback text
     expect(mockGenerateEphemeralToken).toHaveBeenCalledWith(
       expect.objectContaining({
-        systemInstruction: expect.stringContaining("don't have their full CV parsed"),
+        systemInstruction: expect.stringContaining(
+          "don't have their full CV parsed"
+        ),
       })
     );
     expect(mockGenerateEphemeralToken).toHaveBeenCalledWith(

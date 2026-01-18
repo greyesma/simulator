@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   checkScreenCaptureSupport,
   isStreamActive,
@@ -55,20 +55,14 @@ describe("screen utilities", () => {
 
     it("should return false when no tracks are live", () => {
       const mockStream = {
-        getTracks: () => [
-          { readyState: "ended" },
-          { readyState: "ended" },
-        ],
+        getTracks: () => [{ readyState: "ended" }, { readyState: "ended" }],
       } as unknown as MediaStream;
       expect(isStreamActive(mockStream)).toBe(false);
     });
 
     it("should return true when at least one track is live", () => {
       const mockStream = {
-        getTracks: () => [
-          { readyState: "ended" },
-          { readyState: "live" },
-        ],
+        getTracks: () => [{ readyState: "ended" }, { readyState: "live" }],
       } as unknown as MediaStream;
       expect(isStreamActive(mockStream)).toBe(true);
     });
@@ -91,11 +85,17 @@ describe("screen utilities", () => {
 
       const cleanup = onStreamEnded(mockStream, mockCallback);
 
-      expect(addEventListener).toHaveBeenCalledWith("ended", expect.any(Function));
+      expect(addEventListener).toHaveBeenCalledWith(
+        "ended",
+        expect.any(Function)
+      );
 
       // Call cleanup
       cleanup();
-      expect(removeEventListener).toHaveBeenCalledWith("ended", expect.any(Function));
+      expect(removeEventListener).toHaveBeenCalledWith(
+        "ended",
+        expect.any(Function)
+      );
     });
 
     it("should return no-op if no video track exists", () => {

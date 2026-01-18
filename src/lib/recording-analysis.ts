@@ -64,7 +64,9 @@ export const segmentAnalysisResponseSchema = z.object({
 export type ActivityEntry = z.infer<typeof activityEntrySchema>;
 export type ToolUsage = z.infer<typeof toolUsageSchema>;
 export type StuckMoment = z.infer<typeof stuckMomentSchema>;
-export type SegmentAnalysisResponse = z.infer<typeof segmentAnalysisResponseSchema>;
+export type SegmentAnalysisResponse = z.infer<
+  typeof segmentAnalysisResponseSchema
+>;
 
 // Screenshot analysis prompt is now centralized in src/prompts/analysis/recording.ts
 import { buildScreenshotAnalysisContext } from "@/prompts/analysis/recording";
@@ -122,7 +124,8 @@ export async function analyzeSegmentScreenshots(
   });
 
   const images = (await Promise.all(imagePromises)).filter(
-    (img): img is { inlineData: { mimeType: string; data: string } } => img !== null
+    (img): img is { inlineData: { mimeType: string; data: string } } =>
+      img !== null
   );
 
   if (images.length === 0) {
@@ -193,9 +196,7 @@ export function buildSegmentAnalysisData(
 /**
  * Aggregates multiple segment analyses into a single recording analysis
  */
-export function aggregateSegmentAnalyses(
-  analyses: SegmentAnalysisResponse[]
-): {
+export function aggregateSegmentAnalyses(analyses: SegmentAnalysisResponse[]): {
   activityTimeline: ActivityEntry[];
   toolUsage: ToolUsage[];
   stuckMoments: StuckMoment[];

@@ -11,14 +11,9 @@
 import { gemini } from "@/lib/gemini";
 import { db } from "@/server/db";
 import { withRetry } from "@/lib/error-recovery";
-import {
-  createVideoAssessmentLogger,
-  type VideoAssessmentLogger,
-} from "@/lib/assessment-logging";
+import { createVideoAssessmentLogger } from "@/lib/assessment-logging";
 import { generateAndStoreEmbeddings } from "@/lib/embeddings";
 import {
-  VIDEO_EVALUATION_PROMPT,
-  EVALUATION_PROMPT_VERSION,
   buildVideoEvaluationPrompt,
   type VideoEvaluationOutput,
   type AssessmentDimensionType,
@@ -148,8 +143,13 @@ function formatTimestamps(timestamps: string[]): Prisma.InputJsonValue {
 export async function evaluateVideo(
   options: EvaluateVideoOptions
 ): Promise<VideoEvaluationResult> {
-  const { assessmentId, videoUrl, videoDurationMinutes, taskDescription, expectedOutcomes } =
-    options;
+  const {
+    assessmentId,
+    videoUrl,
+    videoDurationMinutes,
+    taskDescription,
+    expectedOutcomes,
+  } = options;
 
   // Generate a unique job ID for this evaluation run
   const jobId = `job-${assessmentId}-${Date.now()}`;
@@ -354,7 +354,8 @@ export async function evaluateVideo(
       summary: evaluation.overall_summary,
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     console.error("[VideoEvaluation] Evaluation failed:", error);
 
     // Log: Error event with full error message and stack trace (event_type: error)
@@ -604,7 +605,10 @@ export async function triggerVideoAssessment(
       videoAssessmentId: videoAssessment.id,
     };
   } catch (error) {
-    console.error("[VideoEvaluation] Failed to trigger video assessment:", error);
+    console.error(
+      "[VideoEvaluation] Failed to trigger video assessment:",
+      error
+    );
     return {
       success: false,
       videoAssessmentId: null,
@@ -703,7 +707,8 @@ export async function retryVideoAssessment(
     });
 
     // Get task description from linked assessment if available
-    const taskDescription = videoAssessment.assessment?.scenario?.taskDescription;
+    const taskDescription =
+      videoAssessment.assessment?.scenario?.taskDescription;
 
     // Start evaluation asynchronously
     evaluateVideo({
@@ -785,7 +790,8 @@ export async function forceRetryVideoAssessment(
     );
 
     // Get task description from linked assessment if available
-    const taskDescription = videoAssessment.assessment?.scenario?.taskDescription;
+    const taskDescription =
+      videoAssessment.assessment?.scenario?.taskDescription;
 
     // Start evaluation asynchronously
     evaluateVideo({
@@ -804,7 +810,10 @@ export async function forceRetryVideoAssessment(
       videoAssessmentId,
     };
   } catch (error) {
-    console.error("[VideoEvaluation] Failed to force retry video assessment:", error);
+    console.error(
+      "[VideoEvaluation] Failed to force retry video assessment:",
+      error
+    );
     return {
       success: false,
       videoAssessmentId,

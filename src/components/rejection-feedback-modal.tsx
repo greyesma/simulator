@@ -101,23 +101,21 @@ export function RejectionFeedbackModal({
       {/* Modal Content */}
       <div
         data-testid="modal-content"
-        className="relative z-10 w-full max-w-lg mx-4 bg-background border-2 border-foreground p-6"
+        className="relative z-10 mx-4 w-full max-w-lg border-2 border-foreground bg-background p-6"
         onClick={handleContentClick}
       >
         {/* Header */}
-        <div className="flex items-start justify-between mb-6">
+        <div className="mb-6 flex items-start justify-between">
           <div>
-            <h2 className="text-lg font-bold">
-              Not a fit: {candidateName}
-            </h2>
-            <p className="text-muted-foreground mt-1">
+            <h2 className="text-lg font-bold">Not a fit: {candidateName}</h2>
+            <p className="mt-1 text-muted-foreground">
               Why isn&apos;t this candidate a fit?
             </p>
           </div>
           <button
             data-testid="close-modal-button"
             onClick={onClose}
-            className="p-2 border-2 border-foreground hover:bg-accent"
+            className="border-2 border-foreground p-2 hover:bg-accent"
             aria-label="Close modal"
           >
             <X size={20} />
@@ -131,16 +129,16 @@ export function RejectionFeedbackModal({
           onChange={(e) => setFeedback(e.target.value)}
           placeholder='e.g., "Need 8+ years, not 5" or "Looking for more frontend focus"'
           rows={4}
-          className="w-full px-4 py-3 border-2 border-foreground bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-secondary resize-none font-sans"
+          className="w-full resize-none border-2 border-foreground bg-background px-4 py-3 font-sans text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-secondary"
           disabled={isSubmitting}
         />
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 mt-6">
+        <div className="mt-6 flex justify-end gap-3">
           <button
             data-testid="cancel-button"
             onClick={onClose}
-            className="px-4 py-2 border-2 border-foreground hover:bg-accent font-medium"
+            className="border-2 border-foreground px-4 py-2 font-medium hover:bg-accent"
           >
             Cancel
           </button>
@@ -148,11 +146,15 @@ export function RejectionFeedbackModal({
             data-testid="submit-feedback-button"
             onClick={handleSubmit}
             disabled={!feedback.trim() || isSubmitting}
-            className="px-4 py-2 border-2 border-foreground bg-foreground text-background hover:bg-secondary hover:text-secondary-foreground font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="flex items-center gap-2 border-2 border-foreground bg-foreground px-4 py-2 font-medium text-background hover:bg-secondary hover:text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting ? (
               <>
-                <Loader2 size={16} className="animate-spin" data-testid="submit-loading" />
+                <Loader2
+                  size={16}
+                  className="animate-spin"
+                  data-testid="submit-loading"
+                />
                 Submitting...
               </>
             ) : (

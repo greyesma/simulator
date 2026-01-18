@@ -117,7 +117,8 @@ export function buildConversationSummaryPrompt(
   coworkerName: string,
   conversationText: string
 ): string {
-  return CONVERSATION_SUMMARY_PROMPT
-    .replace(/{coworkerName}/g, coworkerName)
-    .replace("{conversation}", conversationText);
+  return CONVERSATION_SUMMARY_PROMPT.replace(
+    /{coworkerName}/g,
+    coworkerName
+  ).replace("{conversation}", conversationText);
 }

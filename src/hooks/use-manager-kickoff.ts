@@ -266,7 +266,7 @@ export function useManagerKickoff({
         apiKey: tokenData.token,
         httpOptions: {
           apiVersion: "v1alpha",
-          baseUrl: "https://generativelanguage.googleapis.com",  // No trailing slash!
+          baseUrl: "https://generativelanguage.googleapis.com", // No trailing slash!
         },
       });
 

@@ -108,7 +108,10 @@ export async function POST(request: Request) {
     }));
 
   // Build memory context for this coworker
-  const memory = await buildCoworkerMemory(coworkerConversations, coworker.name);
+  const memory = await buildCoworkerMemory(
+    coworkerConversations,
+    coworker.name
+  );
   const memoryContext = formatMemoryForPrompt(memory, coworker.name);
 
   // Build cross-coworker context (awareness of other conversations)
@@ -165,7 +168,11 @@ export async function POST(request: Request) {
     contents: [
       {
         role: "user",
-        parts: [{ text: `[SYSTEM INSTRUCTIONS - Follow these throughout the conversation]\n\n${systemPrompt}\n\n[END SYSTEM INSTRUCTIONS]\n\nPlease acknowledge you understand and are ready to chat in character.` }],
+        parts: [
+          {
+            text: `[SYSTEM INSTRUCTIONS - Follow these throughout the conversation]\n\n${systemPrompt}\n\n[END SYSTEM INSTRUCTIONS]\n\nPlease acknowledge you understand and are ready to chat in character.`,
+          },
+        ],
       },
       {
         role: "model",
@@ -179,7 +186,8 @@ export async function POST(request: Request) {
     ],
   });
 
-  const responseText = response.text || "I'm sorry, I couldn't generate a response.";
+  const responseText =
+    response.text || "I'm sorry, I couldn't generate a response.";
   const timestamp = new Date().toISOString();
 
   // Create new messages

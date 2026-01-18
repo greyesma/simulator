@@ -9,7 +9,11 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { extractEntities, mapJobTitleToArchetype, inferSeniorityFromYears } from "@/lib/entity-extraction";
+import {
+  extractEntities,
+  mapJobTitleToArchetype,
+  inferSeniorityFromYears,
+} from "@/lib/entity-extraction";
 
 /**
  * POST /api/search/extract
@@ -112,10 +116,14 @@ function extractFallbackEntities(query: string): {
     if (match) {
       // Normalize common abbreviations
       const loc = match[1] || match[0];
-      location = loc === "NYC" ? "New York"
-        : loc === "SF" ? "San Francisco"
-        : loc === "LA" ? "Los Angeles"
-        : loc;
+      location =
+        loc === "NYC"
+          ? "New York"
+          : loc === "SF"
+            ? "San Francisco"
+            : loc === "LA"
+              ? "Los Angeles"
+              : loc;
       break;
     }
   }
@@ -134,21 +142,53 @@ function extractFallbackEntities(query: string): {
 
   // Extract skills (common programming keywords)
   const skillKeywords = [
-    "python", "javascript", "typescript", "react", "node", "nodejs",
-    "go", "golang", "rust", "java", "c++", "ruby", "php", "swift",
-    "kubernetes", "docker", "aws", "gcp", "azure", "terraform",
-    "ml", "machine learning", "ai", "llm", "llms", "data science",
-    "sql", "postgresql", "mongodb", "redis", "graphql", "rest",
+    "python",
+    "javascript",
+    "typescript",
+    "react",
+    "node",
+    "nodejs",
+    "go",
+    "golang",
+    "rust",
+    "java",
+    "c++",
+    "ruby",
+    "php",
+    "swift",
+    "kubernetes",
+    "docker",
+    "aws",
+    "gcp",
+    "azure",
+    "terraform",
+    "ml",
+    "machine learning",
+    "ai",
+    "llm",
+    "llms",
+    "data science",
+    "sql",
+    "postgresql",
+    "mongodb",
+    "redis",
+    "graphql",
+    "rest",
   ];
   const skills: string[] = [];
   for (const skill of skillKeywords) {
     if (lowerQuery.includes(skill)) {
       // Normalize skill names
-      const normalized = skill === "nodejs" ? "Node.js"
-        : skill === "golang" ? "Go"
-        : skill === "llms" ? "LLMs"
-        : skill === "llm" ? "LLMs"
-        : skill.charAt(0).toUpperCase() + skill.slice(1);
+      const normalized =
+        skill === "nodejs"
+          ? "Node.js"
+          : skill === "golang"
+            ? "Go"
+            : skill === "llms"
+              ? "LLMs"
+              : skill === "llm"
+                ? "LLMs"
+                : skill.charAt(0).toUpperCase() + skill.slice(1);
       if (!skills.includes(normalized)) {
         skills.push(normalized);
       }
@@ -158,15 +198,20 @@ function extractFallbackEntities(query: string): {
   // Extract company type
   const companyTypes: string[] = [];
   if (lowerQuery.includes("startup")) companyTypes.push("startup");
-  if (lowerQuery.includes("vc backed") || lowerQuery.includes("vc-backed")) companyTypes.push("VC backed");
+  if (lowerQuery.includes("vc backed") || lowerQuery.includes("vc-backed"))
+    companyTypes.push("VC backed");
   if (lowerQuery.includes("enterprise")) companyTypes.push("enterprise");
-  if (lowerQuery.includes("faang") || lowerQuery.includes("big tech")) companyTypes.push("FAANG");
+  if (lowerQuery.includes("faang") || lowerQuery.includes("big tech"))
+    companyTypes.push("FAANG");
 
   // Extract industry
   const industries: string[] = [];
-  if (lowerQuery.includes("fintech") || lowerQuery.includes("finance")) industries.push("fintech");
-  if (lowerQuery.includes("healthcare") || lowerQuery.includes("health")) industries.push("healthcare");
-  if (lowerQuery.includes("retail") || lowerQuery.includes("e-commerce")) industries.push("retail");
+  if (lowerQuery.includes("fintech") || lowerQuery.includes("finance"))
+    industries.push("fintech");
+  if (lowerQuery.includes("healthcare") || lowerQuery.includes("health"))
+    industries.push("healthcare");
+  if (lowerQuery.includes("retail") || lowerQuery.includes("e-commerce"))
+    industries.push("retail");
 
   const intent = {
     job_title: jobTitle,

@@ -15,7 +15,7 @@ export async function AdminNav() {
   return (
     <Link
       href="/admin"
-      className="font-mono text-sm px-3 py-1 bg-foreground text-background hover:bg-secondary hover:text-secondary-foreground"
+      className="bg-foreground px-3 py-1 font-mono text-sm text-background hover:bg-secondary hover:text-secondary-foreground"
     >
       Admin
     </Link>

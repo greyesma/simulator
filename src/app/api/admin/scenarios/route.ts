@@ -22,7 +22,10 @@ export async function GET() {
 
   const user = session.user as SessionUser;
   if (user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Admin access required" },
+      { status: 403 }
+    );
   }
 
   const scenarios = await db.scenario.findMany({
@@ -50,20 +53,43 @@ export async function POST(request: Request) {
 
   const user = session.user as SessionUser;
   if (user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Admin access required" },
+      { status: 403 }
+    );
   }
 
   const body = await request.json();
-  const { name, companyName, companyDescription, taskDescription, repoUrl, techStack, isPublished } = body;
+  const {
+    name,
+    companyName,
+    companyDescription,
+    taskDescription,
+    repoUrl,
+    techStack,
+    isPublished,
+  } = body;
 
   // Validate required fields
-  if (!name || !companyName || !companyDescription || !taskDescription || !repoUrl) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  if (
+    !name ||
+    !companyName ||
+    !companyDescription ||
+    !taskDescription ||
+    !repoUrl
+  ) {
+    return NextResponse.json(
+      { error: "Missing required fields" },
+      { status: 400 }
+    );
   }
 
   // Validate techStack is an array
   if (techStack !== undefined && !Array.isArray(techStack)) {
-    return NextResponse.json({ error: "techStack must be an array" }, { status: 400 });
+    return NextResponse.json(
+      { error: "techStack must be an array" },
+      { status: 400 }
+    );
   }
 
   const scenario = await db.scenario.create({

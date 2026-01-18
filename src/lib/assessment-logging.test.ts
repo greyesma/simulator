@@ -108,7 +108,9 @@ describe("logVideoAssessmentEvent", () => {
     });
 
     // Verify the timestamp is a valid Date (JavaScript Dates are always UTC internally)
-    expect(result.toISOString()).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+    expect(result.toISOString()).toMatch(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+    );
   });
 });
 
@@ -264,10 +266,14 @@ describe("createVideoAssessmentLogger", () => {
     await logger.logEvent(AssessmentLogEventType.PROMPT_SENT);
 
     // First event should have no duration
-    expect(mockVideoAssessmentLogCreate.mock.calls[0][0].data.durationMs).toBeNull();
+    expect(
+      mockVideoAssessmentLogCreate.mock.calls[0][0].data.durationMs
+    ).toBeNull();
 
     // Second event should have duration >= 50ms
-    expect(mockVideoAssessmentLogCreate.mock.calls[1][0].data.durationMs).toBeGreaterThanOrEqual(50);
+    expect(
+      mockVideoAssessmentLogCreate.mock.calls[1][0].data.durationMs
+    ).toBeGreaterThanOrEqual(50);
   });
 
   it("should track last event timestamp", async () => {

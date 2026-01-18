@@ -19,6 +19,7 @@ Generate Product Requirements Documents (PRDs) for new features that can be conv
 ## Clarifying Questions
 
 Ask about:
+
 - Problem/Goal: What problem does this solve?
 - Core Functionality: What's the minimum viable feature?
 - Scope: What's explicitly out of scope?
@@ -48,38 +49,47 @@ User can respond with "1A, 2C, 3B" etc.
 # PRD: [Feature Name]
 
 ## Overview
+
 Brief description of the feature and the problem it solves.
 
 ## Goals
+
 - Specific, measurable goal 1
 - Specific, measurable goal 2
 
 ## User Stories
 
 ### US-001: [Story Title]
+
 **Description**: As a [user type], I want [feature] so that [benefit].
 
 **Acceptance Criteria**:
+
 - [ ] Specific, verifiable criterion
 - [ ] Another verifiable criterion
 - [ ] Tests pass (if applicable)
 
 ### US-002: [Story Title]
+
 ...
 
 ## Functional Requirements
+
 1. The system shall [specific requirement]
 2. The system shall [specific requirement]
 
 ## Non-Goals
+
 - Explicitly out of scope item 1
 - Explicitly out of scope item 2
 
 ## Technical Considerations
+
 - Any constraints or dependencies
 - Integration points
 
 ## Success Metrics
+
 - How we measure success
 ```
 
@@ -88,12 +98,14 @@ Brief description of the feature and the problem it solves.
 **Critical**: Each story must be completable in ONE Ralph iteration (one Claude context window).
 
 **Right-sized stories**:
+
 - Add a database column with migration
 - Create a single UI component
 - Add one API endpoint
 - Update server logic for one feature
 
 **Too large (split these)**:
+
 - "Build the entire dashboard"
 - "Add authentication system"
 - "Refactor the API layer"
@@ -101,17 +113,20 @@ Brief description of the feature and the problem it solves.
 ## Writing Standards
 
 Write for clarity - assume the reader is a junior developer or AI:
+
 - Be explicit and unambiguous
 - Number requirements for easy reference
 - Use concrete examples
 - Avoid vague criteria like "works correctly" or "good UX"
 
 **Good acceptance criteria**:
+
 - "Add status column to tasks table with default 'pending'"
 - "Button displays 'Submit' text and is disabled when form is invalid"
 - "API returns 404 when resource not found"
 
 **Bad acceptance criteria**:
+
 - "Works correctly"
 - "Handles edge cases"
 - "Good user experience"
@@ -125,6 +140,7 @@ Write for clarity - assume the reader is a junior developer or AI:
 ## Pre-Save Checklist
 
 Before saving the PRD, verify:
+
 - [ ] Asked clarifying questions with lettered options
 - [ ] Incorporated user's answers
 - [ ] User stories are small enough for one iteration

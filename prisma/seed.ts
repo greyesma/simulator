@@ -5,7 +5,12 @@
  * Run with: npx tsx prisma/seed.ts
  */
 
-import { PrismaClient, Prisma, AssessmentDimension, VideoAssessmentStatus } from "@prisma/client";
+import {
+  PrismaClient,
+  Prisma,
+  AssessmentDimension,
+  VideoAssessmentStatus,
+} from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { EXAMPLE_COWORKERS } from "../src/lib/coworker-persona";
 
@@ -83,7 +88,14 @@ Acceptance Criteria:
 5. In-app notification bell with unread count
 6. Unit tests for all API endpoints`,
       repoUrl: "https://github.com/skillvee/flowboard-task",
-      techStack: ["TypeScript", "React", "Node.js", "PostgreSQL", "Redis", "WebSocket"],
+      techStack: [
+        "TypeScript",
+        "React",
+        "Node.js",
+        "PostgreSQL",
+        "Redis",
+        "WebSocket",
+      ],
       isPublished: true,
     },
     create: {
@@ -112,7 +124,14 @@ Acceptance Criteria:
 5. In-app notification bell with unread count
 6. Unit tests for all API endpoints`,
       repoUrl: "https://github.com/skillvee/flowboard-task",
-      techStack: ["TypeScript", "React", "Node.js", "PostgreSQL", "Redis", "WebSocket"],
+      techStack: [
+        "TypeScript",
+        "React",
+        "Node.js",
+        "PostgreSQL",
+        "Redis",
+        "WebSocket",
+      ],
       isPublished: true,
     },
   });
@@ -174,7 +193,13 @@ Acceptance Criteria:
             "Mentored team of 4 junior engineers",
             "Improved CI/CD pipeline, cutting deploy time from 30min to 5min",
           ],
-          technologies: ["TypeScript", "React", "Node.js", "PostgreSQL", "Redis"],
+          technologies: [
+            "TypeScript",
+            "React",
+            "Node.js",
+            "PostgreSQL",
+            "Redis",
+          ],
         },
         {
           company: "StartupXYZ",
@@ -212,24 +237,83 @@ Acceptance Criteria:
           startDate: "2012",
           endDate: "2016",
           gpa: "3.7",
-          honors: ["Dean's List", "ACM Programming Contest - Regional Finalist"],
+          honors: [
+            "Dean's List",
+            "ACM Programming Contest - Regional Finalist",
+          ],
         },
       ],
       skills: [
-        { name: "TypeScript", category: "programming_language" as const, proficiencyLevel: "expert" as const },
-        { name: "JavaScript", category: "programming_language" as const, proficiencyLevel: "expert" as const },
-        { name: "Python", category: "programming_language" as const, proficiencyLevel: "advanced" as const },
-        { name: "Java", category: "programming_language" as const, proficiencyLevel: "intermediate" as const },
-        { name: "React", category: "framework" as const, proficiencyLevel: "expert" as const },
-        { name: "Node.js", category: "framework" as const, proficiencyLevel: "expert" as const },
-        { name: "Next.js", category: "framework" as const, proficiencyLevel: "advanced" as const },
-        { name: "Vue.js", category: "framework" as const, proficiencyLevel: "advanced" as const },
-        { name: "PostgreSQL", category: "database" as const, proficiencyLevel: "expert" as const },
-        { name: "Redis", category: "database" as const, proficiencyLevel: "advanced" as const },
-        { name: "MongoDB", category: "database" as const, proficiencyLevel: "intermediate" as const },
-        { name: "AWS", category: "cloud" as const, proficiencyLevel: "advanced" as const },
-        { name: "Docker", category: "tool" as const, proficiencyLevel: "advanced" as const },
-        { name: "Git", category: "tool" as const, proficiencyLevel: "expert" as const },
+        {
+          name: "TypeScript",
+          category: "programming_language" as const,
+          proficiencyLevel: "expert" as const,
+        },
+        {
+          name: "JavaScript",
+          category: "programming_language" as const,
+          proficiencyLevel: "expert" as const,
+        },
+        {
+          name: "Python",
+          category: "programming_language" as const,
+          proficiencyLevel: "advanced" as const,
+        },
+        {
+          name: "Java",
+          category: "programming_language" as const,
+          proficiencyLevel: "intermediate" as const,
+        },
+        {
+          name: "React",
+          category: "framework" as const,
+          proficiencyLevel: "expert" as const,
+        },
+        {
+          name: "Node.js",
+          category: "framework" as const,
+          proficiencyLevel: "expert" as const,
+        },
+        {
+          name: "Next.js",
+          category: "framework" as const,
+          proficiencyLevel: "advanced" as const,
+        },
+        {
+          name: "Vue.js",
+          category: "framework" as const,
+          proficiencyLevel: "advanced" as const,
+        },
+        {
+          name: "PostgreSQL",
+          category: "database" as const,
+          proficiencyLevel: "expert" as const,
+        },
+        {
+          name: "Redis",
+          category: "database" as const,
+          proficiencyLevel: "advanced" as const,
+        },
+        {
+          name: "MongoDB",
+          category: "database" as const,
+          proficiencyLevel: "intermediate" as const,
+        },
+        {
+          name: "AWS",
+          category: "cloud" as const,
+          proficiencyLevel: "advanced" as const,
+        },
+        {
+          name: "Docker",
+          category: "tool" as const,
+          proficiencyLevel: "advanced" as const,
+        },
+        {
+          name: "Git",
+          category: "tool" as const,
+          proficiencyLevel: "expert" as const,
+        },
         { name: "Agile/Scrum", category: "methodology" as const },
         { name: "Technical Leadership", category: "soft_skill" as const },
         { name: "Mentoring", category: "soft_skill" as const },
@@ -271,7 +355,9 @@ Acceptance Criteria:
           parsedProfile: testParsedProfile as unknown as Prisma.InputJsonValue,
         },
       });
-      console.log(`\n📋 Updated assessment with parsed profile for ${testUser.email}`);
+      console.log(
+        `\n📋 Updated assessment with parsed profile for ${testUser.email}`
+      );
     } else {
       await prisma.assessment.create({
         data: {
@@ -281,7 +367,9 @@ Acceptance Criteria:
           parsedProfile: testParsedProfile as unknown as Prisma.InputJsonValue,
         },
       });
-      console.log(`\n📋 Created assessment with parsed profile for ${testUser.email}`);
+      console.log(
+        `\n📋 Created assessment with parsed profile for ${testUser.email}`
+      );
     }
 
     // Create VideoAssessment with dimension scores for candidate profile testing
@@ -289,17 +377,74 @@ Acceptance Criteria:
       where: { candidateId: testUser.id },
     });
 
-    const videoAssessmentId = existingVideoAssessment?.id || "test-video-assessment";
+    const videoAssessmentId =
+      existingVideoAssessment?.id || "test-video-assessment";
 
     const dimensionScores = [
-      { dimension: AssessmentDimension.COMMUNICATION, score: 4, observableBehaviors: "Clear and professional communication throughout. Asked clarifying questions when needed.", trainableGap: false, timestamps: ["2:34", "5:12", "15:07"] },
-      { dimension: AssessmentDimension.PROBLEM_SOLVING, score: 5, observableBehaviors: "Excellent problem decomposition. Broke down complex tasks into manageable steps.", trainableGap: false, timestamps: ["10:45", "22:30"] },
-      { dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE, score: 4, observableBehaviors: "Strong technical foundation demonstrated in code implementation.", trainableGap: false, timestamps: ["8:15", "18:00", "25:40", "35:20"] },
-      { dimension: AssessmentDimension.COLLABORATION, score: 3, observableBehaviors: "Good teamwork, sought help when stuck. Could improve on proactive communication.", trainableGap: true, timestamps: ["12:00", "28:15"] },
-      { dimension: AssessmentDimension.ADAPTABILITY, score: 4, observableBehaviors: "Adapted well to changing requirements and new information.", trainableGap: false, timestamps: ["30:45"] },
-      { dimension: AssessmentDimension.LEADERSHIP, score: 3, observableBehaviors: "Showed initiative but could take more ownership of decisions.", trainableGap: true, timestamps: [] },
-      { dimension: AssessmentDimension.CREATIVITY, score: 4, observableBehaviors: "Proposed creative solutions to technical challenges.", trainableGap: false, timestamps: ["1:05:30", "1:15:00"] },
-      { dimension: AssessmentDimension.TIME_MANAGEMENT, score: 5, observableBehaviors: "Excellent prioritization and efficient use of time.", trainableGap: false, timestamps: ["5:00", "20:00", "45:00"] },
+      {
+        dimension: AssessmentDimension.COMMUNICATION,
+        score: 4,
+        observableBehaviors:
+          "Clear and professional communication throughout. Asked clarifying questions when needed.",
+        trainableGap: false,
+        timestamps: ["2:34", "5:12", "15:07"],
+      },
+      {
+        dimension: AssessmentDimension.PROBLEM_SOLVING,
+        score: 5,
+        observableBehaviors:
+          "Excellent problem decomposition. Broke down complex tasks into manageable steps.",
+        trainableGap: false,
+        timestamps: ["10:45", "22:30"],
+      },
+      {
+        dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE,
+        score: 4,
+        observableBehaviors:
+          "Strong technical foundation demonstrated in code implementation.",
+        trainableGap: false,
+        timestamps: ["8:15", "18:00", "25:40", "35:20"],
+      },
+      {
+        dimension: AssessmentDimension.COLLABORATION,
+        score: 3,
+        observableBehaviors:
+          "Good teamwork, sought help when stuck. Could improve on proactive communication.",
+        trainableGap: true,
+        timestamps: ["12:00", "28:15"],
+      },
+      {
+        dimension: AssessmentDimension.ADAPTABILITY,
+        score: 4,
+        observableBehaviors:
+          "Adapted well to changing requirements and new information.",
+        trainableGap: false,
+        timestamps: ["30:45"],
+      },
+      {
+        dimension: AssessmentDimension.LEADERSHIP,
+        score: 3,
+        observableBehaviors:
+          "Showed initiative but could take more ownership of decisions.",
+        trainableGap: true,
+        timestamps: [],
+      },
+      {
+        dimension: AssessmentDimension.CREATIVITY,
+        score: 4,
+        observableBehaviors:
+          "Proposed creative solutions to technical challenges.",
+        trainableGap: false,
+        timestamps: ["1:05:30", "1:15:00"],
+      },
+      {
+        dimension: AssessmentDimension.TIME_MANAGEMENT,
+        score: 5,
+        observableBehaviors:
+          "Excellent prioritization and efficient use of time.",
+        trainableGap: false,
+        timestamps: ["5:00", "20:00", "45:00"],
+      },
     ];
 
     if (existingVideoAssessment) {
@@ -339,12 +484,15 @@ Acceptance Criteria:
       await prisma.videoAssessmentSummary.create({
         data: {
           assessmentId: existingVideoAssessment.id,
-          overallSummary: "Test User demonstrated strong technical skills and excellent problem-solving abilities throughout the simulation. They showed great time management and adaptability while maintaining professional communication. Areas for growth include proactive collaboration and taking more ownership in leadership situations.",
+          overallSummary:
+            "Test User demonstrated strong technical skills and excellent problem-solving abilities throughout the simulation. They showed great time management and adaptability while maintaining professional communication. Areas for growth include proactive collaboration and taking more ownership in leadership situations.",
           rawAiResponse: {} as unknown as Prisma.InputJsonValue,
         },
       });
 
-      console.log(`\n🎬 Updated video assessment with dimension scores for ${testUser.email}`);
+      console.log(
+        `\n🎬 Updated video assessment with dimension scores for ${testUser.email}`
+      );
     } else {
       // Create new video assessment
       const videoAssessment = await prisma.videoAssessment.create({
@@ -374,12 +522,15 @@ Acceptance Criteria:
       await prisma.videoAssessmentSummary.create({
         data: {
           assessmentId: videoAssessment.id,
-          overallSummary: "Test User demonstrated strong technical skills and excellent problem-solving abilities throughout the simulation. They showed great time management and adaptability while maintaining professional communication. Areas for growth include proactive collaboration and taking more ownership in leadership situations.",
+          overallSummary:
+            "Test User demonstrated strong technical skills and excellent problem-solving abilities throughout the simulation. They showed great time management and adaptability while maintaining professional communication. Areas for growth include proactive collaboration and taking more ownership in leadership situations.",
           rawAiResponse: {} as unknown as Prisma.InputJsonValue,
         },
       });
 
-      console.log(`\n🎬 Created video assessment with dimension scores for ${testUser.email}`);
+      console.log(
+        `\n🎬 Created video assessment with dimension scores for ${testUser.email}`
+      );
       console.log(`   Video Assessment ID: ${videoAssessment.id}`);
     }
   }

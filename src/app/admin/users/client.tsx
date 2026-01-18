@@ -1,14 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import {
-  Search,
-  X,
-  User,
-  Shield,
-  Calendar,
-  FileText,
-} from "lucide-react";
+import { Search, X, User, Shield, Calendar, FileText } from "lucide-react";
 import type { UserRole } from "@prisma/client";
 
 // Serialized types from server (dates as strings)
@@ -94,12 +87,12 @@ export function UsersClient({ users, stats }: UsersClientProps) {
   }, [users, searchQuery, roleFilter, dateRange]);
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold mb-8">Users</h1>
+    <div className="mx-auto max-w-6xl px-6 py-12">
+      <h1 className="mb-8 text-3xl font-bold">Users</h1>
 
       {/* Aggregate Stats */}
       <div
-        className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+        className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4"
         data-testid="stats-grid"
       >
         <StatCard label="TOTAL USERS" value={stats.total} icon={User} />
@@ -118,18 +111,18 @@ export function UsersClient({ users, stats }: UsersClientProps) {
 
       {/* Filters */}
       <div
-        className="flex flex-wrap items-center gap-4 mb-6"
+        className="mb-6 flex flex-wrap items-center gap-4"
         data-testid="filters"
       >
         {/* Search */}
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <div className="relative min-w-[200px] flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search by name or email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-10 py-2 border-2 border-border bg-background font-mono text-sm focus:outline-none focus:border-foreground"
+            className="w-full border-2 border-border bg-background py-2 pl-10 pr-10 font-mono text-sm focus:border-foreground focus:outline-none"
             data-testid="search-input"
           />
           {searchQuery && (
@@ -138,7 +131,7 @@ export function UsersClient({ users, stats }: UsersClientProps) {
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               aria-label="Clear search"
             >
-              <X className="w-4 h-4" />
+              <X className="h-4 w-4" />
             </button>
           )}
         </div>
@@ -147,7 +140,7 @@ export function UsersClient({ users, stats }: UsersClientProps) {
         <select
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value as UserRole | "all")}
-          className="px-3 py-2 border-2 border-border bg-background font-mono text-sm focus:outline-none focus:border-foreground"
+          className="border-2 border-border bg-background px-3 py-2 font-mono text-sm focus:border-foreground focus:outline-none"
           data-testid="role-filter"
         >
           <option value="all">All Roles</option>
@@ -164,10 +157,10 @@ export function UsersClient({ users, stats }: UsersClientProps) {
             <button
               key={option.value}
               onClick={() => setDateRange(option.value)}
-              className={`px-3 py-2 border-2 font-mono text-xs ${
+              className={`border-2 px-3 py-2 font-mono text-xs ${
                 dateRange === option.value
-                  ? "bg-foreground text-background border-foreground"
-                  : "bg-background text-foreground border-border hover:border-foreground"
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-border bg-background text-foreground hover:border-foreground"
               }`}
             >
               {option.label}
@@ -177,7 +170,7 @@ export function UsersClient({ users, stats }: UsersClientProps) {
       </div>
 
       {/* Results count */}
-      <p className="font-mono text-sm text-muted-foreground mb-4">
+      <p className="mb-4 font-mono text-sm text-muted-foreground">
         Showing {filteredUsers.length} of {users.length} users
       </p>
 
@@ -191,16 +184,16 @@ export function UsersClient({ users, stats }: UsersClientProps) {
           <table className="w-full">
             <thead>
               <tr className="border-b-2 border-border">
-                <th className="text-left p-4 font-mono text-xs text-muted-foreground">
+                <th className="p-4 text-left font-mono text-xs text-muted-foreground">
                   USER
                 </th>
-                <th className="text-left p-4 font-mono text-xs text-muted-foreground">
+                <th className="p-4 text-left font-mono text-xs text-muted-foreground">
                   ROLE
                 </th>
-                <th className="text-left p-4 font-mono text-xs text-muted-foreground">
+                <th className="p-4 text-left font-mono text-xs text-muted-foreground">
                   MEMBER SINCE
                 </th>
-                <th className="text-left p-4 font-mono text-xs text-muted-foreground">
+                <th className="p-4 text-left font-mono text-xs text-muted-foreground">
                   ASSESSMENTS
                 </th>
               </tr>
@@ -230,8 +223,8 @@ function StatCard({
 }) {
   return (
     <div className="border-2 border-border p-4">
-      <div className="flex items-center gap-2 mb-2">
-        <Icon className="w-4 h-4 text-muted-foreground" />
+      <div className="mb-2 flex items-center gap-2">
+        <Icon className="h-4 w-4 text-muted-foreground" />
         <p className="font-mono text-xs text-muted-foreground">{label}</p>
       </div>
       <p className={`text-2xl font-bold ${highlight ? "text-secondary" : ""}`}>
@@ -244,12 +237,12 @@ function StatCard({
 function UserRow({ user }: { user: SerializedUser }) {
   return (
     <tr
-      className="border-b border-border hover:bg-muted/30"
+      className="hover:bg-muted/30 border-b border-border"
       data-testid={`user-row-${user.id}`}
     >
       <td className="p-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-secondary flex items-center justify-center">
+          <div className="flex h-10 w-10 items-center justify-center bg-secondary">
             <span className="font-bold text-secondary-foreground">
               {getInitials(user.name, user.email)}
             </span>
@@ -264,7 +257,7 @@ function UserRow({ user }: { user: SerializedUser }) {
       </td>
       <td className="p-4">
         <span
-          className={`font-mono text-xs px-2 py-1 ${
+          className={`px-2 py-1 font-mono text-xs ${
             user.role === "ADMIN"
               ? "bg-secondary text-secondary-foreground"
               : "bg-muted text-muted-foreground"

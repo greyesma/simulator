@@ -68,14 +68,18 @@ export type EmbeddingVector = number[];
  * @param text - The text to embed
  * @returns Embedding vector (768 dimensions)
  */
-export async function generateEmbedding(text: string): Promise<EmbeddingVector> {
+export async function generateEmbedding(
+  text: string
+): Promise<EmbeddingVector> {
   const response = await gemini.models.embedContent({
     model: EMBEDDING_MODEL,
     contents: [{ parts: [{ text }] }],
   });
 
   if (!response.embeddings?.[0]?.values) {
-    throw new Error("Failed to generate embedding: no embedding values returned");
+    throw new Error(
+      "Failed to generate embedding: no embedding values returned"
+    );
   }
 
   return response.embeddings[0].values;
@@ -311,7 +315,11 @@ export async function generateQueryEmbedding(
   experienceDomains: string[],
   additionalContext?: string
 ): Promise<EmbeddingVector> {
-  const queryText = buildQueryText(skills, experienceDomains, additionalContext);
+  const queryText = buildQueryText(
+    skills,
+    experienceDomains,
+    additionalContext
+  );
   return generateEmbeddingWithRetry(queryText);
 }
 
@@ -407,9 +415,7 @@ export async function hasEmbeddings(
  * @param videoAssessmentId - The video assessment ID
  * @returns Embedding metadata or null if not found
  */
-export async function getEmbeddingMetadata(
-  videoAssessmentId: string
-): Promise<{
+export async function getEmbeddingMetadata(videoAssessmentId: string): Promise<{
   id: string;
   embeddingModel: string;
   createdAt: Date;

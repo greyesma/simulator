@@ -8,7 +8,6 @@ import {
   Award,
   ChevronDown,
   ChevronUp,
-  Download,
   RefreshCw,
   Target,
   TrendingUp,
@@ -19,7 +18,10 @@ import {
   XCircle,
   AlertCircle,
 } from "lucide-react";
-import type { AssessmentReport, SkillScore } from "@/lib/assessment-aggregation";
+import type {
+  AssessmentReport,
+  SkillScore,
+} from "@/lib/assessment-aggregation";
 
 interface ResultsClientProps {
   assessmentId: string;
@@ -37,7 +39,6 @@ function SkillScoreBar({
   score: number;
   maxScore?: number;
 }) {
-  const percentage = (score / maxScore) * 100;
   const segments = Array.from({ length: maxScore }, (_, i) => i + 1);
 
   return (
@@ -86,43 +87,40 @@ function SkillCard({
     <div className="border-2 border-foreground">
       <button
         onClick={onToggle}
-        className="w-full p-4 flex items-center justify-between hover:bg-muted"
+        className="flex w-full items-center justify-between p-4 hover:bg-muted"
       >
-        <div className="flex items-center gap-4 flex-1">
-          <div className="font-bold text-left min-w-[200px]">
+        <div className="flex flex-1 items-center gap-4">
+          <div className="min-w-[200px] text-left font-bold">
             {categoryLabels[skill.category] || skill.category}
           </div>
-          <div className="flex-1 max-w-xs">
+          <div className="max-w-xs flex-1">
             <SkillScoreBar score={skill.score} />
           </div>
           <div className="font-mono text-lg font-bold">{skill.score}/5</div>
           <span
-            className={`font-mono text-xs px-2 py-1 border ${levelColors[skill.level] || "bg-muted"}`}
+            className={`border px-2 py-1 font-mono text-xs ${levelColors[skill.level] || "bg-muted"}`}
           >
             {skill.level.replace("_", " ").toUpperCase()}
           </span>
         </div>
         {isExpanded ? (
-          <ChevronUp className="w-5 h-5" />
+          <ChevronUp className="h-5 w-5" />
         ) : (
-          <ChevronDown className="w-5 h-5" />
+          <ChevronDown className="h-5 w-5" />
         )}
       </button>
 
       {isExpanded && (
-        <div className="px-4 pb-4 pt-2 border-t border-border bg-muted">
-          <p className="text-sm text-muted-foreground mb-3">{skill.notes}</p>
+        <div className="border-t border-border bg-muted px-4 pb-4 pt-2">
+          <p className="mb-3 text-sm text-muted-foreground">{skill.notes}</p>
           {skill.evidence.length > 0 && (
             <div>
-              <h5 className="font-mono text-xs text-muted-foreground mb-2">
+              <h5 className="mb-2 font-mono text-xs text-muted-foreground">
                 EVIDENCE
               </h5>
               <ul className="space-y-1">
                 {skill.evidence.map((item, index) => (
-                  <li
-                    key={index}
-                    className="text-sm flex items-start gap-2"
-                  >
+                  <li key={index} className="flex items-start gap-2 text-sm">
                     <span className="text-secondary">•</span>
                     {item}
                   </li>
@@ -151,11 +149,14 @@ function OverallScoreDisplay({
     needs_improvement: { label: "Needs Improvement", color: "text-red-600" },
   };
 
-  const config = levelLabels[level] || { label: level, color: "text-foreground" };
+  const config = levelLabels[level] || {
+    label: level,
+    color: "text-foreground",
+  };
 
   return (
-    <div className="text-center py-8">
-      <div className="inline-flex items-center justify-center w-32 h-32 border-4 border-foreground bg-background">
+    <div className="py-8 text-center">
+      <div className="inline-flex h-32 w-32 items-center justify-center border-4 border-foreground bg-background">
         <div>
           <div className="text-5xl font-bold">{score}</div>
           <div className="font-mono text-sm text-muted-foreground">/5</div>
@@ -168,27 +169,23 @@ function OverallScoreDisplay({
   );
 }
 
-function MetricsGrid({
-  metrics,
-}: {
-  metrics: AssessmentReport["metrics"];
-}) {
+function MetricsGrid({ metrics }: { metrics: AssessmentReport["metrics"] }) {
   const testStatusIcons: Record<string, React.ReactNode> = {
-    passing: <CheckCircle2 className="w-5 h-5 text-green-600" />,
-    failing: <XCircle className="w-5 h-5 text-red-600" />,
-    none: <AlertCircle className="w-5 h-5 text-muted-foreground" />,
-    unknown: <AlertCircle className="w-5 h-5 text-muted-foreground" />,
+    passing: <CheckCircle2 className="h-5 w-5 text-green-600" />,
+    failing: <XCircle className="h-5 w-5 text-red-600" />,
+    none: <AlertCircle className="h-5 w-5 text-muted-foreground" />,
+    unknown: <AlertCircle className="h-5 w-5 text-muted-foreground" />,
   };
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
       {metrics.totalDurationMinutes !== null && (
         <div className="border-2 border-border p-4">
-          <div className="flex items-center gap-2 text-muted-foreground mb-2">
-            <Clock className="w-4 h-4" />
+          <div className="mb-2 flex items-center gap-2 text-muted-foreground">
+            <Clock className="h-4 w-4" />
             <span className="font-mono text-xs">TOTAL TIME</span>
           </div>
-          <div className="font-bold text-xl">
+          <div className="text-xl font-bold">
             {metrics.totalDurationMinutes} min
           </div>
         </div>
@@ -196,49 +193,51 @@ function MetricsGrid({
 
       {metrics.workingPhaseMinutes !== null && (
         <div className="border-2 border-border p-4">
-          <div className="flex items-center gap-2 text-muted-foreground mb-2">
-            <Target className="w-4 h-4" />
+          <div className="mb-2 flex items-center gap-2 text-muted-foreground">
+            <Target className="h-4 w-4" />
             <span className="font-mono text-xs">WORKING PHASE</span>
           </div>
-          <div className="font-bold text-xl">
+          <div className="text-xl font-bold">
             {metrics.workingPhaseMinutes} min
           </div>
         </div>
       )}
 
       <div className="border-2 border-border p-4">
-        <div className="flex items-center gap-2 text-muted-foreground mb-2">
-          <Users className="w-4 h-4" />
+        <div className="mb-2 flex items-center gap-2 text-muted-foreground">
+          <Users className="h-4 w-4" />
           <span className="font-mono text-xs">COWORKERS</span>
         </div>
-        <div className="font-bold text-xl">{metrics.coworkersContacted}</div>
+        <div className="text-xl font-bold">{metrics.coworkersContacted}</div>
       </div>
 
       <div className="border-2 border-border p-4">
-        <div className="flex items-center gap-2 text-muted-foreground mb-2">
-          <Bot className="w-4 h-4" />
+        <div className="mb-2 flex items-center gap-2 text-muted-foreground">
+          <Bot className="h-4 w-4" />
           <span className="font-mono text-xs">AI TOOLS</span>
         </div>
-        <div className="font-bold text-xl">
+        <div className="text-xl font-bold">
           {metrics.aiToolsUsed ? "Yes" : "No"}
         </div>
       </div>
 
       <div className="border-2 border-border p-4">
-        <div className="flex items-center gap-2 text-muted-foreground mb-2">
+        <div className="mb-2 flex items-center gap-2 text-muted-foreground">
           {testStatusIcons[metrics.testsStatus]}
           <span className="font-mono text-xs">CI TESTS</span>
         </div>
-        <div className="font-bold text-xl capitalize">{metrics.testsStatus}</div>
+        <div className="text-xl font-bold capitalize">
+          {metrics.testsStatus}
+        </div>
       </div>
 
       {metrics.codeReviewScore !== null && (
         <div className="border-2 border-border p-4">
-          <div className="flex items-center gap-2 text-muted-foreground mb-2">
-            <Award className="w-4 h-4" />
+          <div className="mb-2 flex items-center gap-2 text-muted-foreground">
+            <Award className="h-4 w-4" />
             <span className="font-mono text-xs">CODE REVIEW</span>
           </div>
-          <div className="font-bold text-xl">{metrics.codeReviewScore}/5</div>
+          <div className="text-xl font-bold">{metrics.codeReviewScore}/5</div>
         </div>
       )}
     </div>
@@ -247,19 +246,19 @@ function MetricsGrid({
 
 function ProcessingState({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-8">
-      <div className="border-2 border-foreground p-12 text-center max-w-md">
-        <div className="w-16 h-16 border-4 border-secondary border-t-transparent mx-auto mb-6 animate-spin" />
-        <h2 className="text-2xl font-bold mb-4">Processing Your Assessment</h2>
-        <p className="text-muted-foreground mb-6">
+    <div className="flex min-h-screen items-center justify-center bg-background p-8">
+      <div className="max-w-md border-2 border-foreground p-12 text-center">
+        <div className="mx-auto mb-6 h-16 w-16 animate-spin border-4 border-secondary border-t-transparent" />
+        <h2 className="mb-4 text-2xl font-bold">Processing Your Assessment</h2>
+        <p className="mb-6 text-muted-foreground">
           We&apos;re analyzing your performance and generating your personalized
           report. This usually takes less than a minute.
         </p>
         <button
           onClick={onRetry}
-          className="flex items-center gap-2 mx-auto font-mono text-sm text-muted-foreground hover:text-foreground"
+          className="mx-auto flex items-center gap-2 font-mono text-sm text-muted-foreground hover:text-foreground"
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="h-4 w-4" />
           Refresh
         </button>
       </div>
@@ -269,16 +268,17 @@ function ProcessingState({ onRetry }: { onRetry: () => void }) {
 
 function NoReportState({ onGenerate }: { onGenerate: () => void }) {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-8">
-      <div className="border-2 border-foreground p-12 text-center max-w-md">
-        <AlertCircle className="w-16 h-16 mx-auto mb-6 text-secondary" />
-        <h2 className="text-2xl font-bold mb-4">Report Not Ready</h2>
-        <p className="text-muted-foreground mb-6">
-          Your assessment report is still being generated. Click below to check again.
+    <div className="flex min-h-screen items-center justify-center bg-background p-8">
+      <div className="max-w-md border-2 border-foreground p-12 text-center">
+        <AlertCircle className="mx-auto mb-6 h-16 w-16 text-secondary" />
+        <h2 className="mb-4 text-2xl font-bold">Report Not Ready</h2>
+        <p className="mb-6 text-muted-foreground">
+          Your assessment report is still being generated. Click below to check
+          again.
         </p>
         <button
           onClick={onGenerate}
-          className="bg-foreground text-background px-6 py-3 font-bold border-2 border-foreground hover:bg-secondary hover:text-secondary-foreground hover:border-secondary"
+          className="border-2 border-foreground bg-foreground px-6 py-3 font-bold text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground"
         >
           Generate Report
         </button>
@@ -298,7 +298,7 @@ export function ResultsClient({
   const router = useRouter();
   const [report, setReport] = useState<AssessmentReport | null>(initialReport);
   const [expandedSkills, setExpandedSkills] = useState<Set<string>>(new Set());
-  const [isLoading, setIsLoading] = useState(false);
+  const [_isLoading, setIsLoading] = useState(false);
 
   // Poll for report if processing
   useEffect(() => {
@@ -394,14 +394,14 @@ export function ResultsClient({
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="border-b-2 border-foreground bg-background sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+      <header className="sticky top-0 z-10 border-b-2 border-foreground bg-background">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
             <Link
               href="/profile"
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="h-4 w-4" />
               <span className="font-mono text-sm">Back to Profile</span>
             </Link>
           </div>
@@ -414,17 +414,18 @@ export function ResultsClient({
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-8">
+      <main className="mx-auto max-w-5xl px-6 py-8">
         {/* Hero Section */}
-        <section className="border-2 border-foreground p-8 mb-8">
-          <div className="flex flex-col md:flex-row items-center gap-8">
+        <section className="mb-8 border-2 border-foreground p-8">
+          <div className="flex flex-col items-center gap-8 md:flex-row">
             <div className="flex-1">
-              <div className="inline-block bg-secondary text-secondary-foreground px-3 py-1 font-mono text-xs mb-4">
+              <div className="mb-4 inline-block bg-secondary px-3 py-1 font-mono text-xs text-secondary-foreground">
                 {companyName}
               </div>
-              <h2 className="text-3xl font-bold mb-2">{scenarioName}</h2>
+              <h2 className="mb-2 text-3xl font-bold">{scenarioName}</h2>
               <p className="text-muted-foreground">
-                Great work, {userName}! Here&apos;s your detailed assessment breakdown.
+                Great work, {userName}! Here&apos;s your detailed assessment
+                breakdown.
               </p>
             </div>
             <OverallScoreDisplay
@@ -436,8 +437,8 @@ export function ResultsClient({
 
         {/* Metrics */}
         <section className="mb-8">
-          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-            <Target className="w-5 h-5 text-secondary" />
+          <h3 className="mb-4 flex items-center gap-2 text-xl font-bold">
+            <Target className="h-5 w-5 text-secondary" />
             Session Metrics
           </h3>
           <MetricsGrid metrics={report.metrics} />
@@ -445,9 +446,9 @@ export function ResultsClient({
 
         {/* Skill Breakdown */}
         <section className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-bold flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-secondary" />
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="flex items-center gap-2 text-xl font-bold">
+              <TrendingUp className="h-5 w-5 text-secondary" />
               Skill Breakdown
             </h3>
             <div className="flex gap-2">
@@ -480,36 +481,38 @@ export function ResultsClient({
 
         {/* Narrative Feedback */}
         <section className="mb-8">
-          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-            <Award className="w-5 h-5 text-secondary" />
+          <h3 className="mb-4 flex items-center gap-2 text-xl font-bold">
+            <Award className="h-5 w-5 text-secondary" />
             Narrative Feedback
           </h3>
 
           <div className="border-2 border-foreground">
             {/* Summary */}
-            <div className="p-6 border-b border-border">
-              <h4 className="font-mono text-xs text-muted-foreground mb-3">
+            <div className="border-b border-border p-6">
+              <h4 className="mb-3 font-mono text-xs text-muted-foreground">
                 OVERALL SUMMARY
               </h4>
               <div className="prose prose-sm max-w-none">
-                {report.narrative.overallSummary.split("\n\n").map((paragraph, i) => (
-                  <p key={i} className="mb-3 last:mb-0">
-                    {paragraph}
-                  </p>
-                ))}
+                {report.narrative.overallSummary
+                  .split("\n\n")
+                  .map((paragraph, i) => (
+                    <p key={i} className="mb-3 last:mb-0">
+                      {paragraph}
+                    </p>
+                  ))}
               </div>
             </div>
 
             {/* Strengths */}
-            <div className="p-6 border-b border-border bg-green-50">
-              <h4 className="font-mono text-xs text-green-800 mb-3 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4" />
+            <div className="border-b border-border bg-green-50 p-6">
+              <h4 className="mb-3 flex items-center gap-2 font-mono text-xs text-green-800">
+                <CheckCircle2 className="h-4 w-4" />
                 STRENGTHS
               </h4>
               <ul className="space-y-2">
                 {report.narrative.strengths.map((strength, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <span className="text-green-600 mt-1">+</span>
+                    <span className="mt-1 text-green-600">+</span>
                     <span>{strength}</span>
                   </li>
                 ))}
@@ -517,15 +520,15 @@ export function ResultsClient({
             </div>
 
             {/* Areas for Improvement */}
-            <div className="p-6 border-b border-border bg-yellow-50">
-              <h4 className="font-mono text-xs text-yellow-800 mb-3 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" />
+            <div className="border-b border-border bg-yellow-50 p-6">
+              <h4 className="mb-3 flex items-center gap-2 font-mono text-xs text-yellow-800">
+                <TrendingUp className="h-4 w-4" />
                 AREAS FOR IMPROVEMENT
               </h4>
               <ul className="space-y-2">
                 {report.narrative.areasForImprovement.map((area, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <span className="text-yellow-600 mt-1">•</span>
+                    <span className="mt-1 text-yellow-600">•</span>
                     <span>{area}</span>
                   </li>
                 ))}
@@ -534,18 +537,20 @@ export function ResultsClient({
 
             {/* Notable Observations */}
             {report.narrative.notableObservations.length > 0 && (
-              <div className="p-6 bg-blue-50">
-                <h4 className="font-mono text-xs text-blue-800 mb-3 flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4" />
+              <div className="bg-blue-50 p-6">
+                <h4 className="mb-3 flex items-center gap-2 font-mono text-xs text-blue-800">
+                  <AlertCircle className="h-4 w-4" />
                   NOTABLE OBSERVATIONS
                 </h4>
                 <ul className="space-y-2">
-                  {report.narrative.notableObservations.map((observation, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-blue-600 mt-1">*</span>
-                      <span>{observation}</span>
-                    </li>
-                  ))}
+                  {report.narrative.notableObservations.map(
+                    (observation, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="mt-1 text-blue-600">*</span>
+                        <span>{observation}</span>
+                      </li>
+                    )
+                  )}
                 </ul>
               </div>
             )}
@@ -554,8 +559,8 @@ export function ResultsClient({
 
         {/* Recommendations */}
         <section className="mb-8">
-          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-            <Target className="w-5 h-5 text-secondary" />
+          <h3 className="mb-4 flex items-center gap-2 text-xl font-bold">
+            <Target className="h-5 w-5 text-secondary" />
             Recommendations
           </h3>
 
@@ -569,23 +574,25 @@ export function ResultsClient({
 
               return (
                 <div key={index} className="border-2 border-foreground p-6">
-                  <div className="flex items-start justify-between gap-4 mb-3">
-                    <h4 className="font-bold text-lg">{rec.title}</h4>
+                  <div className="mb-3 flex items-start justify-between gap-4">
+                    <h4 className="text-lg font-bold">{rec.title}</h4>
                     <span
-                      className={`font-mono text-xs px-2 py-1 border ${priorityColors[rec.priority]}`}
+                      className={`border px-2 py-1 font-mono text-xs ${priorityColors[rec.priority]}`}
                     >
                       {rec.priority.toUpperCase()}
                     </span>
                   </div>
-                  <p className="text-muted-foreground mb-4">{rec.description}</p>
+                  <p className="mb-4 text-muted-foreground">
+                    {rec.description}
+                  </p>
                   <div>
-                    <h5 className="font-mono text-xs text-muted-foreground mb-2">
+                    <h5 className="mb-2 font-mono text-xs text-muted-foreground">
                       ACTION STEPS
                     </h5>
                     <ol className="space-y-2">
                       {rec.actionableSteps.map((step, stepIndex) => (
                         <li key={stepIndex} className="flex items-start gap-3">
-                          <span className="font-mono text-sm text-secondary font-bold">
+                          <span className="font-mono text-sm font-bold text-secondary">
                             {stepIndex + 1}.
                           </span>
                           <span>{step}</span>
@@ -600,21 +607,21 @@ export function ResultsClient({
         </section>
 
         {/* Footer Actions */}
-        <section className="border-t-2 border-foreground pt-8 mt-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <section className="mt-8 border-t-2 border-foreground pt-8">
+          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <p className="text-sm text-muted-foreground">
               Assessment ID: <span className="font-mono">{assessmentId}</span>
             </p>
             <div className="flex gap-4">
               <Link
                 href="/profile"
-                className="bg-muted text-foreground px-6 py-3 font-semibold border-2 border-foreground hover:bg-foreground hover:text-background"
+                className="border-2 border-foreground bg-muted px-6 py-3 font-semibold text-foreground hover:bg-foreground hover:text-background"
               >
                 Back to Profile
               </Link>
               <Link
                 href="/"
-                className="bg-secondary text-secondary-foreground px-6 py-3 font-bold border-2 border-foreground hover:bg-foreground hover:text-background"
+                className="border-2 border-foreground bg-secondary px-6 py-3 font-bold text-secondary-foreground hover:bg-foreground hover:text-background"
               >
                 Start New Assessment
               </Link>

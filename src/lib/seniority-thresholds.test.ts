@@ -14,8 +14,6 @@
 import { describe, it, expect } from "vitest";
 import { AssessmentDimension } from "@prisma/client";
 import {
-  type SeniorityLevel,
-  type ArchetypeKeyDimensions,
   type DimensionScoreInput,
   SENIORITY_THRESHOLDS,
   ARCHETYPE_KEY_DIMENSIONS,
@@ -144,14 +142,22 @@ describe("meetsThreshold", () => {
         { dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE, score: 1 },
       ];
 
-      const result = meetsThreshold(scores, "SENIOR_BACKEND_ENGINEER", "JUNIOR");
+      const result = meetsThreshold(
+        scores,
+        "SENIOR_BACKEND_ENGINEER",
+        "JUNIOR"
+      );
       expect(result.meetsThreshold).toBe(true);
     });
 
     it("should pass for JUNIOR even with empty scores", () => {
       const scores: DimensionScoreInput[] = [];
 
-      const result = meetsThreshold(scores, "SENIOR_BACKEND_ENGINEER", "JUNIOR");
+      const result = meetsThreshold(
+        scores,
+        "SENIOR_BACKEND_ENGINEER",
+        "JUNIOR"
+      );
       expect(result.meetsThreshold).toBe(true);
     });
 
@@ -161,7 +167,11 @@ describe("meetsThreshold", () => {
         { dimension: AssessmentDimension.PROBLEM_SOLVING, score: 5 },
       ];
 
-      const result = meetsThreshold(scores, "SENIOR_BACKEND_ENGINEER", "JUNIOR");
+      const result = meetsThreshold(
+        scores,
+        "SENIOR_BACKEND_ENGINEER",
+        "JUNIOR"
+      );
       expect(result.meetsThreshold).toBe(true);
     });
   });
@@ -188,7 +198,9 @@ describe("meetsThreshold", () => {
 
       const result = meetsThreshold(scores, "SENIOR_BACKEND_ENGINEER", "MID");
       expect(result.meetsThreshold).toBe(false);
-      expect(result.failingDimensions).toContain(AssessmentDimension.TECHNICAL_KNOWLEDGE);
+      expect(result.failingDimensions).toContain(
+        AssessmentDimension.TECHNICAL_KNOWLEDGE
+      );
     });
 
     it("should fail when a key dimension is missing (no score)", () => {
@@ -200,7 +212,9 @@ describe("meetsThreshold", () => {
 
       const result = meetsThreshold(scores, "SENIOR_BACKEND_ENGINEER", "MID");
       expect(result.meetsThreshold).toBe(false);
-      expect(result.failingDimensions).toContain(AssessmentDimension.PROBLEM_SOLVING);
+      expect(result.failingDimensions).toContain(
+        AssessmentDimension.PROBLEM_SOLVING
+      );
     });
 
     it("should pass when key dimensions exceed threshold", () => {
@@ -237,7 +251,11 @@ describe("meetsThreshold", () => {
         { dimension: AssessmentDimension.TIME_MANAGEMENT, score: 4 },
       ];
 
-      const result = meetsThreshold(scores, "SENIOR_BACKEND_ENGINEER", "SENIOR");
+      const result = meetsThreshold(
+        scores,
+        "SENIOR_BACKEND_ENGINEER",
+        "SENIOR"
+      );
       expect(result.meetsThreshold).toBe(true);
     });
 
@@ -248,9 +266,15 @@ describe("meetsThreshold", () => {
         { dimension: AssessmentDimension.TIME_MANAGEMENT, score: 5 },
       ];
 
-      const result = meetsThreshold(scores, "SENIOR_BACKEND_ENGINEER", "SENIOR");
+      const result = meetsThreshold(
+        scores,
+        "SENIOR_BACKEND_ENGINEER",
+        "SENIOR"
+      );
       expect(result.meetsThreshold).toBe(false);
-      expect(result.failingDimensions).toContain(AssessmentDimension.TECHNICAL_KNOWLEDGE);
+      expect(result.failingDimensions).toContain(
+        AssessmentDimension.TECHNICAL_KNOWLEDGE
+      );
     });
 
     it("should fail when a key dimension is missing", () => {
@@ -260,7 +284,11 @@ describe("meetsThreshold", () => {
         { dimension: AssessmentDimension.TIME_MANAGEMENT, score: 5 },
       ];
 
-      const result = meetsThreshold(scores, "SENIOR_BACKEND_ENGINEER", "SENIOR");
+      const result = meetsThreshold(
+        scores,
+        "SENIOR_BACKEND_ENGINEER",
+        "SENIOR"
+      );
       expect(result.meetsThreshold).toBe(false);
     });
 
@@ -271,7 +299,11 @@ describe("meetsThreshold", () => {
         { dimension: AssessmentDimension.TIME_MANAGEMENT, score: 5 },
       ];
 
-      const result = meetsThreshold(scores, "SENIOR_BACKEND_ENGINEER", "SENIOR");
+      const result = meetsThreshold(
+        scores,
+        "SENIOR_BACKEND_ENGINEER",
+        "SENIOR"
+      );
       expect(result.meetsThreshold).toBe(true);
     });
   });
@@ -282,10 +314,18 @@ describe("meetsThreshold", () => {
         { dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE, score: 3 },
       ];
 
-      const midResult = meetsThreshold(scores, "SENIOR_BACKEND_ENGINEER", "MID");
+      const midResult = meetsThreshold(
+        scores,
+        "SENIOR_BACKEND_ENGINEER",
+        "MID"
+      );
       expect(midResult.threshold).toBe(3);
 
-      const seniorResult = meetsThreshold(scores, "SENIOR_BACKEND_ENGINEER", "SENIOR");
+      const seniorResult = meetsThreshold(
+        scores,
+        "SENIOR_BACKEND_ENGINEER",
+        "SENIOR"
+      );
       expect(seniorResult.threshold).toBe(4);
     });
 
@@ -305,9 +345,15 @@ describe("meetsThreshold", () => {
       ];
 
       const result = meetsThreshold(scores, "SENIOR_BACKEND_ENGINEER", "MID");
-      expect(result.failingDimensions).toContain(AssessmentDimension.TECHNICAL_KNOWLEDGE);
-      expect(result.failingDimensions).toContain(AssessmentDimension.PROBLEM_SOLVING);
-      expect(result.failingDimensions).not.toContain(AssessmentDimension.TIME_MANAGEMENT);
+      expect(result.failingDimensions).toContain(
+        AssessmentDimension.TECHNICAL_KNOWLEDGE
+      );
+      expect(result.failingDimensions).toContain(
+        AssessmentDimension.PROBLEM_SOLVING
+      );
+      expect(result.failingDimensions).not.toContain(
+        AssessmentDimension.TIME_MANAGEMENT
+      );
     });
 
     it("should return empty failing dimensions when threshold met", () => {
@@ -317,7 +363,11 @@ describe("meetsThreshold", () => {
         { dimension: AssessmentDimension.TIME_MANAGEMENT, score: 5 },
       ];
 
-      const result = meetsThreshold(scores, "SENIOR_BACKEND_ENGINEER", "SENIOR");
+      const result = meetsThreshold(
+        scores,
+        "SENIOR_BACKEND_ENGINEER",
+        "SENIOR"
+      );
       expect(result.failingDimensions).toHaveLength(0);
     });
   });
@@ -358,7 +408,9 @@ describe("meetsThreshold", () => {
 
       const result = meetsThreshold(scores, "TECH_LEAD", "SENIOR");
       expect(result.meetsThreshold).toBe(false);
-      expect(result.failingDimensions).toContain(AssessmentDimension.LEADERSHIP);
+      expect(result.failingDimensions).toContain(
+        AssessmentDimension.LEADERSHIP
+      );
     });
   });
 });
@@ -578,14 +630,18 @@ describe("getKeyDimensionsForArchetype", () => {
   });
 
   it("should return different dimensions for different archetypes", () => {
-    const backendKeyDims = getKeyDimensionsForArchetype("SENIOR_BACKEND_ENGINEER");
+    const backendKeyDims = getKeyDimensionsForArchetype(
+      "SENIOR_BACKEND_ENGINEER"
+    );
     const managerKeyDims = getKeyDimensionsForArchetype("ENGINEERING_MANAGER");
 
     // Backend focuses on technical, Manager on leadership
     expect(backendKeyDims).toContain(AssessmentDimension.TECHNICAL_KNOWLEDGE);
     expect(managerKeyDims).toContain(AssessmentDimension.LEADERSHIP);
     expect(backendKeyDims).not.toContain(AssessmentDimension.LEADERSHIP);
-    expect(managerKeyDims).not.toContain(AssessmentDimension.TECHNICAL_KNOWLEDGE);
+    expect(managerKeyDims).not.toContain(
+      AssessmentDimension.TECHNICAL_KNOWLEDGE
+    );
   });
 });
 

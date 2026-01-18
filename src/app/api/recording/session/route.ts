@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
     const recordingId = `${assessmentId}-screen`;
 
     // Ensure recording exists
-    const recording = await db.recording.upsert({
+    await db.recording.upsert({
       where: { id: recordingId },
       create: {
         id: recordingId,
@@ -200,7 +200,9 @@ export async function POST(request: NextRequest) {
       case "addScreenshot": {
         if (!segmentId || !screenshotPath) {
           return NextResponse.json(
-            { error: "segmentId and screenshotPath required for addScreenshot" },
+            {
+              error: "segmentId and screenshotPath required for addScreenshot",
+            },
             { status: 400 }
           );
         }

@@ -17,7 +17,9 @@ import { RejectionFeedbackModal } from "./rejection-feedback-modal";
 const mockOnClose = vi.fn();
 const mockOnSubmit = vi.fn();
 
-function renderModal(props: Partial<Parameters<typeof RejectionFeedbackModal>[0]> = {}) {
+function renderModal(
+  props: Partial<Parameters<typeof RejectionFeedbackModal>[0]> = {}
+) {
   return render(
     <RejectionFeedbackModal
       isOpen={true}
@@ -41,12 +43,16 @@ describe("RejectionFeedbackModal", () => {
   describe("rendering", () => {
     it("renders modal when isOpen is true", () => {
       renderModal({ isOpen: true });
-      expect(screen.getByTestId("rejection-feedback-modal")).toBeInTheDocument();
+      expect(
+        screen.getByTestId("rejection-feedback-modal")
+      ).toBeInTheDocument();
     });
 
     it("does not render modal when isOpen is false", () => {
       renderModal({ isOpen: false });
-      expect(screen.queryByTestId("rejection-feedback-modal")).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("rejection-feedback-modal")
+      ).not.toBeInTheDocument();
     });
 
     it("displays candidate name in the modal title", () => {
@@ -56,7 +62,9 @@ describe("RejectionFeedbackModal", () => {
 
     it('displays "Why isn\'t this candidate a fit?" prompt', () => {
       renderModal();
-      expect(screen.getByText(/Why isn't this candidate a fit?/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Why isn't this candidate a fit?/)
+      ).toBeInTheDocument();
     });
 
     it("renders a text input for feedback", () => {
@@ -108,7 +116,9 @@ describe("RejectionFeedbackModal", () => {
       const submitButton = screen.getByTestId("submit-feedback-button");
       await user.click(submitButton);
 
-      expect(mockOnSubmit).toHaveBeenCalledWith("Looking for more frontend focus");
+      expect(mockOnSubmit).toHaveBeenCalledWith(
+        "Looking for more frontend focus"
+      );
     });
 
     it("disables submit button when input is empty", () => {
@@ -132,9 +142,11 @@ describe("RejectionFeedbackModal", () => {
     it("shows loading state during submission", async () => {
       const user = userEvent.setup();
       // Mock a slow submission
-      const slowSubmit = vi.fn().mockImplementation(
-        () => new Promise((resolve) => setTimeout(resolve, 100))
-      );
+      const slowSubmit = vi
+        .fn()
+        .mockImplementation(
+          () => new Promise((resolve) => setTimeout(resolve, 100))
+        );
       renderModal({ onSubmit: slowSubmit });
 
       const input = screen.getByTestId("feedback-input");
@@ -225,7 +237,9 @@ describe("Acceptance Criteria", () => {
     renderModal({ isOpen: true });
 
     expect(screen.getByTestId("rejection-feedback-modal")).toBeInTheDocument();
-    expect(screen.getByText(/Why isn't this candidate a fit?/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Why isn't this candidate a fit?/)
+    ).toBeInTheDocument();
   });
 
   it("AC3: Feedback input accepts free-form text", async () => {

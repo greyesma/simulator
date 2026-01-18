@@ -27,7 +27,8 @@ vi.mock("@/server/db", () => ({
 // Mock gemini
 const mockGenerateEphemeralToken = vi.fn();
 vi.mock("@/lib/gemini", () => ({
-  generateEphemeralToken: (...args: unknown[]) => mockGenerateEphemeralToken(...args),
+  generateEphemeralToken: (...args: unknown[]) =>
+    mockGenerateEphemeralToken(...args),
 }));
 
 // Mock conversation-memory (to avoid calling Gemini for summarization in tests)
@@ -39,7 +40,8 @@ vi.mock("@/lib/conversation-memory", () => ({
     recentMessages: [],
     totalMessageCount: 0,
   }),
-  formatMemoryForPrompt: (...args: unknown[]) => mockFormatMemoryForPrompt(...args),
+  formatMemoryForPrompt: (...args: unknown[]) =>
+    mockFormatMemoryForPrompt(...args),
   buildCrossCoworkerContext: vi.fn().mockReturnValue(""),
 }));
 
@@ -55,7 +57,10 @@ describe("POST /api/call/token", () => {
 
     const request = new Request("http://localhost/api/call/token", {
       method: "POST",
-      body: JSON.stringify({ assessmentId: "test-id", coworkerId: "coworker-id" }),
+      body: JSON.stringify({
+        assessmentId: "test-id",
+        coworkerId: "coworker-id",
+      }),
     });
 
     const response = await POST(request);
@@ -107,7 +112,10 @@ describe("POST /api/call/token", () => {
 
     const request = new Request("http://localhost/api/call/token", {
       method: "POST",
-      body: JSON.stringify({ assessmentId: "test-id", coworkerId: "coworker-id" }),
+      body: JSON.stringify({
+        assessmentId: "test-id",
+        coworkerId: "coworker-id",
+      }),
     });
 
     const response = await POST(request);
@@ -138,7 +146,10 @@ describe("POST /api/call/token", () => {
 
     const request = new Request("http://localhost/api/call/token", {
       method: "POST",
-      body: JSON.stringify({ assessmentId: "test-id", coworkerId: "coworker-id" }),
+      body: JSON.stringify({
+        assessmentId: "test-id",
+        coworkerId: "coworker-id",
+      }),
     });
 
     const response = await POST(request);
@@ -178,7 +189,10 @@ describe("POST /api/call/token", () => {
 
     const request = new Request("http://localhost/api/call/token", {
       method: "POST",
-      body: JSON.stringify({ assessmentId: "test-id", coworkerId: "coworker-id" }),
+      body: JSON.stringify({
+        assessmentId: "test-id",
+        coworkerId: "coworker-id",
+      }),
     });
 
     const response = await POST(request);
@@ -220,8 +234,16 @@ describe("POST /api/call/token", () => {
         coworkerId: "coworker-id",
         type: "text",
         transcript: [
-          { role: "user", text: "How does auth work?", timestamp: "2024-01-01" },
-          { role: "model", text: "We use JWT tokens.", timestamp: "2024-01-01" },
+          {
+            role: "user",
+            text: "How does auth work?",
+            timestamp: "2024-01-01",
+          },
+          {
+            role: "model",
+            text: "We use JWT tokens.",
+            timestamp: "2024-01-01",
+          },
         ],
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -229,12 +251,17 @@ describe("POST /api/call/token", () => {
       },
     ]);
     // Mock formatMemoryForPrompt to return prior conversation context
-    mockFormatMemoryForPrompt.mockReturnValue("\n## Prior Conversation History\nWe discussed auth.");
+    mockFormatMemoryForPrompt.mockReturnValue(
+      "\n## Prior Conversation History\nWe discussed auth."
+    );
     mockGenerateEphemeralToken.mockResolvedValue("ephemeral-token-123");
 
     const request = new Request("http://localhost/api/call/token", {
       method: "POST",
-      body: JSON.stringify({ assessmentId: "test-id", coworkerId: "coworker-id" }),
+      body: JSON.stringify({
+        assessmentId: "test-id",
+        coworkerId: "coworker-id",
+      }),
     });
 
     const response = await POST(request);
@@ -243,7 +270,9 @@ describe("POST /api/call/token", () => {
     // Verify that generateEphemeralToken was called with system instruction containing prior history
     expect(mockGenerateEphemeralToken).toHaveBeenCalledWith(
       expect.objectContaining({
-        systemInstruction: expect.stringContaining("Prior Conversation History"),
+        systemInstruction: expect.stringContaining(
+          "Prior Conversation History"
+        ),
       })
     );
   });
@@ -256,7 +285,10 @@ describe("POST /api/call/token", () => {
 
     const request = new Request("http://localhost/api/call/token", {
       method: "POST",
-      body: JSON.stringify({ assessmentId: "test-id", coworkerId: "coworker-id" }),
+      body: JSON.stringify({
+        assessmentId: "test-id",
+        coworkerId: "coworker-id",
+      }),
     });
 
     const response = await POST(request);

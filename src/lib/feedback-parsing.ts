@@ -228,7 +228,7 @@ export function applyConstraints<
     skills?: string[];
     industry?: string[];
     company_type?: string[];
-  }
+  },
 >(currentIntent: T, constraints: ConstraintUpdate[]): T {
   const updated = { ...currentIntent };
 

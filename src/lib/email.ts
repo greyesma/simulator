@@ -7,7 +7,10 @@
 
 import { Resend } from "resend";
 import { env } from "@/lib/env";
-import type { AssessmentReport, SkillCategory } from "@/lib/assessment-aggregation";
+import type {
+  AssessmentReport,
+  SkillCategory,
+} from "@/lib/assessment-aggregation";
 
 // ============================================================================
 // Resend Client
@@ -379,10 +382,18 @@ export function generateReportEmailText(params: SendReportEmailParams): string {
   ];
 
   topSkills.forEach((skill) => {
-    lines.push(`• ${formatSkillCategory(skill.category)}: ${skill.score.toFixed(1)}/5`);
+    lines.push(
+      `• ${formatSkillCategory(skill.category)}: ${skill.score.toFixed(1)}/5`
+    );
   });
 
-  lines.push("", "SUMMARY", "-".repeat(20), report.narrative.overallSummary, "");
+  lines.push(
+    "",
+    "SUMMARY",
+    "-".repeat(20),
+    report.narrative.overallSummary,
+    ""
+  );
 
   if (report.narrative.strengths.length > 0) {
     lines.push("KEY STRENGTHS", "-".repeat(20));

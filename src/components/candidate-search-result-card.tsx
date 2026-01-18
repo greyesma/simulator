@@ -15,7 +15,7 @@
 
 import Link from "next/link";
 import { AssessmentDimension } from "@prisma/client";
-import { ArrowRight, User, TrendingUp, TrendingDown, X } from "lucide-react";
+import { ArrowRight, User, TrendingUp, X } from "lucide-react";
 import type { RoleArchetype, WeightLevel } from "@/lib/archetype-weights";
 import type { SeniorityLevel } from "@/lib/seniority-thresholds";
 import { SENIORITY_THRESHOLDS } from "@/lib/seniority-thresholds";
@@ -151,7 +151,11 @@ function DimensionScoreBar({
   weightLevel?: WeightLevel;
   seniorityLevel: SeniorityLevel | null;
 }) {
-  const thresholdStatus = getThresholdStatus(score, seniorityLevel, weightLevel);
+  const thresholdStatus = getThresholdStatus(
+    score,
+    seniorityLevel,
+    weightLevel
+  );
 
   // Determine bar color based on threshold status
   let barColorClass = "bg-secondary"; // Default gold
@@ -167,12 +171,12 @@ function DimensionScoreBar({
   return (
     <div className="flex items-center gap-2" data-testid="dimension-score-bar">
       <span
-        className={`font-mono text-xs w-14 ${isKeyDimension ? "font-bold" : "text-muted-foreground"}`}
+        className={`w-14 font-mono text-xs ${isKeyDimension ? "font-bold" : "text-muted-foreground"}`}
         data-testid="dimension-label"
       >
         {dimensionShortLabels[dimension]}
       </span>
-      <div className="flex gap-[2px] flex-1" data-testid="score-dots">
+      <div className="flex flex-1 gap-[2px]" data-testid="score-dots">
         {[1, 2, 3, 4, 5].map((level) => (
           <div
             key={level}
@@ -183,7 +187,10 @@ function DimensionScoreBar({
           />
         ))}
       </div>
-      <span className="font-mono text-xs w-4 text-right" data-testid="score-value">
+      <span
+        className="w-4 text-right font-mono text-xs"
+        data-testid="score-value"
+      >
         {score}
       </span>
     </div>
@@ -204,10 +211,13 @@ function FitScoreBadge({ score }: { score: number }) {
 
   return (
     <div
-      className={`flex items-center gap-1 px-3 py-2 border-2 border-foreground ${bgClass}`}
+      className={`flex items-center gap-1 border-2 border-foreground px-3 py-2 ${bgClass}`}
       data-testid="fit-score-badge"
     >
-      <TrendingUp size={14} className={score >= 80 ? "text-secondary-foreground" : ""} />
+      <TrendingUp
+        size={14}
+        className={score >= 80 ? "text-secondary-foreground" : ""}
+      />
       <span
         className={`font-mono text-lg font-bold ${score >= 80 ? "text-secondary-foreground" : ""}`}
         data-testid="fit-score-value"
@@ -250,9 +260,7 @@ export function CandidateSearchResultCard({
   const displayName = candidateInfo.name || candidateInfo.email || "Anonymous";
 
   // Create score map for easy lookup
-  const scoreMap = new Map(
-    dimensionScores.map((s) => [s.dimension, s])
-  );
+  const scoreMap = new Map(dimensionScores.map((s) => [s.dimension, s]));
 
   // Format completion date
   const formattedDate = completedAt
@@ -264,35 +272,37 @@ export function CandidateSearchResultCard({
 
   return (
     <article
-      className={`border-2 border-foreground bg-background flex flex-col h-full ${className}`}
+      className={`flex h-full flex-col border-2 border-foreground bg-background ${className}`}
       data-testid="candidate-card"
     >
       {/* Header: Avatar, Name, Fit Score */}
-      <header className="flex items-start gap-4 p-4 border-b-2 border-foreground">
+      <header className="flex items-start gap-4 border-b-2 border-foreground p-4">
         {/* Avatar */}
         <div
-          className="w-12 h-12 bg-secondary border-2 border-foreground flex items-center justify-center flex-shrink-0"
+          className="flex h-12 w-12 flex-shrink-0 items-center justify-center border-2 border-foreground bg-secondary"
           data-testid="candidate-avatar"
         >
-          <span className="text-sm font-bold text-secondary-foreground">{initials}</span>
+          <span className="text-sm font-bold text-secondary-foreground">
+            {initials}
+          </span>
         </div>
 
         {/* Name and Archetype */}
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <h3
-            className="font-bold truncate text-lg"
+            className="truncate text-lg font-bold"
             data-testid="candidate-name"
           >
             {displayName}
           </h3>
           <p
-            className="font-mono text-xs text-muted-foreground truncate"
+            className="truncate font-mono text-xs text-muted-foreground"
             data-testid="archetype-match"
           >
             {archetypeDisplayNames[archetype]}
           </p>
           {formattedDate && (
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="mt-1 text-xs text-muted-foreground">
               Assessed {formattedDate}
             </p>
           )}
@@ -303,8 +313,8 @@ export function CandidateSearchResultCard({
       </header>
 
       {/* Dimension Scores */}
-      <section className="p-4 flex-1" data-testid="dimensions-section">
-        <h4 className="font-mono text-xs text-muted-foreground mb-3 uppercase tracking-wider">
+      <section className="flex-1 p-4" data-testid="dimensions-section">
+        <h4 className="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">
           Dimension Scores
         </h4>
         <div className="space-y-2">
@@ -328,21 +338,21 @@ export function CandidateSearchResultCard({
       {/* Summary Excerpt */}
       {summaryExcerpt && (
         <section
-          className="px-4 pb-4 border-t border-muted"
+          className="border-t border-muted px-4 pb-4"
           data-testid="summary-section"
         >
-          <p className="text-sm text-muted-foreground line-clamp-2 mt-3">
+          <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">
             {summaryExcerpt}
           </p>
         </section>
       )}
 
       {/* Footer: View Profile Button + Reject Button */}
-      <footer className="p-4 border-t-2 border-foreground mt-auto">
+      <footer className="mt-auto border-t-2 border-foreground p-4">
         <div className="flex gap-2">
           <Link
             href={`/candidate/${id}?archetype=${archetype}`}
-            className="flex items-center justify-center gap-2 flex-1 px-4 py-3 border-2 border-foreground bg-foreground text-background hover:bg-secondary hover:text-secondary-foreground font-bold"
+            className="flex flex-1 items-center justify-center gap-2 border-2 border-foreground bg-foreground px-4 py-3 font-bold text-background hover:bg-secondary hover:text-secondary-foreground"
             data-testid="view-profile-button"
           >
             View Profile
@@ -351,7 +361,7 @@ export function CandidateSearchResultCard({
           {onReject && (
             <button
               onClick={() => onReject(id)}
-              className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-foreground bg-background text-foreground hover:bg-red-100 hover:border-red-500 hover:text-red-700 font-medium"
+              className="flex items-center justify-center gap-2 border-2 border-foreground bg-background px-4 py-3 font-medium text-foreground hover:border-red-500 hover:bg-red-100 hover:text-red-700"
               data-testid="reject-button"
               aria-label="Not a fit"
             >
@@ -402,7 +412,7 @@ export function CandidateSearchResultGrid({
 
   return (
     <div
-      className={`grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ${className}`}
+      className={`grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ${className}`}
       data-testid="candidate-grid"
     >
       {candidates.map((candidate) => (

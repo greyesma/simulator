@@ -27,22 +27,24 @@ If a decision needs to be made, make the reasonable choice and document it. You 
 
 You have access to these skills - invoke them when relevant:
 
-| Skill | Purpose | Invoke |
-|-------|---------|--------|
-| `superpowers:test-driven-development` | Write tests first (RED), make pass (GREEN), refactor | `/superpowers:test-driven-development` |
-| `superpowers:systematic-debugging` | Structured approach to fix bugs | `/superpowers:systematic-debugging` |
-| `superpowers:verification-before-completion` | Run verification before claiming done | `/superpowers:verification-before-completion` |
-| `frontend-design` | Neo-brutalist UI design (auto-activates) | `/frontend-design` |
-| `react-best-practices` | Next.js/React optimization (auto-activates) | `/react-best-practices` |
-| `agent-browser` | Browser automation, screenshots, E2E testing | `/agent-browser` |
+| Skill                                        | Purpose                                              | Invoke                                        |
+| -------------------------------------------- | ---------------------------------------------------- | --------------------------------------------- |
+| `superpowers:test-driven-development`        | Write tests first (RED), make pass (GREEN), refactor | `/superpowers:test-driven-development`        |
+| `superpowers:systematic-debugging`           | Structured approach to fix bugs                      | `/superpowers:systematic-debugging`           |
+| `superpowers:verification-before-completion` | Run verification before claiming done                | `/superpowers:verification-before-completion` |
+| `frontend-design`                            | Neo-brutalist UI design (auto-activates)             | `/frontend-design`                            |
+| `react-best-practices`                       | Next.js/React optimization (auto-activates)          | `/react-best-practices`                       |
+| `agent-browser`                              | Browser automation, screenshots, E2E testing         | `/agent-browser`                              |
 
 **When to use:**
+
 - Bug fix → `/superpowers:systematic-debugging`
 - Writing code → `/superpowers:test-driven-development`
 - Before commit → `/superpowers:verification-before-completion`
 - UI work → `/agent-browser` for screenshots
 
 **Do NOT use these skills (they require user input):**
+
 - `superpowers:brainstorming` - requires user confirmation
 - `superpowers:writing-plans` - presents plans for approval
 - `EnterPlanMode` - waits for user approval
@@ -78,6 +80,7 @@ Types: feat, fix, refactor, docs, test, chore
    ```
 3. Include the screenshot in your commit (it will be pushed with other changes)
 4. Comment on the issue with the image referenced via raw GitHub URL:
+
    ```bash
    gh issue comment <number> --body '![Screenshot](https://raw.githubusercontent.com/skillvee/simulator/main/screenshots/issue-<number>.png)
 
@@ -90,6 +93,7 @@ Types: feat, fix, refactor, docs, test, chore
 
    ```markdown
    ## Issue #<number>: <title>
+
    - What was implemented
    - Files changed
    - Learnings for future iterations

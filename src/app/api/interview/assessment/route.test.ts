@@ -150,8 +150,16 @@ describe("POST /api/interview/assessment", () => {
           coworkerId: null,
           type: "voice",
           transcript: [
-            { role: "model", text: "Hello, welcome to the interview", timestamp: "2025-01-01T00:00:00Z" },
-            { role: "user", text: "Thank you for having me", timestamp: "2025-01-01T00:00:05Z" },
+            {
+              role: "model",
+              text: "Hello, welcome to the interview",
+              timestamp: "2025-01-01T00:00:00Z",
+            },
+            {
+              role: "user",
+              text: "Thank you for having me",
+              timestamp: "2025-01-01T00:00:05Z",
+            },
           ],
         },
       ],
@@ -163,7 +171,11 @@ describe("POST /api/interview/assessment", () => {
       cvVerificationNotes: "CV claims appear consistent",
       cvConsistencyScore: 4,
       verifiedClaims: [
-        { claim: "5 years experience", status: "verified", notes: "Discussed in detail" },
+        {
+          claim: "5 years experience",
+          status: "verified",
+          notes: "Discussed in detail",
+        },
       ],
       professionalismScore: 5,
       technicalDepthScore: 3,

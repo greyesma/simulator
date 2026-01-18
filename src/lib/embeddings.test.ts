@@ -53,7 +53,9 @@ import {
 
 // Cast mocks for type-safe access
 const mockEmbedContent = gemini.models.embedContent as ReturnType<typeof vi.fn>;
-const mockDbVideoAssessment = db.videoAssessment as unknown as { findUnique: ReturnType<typeof vi.fn> };
+const mockDbVideoAssessment = db.videoAssessment as unknown as {
+  findUnique: ReturnType<typeof vi.fn>;
+};
 const mockExecuteRaw = db.$executeRaw as unknown as ReturnType<typeof vi.fn>;
 const mockQueryRaw = db.$queryRaw as unknown as ReturnType<typeof vi.fn>;
 
@@ -226,7 +228,9 @@ describe("buildQueryText", () => {
       ["frontend", "backend"]
     );
 
-    expect(result).toContain("Required skills and technologies: TypeScript, React, Node.js");
+    expect(result).toContain(
+      "Required skills and technologies: TypeScript, React, Node.js"
+    );
     expect(result).toContain("Experience domains: frontend, backend");
   });
 
@@ -237,7 +241,9 @@ describe("buildQueryText", () => {
       "Must have ML experience"
     );
 
-    expect(result).toContain("Additional requirements: Must have ML experience");
+    expect(result).toContain(
+      "Additional requirements: Must have ML experience"
+    );
   });
 
   it("should handle empty skills array", () => {

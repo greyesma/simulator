@@ -17,17 +17,17 @@ export default async function ScenariosPage() {
   });
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8">
-      <header className="flex items-center justify-between mb-8">
+    <div className="mx-auto max-w-6xl px-6 py-8">
+      <header className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-bold text-3xl mb-2">Scenarios</h1>
+          <h1 className="mb-2 text-3xl font-bold">Scenarios</h1>
           <p className="text-muted-foreground">
             Manage assessment scenarios for candidates
           </p>
         </div>
         <Link
           href="/admin/scenarios/builder"
-          className="px-6 py-3 bg-secondary text-secondary-foreground font-bold border-2 border-foreground hover:bg-secondary/80"
+          className="hover:bg-secondary/80 border-2 border-foreground bg-secondary px-6 py-3 font-bold text-secondary-foreground"
         >
           Create with AI
         </Link>
@@ -35,16 +35,16 @@ export default async function ScenariosPage() {
 
       {scenarios.length === 0 ? (
         <div className="border-2 border-foreground p-12 text-center">
-          <div className="w-16 h-16 bg-muted border-2 border-foreground flex items-center justify-center mx-auto mb-4">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center border-2 border-foreground bg-muted">
             <span className="text-2xl">?</span>
           </div>
-          <h2 className="font-bold text-xl mb-2">No scenarios yet</h2>
-          <p className="text-muted-foreground mb-6">
+          <h2 className="mb-2 text-xl font-bold">No scenarios yet</h2>
+          <p className="mb-6 text-muted-foreground">
             Create your first scenario using the AI-powered builder
           </p>
           <Link
             href="/admin/scenarios/builder"
-            className="px-6 py-3 bg-foreground text-background font-bold border-2 border-foreground hover:bg-secondary hover:text-secondary-foreground inline-block"
+            className="inline-block border-2 border-foreground bg-foreground px-6 py-3 font-bold text-background hover:bg-secondary hover:text-secondary-foreground"
           >
             Create Scenario
           </Link>
@@ -55,29 +55,29 @@ export default async function ScenariosPage() {
             <Link
               key={scenario.id}
               href={`/admin/scenarios/${scenario.id}`}
-              className="block border-2 border-foreground p-6 bg-background hover:bg-muted transition-colors"
+              className="block border-2 border-foreground bg-background p-6 transition-colors hover:bg-muted"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h2 className="font-bold text-xl">{scenario.name}</h2>
+                  <div className="mb-2 flex items-center gap-3">
+                    <h2 className="text-xl font-bold">{scenario.name}</h2>
                     <span
-                      className={`px-2 py-0.5 text-xs font-mono border ${
+                      className={`border px-2 py-0.5 font-mono text-xs ${
                         scenario.isPublished
-                          ? "border-green-600 text-green-700 bg-green-50"
+                          ? "border-green-600 bg-green-50 text-green-700"
                           : "border-muted-foreground text-muted-foreground"
                       }`}
                     >
                       {scenario.isPublished ? "Published" : "Draft"}
                     </span>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-2">
+                  <p className="mb-2 text-sm text-muted-foreground">
                     {scenario.companyName}
                   </p>
-                  <p className="text-sm line-clamp-2 mb-4">
+                  <p className="mb-4 line-clamp-2 text-sm">
                     {scenario.taskDescription}
                   </p>
-                  <div className="flex items-center gap-4 text-sm font-mono text-muted-foreground">
+                  <div className="flex items-center gap-4 font-mono text-sm text-muted-foreground">
                     <span>{scenario._count.coworkers} coworkers</span>
                     <span>|</span>
                     <span>{scenario._count.assessments} assessments</span>
@@ -90,17 +90,17 @@ export default async function ScenariosPage() {
                 </div>
                 <div className="flex flex-col gap-2">
                   {scenario.techStack.length > 0 && (
-                    <div className="flex flex-wrap gap-1 justify-end">
+                    <div className="flex flex-wrap justify-end gap-1">
                       {scenario.techStack.slice(0, 4).map((tech, i) => (
                         <span
                           key={i}
-                          className="px-2 py-0.5 text-xs font-mono border border-foreground bg-muted"
+                          className="border border-foreground bg-muted px-2 py-0.5 font-mono text-xs"
                         >
                           {tech}
                         </span>
                       ))}
                       {scenario.techStack.length > 4 && (
-                        <span className="px-2 py-0.5 text-xs font-mono text-muted-foreground">
+                        <span className="px-2 py-0.5 font-mono text-xs text-muted-foreground">
                           +{scenario.techStack.length - 4}
                         </span>
                       )}

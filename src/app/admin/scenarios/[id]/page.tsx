@@ -32,36 +32,36 @@ export default async function ScenarioDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8">
+    <div className="mx-auto max-w-6xl px-6 py-8">
       {/* Breadcrumb */}
       <nav className="mb-6">
         <Link
           href="/admin/scenarios"
-          className="text-muted-foreground hover:text-foreground font-mono text-sm"
+          className="font-mono text-sm text-muted-foreground hover:text-foreground"
         >
           &larr; Back to Scenarios
         </Link>
       </nav>
 
       {/* Header */}
-      <header className="flex items-start justify-between gap-6 mb-8">
+      <header className="mb-8 flex items-start justify-between gap-6">
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="font-bold text-3xl">{scenario.name}</h1>
+          <div className="mb-2 flex items-center gap-3">
+            <h1 className="text-3xl font-bold">{scenario.name}</h1>
             <span
-              className={`px-2 py-0.5 text-xs font-mono border ${
+              className={`border px-2 py-0.5 font-mono text-xs ${
                 scenario.isPublished
-                  ? "border-green-600 text-green-700 bg-green-50"
+                  ? "border-green-600 bg-green-50 text-green-700"
                   : "border-muted-foreground text-muted-foreground"
               }`}
             >
               {scenario.isPublished ? "Published" : "Draft"}
             </span>
           </div>
-          <p className="text-lg text-muted-foreground mb-1">
+          <p className="mb-1 text-lg text-muted-foreground">
             {scenario.companyName}
           </p>
-          <p className="text-sm text-muted-foreground font-mono">
+          <p className="font-mono text-sm text-muted-foreground">
             {scenario._count.assessments} assessments | Created{" "}
             {new Date(scenario.createdAt).toLocaleDateString()}
           </p>

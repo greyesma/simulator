@@ -30,14 +30,18 @@ function SeniorityBadge({ level }: { level: string }) {
   return (
     <span
       data-testid="seniority-badge"
-      className="font-mono text-xs px-3 py-1 bg-secondary text-secondary-foreground border-2 border-foreground"
+      className="border-2 border-foreground bg-secondary px-3 py-1 font-mono text-xs text-secondary-foreground"
     >
       {label}
     </span>
   );
 }
 
-function ParseQualityWarning({ quality }: { quality: "high" | "medium" | "low" }) {
+function ParseQualityWarning({
+  quality,
+}: {
+  quality: "high" | "medium" | "low";
+}) {
   if (quality === "high") return null;
 
   const message =
@@ -46,7 +50,7 @@ function ParseQualityWarning({ quality }: { quality: "high" | "medium" | "low" }
       : "Low quality parse - significant information may be missing";
 
   return (
-    <div className="mb-4 p-3 border-2 border-foreground bg-muted/30 font-mono text-sm">
+    <div className="bg-muted/30 mb-4 border-2 border-foreground p-3 font-mono text-sm">
       {message}
     </div>
   );
@@ -54,7 +58,7 @@ function ParseQualityWarning({ quality }: { quality: "high" | "medium" | "low" }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="text-lg font-bold mb-4 border-b-2 border-foreground pb-2">
+    <h3 className="mb-4 border-b-2 border-foreground pb-2 text-lg font-bold">
       {children}
     </h3>
   );
@@ -66,10 +70,12 @@ function SkillTag({
   skill: { name: string; proficiencyLevel?: string };
 }) {
   return (
-    <span className="inline-block font-mono text-sm px-2 py-1 border-2 border-foreground mr-2 mb-2">
+    <span className="mb-2 mr-2 inline-block border-2 border-foreground px-2 py-1 font-mono text-sm">
       {skill.name}
       {skill.proficiencyLevel && (
-        <span className="text-muted-foreground ml-1">({skill.proficiencyLevel})</span>
+        <span className="ml-1 text-muted-foreground">
+          ({skill.proficiencyLevel})
+        </span>
       )}
     </span>
   );
@@ -109,7 +115,7 @@ function SkillsByCategory({ skills }: { skills: Skill[] }) {
 
         return (
           <div key={category}>
-            <h4 className="font-mono text-sm text-muted-foreground mb-2">
+            <h4 className="mb-2 font-mono text-sm text-muted-foreground">
               {label}
             </h4>
             <div className="flex flex-wrap">
@@ -131,7 +137,7 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
 
   return (
     <section className="mb-12">
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <h2 className="text-2xl font-bold">Parsed Profile</h2>
         {profile.seniorityLevel && profile.seniorityLevel !== "unknown" && (
           <SeniorityBadge level={profile.seniorityLevel} />
@@ -140,11 +146,11 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
 
       <ParseQualityWarning quality={profile.parseQuality} />
 
-      <div className="border-2 border-foreground p-6 space-y-8">
+      <div className="space-y-8 border-2 border-foreground p-6">
         {/* Header with basic info */}
         <div className="border-b-2 border-border pb-6">
           {profile.name && (
-            <h3 className="text-xl font-bold mb-2">{profile.name}</h3>
+            <h3 className="mb-2 text-xl font-bold">{profile.name}</h3>
           )}
           <div className="space-y-1 font-mono text-sm">
             {profile.email && (
@@ -165,7 +171,7 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
                   href={profile.linkedIn}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-mono text-sm border-b-2 border-secondary hover:text-secondary"
+                  className="border-b-2 border-secondary font-mono text-sm hover:text-secondary"
                 >
                   LinkedIn
                 </a>
@@ -175,7 +181,7 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
                   href={profile.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-mono text-sm border-b-2 border-secondary hover:text-secondary"
+                  className="border-b-2 border-secondary font-mono text-sm hover:text-secondary"
                 >
                   GitHub
                 </a>
@@ -185,7 +191,7 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
                   href={profile.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-mono text-sm border-b-2 border-secondary hover:text-secondary"
+                  className="border-b-2 border-secondary font-mono text-sm hover:text-secondary"
                 >
                   Website
                 </a>
@@ -196,7 +202,9 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
           {profile.totalYearsOfExperience !== undefined && (
             <p className="mt-4 font-mono text-sm">
               <span className="text-muted-foreground">Total Experience:</span>{" "}
-              <span className="font-bold">{profile.totalYearsOfExperience} years</span>
+              <span className="font-bold">
+                {profile.totalYearsOfExperience} years
+              </span>
             </p>
           )}
         </div>
@@ -220,17 +228,19 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
                   className="border-l-4 border-secondary pl-4"
                 >
                   <h4 className="font-bold">{exp.title}</h4>
-                  <p className="font-bold text-muted-foreground">{exp.company}</p>
-                  <p className="font-mono text-sm text-muted-foreground mt-1">
+                  <p className="font-bold text-muted-foreground">
+                    {exp.company}
+                  </p>
+                  <p className="mt-1 font-mono text-sm text-muted-foreground">
                     {exp.startDate} - {exp.endDate || "Present"}
                     {exp.duration && (
-                      <span className="ml-2 bg-muted px-2 py-0.5 border border-border">
+                      <span className="ml-2 border border-border bg-muted px-2 py-0.5">
                         {exp.duration}
                       </span>
                     )}
                   </p>
                   {exp.location && (
-                    <p className="font-mono text-xs text-muted-foreground mt-1">
+                    <p className="mt-1 font-mono text-xs text-muted-foreground">
                       {exp.location}
                     </p>
                   )}
@@ -244,7 +254,7 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
                       {exp.highlights.map((highlight, i) => (
                         <li
                           key={i}
-                          className="text-sm before:content-['■'] before:text-secondary before:mr-2"
+                          className="text-sm before:mr-2 before:text-secondary before:content-['■']"
                         >
                           {highlight}
                         </li>
@@ -256,7 +266,7 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
                       {exp.technologies.map((tech, i) => (
                         <span
                           key={i}
-                          className="font-mono text-xs px-2 py-0.5 bg-muted border border-border"
+                          className="border border-border bg-muted px-2 py-0.5 font-mono text-xs"
                         >
                           {tech}
                         </span>
@@ -285,20 +295,20 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
                     {edu.field && ` in ${edu.field}`}
                   </p>
                   {(edu.startDate || edu.endDate) && (
-                    <p className="font-mono text-sm text-muted-foreground mt-1">
+                    <p className="mt-1 font-mono text-sm text-muted-foreground">
                       {edu.startDate && `${edu.startDate} - `}
                       {edu.endDate || "Present"}
                     </p>
                   )}
                   {edu.gpa && (
-                    <p className="font-mono text-sm mt-1">GPA: {edu.gpa}</p>
+                    <p className="mt-1 font-mono text-sm">GPA: {edu.gpa}</p>
                   )}
                   {edu.honors && edu.honors.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-2">
                       {edu.honors.map((honor, i) => (
                         <span
                           key={i}
-                          className="font-mono text-xs px-2 py-0.5 bg-secondary/20 border border-border"
+                          className="bg-secondary/20 border border-border px-2 py-0.5 font-mono text-xs"
                         >
                           {honor}
                         </span>
@@ -331,7 +341,9 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
                 >
                   <div>
                     <h4 className="font-bold">{cert.name}</h4>
-                    <p className="text-muted-foreground text-sm">{cert.issuer}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {cert.issuer}
+                    </p>
                   </div>
                   {cert.dateObtained && (
                     <span className="font-mono text-xs text-muted-foreground">
@@ -355,7 +367,7 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
                   className="border-2 border-foreground px-4 py-2"
                 >
                   <span className="font-bold">{lang.language}</span>
-                  <span className="font-mono text-sm text-muted-foreground ml-2">
+                  <span className="ml-2 font-mono text-sm text-muted-foreground">
                     ({lang.proficiency})
                   </span>
                 </div>

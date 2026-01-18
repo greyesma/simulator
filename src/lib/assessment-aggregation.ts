@@ -26,7 +26,6 @@ import type { Prisma } from "@prisma/client";
 import type { CodeReviewData } from "@/lib/code-review";
 import type { PrCiStatus } from "@/lib/github";
 import type {
-  SegmentAnalysisResponse,
   ActivityEntry,
   ToolUsage,
   StuckMoment,
@@ -59,7 +58,13 @@ export type SkillCategory = z.infer<typeof skillCategorySchema>;
 export const skillScoreSchema = z.object({
   category: skillCategorySchema,
   score: z.number().min(1).max(5),
-  level: z.enum(["exceptional", "strong", "adequate", "developing", "needs_improvement"]),
+  level: z.enum([
+    "exceptional",
+    "strong",
+    "adequate",
+    "developing",
+    "needs_improvement",
+  ]),
   evidence: z.array(z.string()), // Specific examples supporting the score
   notes: z.string(),
 });
@@ -191,7 +196,13 @@ export const assessmentReportSchema = z.object({
 
   // Overall scores
   overallScore: z.number().min(1).max(5),
-  overallLevel: z.enum(["exceptional", "strong", "adequate", "developing", "needs_improvement"]),
+  overallLevel: z.enum([
+    "exceptional",
+    "strong",
+    "adequate",
+    "developing",
+    "needs_improvement",
+  ]),
 
   // Skill scores (8 categories)
   skillScores: z.array(skillScoreSchema),
@@ -264,7 +275,9 @@ function calculateSkillScore(
         );
       }
 
-      notes = signals.hrInterview?.communicationNotes || "Communication skills assessed during HR interview and coworker interactions.";
+      notes =
+        signals.hrInterview?.communicationNotes ||
+        "Communication skills assessed during HR interview and coworker interactions.";
       break;
     }
 
@@ -274,21 +287,33 @@ function calculateSkillScore(
       const codeQuality = signals.codeReview?.codeQualityScore;
       const patternScore = signals.codeReview?.patternScore;
 
-      if (codeQuality !== null && codeQuality !== undefined && patternScore !== null && patternScore !== undefined) {
+      if (
+        codeQuality !== null &&
+        codeQuality !== undefined &&
+        patternScore !== null &&
+        patternScore !== undefined
+      ) {
         score = Math.round((codeQuality + patternScore) / 2);
-        evidence.push(`Code quality: ${codeQuality}/5, Patterns: ${patternScore}/5`);
+        evidence.push(
+          `Code quality: ${codeQuality}/5, Patterns: ${patternScore}/5`
+        );
       }
 
       if (stuckMoments.length > 0) {
-        const avgStuckTime = stuckMoments.reduce((sum, m) => sum + m.durationSeconds, 0) / stuckMoments.length;
-        evidence.push(`${stuckMoments.length} stuck moments with avg duration ${Math.round(avgStuckTime)}s`);
+        const avgStuckTime =
+          stuckMoments.reduce((sum, m) => sum + m.durationSeconds, 0) /
+          stuckMoments.length;
+        evidence.push(
+          `${stuckMoments.length} stuck moments with avg duration ${Math.round(avgStuckTime)}s`
+        );
         // Penalize for many/long stuck moments
         if (stuckMoments.length > 5 || avgStuckTime > 300) {
           score = Math.max(1, score - 1);
         }
       }
 
-      notes = "Problem decomposition assessed through code structure and working patterns.";
+      notes =
+        "Problem decomposition assessed through code structure and working patterns.";
       break;
     }
 
@@ -296,18 +321,22 @@ function calculateSkillScore(
       // Sources: Recording tool usage, code review AI detection
       const aiToolsUsed = signals.recording?.aiToolsUsed || false;
       const toolUsage = signals.recording?.toolUsage || [];
-      const aiToolUsageEvident = signals.codeReview?.summary?.aiToolUsageEvident || false;
+      const aiToolUsageEvident =
+        signals.codeReview?.summary?.aiToolUsageEvident || false;
 
-      const aiTools = toolUsage.filter((t) =>
-        t.tool.toLowerCase().includes("claude") ||
-        t.tool.toLowerCase().includes("chatgpt") ||
-        t.tool.toLowerCase().includes("copilot") ||
-        t.tool.toLowerCase().includes("ai")
+      const aiTools = toolUsage.filter(
+        (t) =>
+          t.tool.toLowerCase().includes("claude") ||
+          t.tool.toLowerCase().includes("chatgpt") ||
+          t.tool.toLowerCase().includes("copilot") ||
+          t.tool.toLowerCase().includes("ai")
       );
 
       if (aiToolsUsed || aiTools.length > 0) {
         score = 4; // Using AI tools is positive
-        evidence.push(`AI tools detected in workflow: ${aiTools.map((t) => t.tool).join(", ") || "Yes"}`);
+        evidence.push(
+          `AI tools detected in workflow: ${aiTools.map((t) => t.tool).join(", ") || "Yes"}`
+        );
       } else {
         score = 3; // Not using AI is neutral
         evidence.push("No AI tool usage detected");
@@ -317,7 +346,8 @@ function calculateSkillScore(
         evidence.push("AI-assisted code patterns detected in code review");
       }
 
-      notes = "AI leverage assessed through tool usage patterns and code analysis.";
+      notes =
+        "AI leverage assessed through tool usage patterns and code analysis.";
       break;
     }
 
@@ -328,11 +358,17 @@ function calculateSkillScore(
 
       if (codeReview) {
         score = codeReview.overallScore;
-        evidence.push(`Code review overall score: ${codeReview.overallScore}/5`);
-        evidence.push(`Quality: ${codeReview.codeQualityScore}/5, Security: ${codeReview.securityScore}/5`);
+        evidence.push(
+          `Code review overall score: ${codeReview.overallScore}/5`
+        );
+        evidence.push(
+          `Quality: ${codeReview.codeQualityScore}/5, Security: ${codeReview.securityScore}/5`
+        );
 
         if (codeReview.summary?.strengths?.length > 0) {
-          evidence.push(`Strengths: ${codeReview.summary.strengths.slice(0, 2).join("; ")}`);
+          evidence.push(
+            `Strengths: ${codeReview.summary.strengths.slice(0, 2).join("; ")}`
+          );
         }
       }
 
@@ -347,7 +383,9 @@ function calculateSkillScore(
       }
 
       score = Math.round(score);
-      notes = codeReview?.summary?.overallAssessment || "Code quality assessed through automated review.";
+      notes =
+        codeReview?.summary?.overallAssessment ||
+        "Code quality assessed through automated review.";
       break;
     }
 
@@ -358,10 +396,14 @@ function calculateSkillScore(
 
       if (coworkersContacted >= 3) {
         score = 5;
-        evidence.push(`Excellent collaboration: contacted ${coworkersContacted} different coworkers`);
+        evidence.push(
+          `Excellent collaboration: contacted ${coworkersContacted} different coworkers`
+        );
       } else if (coworkersContacted >= 2) {
         score = 4;
-        evidence.push(`Good collaboration: contacted ${coworkersContacted} coworkers`);
+        evidence.push(
+          `Good collaboration: contacted ${coworkersContacted} coworkers`
+        );
       } else if (coworkersContacted === 1) {
         score = 3;
         evidence.push(`Limited collaboration: only contacted 1 coworker`);
@@ -374,7 +416,8 @@ function calculateSkillScore(
         evidence.push(`${totalInteractions} total interactions with team`);
       }
 
-      notes = "Cross-functional collaboration assessed through coworker engagement patterns.";
+      notes =
+        "Cross-functional collaboration assessed through coworker engagement patterns.";
       break;
     }
 
@@ -404,7 +447,8 @@ function calculateSkillScore(
         evidence.push(`Working phase duration: ${workingMinutes} minutes`);
       }
 
-      notes = "Time management assessed through focus patterns and activity distribution.";
+      notes =
+        "Time management assessed through focus patterns and activity distribution.";
       break;
     }
 
@@ -430,10 +474,13 @@ function calculateSkillScore(
       );
       if (technicalDifficulties.length > 3) {
         score = Math.max(1, score - 1);
-        evidence.push(`${technicalDifficulties.length} technical difficulties encountered`);
+        evidence.push(
+          `${technicalDifficulties.length} technical difficulties encountered`
+        );
       }
 
-      notes = "Technical decision-making assessed through code architecture and problem-solving patterns.";
+      notes =
+        "Technical decision-making assessed through code architecture and problem-solving patterns.";
       break;
     }
 
@@ -461,7 +508,8 @@ function calculateSkillScore(
       }
 
       score = Math.round(score);
-      notes = "Presentation skills assessed through interview and defense performance.";
+      notes =
+        "Presentation skills assessed through interview and defense performance.";
       break;
     }
   }
@@ -478,7 +526,9 @@ function calculateSkillScore(
 /**
  * Calculate all 8 skill scores from assessment signals
  */
-export function calculateAllSkillScores(signals: AssessmentSignals): SkillScore[] {
+export function calculateAllSkillScores(
+  signals: AssessmentSignals
+): SkillScore[] {
   const categories: SkillCategory[] = [
     "communication",
     "problem_decomposition",
@@ -550,17 +600,25 @@ function formatHRForPrompt(hr: HRSignals | null): string {
   if (!hr) return "HR interview data not available.";
 
   const parts: string[] = [];
-  if (hr.communicationScore) parts.push(`Communication: ${hr.communicationScore}/5`);
-  if (hr.professionalismScore) parts.push(`Professionalism: ${hr.professionalismScore}/5`);
-  if (hr.technicalDepthScore) parts.push(`Technical depth: ${hr.technicalDepthScore}/5`);
-  if (hr.cvConsistencyScore) parts.push(`CV consistency: ${hr.cvConsistencyScore}/5`);
+  if (hr.communicationScore)
+    parts.push(`Communication: ${hr.communicationScore}/5`);
+  if (hr.professionalismScore)
+    parts.push(`Professionalism: ${hr.professionalismScore}/5`);
+  if (hr.technicalDepthScore)
+    parts.push(`Technical depth: ${hr.technicalDepthScore}/5`);
+  if (hr.cvConsistencyScore)
+    parts.push(`CV consistency: ${hr.cvConsistencyScore}/5`);
   if (hr.communicationNotes) parts.push(`Notes: ${hr.communicationNotes}`);
   if (hr.cultureFitNotes) parts.push(`Culture fit: ${hr.cultureFitNotes}`);
   if (hr.interviewDurationSeconds) {
-    parts.push(`Duration: ${Math.round(hr.interviewDurationSeconds / 60)} minutes`);
+    parts.push(
+      `Duration: ${Math.round(hr.interviewDurationSeconds / 60)} minutes`
+    );
   }
 
-  return parts.length > 0 ? parts.join("\n") : "HR interview completed, no detailed scores available.";
+  return parts.length > 0
+    ? parts.join("\n")
+    : "HR interview completed, no detailed scores available.";
 }
 
 /**
@@ -581,7 +639,9 @@ function formatCodeReviewForPrompt(review: CodeReviewData | null): string {
     parts.push(`Strengths: ${review.summary.strengths.join("; ")}`);
   }
   if (review.summary?.areasForImprovement?.length > 0) {
-    parts.push(`Areas for improvement: ${review.summary.areasForImprovement.join("; ")}`);
+    parts.push(
+      `Areas for improvement: ${review.summary.areasForImprovement.join("; ")}`
+    );
   }
   if (review.summary?.testCoverage) {
     parts.push(`Test coverage: ${review.summary.testCoverage}`);
@@ -610,12 +670,16 @@ function formatRecordingForPrompt(recording: RecordingSignals | null): string {
 
   if (recording.stuckMoments.length > 0) {
     parts.push(`Stuck moments: ${recording.stuckMoments.length}`);
-    const causes = [...new Set(recording.stuckMoments.map((m) => m.potentialCause))];
+    const causes = [
+      ...new Set(recording.stuckMoments.map((m) => m.potentialCause)),
+    ];
     parts.push(`Common causes: ${causes.join(", ")}`);
   }
 
   if (recording.keyObservations.length > 0) {
-    parts.push(`Key observations: ${recording.keyObservations.slice(0, 3).join("; ")}`);
+    parts.push(
+      `Key observations: ${recording.keyObservations.slice(0, 3).join("; ")}`
+    );
   }
 
   return parts.join("\n");
@@ -624,7 +688,9 @@ function formatRecordingForPrompt(recording: RecordingSignals | null): string {
 /**
  * Format collaboration data for the narrative prompt
  */
-function formatCollaborationForPrompt(conversations: ConversationSignals): string {
+function formatCollaborationForPrompt(
+  conversations: ConversationSignals
+): string {
   const parts: string[] = [
     `Coworkers contacted: ${conversations.uniqueCoworkersContacted}`,
     `Total interactions: ${conversations.totalCoworkerInteractions}`,
@@ -632,17 +698,24 @@ function formatCollaborationForPrompt(conversations: ConversationSignals): strin
 
   if (conversations.coworkerChats.length > 0) {
     const coworkerList = conversations.coworkerChats
-      .map((c) => `${c.coworkerName} (${c.coworkerRole}): ${c.messages.length} messages`)
+      .map(
+        (c) =>
+          `${c.coworkerName} (${c.coworkerRole}): ${c.messages.length} messages`
+      )
       .join("; ");
     parts.push(`Interactions: ${coworkerList}`);
   }
 
   if (conversations.kickoffTranscript.length > 0) {
-    parts.push(`Kickoff call: ${conversations.kickoffTranscript.length} exchanges`);
+    parts.push(
+      `Kickoff call: ${conversations.kickoffTranscript.length} exchanges`
+    );
   }
 
   if (conversations.defenseTranscript.length > 0) {
-    parts.push(`Defense call: ${conversations.defenseTranscript.length} exchanges`);
+    parts.push(
+      `Defense call: ${conversations.defenseTranscript.length} exchanges`
+    );
   }
 
   return parts.join("\n");
@@ -658,10 +731,14 @@ function formatTimingForPrompt(timing: AssessmentSignals["timing"]): string {
     parts.push(`Completed: ${timing.completedAt.toISOString()}`);
   }
   if (timing.totalDurationSeconds) {
-    parts.push(`Total duration: ${Math.round(timing.totalDurationSeconds / 60)} minutes`);
+    parts.push(
+      `Total duration: ${Math.round(timing.totalDurationSeconds / 60)} minutes`
+    );
   }
   if (timing.workingPhaseSeconds) {
-    parts.push(`Working phase: ${Math.round(timing.workingPhaseSeconds / 60)} minutes`);
+    parts.push(
+      `Working phase: ${Math.round(timing.workingPhaseSeconds / 60)} minutes`
+    );
   }
 
   return parts.join("\n");
@@ -674,12 +751,17 @@ export async function generateNarrativeFeedback(
   signals: AssessmentSignals,
   skillScores: SkillScore[]
 ): Promise<NarrativeFeedback> {
-  const prompt = NARRATIVE_PROMPT
-    .replace("{skillScores}", formatSkillScoresForPrompt(skillScores))
+  const prompt = NARRATIVE_PROMPT.replace(
+    "{skillScores}",
+    formatSkillScoresForPrompt(skillScores)
+  )
     .replace("{hrInterview}", formatHRForPrompt(signals.hrInterview))
     .replace("{codeReview}", formatCodeReviewForPrompt(signals.codeReview))
     .replace("{recording}", formatRecordingForPrompt(signals.recording))
-    .replace("{collaboration}", formatCollaborationForPrompt(signals.conversations))
+    .replace(
+      "{collaboration}",
+      formatCollaborationForPrompt(signals.conversations)
+    )
     .replace("{timing}", formatTimingForPrompt(signals.timing));
 
   try {
@@ -734,12 +816,18 @@ export async function generateRecommendations(
   const sortedScores = [...skillScores].sort((a, b) => a.score - b.score);
   const weaknesses = sortedScores.slice(0, 3);
 
-  const prompt = RECOMMENDATIONS_PROMPT
+  const prompt = RECOMMENDATIONS_PROMPT.replace(
+    "{skillScores}",
+    sortedScores
+      .map((s) => `${s.category}: ${s.score}/5 - ${s.notes}`)
+      .join("\n")
+  )
     .replace(
-      "{skillScores}",
-      sortedScores.map((s) => `${s.category}: ${s.score}/5 - ${s.notes}`).join("\n")
+      "{weaknesses}",
+      weaknesses
+        .map((s) => `${s.category}: ${s.evidence.join("; ")}`)
+        .join("\n")
     )
-    .replace("{weaknesses}", weaknesses.map((s) => `${s.category}: ${s.evidence.join("; ")}`).join("\n"))
     .replace("{observations}", narrative.notableObservations.join("\n"));
 
   try {
@@ -769,7 +857,12 @@ export async function generateRecommendations(
     // Return fallback recommendations based on lowest scores
     return weaknesses.slice(0, 3).map((skill, index) => ({
       category: skill.category,
-      priority: index === 0 ? "high" as const : index === 1 ? "medium" as const : "low" as const,
+      priority:
+        index === 0
+          ? ("high" as const)
+          : index === 1
+            ? ("medium" as const)
+            : ("low" as const),
       title: `Improve ${skill.category.replace(/_/g, " ")}`,
       description: skill.notes,
       actionableSteps: [
@@ -852,7 +945,9 @@ export async function generateAssessmentReport(
 /**
  * Converts AssessmentReport to Prisma JSON input
  */
-export function reportToPrismaJson(report: AssessmentReport): Prisma.InputJsonValue {
+export function reportToPrismaJson(
+  report: AssessmentReport
+): Prisma.InputJsonValue {
   return report as unknown as Prisma.InputJsonValue;
 }
 
@@ -869,12 +964,16 @@ export function formatReportForDisplay(report: AssessmentReport): string {
   }
   lines.push("");
 
-  lines.push(`## Overall Score: ${report.overallScore}/5 (${report.overallLevel})`);
+  lines.push(
+    `## Overall Score: ${report.overallScore}/5 (${report.overallLevel})`
+  );
   lines.push("");
 
   lines.push("## Skill Scores");
   for (const skill of report.skillScores) {
-    lines.push(`- **${skill.category.replace(/_/g, " ")}**: ${skill.score}/5 (${skill.level})`);
+    lines.push(
+      `- **${skill.category.replace(/_/g, " ")}**: ${skill.score}/5 (${skill.level})`
+    );
   }
   lines.push("");
 
@@ -907,10 +1006,14 @@ export function formatReportForDisplay(report: AssessmentReport): string {
 
   lines.push("## Metrics");
   if (report.metrics.totalDurationMinutes) {
-    lines.push(`- Total duration: ${report.metrics.totalDurationMinutes} minutes`);
+    lines.push(
+      `- Total duration: ${report.metrics.totalDurationMinutes} minutes`
+    );
   }
   if (report.metrics.workingPhaseMinutes) {
-    lines.push(`- Working phase: ${report.metrics.workingPhaseMinutes} minutes`);
+    lines.push(
+      `- Working phase: ${report.metrics.workingPhaseMinutes} minutes`
+    );
   }
   lines.push(`- Coworkers contacted: ${report.metrics.coworkersContacted}`);
   lines.push(`- AI tools used: ${report.metrics.aiToolsUsed ? "Yes" : "No"}`);

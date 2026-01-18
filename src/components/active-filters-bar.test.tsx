@@ -24,9 +24,24 @@ describe("ActiveFiltersBar", () => {
   const mockOnClearAll = vi.fn();
 
   const sampleFilters: ActiveFilter[] = [
-    { type: "job_title", label: "Role", value: "Software Engineer", isRefinedByFeedback: false },
-    { type: "location", label: "Location", value: "SF", isRefinedByFeedback: false },
-    { type: "skills", label: "Skills", value: "Python, LLMs", isRefinedByFeedback: false },
+    {
+      type: "job_title",
+      label: "Role",
+      value: "Software Engineer",
+      isRefinedByFeedback: false,
+    },
+    {
+      type: "location",
+      label: "Location",
+      value: "SF",
+      isRefinedByFeedback: false,
+    },
+    {
+      type: "skills",
+      label: "Skills",
+      value: "Python, LLMs",
+      isRefinedByFeedback: false,
+    },
   ];
 
   beforeEach(() => {
@@ -99,7 +114,9 @@ describe("ActiveFiltersBar", () => {
         />
       );
 
-      expect(screen.getByTestId("clear-all-filters-button")).toBeInTheDocument();
+      expect(
+        screen.getByTestId("clear-all-filters-button")
+      ).toBeInTheDocument();
       expect(screen.getByText("Clear all filters")).toBeInTheDocument();
     });
 
@@ -112,7 +129,9 @@ describe("ActiveFiltersBar", () => {
         />
       );
 
-      expect(screen.queryByTestId("clear-all-filters-button")).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("clear-all-filters-button")
+      ).not.toBeInTheDocument();
     });
 
     it("calls onClearAll when Clear all filters is clicked", () => {
@@ -169,16 +188,33 @@ describe("ActiveFiltersBar", () => {
       );
 
       expect(screen.getByLabelText("Remove Role filter")).toBeInTheDocument();
-      expect(screen.getByLabelText("Remove Location filter")).toBeInTheDocument();
+      expect(
+        screen.getByLabelText("Remove Location filter")
+      ).toBeInTheDocument();
       expect(screen.getByLabelText("Remove Skills filter")).toBeInTheDocument();
     });
   });
 
   describe("Refined by feedback indicator", () => {
     const refinedFilters: ActiveFilter[] = [
-      { type: "job_title", label: "Role", value: "Frontend Engineer", isRefinedByFeedback: false },
-      { type: "years_experience", label: "Experience", value: "8+ years", isRefinedByFeedback: true },
-      { type: "skills", label: "Skills", value: "React", isRefinedByFeedback: true },
+      {
+        type: "job_title",
+        label: "Role",
+        value: "Frontend Engineer",
+        isRefinedByFeedback: false,
+      },
+      {
+        type: "years_experience",
+        label: "Experience",
+        value: "8+ years",
+        isRefinedByFeedback: true,
+      },
+      {
+        type: "skills",
+        label: "Skills",
+        value: "React",
+        isRefinedByFeedback: true,
+      },
     ];
 
     it("shows Refined by feedback indicator when any filter was refined", () => {
@@ -190,7 +226,9 @@ describe("ActiveFiltersBar", () => {
         />
       );
 
-      expect(screen.getByTestId("refined-by-feedback-indicator")).toBeInTheDocument();
+      expect(
+        screen.getByTestId("refined-by-feedback-indicator")
+      ).toBeInTheDocument();
       expect(screen.getByText("Refined by feedback")).toBeInTheDocument();
     });
 
@@ -203,7 +241,9 @@ describe("ActiveFiltersBar", () => {
         />
       );
 
-      expect(screen.queryByTestId("refined-by-feedback-indicator")).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("refined-by-feedback-indicator")
+      ).not.toBeInTheDocument();
     });
 
     it("shows sparkle icon on refined filter chips", () => {
@@ -247,7 +287,9 @@ describe("ActiveFiltersBar", () => {
         />
       );
 
-      expect(screen.getByTestId("active-filters-bar")).toHaveClass("custom-class");
+      expect(screen.getByTestId("active-filters-bar")).toHaveClass(
+        "custom-class"
+      );
     });
   });
 });
@@ -402,7 +444,12 @@ describe("createFiltersFromIntent", () => {
   it("marks archetype as refined when job_title is refined", () => {
     const intent = { ...baseIntent, job_title: "Frontend Engineer" };
     const refinedFields = new Set(["job_title"]);
-    const result = createFiltersFromIntent(intent, "SENIOR_FRONTEND_ENGINEER", null, refinedFields);
+    const result = createFiltersFromIntent(
+      intent,
+      "SENIOR_FRONTEND_ENGINEER",
+      null,
+      refinedFields
+    );
 
     expect(result[0].type).toBe("archetype");
     expect(result[0].isRefinedByFeedback).toBe(true);
@@ -411,7 +458,12 @@ describe("createFiltersFromIntent", () => {
   it("marks seniority as refined when years_experience is refined", () => {
     const intent = { ...baseIntent, years_experience: 8 };
     const refinedFields = new Set(["years_experience"]);
-    const result = createFiltersFromIntent(intent, null, "SENIOR", refinedFields);
+    const result = createFiltersFromIntent(
+      intent,
+      null,
+      "SENIOR",
+      refinedFields
+    );
 
     expect(result[0].type).toBe("seniority");
     expect(result[0].isRefinedByFeedback).toBe(true);
@@ -433,7 +485,11 @@ describe("removeFilterFromIntent", () => {
   };
 
   it("removes job_title when job_title filter is removed", () => {
-    const filter: ActiveFilter = { type: "job_title", label: "Role", value: "Software Engineer" };
+    const filter: ActiveFilter = {
+      type: "job_title",
+      label: "Role",
+      value: "Software Engineer",
+    };
     const result = removeFilterFromIntent(completeIntent, filter);
 
     expect(result.job_title).toBeNull();
@@ -441,14 +497,22 @@ describe("removeFilterFromIntent", () => {
   });
 
   it("removes job_title when archetype filter is removed", () => {
-    const filter: ActiveFilter = { type: "archetype", label: "Role", value: "Frontend Engineer" };
+    const filter: ActiveFilter = {
+      type: "archetype",
+      label: "Role",
+      value: "Frontend Engineer",
+    };
     const result = removeFilterFromIntent(completeIntent, filter);
 
     expect(result.job_title).toBeNull();
   });
 
   it("removes location when location filter is removed", () => {
-    const filter: ActiveFilter = { type: "location", label: "Location", value: "NYC" };
+    const filter: ActiveFilter = {
+      type: "location",
+      label: "Location",
+      value: "NYC",
+    };
     const result = removeFilterFromIntent(completeIntent, filter);
 
     expect(result.location).toBeNull();
@@ -456,42 +520,66 @@ describe("removeFilterFromIntent", () => {
   });
 
   it("removes years_experience when years_experience filter is removed", () => {
-    const filter: ActiveFilter = { type: "years_experience", label: "Experience", value: "5+ years" };
+    const filter: ActiveFilter = {
+      type: "years_experience",
+      label: "Experience",
+      value: "5+ years",
+    };
     const result = removeFilterFromIntent(completeIntent, filter);
 
     expect(result.years_experience).toBeNull();
   });
 
   it("removes years_experience when seniority filter is removed", () => {
-    const filter: ActiveFilter = { type: "seniority", label: "Experience", value: "Senior" };
+    const filter: ActiveFilter = {
+      type: "seniority",
+      label: "Experience",
+      value: "Senior",
+    };
     const result = removeFilterFromIntent(completeIntent, filter);
 
     expect(result.years_experience).toBeNull();
   });
 
   it("clears skills array when skills filter is removed", () => {
-    const filter: ActiveFilter = { type: "skills", label: "Skills", value: "Python, React" };
+    const filter: ActiveFilter = {
+      type: "skills",
+      label: "Skills",
+      value: "Python, React",
+    };
     const result = removeFilterFromIntent(completeIntent, filter);
 
     expect(result.skills).toEqual([]);
   });
 
   it("clears industry array when industry filter is removed", () => {
-    const filter: ActiveFilter = { type: "industry", label: "Industry", value: "fintech" };
+    const filter: ActiveFilter = {
+      type: "industry",
+      label: "Industry",
+      value: "fintech",
+    };
     const result = removeFilterFromIntent(completeIntent, filter);
 
     expect(result.industry).toEqual([]);
   });
 
   it("clears company_type array when company_type filter is removed", () => {
-    const filter: ActiveFilter = { type: "company_type", label: "Company", value: "startup" };
+    const filter: ActiveFilter = {
+      type: "company_type",
+      label: "Company",
+      value: "startup",
+    };
     const result = removeFilterFromIntent(completeIntent, filter);
 
     expect(result.company_type).toEqual([]);
   });
 
   it("does not modify the original intent object", () => {
-    const filter: ActiveFilter = { type: "job_title", label: "Role", value: "Software Engineer" };
+    const filter: ActiveFilter = {
+      type: "job_title",
+      label: "Role",
+      value: "Software Engineer",
+    };
     const result = removeFilterFromIntent(completeIntent, filter);
 
     expect(result).not.toBe(completeIntent);
@@ -519,7 +607,12 @@ describe("ActiveFiltersBar integration", () => {
     };
 
     const refinedFields = new Set(["years_experience"]);
-    const filters = createFiltersFromIntent(intent, "SENIOR_FRONTEND_ENGINEER", "MID", refinedFields);
+    const filters = createFiltersFromIntent(
+      intent,
+      "SENIOR_FRONTEND_ENGINEER",
+      "MID",
+      refinedFields
+    );
 
     // Render with the generated filters
     render(
@@ -534,7 +627,9 @@ describe("ActiveFiltersBar integration", () => {
     expect(screen.getAllByTestId("filter-chip")).toHaveLength(5);
 
     // Verify refined indicator is shown
-    expect(screen.getByTestId("refined-by-feedback-indicator")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("refined-by-feedback-indicator")
+    ).toBeInTheDocument();
 
     // Click clear all
     fireEvent.click(screen.getByTestId("clear-all-filters-button"));
@@ -546,8 +641,18 @@ describe("ActiveFiltersBar integration", () => {
     const mockOnClearAll = vi.fn();
 
     const filters: ActiveFilter[] = [
-      { type: "location", label: "Location", value: "NYC", isRefinedByFeedback: false },
-      { type: "skills", label: "Skills", value: "Python", isRefinedByFeedback: true },
+      {
+        type: "location",
+        label: "Location",
+        value: "NYC",
+        isRefinedByFeedback: false,
+      },
+      {
+        type: "skills",
+        label: "Skills",
+        value: "Python",
+        isRefinedByFeedback: true,
+      },
     ];
 
     render(

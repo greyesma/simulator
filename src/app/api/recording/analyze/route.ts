@@ -206,11 +206,11 @@ export async function POST(request: NextRequest) {
       ...analysisResults.map((r) => r.analysis),
       ...recording.segments
         .filter(
-          (s) =>
-            s.analysis &&
-            !segmentsToAnalyze.some((st) => st.id === s.id)
+          (s) => s.analysis && !segmentsToAnalyze.some((st) => st.id === s.id)
         )
-        .map((s) => s.analysis!.aiAnalysis as unknown as SegmentAnalysisResponse),
+        .map(
+          (s) => s.analysis!.aiAnalysis as unknown as SegmentAnalysisResponse
+        ),
     ];
 
     const aggregated = aggregateSegmentAnalyses(allAnalyses);

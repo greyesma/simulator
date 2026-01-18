@@ -134,7 +134,10 @@ Things to dig into:
 /**
  * Fallback context when CV parsing fails
  */
-export function formatBasicCandidateContext(name?: string, email?: string): string {
+export function formatBasicCandidateContext(
+  name?: string,
+  email?: string
+): string {
   return `
 
 ## Candidate Info

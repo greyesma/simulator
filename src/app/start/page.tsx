@@ -103,23 +103,26 @@ function getRedirectUrlForStatus(
  */
 function NoScenariosMessage() {
   return (
-    <main className="min-h-screen bg-background text-foreground flex items-center justify-center px-6">
+    <main className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
       <div className="max-w-md text-center">
         <div className="border-2 border-border p-8">
           <div className="mb-6">
             <div
-              className="w-16 h-16 bg-secondary mx-auto"
-              style={{ clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)" }}
+              className="mx-auto h-16 w-16 bg-secondary"
+              style={{
+                clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+              }}
             />
           </div>
-          <h1 className="text-2xl font-bold mb-4">No Assessments Available</h1>
-          <p className="text-muted-foreground mb-6">
-            We&apos;re working on preparing new assessment scenarios. Please check
-            back soon.
+          <h1 className="mb-4 text-2xl font-bold">No Assessments Available</h1>
+          <p className="mb-6 text-muted-foreground">
+            We&apos;re working on preparing new assessment scenarios. Please
+            check back soon.
           </p>
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a
             href="/"
-            className="inline-block bg-foreground text-background px-6 py-3 font-semibold border-2 border-foreground hover:bg-secondary hover:text-secondary-foreground hover:border-secondary"
+            className="inline-block border-2 border-foreground bg-foreground px-6 py-3 font-semibold text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground"
           >
             Back to Home
           </a>

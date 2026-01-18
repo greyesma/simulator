@@ -67,7 +67,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token?.id) {
         const dbUser = await db.user.findUnique({
           where: { id: token.id as string, deletedAt: null },
-          select: { id: true, role: true, name: true, email: true, image: true },
+          select: {
+            id: true,
+            role: true,
+            name: true,
+            email: true,
+            image: true,
+          },
         });
 
         if (dbUser) {

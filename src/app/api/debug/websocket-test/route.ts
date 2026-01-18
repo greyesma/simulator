@@ -22,7 +22,11 @@ export async function GET() {
       apiKey: env.GEMINI_API_KEY,
       httpOptions: { apiVersion: "v1alpha" },
     });
-    (results.steps as unknown[]).push({ step: 1, name: "Client initialized", success: true });
+    (results.steps as unknown[]).push({
+      step: 1,
+      name: "Client initialized",
+      success: true,
+    });
 
     // Step 2: Generate token
     const tokenResponse = await ai.authTokens.create({
@@ -57,7 +61,9 @@ export async function GET() {
       name: "WebSocket URL analysis",
       expectedUrl: expectedWsUrl.substring(0, 100) + "...",
       hasDoubleSlash,
-      warning: hasDoubleSlash ? "URL has double slash - this may cause connection issues" : null,
+      warning: hasDoubleSlash
+        ? "URL has double slash - this may cause connection issues"
+        : null,
     });
 
     // Step 4: Check model availability
@@ -79,8 +85,8 @@ export async function GET() {
     });
 
     results.status = "diagnostics_complete";
-    results.recommendation = "If WebSocket fails with double slash, the SDK may have a URL construction bug. Consider using direct WebSocket connection instead.";
-
+    results.recommendation =
+      "If WebSocket fails with double slash, the SDK may have a URL construction bug. Consider using direct WebSocket connection instead.";
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     (results.steps as unknown[]).push({

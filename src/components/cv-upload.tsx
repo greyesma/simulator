@@ -24,7 +24,9 @@ export function CVUpload({
 }: CVUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [fileName, setFileName] = useState<string | null>(currentFileName || null);
+  const [fileName, setFileName] = useState<string | null>(
+    currentFileName || null
+  );
   const [error, setError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -89,8 +91,7 @@ export function CVUpload({
       setFileName(data.fileName);
       onUploadComplete?.(data);
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Upload failed";
+      const errorMessage = err instanceof Error ? err.message : "Upload failed";
       setError(errorMessage);
       onError?.(errorMessage);
       setProgress(0);
@@ -146,25 +147,23 @@ export function CVUpload({
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        className={`
-          border-2 border-dashed p-8 text-center cursor-pointer transition-colors
-          ${isDragOver ? "border-secondary bg-secondary/10" : "border-border hover:border-foreground"}
-          ${isUploading ? "pointer-events-none opacity-70" : ""}
-        `}
+        className={`cursor-pointer border-2 border-dashed p-8 text-center transition-colors ${isDragOver ? "bg-secondary/10 border-secondary" : "border-border hover:border-foreground"} ${isUploading ? "pointer-events-none opacity-70" : ""} `}
       >
         {isUploading ? (
           <div className="space-y-4">
             <div className="font-mono text-sm">
               {progress < 90 ? "Uploading..." : "Analyzing CV..."}
             </div>
-            <div className="w-full h-2 bg-muted border border-border">
+            <div className="h-2 w-full border border-border bg-muted">
               <div
                 className="h-full bg-secondary transition-all duration-200"
                 style={{ width: `${progress}%` }}
               />
             </div>
             <div className="font-mono text-xs text-muted-foreground">
-              {progress < 90 ? `${progress}%` : "Extracting your experience and skills"}
+              {progress < 90
+                ? `${progress}%`
+                : "Extracting your experience and skills"}
             </div>
           </div>
         ) : fileName ? (
@@ -189,7 +188,7 @@ export function CVUpload({
       </div>
 
       {error && (
-        <div className="mt-2 font-mono text-sm text-red-500 border-2 border-red-500 p-2">
+        <div className="mt-2 border-2 border-red-500 p-2 font-mono text-sm text-red-500">
           {error}
         </div>
       )}

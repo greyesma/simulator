@@ -7,10 +7,7 @@ import {
   formatCVContextForHR,
   formatBasicCandidateContext,
 } from "@/prompts";
-import {
-  formatProfileForPrompt,
-  profileFromPrismaJson,
-} from "@/lib/cv-parser";
+import { formatProfileForPrompt, profileFromPrismaJson } from "@/lib/cv-parser";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -61,7 +58,8 @@ export async function POST(request: Request) {
 
     // First, try to use the parsed profile from Assessment (if CV was uploaded during assessment)
     // Then fallback to User's parsed profile (if CV was uploaded from profile page)
-    const parsedProfileJson = assessment.parsedProfile || assessment.user.parsedProfile;
+    const parsedProfileJson =
+      assessment.parsedProfile || assessment.user.parsedProfile;
 
     if (parsedProfileJson) {
       try {

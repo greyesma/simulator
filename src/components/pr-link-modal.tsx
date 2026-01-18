@@ -65,16 +65,13 @@ export function PrLinkModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-foreground/80"
-        onClick={onClose}
-      />
+      <div className="bg-foreground/80 absolute inset-0" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative bg-background border-4 border-foreground p-8 max-w-md w-full mx-4">
+      <div className="relative mx-4 w-full max-w-md border-4 border-foreground bg-background p-8">
         {/* Header */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold mb-2">Ready to Submit?</h2>
+          <h2 className="mb-2 text-2xl font-bold">Ready to Submit?</h2>
           <p className="text-muted-foreground">
             Great work! Please share your PR link so {managerName} can review
             your code and schedule the final defense.
@@ -85,7 +82,7 @@ export function PrLinkModal({
         <div className="mb-6">
           <label
             htmlFor="prUrl"
-            className="block font-bold mb-2 font-mono text-sm"
+            className="mb-2 block font-mono text-sm font-bold"
           >
             PR/MR Link
           </label>
@@ -100,16 +97,16 @@ export function PrLinkModal({
             onKeyDown={handleKeyDown}
             placeholder="https://github.com/org/repo/pull/123"
             disabled={isSubmitting}
-            className="w-full px-4 py-3 border-2 border-foreground bg-background text-foreground font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-50"
+            className="w-full border-2 border-foreground bg-background px-4 py-3 font-mono text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-50"
             autoFocus
           />
           {error && (
-            <p className="mt-2 text-sm font-mono text-red-600">{error}</p>
+            <p className="mt-2 font-mono text-sm text-red-600">{error}</p>
           )}
         </div>
 
         {/* Helpful hint */}
-        <div className="mb-6 p-4 bg-secondary/20 border-2 border-foreground">
+        <div className="bg-secondary/20 mb-6 border-2 border-foreground p-4">
           <p className="text-sm">
             <span className="font-bold">Accepted formats:</span> GitHub PRs,
             GitLab MRs, or Bitbucket Pull Requests
@@ -121,14 +118,14 @@ export function PrLinkModal({
           <button
             onClick={onClose}
             disabled={isSubmitting}
-            className="flex-1 px-6 py-3 border-2 border-foreground bg-background text-foreground font-bold hover:bg-muted disabled:opacity-50"
+            className="flex-1 border-2 border-foreground bg-background px-6 py-3 font-bold text-foreground hover:bg-muted disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={isSubmitting || !prUrl.trim()}
-            className="flex-1 px-6 py-3 border-2 border-foreground bg-secondary text-secondary-foreground font-bold hover:bg-secondary/80 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="hover:bg-secondary/80 flex-1 border-2 border-foreground bg-secondary px-6 py-3 font-bold text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting ? "Submitting..." : "Submit PR"}
           </button>

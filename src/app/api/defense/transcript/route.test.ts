@@ -129,8 +129,16 @@ describe("POST /api/defense/transcript", () => {
     });
 
     const transcript = [
-      { role: "user", text: "Let me walk you through my PR", timestamp: "2024-01-01T00:00:00Z" },
-      { role: "model", text: "Please go ahead", timestamp: "2024-01-01T00:00:01Z" },
+      {
+        role: "user",
+        text: "Let me walk you through my PR",
+        timestamp: "2024-01-01T00:00:00Z",
+      },
+      {
+        role: "model",
+        text: "Please go ahead",
+        timestamp: "2024-01-01T00:00:01Z",
+      },
     ];
 
     const request = new Request("http://localhost/api/defense/transcript", {
@@ -167,7 +175,11 @@ describe("POST /api/defense/transcript", () => {
     mockConversationFindFirst.mockResolvedValue({
       id: "existing-conv-id",
       transcript: [
-        { role: "user", text: "Previous message", timestamp: "2024-01-01T00:00:00Z" },
+        {
+          role: "user",
+          text: "Previous message",
+          timestamp: "2024-01-01T00:00:00Z",
+        },
       ],
     });
     mockConversationUpdate.mockResolvedValue({
@@ -175,7 +187,11 @@ describe("POST /api/defense/transcript", () => {
     });
 
     const newTranscript = [
-      { role: "model", text: "New response", timestamp: "2024-01-01T00:00:02Z" },
+      {
+        role: "model",
+        text: "New response",
+        timestamp: "2024-01-01T00:00:02Z",
+      },
     ];
 
     const request = new Request("http://localhost/api/defense/transcript", {
@@ -299,8 +315,16 @@ describe("GET /api/defense/transcript", () => {
 
   it("should return transcript when conversation exists", async () => {
     const transcript = [
-      { role: "user", text: "Here's my approach", timestamp: "2024-01-01T00:00:00Z" },
-      { role: "model", text: "Tell me more about that decision", timestamp: "2024-01-01T00:00:01Z" },
+      {
+        role: "user",
+        text: "Here's my approach",
+        timestamp: "2024-01-01T00:00:00Z",
+      },
+      {
+        role: "model",
+        text: "Tell me more about that decision",
+        timestamp: "2024-01-01T00:00:01Z",
+      },
     ];
 
     mockAuth.mockResolvedValue({

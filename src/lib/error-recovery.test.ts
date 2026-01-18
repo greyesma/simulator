@@ -20,7 +20,10 @@ describe("error-recovery", () => {
     });
 
     it("categorizes NotAllowedError correctly", () => {
-      const error = new DOMException("User denied permission", "NotAllowedError");
+      const error = new DOMException(
+        "User denied permission",
+        "NotAllowedError"
+      );
       const result = categorizeError(error);
       expect(result.category).toBe("permission");
       expect(result.isRetryable).toBe(false);
@@ -57,7 +60,10 @@ describe("error-recovery", () => {
     });
 
     it("categorizes browser compatibility errors correctly", () => {
-      const error = new DOMException("Feature not supported", "NotSupportedError");
+      const error = new DOMException(
+        "Feature not supported",
+        "NotSupportedError"
+      );
       const result = categorizeError(error);
       expect(result.category).toBe("browser");
       expect(result.isRetryable).toBe(false);
@@ -146,7 +152,9 @@ describe("error-recovery", () => {
     });
 
     it("does not retry non-retryable errors", async () => {
-      const operation = vi.fn().mockRejectedValue(new Error("Permission denied"));
+      const operation = vi
+        .fn()
+        .mockRejectedValue(new Error("Permission denied"));
 
       await expect(
         withRetry(operation, { maxAttempts: 3, baseDelayMs: 10 })
@@ -180,7 +188,11 @@ describe("error-recovery", () => {
       });
 
       expect(onRetry).toHaveBeenCalledTimes(1);
-      expect(onRetry).toHaveBeenCalledWith(1, expect.any(Object), expect.any(Number));
+      expect(onRetry).toHaveBeenCalledWith(
+        1,
+        expect.any(Object),
+        expect.any(Number)
+      );
     });
   });
 
@@ -288,7 +300,9 @@ describe("error-recovery", () => {
 
       it("includes timestamp", () => {
         saveProgress("assessment-123", "hr-interview", {});
-        const stored = JSON.parse(mockStorage["progress-assessment-123-hr-interview"]);
+        const stored = JSON.parse(
+          mockStorage["progress-assessment-123-hr-interview"]
+        );
         expect(stored.lastUpdated).toBeTruthy();
         expect(new Date(stored.lastUpdated)).toBeInstanceOf(Date);
       });
@@ -296,7 +310,9 @@ describe("error-recovery", () => {
 
     describe("loadProgress", () => {
       it("loads saved progress", () => {
-        saveProgress("assessment-123", "hr-interview", { transcript: ["message"] });
+        saveProgress("assessment-123", "hr-interview", {
+          transcript: ["message"],
+        });
         const progress = loadProgress("assessment-123", "hr-interview");
         expect(progress).toBeTruthy();
         expect(progress?.data.transcript).toEqual(["message"]);

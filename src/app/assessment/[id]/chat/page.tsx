@@ -9,7 +9,10 @@ interface ChatPageProps {
   searchParams: Promise<{ coworkerId?: string }>;
 }
 
-export default async function ChatPage({ params, searchParams }: ChatPageProps) {
+export default async function ChatPage({
+  params,
+  searchParams,
+}: ChatPageProps) {
   const session = await auth();
   if (!session?.user?.id) {
     redirect("/sign-in");

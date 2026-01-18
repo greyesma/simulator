@@ -17,10 +17,7 @@ import {
   onStreamEnded,
   type ScreenPermissionState,
 } from "@/lib/screen";
-import {
-  VideoRecorder,
-  checkMediaRecorderSupport,
-} from "@/lib/video-recorder";
+import { VideoRecorder, checkMediaRecorderSupport } from "@/lib/video-recorder";
 
 export type ScreenRecordingState =
   | "idle"
@@ -42,9 +39,8 @@ interface ScreenRecordingContextValue {
   retryRecording: () => Promise<boolean>;
 }
 
-const ScreenRecordingContext = createContext<ScreenRecordingContextValue | null>(
-  null
-);
+const ScreenRecordingContext =
+  createContext<ScreenRecordingContextValue | null>(null);
 
 interface ScreenRecordingProviderProps {
   children: ReactNode;
@@ -152,7 +148,9 @@ interface SessionStatus {
   totalScreenshots: number;
 }
 
-async function getSessionStatus(assessmentId: string): Promise<SessionStatus | null> {
+async function getSessionStatus(
+  assessmentId: string
+): Promise<SessionStatus | null> {
   try {
     const response = await fetch(
       `/api/recording/session?assessmentId=${assessmentId}`
@@ -183,7 +181,8 @@ export function ScreenRecordingProvider({
   const startTimeRef = useRef<number | null>(null);
   const segmentIdRef = useRef<string | null>(null);
 
-  const isSupported = checkScreenCaptureSupport() && checkMediaRecorderSupport();
+  const isSupported =
+    checkScreenCaptureSupport() && checkMediaRecorderSupport();
 
   const handleStreamStopped = useCallback(() => {
     // Stop video recording and upload final chunk
@@ -323,10 +322,7 @@ export function ScreenRecordingProvider({
       ) {
         setPermissionState("denied");
         setError("Screen sharing permission was denied.");
-      } else if (
-        err instanceof DOMException &&
-        err.name === "NotFoundError"
-      ) {
+      } else if (err instanceof DOMException && err.name === "NotFoundError") {
         setPermissionState("unavailable");
         setError("No screen available to share.");
       } else {
@@ -405,7 +401,10 @@ export function ScreenRecordingProvider({
           setState("stopped");
           setPermissionState("stopped");
           // Mark the stale segment as interrupted
-          await interruptRecordingSession(assessmentId, status.activeSegment.id);
+          await interruptRecordingSession(
+            assessmentId,
+            status.activeSegment.id
+          );
         }
       }
 

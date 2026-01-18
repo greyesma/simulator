@@ -629,13 +629,13 @@ The MVP is developer-focused (B2C): developers practice real-world scenarios, re
 
 ## Appendix: Skill Assessment Categories
 
-| Category | What it measures |
-|----------|------------------|
-| Communication | Asking good questions, clarity in calls, articulation |
-| Problem Decomposition | Breaking down the task, planning approach |
-| AI Leverage | Frequency, quality of prompting, appropriate reliance |
-| Code Quality | Clean, tested, maintainable, secure code |
-| XFN Collaboration | Engaging the right coworkers, gathering context |
-| Time Management | Pacing, prioritization, efficiency |
-| Technical Decision-Making | Architecture choices, tradeoffs |
-| Presentation/Defense | Explaining decisions in final meeting |
+| Category                  | What it measures                                      |
+| ------------------------- | ----------------------------------------------------- |
+| Communication             | Asking good questions, clarity in calls, articulation |
+| Problem Decomposition     | Breaking down the task, planning approach             |
+| AI Leverage               | Frequency, quality of prompting, appropriate reliance |
+| Code Quality              | Clean, tested, maintainable, secure code              |
+| XFN Collaboration         | Engaging the right coworkers, gathering context       |
+| Time Management           | Pacing, prioritization, efficiency                    |
+| Technical Decision-Making | Architecture choices, tradeoffs                       |
+| Presentation/Defense      | Explaining decisions in final meeting                 |

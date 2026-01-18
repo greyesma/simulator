@@ -204,19 +204,29 @@ describe("POST /api/chat", () => {
       knowledge: [],
     });
     const existingHistory = [
-      { role: "user", text: "Previous message", timestamp: "2025-01-01T00:00:00Z" },
-      { role: "model", text: "Previous response", timestamp: "2025-01-01T00:00:01Z" },
+      {
+        role: "user",
+        text: "Previous message",
+        timestamp: "2025-01-01T00:00:00Z",
+      },
+      {
+        role: "model",
+        text: "Previous response",
+        timestamp: "2025-01-01T00:00:01Z",
+      },
     ];
     // Mock findMany to return existing text conversation
-    mockConversationFindMany.mockResolvedValue([{
-      id: "conv-1",
-      coworkerId: "coworker-1",
-      type: "text",
-      transcript: existingHistory,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      coworker: { id: "coworker-1", name: "Jordan Rivera" },
-    }]);
+    mockConversationFindMany.mockResolvedValue([
+      {
+        id: "conv-1",
+        coworkerId: "coworker-1",
+        type: "text",
+        transcript: existingHistory,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        coworker: { id: "coworker-1", name: "Jordan Rivera" },
+      },
+    ]);
     mockConversationUpdate.mockResolvedValue({});
     mockGenerateContent.mockResolvedValue({
       text: "Follow-up response",
@@ -243,7 +253,9 @@ describe("POST /api/chat", () => {
           expect.objectContaining({
             role: "user",
             parts: expect.arrayContaining([
-              expect.objectContaining({ text: expect.stringContaining("SYSTEM INSTRUCTIONS") }),
+              expect.objectContaining({
+                text: expect.stringContaining("SYSTEM INSTRUCTIONS"),
+              }),
             ]),
           }),
           // History messages
@@ -345,7 +357,9 @@ describe("GET /api/chat", () => {
       user: { id: "user-1" },
     });
 
-    const request = new Request("http://localhost/api/chat?assessmentId=test-id");
+    const request = new Request(
+      "http://localhost/api/chat?assessmentId=test-id"
+    );
 
     const response = await GET(request);
     expect(response.status).toBe(400);

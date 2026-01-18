@@ -25,10 +25,11 @@ vi.mock("@/lib/gemini", () => ({
 // Import after mocking
 import { gemini } from "@/lib/gemini";
 import { parseFeedback } from "./feedback-parsing";
-import type { FeedbackParseResult, ConstraintUpdate } from "./feedback-parsing";
 
 // Cast the mock for type safety
-const mockGenerateContent = gemini.models.generateContent as ReturnType<typeof vi.fn>;
+const mockGenerateContent = gemini.models.generateContent as ReturnType<
+  typeof vi.fn
+>;
 
 // ============================================================================
 // Test Setup
@@ -131,7 +132,9 @@ describe("parseFeedback", () => {
         }),
       });
 
-      const result = await parseFeedback("Need someone who knows React and TypeScript");
+      const result = await parseFeedback(
+        "Need someone who knows React and TypeScript"
+      );
 
       expect(result.success).toBe(true);
       expect(result.constraints).toContainEqual(
@@ -224,16 +227,17 @@ describe("parseFeedback", () => {
         expect.objectContaining({ type: "years_experience", value: "8+" })
       );
       expect(result.constraints).toContainEqual(
-        expect.objectContaining({ type: "skills", value: expect.arrayContaining(["Python"]) })
+        expect.objectContaining({
+          type: "skills",
+          value: expect.arrayContaining(["Python"]),
+        })
       );
     });
   });
 
   describe("error handling", () => {
     it("returns success: false when Gemini call fails", async () => {
-      mockGenerateContent.mockRejectedValueOnce(
-        new Error("API error")
-      );
+      mockGenerateContent.mockRejectedValueOnce(new Error("API error"));
 
       const result = await parseFeedback("Some feedback");
 

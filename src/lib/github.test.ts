@@ -49,7 +49,9 @@ describe("parseGitHubPrUrl", () => {
 
   it("should return null for invalid GitHub URLs", () => {
     expect(parseGitHubPrUrl("https://github.com/owner/repo")).toBeNull();
-    expect(parseGitHubPrUrl("https://github.com/owner/repo/issues/123")).toBeNull();
+    expect(
+      parseGitHubPrUrl("https://github.com/owner/repo/issues/123")
+    ).toBeNull();
     expect(parseGitHubPrUrl("https://github.com/owner/repo/pull/")).toBeNull();
     expect(parseGitHubPrUrl("not-a-url")).toBeNull();
   });
@@ -334,9 +336,8 @@ describe("fetchGitHubPrContent without token", () => {
       },
     }));
 
-    const { fetchGitHubPrContent: fetchWithoutToken } = await import(
-      "./github"
-    );
+    const { fetchGitHubPrContent: fetchWithoutToken } =
+      await import("./github");
     const result = await fetchWithoutToken(
       "https://github.com/owner/repo/pull/123"
     );

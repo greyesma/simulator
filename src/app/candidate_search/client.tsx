@@ -16,11 +16,25 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { ArrowUp, Briefcase, MapPin, Clock, Cpu, Building2, Factory, Loader2, CheckCircle, ArrowLeft } from "lucide-react";
+import {
+  ArrowUp,
+  Briefcase,
+  MapPin,
+  Clock,
+  Cpu,
+  Building2,
+  Factory,
+  Loader2,
+  CheckCircle,
+  ArrowLeft,
+} from "lucide-react";
 import type { ExtractedIntent } from "@/lib/entity-extraction";
 import type { RoleArchetype } from "@/lib/archetype-weights";
 import type { SeniorityLevel } from "@/lib/seniority-thresholds";
-import { CandidateSearchResultGrid, type CandidateSearchResult } from "@/components/candidate-search-result-card";
+import {
+  CandidateSearchResultGrid,
+  type CandidateSearchResult,
+} from "@/components/candidate-search-result-card";
 import { RejectionFeedbackModal } from "@/components/rejection-feedback-modal";
 import type { ConstraintUpdate } from "@/lib/feedback-parsing";
 import { AssessmentDimension } from "@prisma/client";
@@ -85,14 +99,39 @@ const MOCK_CANDIDATES: CandidateSearchResult[] = [
     archetype: "SENIOR_FRONTEND_ENGINEER",
     seniorityLevel: "SENIOR",
     dimensionScores: [
-      { dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE, score: 5, weightLevel: "VERY_HIGH" },
-      { dimension: AssessmentDimension.PROBLEM_SOLVING, score: 4, weightLevel: "HIGH" },
-      { dimension: AssessmentDimension.COMMUNICATION, score: 5, weightLevel: "VERY_HIGH" },
-      { dimension: AssessmentDimension.COLLABORATION, score: 4, weightLevel: "HIGH" },
-      { dimension: AssessmentDimension.ADAPTABILITY, score: 4, weightLevel: "MEDIUM" },
-      { dimension: AssessmentDimension.LEADERSHIP, score: 3, weightLevel: "MEDIUM" },
+      {
+        dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE,
+        score: 5,
+        weightLevel: "VERY_HIGH",
+      },
+      {
+        dimension: AssessmentDimension.PROBLEM_SOLVING,
+        score: 4,
+        weightLevel: "HIGH",
+      },
+      {
+        dimension: AssessmentDimension.COMMUNICATION,
+        score: 5,
+        weightLevel: "VERY_HIGH",
+      },
+      {
+        dimension: AssessmentDimension.COLLABORATION,
+        score: 4,
+        weightLevel: "HIGH",
+      },
+      {
+        dimension: AssessmentDimension.ADAPTABILITY,
+        score: 4,
+        weightLevel: "MEDIUM",
+      },
+      {
+        dimension: AssessmentDimension.LEADERSHIP,
+        score: 3,
+        weightLevel: "MEDIUM",
+      },
     ],
-    summaryExcerpt: "Exceptional frontend developer with 8 years of React experience and strong communication skills.",
+    summaryExcerpt:
+      "Exceptional frontend developer with 8 years of React experience and strong communication skills.",
     completedAt: new Date("2026-01-10"),
   },
   {
@@ -102,14 +141,39 @@ const MOCK_CANDIDATES: CandidateSearchResult[] = [
     archetype: "SENIOR_FRONTEND_ENGINEER",
     seniorityLevel: "MID",
     dimensionScores: [
-      { dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE, score: 4, weightLevel: "VERY_HIGH" },
-      { dimension: AssessmentDimension.PROBLEM_SOLVING, score: 4, weightLevel: "HIGH" },
-      { dimension: AssessmentDimension.COMMUNICATION, score: 4, weightLevel: "VERY_HIGH" },
-      { dimension: AssessmentDimension.COLLABORATION, score: 4, weightLevel: "HIGH" },
-      { dimension: AssessmentDimension.ADAPTABILITY, score: 3, weightLevel: "MEDIUM" },
-      { dimension: AssessmentDimension.LEADERSHIP, score: 3, weightLevel: "MEDIUM" },
+      {
+        dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE,
+        score: 4,
+        weightLevel: "VERY_HIGH",
+      },
+      {
+        dimension: AssessmentDimension.PROBLEM_SOLVING,
+        score: 4,
+        weightLevel: "HIGH",
+      },
+      {
+        dimension: AssessmentDimension.COMMUNICATION,
+        score: 4,
+        weightLevel: "VERY_HIGH",
+      },
+      {
+        dimension: AssessmentDimension.COLLABORATION,
+        score: 4,
+        weightLevel: "HIGH",
+      },
+      {
+        dimension: AssessmentDimension.ADAPTABILITY,
+        score: 3,
+        weightLevel: "MEDIUM",
+      },
+      {
+        dimension: AssessmentDimension.LEADERSHIP,
+        score: 3,
+        weightLevel: "MEDIUM",
+      },
     ],
-    summaryExcerpt: "Solid frontend developer with 5 years of experience, strong in React and TypeScript.",
+    summaryExcerpt:
+      "Solid frontend developer with 5 years of experience, strong in React and TypeScript.",
     completedAt: new Date("2026-01-12"),
   },
   {
@@ -119,14 +183,39 @@ const MOCK_CANDIDATES: CandidateSearchResult[] = [
     archetype: "FULLSTACK_ENGINEER",
     seniorityLevel: "SENIOR",
     dimensionScores: [
-      { dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE, score: 5, weightLevel: "VERY_HIGH" },
-      { dimension: AssessmentDimension.PROBLEM_SOLVING, score: 5, weightLevel: "VERY_HIGH" },
-      { dimension: AssessmentDimension.COMMUNICATION, score: 4, weightLevel: "HIGH" },
-      { dimension: AssessmentDimension.COLLABORATION, score: 4, weightLevel: "HIGH" },
-      { dimension: AssessmentDimension.ADAPTABILITY, score: 5, weightLevel: "VERY_HIGH" },
-      { dimension: AssessmentDimension.LEADERSHIP, score: 4, weightLevel: "MEDIUM" },
+      {
+        dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE,
+        score: 5,
+        weightLevel: "VERY_HIGH",
+      },
+      {
+        dimension: AssessmentDimension.PROBLEM_SOLVING,
+        score: 5,
+        weightLevel: "VERY_HIGH",
+      },
+      {
+        dimension: AssessmentDimension.COMMUNICATION,
+        score: 4,
+        weightLevel: "HIGH",
+      },
+      {
+        dimension: AssessmentDimension.COLLABORATION,
+        score: 4,
+        weightLevel: "HIGH",
+      },
+      {
+        dimension: AssessmentDimension.ADAPTABILITY,
+        score: 5,
+        weightLevel: "VERY_HIGH",
+      },
+      {
+        dimension: AssessmentDimension.LEADERSHIP,
+        score: 4,
+        weightLevel: "MEDIUM",
+      },
     ],
-    summaryExcerpt: "Versatile fullstack engineer with 7 years of experience, excellent problem-solving skills.",
+    summaryExcerpt:
+      "Versatile fullstack engineer with 7 years of experience, excellent problem-solving skills.",
     completedAt: new Date("2026-01-14"),
   },
 ];
@@ -179,9 +268,13 @@ export function CandidateSearchClient() {
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
 
   // Results state
-  const [searchResults, setSearchResults] = useState<CandidateSearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<CandidateSearchResult[]>(
+    []
+  );
   const [hasSearched, setHasSearched] = useState(false);
-  const [rejectedCandidateIds, setRejectedCandidateIds] = useState<Set<string>>(new Set());
+  const [rejectedCandidateIds, setRejectedCandidateIds] = useState<Set<string>>(
+    new Set()
+  );
 
   // Rejection modal state
   const [rejectionModal, setRejectionModal] = useState<{
@@ -250,10 +343,13 @@ export function CandidateSearchClient() {
   }, [toasts]);
 
   // Add a toast notification
-  const addToast = useCallback((message: string, type: Toast["type"] = "info") => {
-    const id = `toast-${Date.now()}`;
-    setToasts((prev) => [...prev, { id, message, type }]);
-  }, []);
+  const addToast = useCallback(
+    (message: string, type: Toast["type"] = "info") => {
+      const id = `toast-${Date.now()}`;
+      setToasts((prev) => [...prev, { id, message, type }]);
+    },
+    []
+  );
 
   // Debounced entity extraction
   const extractEntities = useCallback(async (text: string) => {
@@ -323,16 +419,20 @@ export function CandidateSearchClient() {
   };
 
   // Handle candidate rejection - open modal
-  const handleRejectCandidate = useCallback((candidateId: string) => {
-    const candidate = searchResults.find((c) => c.id === candidateId);
-    if (!candidate) return;
+  const handleRejectCandidate = useCallback(
+    (candidateId: string) => {
+      const candidate = searchResults.find((c) => c.id === candidateId);
+      if (!candidate) return;
 
-    setRejectionModal({
-      isOpen: true,
-      candidateId,
-      candidateName: candidate.candidate.name || candidate.candidate.email || "Anonymous",
-    });
-  }, [searchResults]);
+      setRejectionModal({
+        isOpen: true,
+        candidateId,
+        candidateName:
+          candidate.candidate.name || candidate.candidate.email || "Anonymous",
+      });
+    },
+    [searchResults]
+  );
 
   // Handle feedback submission from modal
   const handleFeedbackSubmit = async (feedback: string) => {
@@ -360,7 +460,9 @@ export function CandidateSearchClient() {
 
           const constraintDescriptions = result.constraints
             .map((c: ConstraintUpdate) => {
-              const value = Array.isArray(c.value) ? c.value.join(", ") : c.value;
+              const value = Array.isArray(c.value)
+                ? c.value.join(", ")
+                : c.value;
               return `${c.type}: ${value}`;
             })
             .join("; ");
@@ -380,28 +482,41 @@ export function CandidateSearchClient() {
                       ? constraint.value.match(/(\d+)/)
                       : null;
                   if (yearsMatch) {
-                    updatedIntent.years_experience = parseInt(yearsMatch[1], 10);
+                    updatedIntent.years_experience = parseInt(
+                      yearsMatch[1],
+                      10
+                    );
                   }
                   break;
                 case "skills":
                   const newSkills = Array.isArray(constraint.value)
                     ? constraint.value
                     : [constraint.value];
-                  updatedIntent.skills = [...(updatedIntent.skills || []), ...newSkills];
+                  updatedIntent.skills = [
+                    ...(updatedIntent.skills || []),
+                    ...newSkills,
+                  ];
                   break;
                 case "job_title":
                   updatedIntent.job_title =
-                    typeof constraint.value === "string" ? constraint.value : null;
+                    typeof constraint.value === "string"
+                      ? constraint.value
+                      : null;
                   break;
                 case "location":
                   updatedIntent.location =
-                    typeof constraint.value === "string" ? constraint.value : null;
+                    typeof constraint.value === "string"
+                      ? constraint.value
+                      : null;
                   break;
                 case "industry":
                   const newIndustry = Array.isArray(constraint.value)
                     ? constraint.value
                     : [constraint.value];
-                  updatedIntent.industry = [...(updatedIntent.industry || []), ...newIndustry];
+                  updatedIntent.industry = [
+                    ...(updatedIntent.industry || []),
+                    ...newIndustry,
+                  ];
                   break;
                 case "company_type":
                   const newCompanyType = Array.isArray(constraint.value)
@@ -426,7 +541,9 @@ export function CandidateSearchClient() {
     }
 
     // Remove the rejected candidate from results
-    setRejectedCandidateIds((prev) => new Set([...prev, rejectionModal.candidateId!]));
+    setRejectedCandidateIds(
+      (prev) => new Set([...prev, rejectionModal.candidateId!])
+    );
 
     // Close modal
     setRejectionModal({ isOpen: false, candidateId: null, candidateName: "" });
@@ -444,40 +561,43 @@ export function CandidateSearchClient() {
   };
 
   // Handle removing a single filter
-  const handleRemoveFilter = useCallback((filter: ActiveFilter) => {
-    if (!extraction) return;
+  const handleRemoveFilter = useCallback(
+    (filter: ActiveFilter) => {
+      if (!extraction) return;
 
-    // Update the extraction intent
-    const updatedIntent = removeFilterFromIntent(extraction.intent, filter);
+      // Update the extraction intent
+      const updatedIntent = removeFilterFromIntent(extraction.intent, filter);
 
-    // Clear archetype/seniority if the corresponding filter was removed
-    let updatedArchetype = extraction.archetype;
-    let updatedSeniority = extraction.seniority;
+      // Clear archetype/seniority if the corresponding filter was removed
+      let updatedArchetype = extraction.archetype;
+      let updatedSeniority = extraction.seniority;
 
-    if (filter.type === "job_title" || filter.type === "archetype") {
-      updatedArchetype = null;
-    }
-    if (filter.type === "years_experience" || filter.type === "seniority") {
-      updatedSeniority = null;
-    }
+      if (filter.type === "job_title" || filter.type === "archetype") {
+        updatedArchetype = null;
+      }
+      if (filter.type === "years_experience" || filter.type === "seniority") {
+        updatedSeniority = null;
+      }
 
-    setExtraction({
-      ...extraction,
-      intent: updatedIntent,
-      archetype: updatedArchetype,
-      seniority: updatedSeniority,
-    });
+      setExtraction({
+        ...extraction,
+        intent: updatedIntent,
+        archetype: updatedArchetype,
+        seniority: updatedSeniority,
+      });
 
-    // Remove from refined fields if it was marked as refined
-    if (refinedFields.has(filter.type)) {
-      const newRefinedFields = new Set(refinedFields);
-      newRefinedFields.delete(filter.type);
-      setRefinedFields(newRefinedFields);
-    }
+      // Remove from refined fields if it was marked as refined
+      if (refinedFields.has(filter.type)) {
+        const newRefinedFields = new Set(refinedFields);
+        newRefinedFields.delete(filter.type);
+        setRefinedFields(newRefinedFields);
+      }
 
-    // Show toast
-    addToast(`Removed ${filter.label} filter`, "info");
-  }, [extraction, refinedFields, addToast]);
+      // Show toast
+      addToast(`Removed ${filter.label} filter`, "info");
+    },
+    [extraction, refinedFields, addToast]
+  );
 
   // Handle clearing all filters
   const handleClearAllFilters = useCallback(() => {
@@ -516,7 +636,7 @@ export function CandidateSearchClient() {
       label: "Job Title",
       value: extraction?.archetype
         ? formatArchetype(extraction.archetype)
-        : extraction?.intent.job_title ?? null,
+        : (extraction?.intent.job_title ?? null),
       icon: <Briefcase size={14} />,
       isActive: !!(extraction?.intent.job_title || extraction?.archetype),
     },
@@ -534,7 +654,9 @@ export function CandidateSearchClient() {
           ? `${extraction.intent.years_experience}+ years`
           : null,
       icon: <Clock size={14} />,
-      isActive: !!(extraction?.intent.years_experience || extraction?.seniority),
+      isActive: !!(
+        extraction?.intent.years_experience || extraction?.seniority
+      ),
     },
     {
       label: "Skills",
@@ -543,7 +665,9 @@ export function CandidateSearchClient() {
           ? extraction.intent.skills.join(", ")
           : null,
       icon: <Cpu size={14} />,
-      isActive: !!(extraction?.intent.skills && extraction.intent.skills.length > 0),
+      isActive: !!(
+        extraction?.intent.skills && extraction.intent.skills.length > 0
+      ),
     },
     {
       label: "Industry",
@@ -552,17 +676,21 @@ export function CandidateSearchClient() {
           ? extraction.intent.industry.join(", ")
           : null,
       icon: <Factory size={14} />,
-      isActive: !!(extraction?.intent.industry && extraction.intent.industry.length > 0),
+      isActive: !!(
+        extraction?.intent.industry && extraction.intent.industry.length > 0
+      ),
     },
     {
       label: "Company Type",
       value:
-        extraction?.intent.company_type && extraction.intent.company_type.length > 0
+        extraction?.intent.company_type &&
+        extraction.intent.company_type.length > 0
           ? extraction.intent.company_type.join(", ")
           : null,
       icon: <Building2 size={14} />,
       isActive: !!(
-        extraction?.intent.company_type && extraction.intent.company_type.length > 0
+        extraction?.intent.company_type &&
+        extraction.intent.company_type.length > 0
       ),
     },
   ];
@@ -578,15 +706,15 @@ export function CandidateSearchClient() {
     : [];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="flex min-h-screen flex-col bg-background">
       {/* Header */}
       <header className="border-b-2 border-foreground px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+        <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div className="flex items-center gap-4">
             {hasSearched && (
               <button
                 onClick={handleBackToSearch}
-                className="p-2 border-2 border-foreground hover:bg-accent"
+                className="border-2 border-foreground p-2 hover:bg-accent"
                 aria-label="Back to search"
                 data-testid="back-button"
               >
@@ -595,50 +723,53 @@ export function CandidateSearchClient() {
             )}
             <h1 className="text-xl font-bold">Candidate Search</h1>
           </div>
-          <span className="text-sm text-muted-foreground font-mono">BETA</span>
+          <span className="font-mono text-sm text-muted-foreground">BETA</span>
         </div>
       </header>
 
       {/* Main content */}
-      <main className="flex-1 flex flex-col px-6 py-8">
+      <main className="flex flex-1 flex-col px-6 py-8">
         {isSearching ? (
           /* Loading State */
-          <div className="flex-1 flex items-center justify-center" data-testid="loading-state">
+          <div
+            className="flex flex-1 items-center justify-center"
+            data-testid="loading-state"
+          >
             <div className="w-full max-w-3xl">
               <div className="flex flex-col items-center justify-center py-16">
                 {/* Animated loading indicator */}
                 <div
-                  className="relative w-16 h-16 mb-8"
+                  className="relative mb-8 h-16 w-16"
                   data-testid="loading-indicator"
                 >
                   {/* Outer spinning ring */}
-                  <div className="absolute inset-0 border-4 border-muted animate-spin border-t-secondary" />
+                  <div className="absolute inset-0 animate-spin border-4 border-muted border-t-secondary" />
                   {/* Inner pulsing circle */}
-                  <div className="absolute inset-3 bg-secondary animate-pulse" />
+                  <div className="absolute inset-3 animate-pulse bg-secondary" />
                 </div>
 
                 {/* Sequential loading messages */}
                 <div className="text-center" data-testid="loading-messages">
                   <p
-                    className="text-xl font-medium text-foreground mb-2 transition-opacity duration-300"
+                    className="mb-2 text-xl font-medium text-foreground transition-opacity duration-300"
                     data-testid="current-loading-message"
                   >
                     {LOADING_MESSAGES[loadingMessageIndex]}
                   </p>
-                  <p className="text-sm text-muted-foreground font-mono">
+                  <p className="font-mono text-sm text-muted-foreground">
                     Please wait while we search our database
                   </p>
                 </div>
 
                 {/* Progress dots showing message sequence */}
                 <div
-                  className="flex gap-2 mt-8"
+                  className="mt-8 flex gap-2"
                   data-testid="loading-progress-dots"
                 >
                   {LOADING_MESSAGES.map((_, index) => (
                     <div
                       key={index}
-                      className={`w-2 h-2 transition-colors ${
+                      className={`h-2 w-2 transition-colors ${
                         index <= loadingMessageIndex
                           ? "bg-secondary"
                           : "bg-muted"
@@ -652,7 +783,10 @@ export function CandidateSearchClient() {
           </div>
         ) : hasSearched ? (
           /* Search Results */
-          <div className="w-full max-w-6xl mx-auto" data-testid="search-results">
+          <div
+            className="mx-auto w-full max-w-6xl"
+            data-testid="search-results"
+          >
             {/* Active filters bar - above results */}
             <ActiveFiltersBar
               filters={activeFilters}
@@ -664,7 +798,8 @@ export function CandidateSearchClient() {
             {/* Results count */}
             <div className="mb-6 flex items-center justify-between">
               <p className="text-muted-foreground">
-                {visibleResults.length} candidate{visibleResults.length !== 1 ? "s" : ""} found
+                {visibleResults.length} candidate
+                {visibleResults.length !== 1 ? "s" : ""} found
                 {rejectedCandidateIds.size > 0 && (
                   <span className="ml-2 text-sm">
                     ({rejectedCandidateIds.size} rejected)
@@ -681,11 +816,11 @@ export function CandidateSearchClient() {
           </div>
         ) : (
           /* Search Form */
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-1 items-center justify-center">
             <div className="w-full max-w-3xl">
               {/* Greeting */}
               <div className="mb-8 text-center">
-                <h2 className="text-3xl font-bold mb-3">
+                <h2 className="mb-3 text-3xl font-bold">
                   Hi there, please describe the profile you&apos;re looking for.
                 </h2>
                 <p className="text-muted-foreground">
@@ -702,7 +837,7 @@ export function CandidateSearchClient() {
                   onKeyDown={handleKeyDown}
                   placeholder={EXAMPLE_QUERY}
                   rows={4}
-                  className="w-full px-4 py-4 pr-16 border-2 border-foreground bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-secondary resize-none font-sans"
+                  className="w-full resize-none border-2 border-foreground bg-background px-4 py-4 pr-16 font-sans text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-secondary"
                   disabled={isSearching}
                   data-testid="search-input"
                 />
@@ -710,7 +845,7 @@ export function CandidateSearchClient() {
                 <button
                   onClick={handleSearch}
                   disabled={!query.trim() || isSearching}
-                  className="absolute bottom-4 right-4 w-10 h-10 flex items-center justify-center bg-purple-600 text-white border-2 border-foreground hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center border-2 border-foreground bg-purple-600 text-white hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label="Search"
                   data-testid="search-button"
                 >
@@ -724,12 +859,12 @@ export function CandidateSearchClient() {
 
               {/* Context tags */}
               <div className="border-2 border-foreground bg-background p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+                <div className="mb-3 flex items-center gap-2">
+                  <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
                     Detected Entities
                   </span>
                   {isExtracting && (
-                    <span className="w-2 h-2 bg-secondary animate-pulse" />
+                    <span className="h-2 w-2 animate-pulse bg-secondary" />
                   )}
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -742,7 +877,7 @@ export function CandidateSearchClient() {
               {/* Processing time indicator */}
               {extraction && (
                 <div className="mt-4 text-center">
-                  <span className="text-xs font-mono text-muted-foreground">
+                  <span className="font-mono text-xs text-muted-foreground">
                     Extracted in {extraction.processingTimeMs}ms
                   </span>
                 </div>
@@ -754,7 +889,7 @@ export function CandidateSearchClient() {
 
       {/* Footer */}
       <footer className="border-t-2 border-foreground px-6 py-4">
-        <div className="max-w-6xl mx-auto text-center text-sm text-muted-foreground">
+        <div className="mx-auto max-w-6xl text-center text-sm text-muted-foreground">
           <span className="font-mono">Powered by AI entity extraction</span>
         </div>
       </footer>
@@ -763,24 +898,30 @@ export function CandidateSearchClient() {
       <RejectionFeedbackModal
         isOpen={rejectionModal.isOpen}
         candidateName={rejectionModal.candidateName}
-        onClose={() => setRejectionModal({ isOpen: false, candidateId: null, candidateName: "" })}
+        onClose={() =>
+          setRejectionModal({
+            isOpen: false,
+            candidateId: null,
+            candidateName: "",
+          })
+        }
         onSubmit={handleFeedbackSubmit}
       />
 
       {/* Toast Notifications */}
-      <div className="fixed bottom-6 right-6 flex flex-col gap-2 z-50" data-testid="toast-container">
+      <div
+        className="fixed bottom-6 right-6 z-50 flex flex-col gap-2"
+        data-testid="toast-container"
+      >
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`
-              flex items-center gap-3 px-4 py-3 border-2 border-foreground
-              ${toast.type === "success" ? "bg-green-100 dark:bg-green-900" : ""}
-              ${toast.type === "error" ? "bg-red-100 dark:bg-red-900" : ""}
-              ${toast.type === "info" ? "bg-background" : ""}
-            `}
+            className={`flex items-center gap-3 border-2 border-foreground px-4 py-3 ${toast.type === "success" ? "bg-green-100 dark:bg-green-900" : ""} ${toast.type === "error" ? "bg-red-100 dark:bg-red-900" : ""} ${toast.type === "info" ? "bg-background" : ""} `}
             data-testid="toast"
           >
-            {toast.type === "success" && <CheckCircle size={20} className="text-green-600" />}
+            {toast.type === "success" && (
+              <CheckCircle size={20} className="text-green-600" />
+            )}
             <span className="font-medium">{toast.message}</span>
           </div>
         ))}
@@ -800,23 +941,26 @@ interface ContextTagBadgeProps {
 function ContextTagBadge({ tag }: ContextTagBadgeProps) {
   return (
     <div
-      className={`
-        flex items-center gap-2 px-3 py-2 border-2 transition-colors
-        ${
-          tag.isActive
-            ? "border-foreground bg-secondary text-secondary-foreground"
-            : "border-muted-foreground/30 bg-muted/20 text-muted-foreground"
-        }
-      `}
+      className={`flex items-center gap-2 border-2 px-3 py-2 transition-colors ${
+        tag.isActive
+          ? "border-foreground bg-secondary text-secondary-foreground"
+          : "border-muted-foreground/30 bg-muted/20 text-muted-foreground"
+      } `}
     >
-      <span className={tag.isActive ? "text-secondary-foreground" : "text-muted-foreground"}>
+      <span
+        className={
+          tag.isActive ? "text-secondary-foreground" : "text-muted-foreground"
+        }
+      >
         {tag.icon}
       </span>
       <div className="flex flex-col">
-        <span className="text-xs font-mono uppercase tracking-wider opacity-70">
+        <span className="font-mono text-xs uppercase tracking-wider opacity-70">
           {tag.label}
         </span>
-        <span className={`text-sm font-medium ${tag.isActive ? "" : "opacity-50"}`}>
+        <span
+          className={`text-sm font-medium ${tag.isActive ? "" : "opacity-50"}`}
+        >
           {tag.value || "Not detected"}
         </span>
       </div>

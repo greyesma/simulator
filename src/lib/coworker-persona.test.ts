@@ -152,7 +152,10 @@ describe("buildCoworkerSystemPrompt", () => {
       knowledge: [],
     };
 
-    const prompt = buildCoworkerSystemPrompt(coworkerWithNoKnowledge, baseContext);
+    const prompt = buildCoworkerSystemPrompt(
+      coworkerWithNoKnowledge,
+      baseContext
+    );
 
     expect(prompt).toContain("don't have specific technical knowledge");
   });

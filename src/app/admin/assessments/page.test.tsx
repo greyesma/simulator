@@ -238,7 +238,9 @@ describe("AssessmentsClient", () => {
     );
 
     const statsGrid = screen.getByTestId("stats-grid");
-    expect(within(statsGrid).getByText("TOTAL ASSESSMENTS")).toBeInTheDocument();
+    expect(
+      within(statsGrid).getByText("TOTAL ASSESSMENTS")
+    ).toBeInTheDocument();
     expect(within(statsGrid).getByText("3")).toBeInTheDocument();
     expect(within(statsGrid).getByText("SUCCESS RATE")).toBeInTheDocument();
     expect(within(statsGrid).getByText("33%")).toBeInTheDocument();
@@ -306,7 +308,9 @@ describe("AssessmentsClient", () => {
 
       expect(screen.getByText("John Doe")).toBeInTheDocument();
       expect(screen.queryByText("Jane Smith")).not.toBeInTheDocument();
-      expect(screen.getByText("Showing 1 of 3 assessments")).toBeInTheDocument();
+      expect(
+        screen.getByText("Showing 1 of 3 assessments")
+      ).toBeInTheDocument();
     });
 
     it("filters by email", () => {
@@ -354,7 +358,9 @@ describe("AssessmentsClient", () => {
       fireEvent.click(clearButton);
 
       expect((searchInput as HTMLInputElement).value).toBe("");
-      expect(screen.getByText("Showing 3 of 3 assessments")).toBeInTheDocument();
+      expect(
+        screen.getByText("Showing 3 of 3 assessments")
+      ).toBeInTheDocument();
     });
   });
 
@@ -372,7 +378,9 @@ describe("AssessmentsClient", () => {
 
       expect(screen.getByText("John Doe")).toBeInTheDocument();
       expect(screen.queryByText("Jane Smith")).not.toBeInTheDocument();
-      expect(screen.getByText("Showing 1 of 3 assessments")).toBeInTheDocument();
+      expect(
+        screen.getByText("Showing 1 of 3 assessments")
+      ).toBeInTheDocument();
     });
 
     it("shows all statuses when 'All Status' is selected", () => {
@@ -387,7 +395,9 @@ describe("AssessmentsClient", () => {
       fireEvent.change(statusFilter, { target: { value: "WORKING" } });
       fireEvent.change(statusFilter, { target: { value: "all" } });
 
-      expect(screen.getByText("Showing 3 of 3 assessments")).toBeInTheDocument();
+      expect(
+        screen.getByText("Showing 3 of 3 assessments")
+      ).toBeInTheDocument();
     });
   });
 
@@ -462,7 +472,9 @@ describe("AssessmentsClient", () => {
 
       const details = screen.getByTestId("details-assess-1");
       expect(within(details).getByText("assess-1")).toBeInTheDocument();
-      expect(within(details).getByText("Frontend Developer")).toBeInTheDocument();
+      expect(
+        within(details).getByText("Frontend Developer")
+      ).toBeInTheDocument();
     });
 
     it("shows event logs in expanded view", () => {
@@ -477,7 +489,9 @@ describe("AssessmentsClient", () => {
       fireEvent.click(firstRow);
 
       const details = screen.getByTestId("details-assess-1");
-      expect(within(details).getByText("EVENT LOG (2 events)")).toBeInTheDocument();
+      expect(
+        within(details).getByText("EVENT LOG (2 events)")
+      ).toBeInTheDocument();
       expect(within(details).getByText("STARTED")).toBeInTheDocument();
     });
 
@@ -493,7 +507,9 @@ describe("AssessmentsClient", () => {
       fireEvent.click(firstRow);
 
       const details = screen.getByTestId("details-assess-1");
-      expect(within(details).getByText("API CALLS (1 calls)")).toBeInTheDocument();
+      expect(
+        within(details).getByText("API CALLS (1 calls)")
+      ).toBeInTheDocument();
       expect(
         within(details).getByText("gemini-3-flash-preview")
       ).toBeInTheDocument();
@@ -564,7 +580,9 @@ describe("AssessmentsClient", () => {
       fireEvent.click(thirdRow);
 
       const details = screen.getByTestId("details-assess-3");
-      expect(within(details).getByText("No events recorded")).toBeInTheDocument();
+      expect(
+        within(details).getByText("No events recorded")
+      ).toBeInTheDocument();
     });
 
     it("shows empty API calls message in expanded view when no calls", () => {
@@ -664,7 +682,9 @@ describe("AssessmentsClient", () => {
       fireEvent.change(searchInput, { target: { value: "John" } });
 
       expect(screen.getByText("John Doe")).toBeInTheDocument();
-      expect(screen.getByText("Showing 1 of 3 assessments")).toBeInTheDocument();
+      expect(
+        screen.getByText("Showing 1 of 3 assessments")
+      ).toBeInTheDocument();
     });
   });
 });

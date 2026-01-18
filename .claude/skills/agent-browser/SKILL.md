@@ -14,6 +14,7 @@ Installed globally via `npm install -g agent-browser` with Chromium downloaded v
 ## Core Commands
 
 ### Navigation & Screenshots
+
 ```bash
 # Open a URL
 agent-browser open "https://example.com"
@@ -29,6 +30,7 @@ agent-browser snapshot
 ```
 
 ### Interactions
+
 ```bash
 # Click element (use @ref from snapshot, or CSS selector)
 agent-browser click "@ref123"
@@ -53,6 +55,7 @@ agent-browser wait 2000
 ```
 
 ### Get Information
+
 ```bash
 agent-browser get text ".message"
 agent-browser get html "#content"
@@ -63,6 +66,7 @@ agent-browser get url
 ```
 
 ### Check State
+
 ```bash
 agent-browser is visible ".modal"
 agent-browser is enabled "button.submit"
@@ -72,12 +76,14 @@ agent-browser is checked "#remember-me"
 ## Visual Testing Workflow
 
 1. **Capture baseline screenshots** before changes:
+
    ```bash
    agent-browser open "http://localhost:3000"
    agent-browser screenshot ./baseline/home.png
    ```
 
 2. **After changes, capture new screenshots**:
+
    ```bash
    agent-browser open "http://localhost:3000"
    agent-browser screenshot ./current/home.png
@@ -89,10 +95,10 @@ agent-browser is checked "#remember-me"
 
 Two test users are seeded in the database for E2E testing. Use these to access protected routes:
 
-| Role  | Email            | Password          |
-|-------|------------------|-------------------|
-| Admin | admin@test.com   | testpassword123   |
-| User  | user@test.com    | testpassword123   |
+| Role  | Email          | Password        |
+| ----- | -------------- | --------------- |
+| Admin | admin@test.com | testpassword123 |
+| User  | user@test.com  | testpassword123 |
 
 **Note:** Run `npx tsx prisma/seed.ts` to create these users if they don't exist.
 
@@ -127,6 +133,7 @@ agent-browser screenshot ./screenshots/admin-dashboard.png
 ```
 
 **Important:** Use the same `--session` flag across all commands to maintain the login session:
+
 ```bash
 agent-browser open "http://localhost:3000/sign-in" --session "my-test"
 agent-browser fill "#email" "user@test.com" --session "my-test"

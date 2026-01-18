@@ -15,8 +15,13 @@ export function ScreenRecordingGuard({
   assessmentId,
   companyName = "the company",
 }: ScreenRecordingGuardProps) {
-  const { state, permissionState, isRecording, startRecording, retryRecording } =
-    useScreenRecordingContext();
+  const {
+    state,
+    permissionState,
+    isRecording,
+    startRecording,
+    retryRecording,
+  } = useScreenRecordingContext();
   const [showStoppedModal, setShowStoppedModal] = useState(false);
   const [showInitialModal, setShowInitialModal] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
@@ -69,34 +74,35 @@ export function ScreenRecordingGuard({
   if (showInitialModal) {
     return (
       <>
-        <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
-          <div className="max-w-lg w-full">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background p-4">
+          <div className="w-full max-w-lg">
             {/* Icons */}
             <div className="mb-6 text-center">
               <div className="inline-flex items-center gap-4">
-                <div className="bg-secondary border-4 border-foreground p-4">
-                  <Monitor className="w-8 h-8 text-secondary-foreground" />
+                <div className="border-4 border-foreground bg-secondary p-4">
+                  <Monitor className="h-8 w-8 text-secondary-foreground" />
                 </div>
                 <span className="text-2xl font-bold">+</span>
-                <div className="bg-secondary border-4 border-foreground p-4">
-                  <Mic className="w-8 h-8 text-secondary-foreground" />
+                <div className="border-4 border-foreground bg-secondary p-4">
+                  <Mic className="h-8 w-8 text-secondary-foreground" />
                 </div>
               </div>
             </div>
 
             {/* Title */}
-            <h2 className="text-2xl font-bold text-center mb-4">
+            <h2 className="mb-4 text-center text-2xl font-bold">
               Recording Notice
             </h2>
 
             {/* Message */}
-            <div className="bg-muted border-2 border-foreground p-6 mb-6">
-              <p className="text-foreground mb-4">
-                To provide you with detailed feedback on your work, we need to record:
+            <div className="mb-6 border-2 border-foreground bg-muted p-6">
+              <p className="mb-4 text-foreground">
+                To provide you with detailed feedback on your work, we need to
+                record:
               </p>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <Monitor className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <Monitor className="mt-0.5 h-5 w-5 flex-shrink-0" />
                   <div>
                     <span className="font-bold">Screen Recording</span>
                     <p className="text-sm text-muted-foreground">
@@ -105,7 +111,7 @@ export function ScreenRecordingGuard({
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Mic className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <Mic className="mt-0.5 h-5 w-5 flex-shrink-0" />
                   <div>
                     <span className="font-bold">Voice Recording</span>
                     <p className="text-sm text-muted-foreground">
@@ -114,8 +120,9 @@ export function ScreenRecordingGuard({
                   </div>
                 </li>
               </ul>
-              <p className="mt-4 text-sm text-muted-foreground font-mono border-t border-border pt-4">
-                Your recordings are private and only used for assessment at {companyName}.
+              <p className="mt-4 border-t border-border pt-4 font-mono text-sm text-muted-foreground">
+                Your recordings are private and only used for assessment at{" "}
+                {companyName}.
               </p>
             </div>
 
@@ -123,29 +130,29 @@ export function ScreenRecordingGuard({
             <button
               onClick={handleAcceptAndStart}
               disabled={isStarting}
-              className="w-full bg-foreground text-background px-6 py-4 text-lg font-bold border-4 border-foreground hover:bg-secondary hover:text-secondary-foreground disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              className="flex w-full items-center justify-center gap-3 border-4 border-foreground bg-foreground px-6 py-4 text-lg font-bold text-background hover:bg-secondary hover:text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isStarting ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-background border-t-transparent animate-spin" />
+                  <div className="h-5 w-5 animate-spin border-2 border-background border-t-transparent" />
                   Starting Recording...
                 </>
               ) : (
                 <>
                   Accept & Continue
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="h-5 w-5" />
                 </>
               )}
             </button>
 
-            <p className="mt-4 text-center text-sm text-muted-foreground font-mono">
+            <p className="mt-4 text-center font-mono text-sm text-muted-foreground">
               You will be prompted to share your screen next
             </p>
           </div>
         </div>
 
         {/* Render children behind the overlay (hidden) */}
-        <div className="blur-sm pointer-events-none">{children}</div>
+        <div className="pointer-events-none blur-sm">{children}</div>
       </>
     );
   }
@@ -155,27 +162,27 @@ export function ScreenRecordingGuard({
     return (
       <>
         {/* Overlay */}
-        <div className="fixed inset-0 bg-background/95 z-50 flex items-center justify-center p-4">
-          <div className="max-w-md w-full">
+        <div className="bg-background/95 fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="w-full max-w-md">
             {/* Warning icon */}
             <div className="mb-6 text-center">
-              <div className="inline-block bg-secondary border-4 border-foreground p-4">
-                <AlertTriangle className="w-12 h-12 text-secondary-foreground" />
+              <div className="inline-block border-4 border-foreground bg-secondary p-4">
+                <AlertTriangle className="h-12 w-12 text-secondary-foreground" />
               </div>
             </div>
 
             {/* Title */}
-            <h2 className="text-2xl font-bold text-center mb-4">
+            <h2 className="mb-4 text-center text-2xl font-bold">
               Screen Recording Stopped
             </h2>
 
             {/* Message */}
-            <div className="bg-muted border-2 border-foreground p-6 mb-6">
-              <p className="text-muted-foreground mb-4">
+            <div className="mb-6 border-2 border-foreground bg-muted p-6">
+              <p className="mb-4 text-muted-foreground">
                 Your screen recording has stopped. To continue with the
                 assessment, you need to share your screen again.
               </p>
-              <p className="text-sm font-mono text-muted-foreground">
+              <p className="font-mono text-sm text-muted-foreground">
                 Screen recording is required to capture your work process and
                 provide you with detailed feedback.
               </p>
@@ -185,29 +192,29 @@ export function ScreenRecordingGuard({
             <button
               onClick={handleRetry}
               disabled={isRetrying}
-              className="w-full bg-foreground text-background px-6 py-4 text-lg font-bold border-4 border-foreground hover:bg-secondary hover:text-secondary-foreground disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              className="flex w-full items-center justify-center gap-3 border-4 border-foreground bg-foreground px-6 py-4 text-lg font-bold text-background hover:bg-secondary hover:text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isRetrying ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-background border-t-transparent animate-spin" />
+                  <div className="h-5 w-5 animate-spin border-2 border-background border-t-transparent" />
                   Requesting Permission...
                 </>
               ) : (
                 <>
-                  <Monitor className="w-5 h-5" />
+                  <Monitor className="h-5 w-5" />
                   Resume Screen Sharing
                 </>
               )}
             </button>
 
-            <p className="mt-4 text-center text-sm text-muted-foreground font-mono">
+            <p className="mt-4 text-center font-mono text-sm text-muted-foreground">
               You cannot continue without screen sharing enabled
             </p>
           </div>
         </div>
 
         {/* Render children behind the overlay (hidden) */}
-        <div className="blur-sm pointer-events-none">{children}</div>
+        <div className="pointer-events-none blur-sm">{children}</div>
       </>
     );
   }

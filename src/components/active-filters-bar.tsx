@@ -99,14 +99,11 @@ function FilterChip({
 }) {
   return (
     <div
-      className={`
-        inline-flex items-center gap-2 px-3 py-2 border-2
-        ${
-          filter.isRefinedByFeedback
-            ? "border-purple-500 bg-purple-50 dark:bg-purple-950"
-            : "border-foreground bg-secondary"
-        }
-      `}
+      className={`inline-flex items-center gap-2 border-2 px-3 py-2 ${
+        filter.isRefinedByFeedback
+          ? "border-purple-500 bg-purple-50 dark:bg-purple-950"
+          : "border-foreground bg-secondary"
+      } `}
       data-testid="filter-chip"
       data-filter-type={filter.type}
     >
@@ -124,7 +121,7 @@ function FilterChip({
       {/* Label and Value */}
       <span className="flex items-center gap-1">
         <span
-          className={`text-xs font-mono uppercase tracking-wider ${
+          className={`font-mono text-xs uppercase tracking-wider ${
             filter.isRefinedByFeedback
               ? "text-purple-600 dark:text-purple-400"
               : "text-secondary-foreground/70"
@@ -155,14 +152,11 @@ function FilterChip({
       {/* Remove button */}
       <button
         onClick={onRemove}
-        className={`
-          p-0.5 hover:bg-foreground/10 transition-colors
-          ${
-            filter.isRefinedByFeedback
-              ? "text-purple-700 dark:text-purple-300 hover:text-purple-900 dark:hover:text-purple-100"
-              : "text-secondary-foreground hover:text-foreground"
-          }
-        `}
+        className={`hover:bg-foreground/10 p-0.5 transition-colors ${
+          filter.isRefinedByFeedback
+            ? "text-purple-700 hover:text-purple-900 dark:text-purple-300 dark:hover:text-purple-100"
+            : "text-secondary-foreground hover:text-foreground"
+        } `}
         aria-label={`Remove ${filter.label} filter`}
         data-testid="remove-filter-button"
       >
@@ -199,13 +193,13 @@ export function ActiveFiltersBar({
 
   return (
     <div
-      className={`p-4 border-2 border-foreground bg-muted/10 ${className}`}
+      className={`bg-muted/10 border-2 border-foreground p-4 ${className}`}
       data-testid="active-filters-bar"
     >
       {/* Header row with label and clear all */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+          <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
             Active Filters
           </span>
           {hasRefinedFilters && (
@@ -223,7 +217,7 @@ export function ActiveFiltersBar({
         {hasMultipleFilters && (
           <button
             onClick={onClearAll}
-            className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-2"
+            className="text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
             data-testid="clear-all-filters-button"
           >
             Clear all filters
@@ -232,7 +226,10 @@ export function ActiveFiltersBar({
       </div>
 
       {/* Filter chips */}
-      <div className="flex flex-wrap gap-2" data-testid="filter-chips-container">
+      <div
+        className="flex flex-wrap gap-2"
+        data-testid="filter-chips-container"
+      >
         {filters.map((filter, index) => (
           <FilterChip
             key={`${filter.type}-${filter.value}-${index}`}
@@ -272,7 +269,8 @@ export function createFiltersFromIntent(
       type: "archetype",
       label: "Role",
       value: formatArchetype(archetype),
-      isRefinedByFeedback: refinedFields.has("job_title") || refinedFields.has("archetype"),
+      isRefinedByFeedback:
+        refinedFields.has("job_title") || refinedFields.has("archetype"),
     });
   } else if (intent.job_title) {
     filters.push({
@@ -299,7 +297,8 @@ export function createFiltersFromIntent(
       type: "seniority",
       label: "Experience",
       value: formatSeniority(seniority),
-      isRefinedByFeedback: refinedFields.has("years_experience") || refinedFields.has("seniority"),
+      isRefinedByFeedback:
+        refinedFields.has("years_experience") || refinedFields.has("seniority"),
     });
   } else if (intent.years_experience !== null) {
     filters.push({

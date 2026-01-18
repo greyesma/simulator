@@ -8,10 +8,7 @@ import {
   type ConversationWithMeta,
   type ChatMessage,
 } from "@/lib/conversation-memory";
-import {
-  fetchPrCiStatus,
-  formatCiStatusForPrompt,
-} from "@/lib/github";
+import { fetchPrCiStatus, formatCiStatusForPrompt } from "@/lib/github";
 import {
   analyzeCodeReview,
   buildCodeReviewData,
@@ -112,19 +109,21 @@ export async function POST(request: Request) {
     // Extended type for conversation types (the DB stores more than just text/voice)
     type ExtendedConversationType = "text" | "voice" | "kickoff" | "defense";
 
-    interface ExtendedConversationWithMeta extends Omit<ConversationWithMeta, "type"> {
+    interface ExtendedConversationWithMeta extends Omit<
+      ConversationWithMeta,
+      "type"
+    > {
       type: ExtendedConversationType;
     }
 
-    const allConversations: ExtendedConversationWithMeta[] = assessment.conversations.map(
-      (conv) => ({
+    const allConversations: ExtendedConversationWithMeta[] =
+      assessment.conversations.map((conv) => ({
         type: conv.type as ExtendedConversationType,
         coworkerId: conv.coworkerId,
         messages: (conv.transcript as unknown as ChatMessage[]) || [],
         createdAt: conv.createdAt,
         updatedAt: conv.updatedAt,
-      })
-    );
+      }));
 
     // Get memory context for manager (they were in kickoff call)
     const managerConversations = allConversations.filter(
@@ -174,7 +173,8 @@ ${hr.communicationNotes ? `- Notes: ${hr.communicationNotes}` : ""}`;
     }
 
     // Fetch CI status for the PR
-    let ciStatusSummary = "CI Status: Not available (PR not yet submitted or CI not configured)";
+    let ciStatusSummary =
+      "CI Status: Not available (PR not yet submitted or CI not configured)";
     if (assessment.prUrl) {
       try {
         const ciStatus = await fetchPrCiStatus(assessment.prUrl);
@@ -210,7 +210,10 @@ ${hr.communicationNotes ? `- Notes: ${hr.communicationNotes}` : ""}`;
         } else {
           // Run code review analysis
           const analysis = await analyzeCodeReview(assessment.prUrl);
-          const codeReviewData = buildCodeReviewData(assessment.prUrl, analysis);
+          const codeReviewData = buildCodeReviewData(
+            assessment.prUrl,
+            analysis
+          );
 
           // Cache the code review in the assessment
           await db.assessment.update({

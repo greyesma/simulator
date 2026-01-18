@@ -144,7 +144,7 @@ async function summarizeConversation(
  */
 export function formatMemoryForPrompt(
   memory: CoworkerMemory,
-  coworkerName: string
+  _coworkerName: string
 ): string {
   if (!memory.hasPriorConversations) {
     return "";

@@ -47,7 +47,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file size
-    const maxSize = type === "video" ? MAX_VIDEO_CHUNK_SIZE : MAX_SCREENSHOT_SIZE;
+    const maxSize =
+      type === "video" ? MAX_VIDEO_CHUNK_SIZE : MAX_SCREENSHOT_SIZE;
     if (file.size > maxSize) {
       return NextResponse.json(
         { error: `File too large. Maximum size is ${maxSize / 1024 / 1024}MB` },
@@ -73,7 +74,8 @@ export async function POST(request: NextRequest) {
     const { error: uploadError } = await supabaseAdmin.storage
       .from(bucket)
       .upload(path, buffer, {
-        contentType: file.type || (type === "video" ? "video/webm" : "image/jpeg"),
+        contentType:
+          file.type || (type === "video" ? "video/webm" : "image/jpeg"),
         cacheControl: "3600",
         upsert: false,
       });

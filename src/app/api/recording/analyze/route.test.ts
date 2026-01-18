@@ -35,7 +35,9 @@ vi.mock("@/lib/supabase", () => ({
       from: () => ({
         createSignedUrl: vi
           .fn()
-          .mockResolvedValue({ data: { signedUrl: "https://example.com/ss.png" } }),
+          .mockResolvedValue({
+            data: { signedUrl: "https://example.com/ss.png" },
+          }),
       }),
     },
   },
@@ -188,7 +190,9 @@ describe("POST /api/recording/analyze", () => {
       ],
     });
     mockAnalyzeSegmentScreenshots.mockResolvedValue({
-      activityTimeline: [{ timestamp: "0:00", activity: "coding", description: "Test" }],
+      activityTimeline: [
+        { timestamp: "0:00", activity: "coding", description: "Test" },
+      ],
       toolUsage: [{ tool: "VS Code", usageCount: 2, contextNotes: "Editing" }],
       stuckMoments: [],
       summary: {
@@ -328,7 +332,10 @@ describe("POST /api/recording/analyze", () => {
 
     const request = new NextRequest("http://localhost/api/recording/analyze", {
       method: "POST",
-      body: JSON.stringify({ assessmentId: "assessment-1", forceReanalyze: true }),
+      body: JSON.stringify({
+        assessmentId: "assessment-1",
+        forceReanalyze: true,
+      }),
     });
 
     const response = await POST(request);

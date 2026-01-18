@@ -1,8 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import {
-  checkMediaRecorderSupport,
-  getBestMimeType,
-} from "./video-recorder";
+import { checkMediaRecorderSupport, getBestMimeType } from "./video-recorder";
 
 describe("video-recorder", () => {
   describe("checkMediaRecorderSupport", () => {

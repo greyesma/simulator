@@ -5,8 +5,8 @@
  * @see Issue #74: US-012
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AssessmentDimension } from "@prisma/client";
 import {
@@ -49,18 +49,46 @@ function createMockCandidate(
     archetype: "SENIOR_FRONTEND_ENGINEER",
     seniorityLevel: "SENIOR",
     dimensionScores: [
-      { dimension: AssessmentDimension.COMMUNICATION, score: 4, weightLevel: "VERY_HIGH" },
-      { dimension: AssessmentDimension.PROBLEM_SOLVING, score: 5, weightLevel: "HIGH" },
+      {
+        dimension: AssessmentDimension.COMMUNICATION,
+        score: 4,
+        weightLevel: "VERY_HIGH",
+      },
+      {
+        dimension: AssessmentDimension.PROBLEM_SOLVING,
+        score: 5,
+        weightLevel: "HIGH",
+      },
       {
         dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE,
         score: 4,
         weightLevel: "VERY_HIGH",
       },
-      { dimension: AssessmentDimension.COLLABORATION, score: 3, weightLevel: "HIGH" },
-      { dimension: AssessmentDimension.ADAPTABILITY, score: 4, weightLevel: "MEDIUM" },
-      { dimension: AssessmentDimension.LEADERSHIP, score: 3, weightLevel: "MEDIUM" },
-      { dimension: AssessmentDimension.CREATIVITY, score: 5, weightLevel: "VERY_HIGH" },
-      { dimension: AssessmentDimension.TIME_MANAGEMENT, score: 4, weightLevel: "HIGH" },
+      {
+        dimension: AssessmentDimension.COLLABORATION,
+        score: 3,
+        weightLevel: "HIGH",
+      },
+      {
+        dimension: AssessmentDimension.ADAPTABILITY,
+        score: 4,
+        weightLevel: "MEDIUM",
+      },
+      {
+        dimension: AssessmentDimension.LEADERSHIP,
+        score: 3,
+        weightLevel: "MEDIUM",
+      },
+      {
+        dimension: AssessmentDimension.CREATIVITY,
+        score: 5,
+        weightLevel: "VERY_HIGH",
+      },
+      {
+        dimension: AssessmentDimension.TIME_MANAGEMENT,
+        score: 4,
+        weightLevel: "HIGH",
+      },
     ],
     summaryExcerpt:
       "Demonstrates strong frontend expertise with excellent communication skills.",
@@ -89,10 +117,14 @@ describe("CandidateSearchResultCard", () => {
     });
 
     it("displays candidate name correctly", () => {
-      const candidate = createMockCandidate({ candidate: { id: "1", name: "John Smith", email: null } });
+      const candidate = createMockCandidate({
+        candidate: { id: "1", name: "John Smith", email: null },
+      });
       render(<CandidateSearchResultCard candidate={candidate} />);
 
-      expect(screen.getByTestId("candidate-name")).toHaveTextContent("John Smith");
+      expect(screen.getByTestId("candidate-name")).toHaveTextContent(
+        "John Smith"
+      );
     });
 
     it("displays candidate email when name is null", () => {
@@ -101,7 +133,9 @@ describe("CandidateSearchResultCard", () => {
       });
       render(<CandidateSearchResultCard candidate={candidate} />);
 
-      expect(screen.getByTestId("candidate-name")).toHaveTextContent("john@example.com");
+      expect(screen.getByTestId("candidate-name")).toHaveTextContent(
+        "john@example.com"
+      );
     });
 
     it("displays Anonymous when name and email are null", () => {
@@ -110,7 +144,9 @@ describe("CandidateSearchResultCard", () => {
       });
       render(<CandidateSearchResultCard candidate={candidate} />);
 
-      expect(screen.getByTestId("candidate-name")).toHaveTextContent("Anonymous");
+      expect(screen.getByTestId("candidate-name")).toHaveTextContent(
+        "Anonymous"
+      );
     });
 
     it("displays fit score correctly", () => {
@@ -121,10 +157,14 @@ describe("CandidateSearchResultCard", () => {
     });
 
     it("displays archetype match correctly", () => {
-      const candidate = createMockCandidate({ archetype: "ENGINEERING_MANAGER" });
+      const candidate = createMockCandidate({
+        archetype: "ENGINEERING_MANAGER",
+      });
       render(<CandidateSearchResultCard candidate={candidate} />);
 
-      expect(screen.getByTestId("archetype-match")).toHaveTextContent("Eng Manager");
+      expect(screen.getByTestId("archetype-match")).toHaveTextContent(
+        "Eng Manager"
+      );
     });
 
     it("displays summary excerpt when provided", () => {
@@ -134,7 +174,9 @@ describe("CandidateSearchResultCard", () => {
       render(<CandidateSearchResultCard candidate={candidate} />);
 
       expect(screen.getByTestId("summary-section")).toBeInTheDocument();
-      expect(screen.getByText("Strong technical skills with leadership potential.")).toBeInTheDocument();
+      expect(
+        screen.getByText("Strong technical skills with leadership potential.")
+      ).toBeInTheDocument();
     });
 
     it("does not render summary section when summaryExcerpt is null", () => {
@@ -220,11 +262,31 @@ describe("CandidateSearchResultCard", () => {
             score: 5,
             weightLevel: "VERY_HIGH",
           },
-          { dimension: AssessmentDimension.PROBLEM_SOLVING, score: 3, weightLevel: "HIGH" },
-          { dimension: AssessmentDimension.COMMUNICATION, score: 4, weightLevel: "HIGH" },
-          { dimension: AssessmentDimension.COLLABORATION, score: 3, weightLevel: "HIGH" },
-          { dimension: AssessmentDimension.ADAPTABILITY, score: 4, weightLevel: "MEDIUM" },
-          { dimension: AssessmentDimension.LEADERSHIP, score: 3, weightLevel: "MEDIUM" },
+          {
+            dimension: AssessmentDimension.PROBLEM_SOLVING,
+            score: 3,
+            weightLevel: "HIGH",
+          },
+          {
+            dimension: AssessmentDimension.COMMUNICATION,
+            score: 4,
+            weightLevel: "HIGH",
+          },
+          {
+            dimension: AssessmentDimension.COLLABORATION,
+            score: 3,
+            weightLevel: "HIGH",
+          },
+          {
+            dimension: AssessmentDimension.ADAPTABILITY,
+            score: 4,
+            weightLevel: "MEDIUM",
+          },
+          {
+            dimension: AssessmentDimension.LEADERSHIP,
+            score: 3,
+            weightLevel: "MEDIUM",
+          },
         ],
       });
       render(<CandidateSearchResultCard candidate={candidate} />);
@@ -243,11 +305,31 @@ describe("CandidateSearchResultCard", () => {
             score: 3,
             weightLevel: "VERY_HIGH",
           },
-          { dimension: AssessmentDimension.PROBLEM_SOLVING, score: 3, weightLevel: "HIGH" },
-          { dimension: AssessmentDimension.COMMUNICATION, score: 4, weightLevel: "HIGH" },
-          { dimension: AssessmentDimension.COLLABORATION, score: 3, weightLevel: "HIGH" },
-          { dimension: AssessmentDimension.ADAPTABILITY, score: 4, weightLevel: "MEDIUM" },
-          { dimension: AssessmentDimension.LEADERSHIP, score: 3, weightLevel: "MEDIUM" },
+          {
+            dimension: AssessmentDimension.PROBLEM_SOLVING,
+            score: 3,
+            weightLevel: "HIGH",
+          },
+          {
+            dimension: AssessmentDimension.COMMUNICATION,
+            score: 4,
+            weightLevel: "HIGH",
+          },
+          {
+            dimension: AssessmentDimension.COLLABORATION,
+            score: 3,
+            weightLevel: "HIGH",
+          },
+          {
+            dimension: AssessmentDimension.ADAPTABILITY,
+            score: 4,
+            weightLevel: "MEDIUM",
+          },
+          {
+            dimension: AssessmentDimension.LEADERSHIP,
+            score: 3,
+            weightLevel: "MEDIUM",
+          },
         ],
       });
       render(<CandidateSearchResultCard candidate={candidate} />);
@@ -275,11 +357,31 @@ describe("CandidateSearchResultCard", () => {
             score: 1,
             weightLevel: "VERY_HIGH",
           },
-          { dimension: AssessmentDimension.PROBLEM_SOLVING, score: 1, weightLevel: "HIGH" },
-          { dimension: AssessmentDimension.COMMUNICATION, score: 1, weightLevel: "HIGH" },
-          { dimension: AssessmentDimension.COLLABORATION, score: 1, weightLevel: "HIGH" },
-          { dimension: AssessmentDimension.ADAPTABILITY, score: 1, weightLevel: "MEDIUM" },
-          { dimension: AssessmentDimension.LEADERSHIP, score: 1, weightLevel: "MEDIUM" },
+          {
+            dimension: AssessmentDimension.PROBLEM_SOLVING,
+            score: 1,
+            weightLevel: "HIGH",
+          },
+          {
+            dimension: AssessmentDimension.COMMUNICATION,
+            score: 1,
+            weightLevel: "HIGH",
+          },
+          {
+            dimension: AssessmentDimension.COLLABORATION,
+            score: 1,
+            weightLevel: "HIGH",
+          },
+          {
+            dimension: AssessmentDimension.ADAPTABILITY,
+            score: 1,
+            weightLevel: "MEDIUM",
+          },
+          {
+            dimension: AssessmentDimension.LEADERSHIP,
+            score: 1,
+            weightLevel: "MEDIUM",
+          },
         ],
       });
       render(<CandidateSearchResultCard candidate={candidate} />);
@@ -292,11 +394,17 @@ describe("CandidateSearchResultCard", () => {
 
   describe("View Profile link", () => {
     it("links to the correct candidate profile page with archetype context", () => {
-      const candidate = createMockCandidate({ id: "va-456", archetype: "SENIOR_FRONTEND_ENGINEER" });
+      const candidate = createMockCandidate({
+        id: "va-456",
+        archetype: "SENIOR_FRONTEND_ENGINEER",
+      });
       render(<CandidateSearchResultCard candidate={candidate} />);
 
       const viewProfileLink = screen.getByTestId("view-profile-button");
-      expect(viewProfileLink).toHaveAttribute("href", "/candidate/va-456?archetype=SENIOR_FRONTEND_ENGINEER");
+      expect(viewProfileLink).toHaveAttribute(
+        "href",
+        "/candidate/va-456?archetype=SENIOR_FRONTEND_ENGINEER"
+      );
     });
 
     it("displays View Profile button text", () => {
@@ -354,7 +462,12 @@ describe("CandidateSearchResultCard", () => {
   describe("className prop", () => {
     it("applies custom className to card", () => {
       const candidate = createMockCandidate();
-      render(<CandidateSearchResultCard candidate={candidate} className="custom-class" />);
+      render(
+        <CandidateSearchResultCard
+          candidate={candidate}
+          className="custom-class"
+        />
+      );
 
       expect(screen.getByTestId("candidate-card")).toHaveClass("custom-class");
     });
@@ -363,14 +476,18 @@ describe("CandidateSearchResultCard", () => {
   describe("reject button", () => {
     it('renders a "Not a fit" reject button when onReject is provided', () => {
       const candidate = createMockCandidate();
-      render(<CandidateSearchResultCard candidate={candidate} onReject={() => {}} />);
+      render(
+        <CandidateSearchResultCard candidate={candidate} onReject={() => {}} />
+      );
 
       expect(screen.getByTestId("reject-button")).toBeInTheDocument();
     });
 
     it("displays the correct button text", () => {
       const candidate = createMockCandidate();
-      render(<CandidateSearchResultCard candidate={candidate} onReject={() => {}} />);
+      render(
+        <CandidateSearchResultCard candidate={candidate} onReject={() => {}} />
+      );
 
       expect(screen.getByText(/Not a fit/)).toBeInTheDocument();
     });
@@ -379,7 +496,12 @@ describe("CandidateSearchResultCard", () => {
       const user = userEvent.setup();
       const mockOnReject = vi.fn();
       const candidate = createMockCandidate({ id: "va-456" });
-      render(<CandidateSearchResultCard candidate={candidate} onReject={mockOnReject} />);
+      render(
+        <CandidateSearchResultCard
+          candidate={candidate}
+          onReject={mockOnReject}
+        />
+      );
 
       await user.click(screen.getByTestId("reject-button"));
       expect(mockOnReject).toHaveBeenCalledWith("va-456");
@@ -395,7 +517,9 @@ describe("CandidateSearchResultCard", () => {
 
     it("renders reject button when onReject is provided", () => {
       const candidate = createMockCandidate();
-      render(<CandidateSearchResultCard candidate={candidate} onReject={() => {}} />);
+      render(
+        <CandidateSearchResultCard candidate={candidate} onReject={() => {}} />
+      );
 
       expect(screen.getByTestId("reject-button")).toBeInTheDocument();
     });
@@ -444,7 +568,12 @@ describe("CandidateSearchResultGrid", () => {
   describe("className prop", () => {
     it("applies custom className to grid", () => {
       const candidates = [createMockCandidate()];
-      render(<CandidateSearchResultGrid candidates={candidates} className="custom-grid" />);
+      render(
+        <CandidateSearchResultGrid
+          candidates={candidates}
+          className="custom-grid"
+        />
+      );
 
       expect(screen.getByTestId("candidate-grid")).toHaveClass("custom-grid");
     });
@@ -466,7 +595,9 @@ describe("Acceptance Criteria", () => {
 
     expect(screen.getByTestId("candidate-name")).toHaveTextContent("John Doe");
     expect(screen.getByTestId("fit-score-value")).toHaveTextContent("87");
-    expect(screen.getByTestId("archetype-match")).toHaveTextContent("Backend Engineer");
+    expect(screen.getByTestId("archetype-match")).toHaveTextContent(
+      "Backend Engineer"
+    );
   });
 
   it("AC2: Shows 6 dimension scores as compact visual", () => {
@@ -493,10 +624,26 @@ describe("Acceptance Criteria", () => {
           weightLevel: "VERY_HIGH",
         }, // below (amber)
         // Other dimensions
-        { dimension: AssessmentDimension.PROBLEM_SOLVING, score: 4, weightLevel: "HIGH" },
-        { dimension: AssessmentDimension.COLLABORATION, score: 3, weightLevel: "HIGH" },
-        { dimension: AssessmentDimension.ADAPTABILITY, score: 4, weightLevel: "MEDIUM" },
-        { dimension: AssessmentDimension.LEADERSHIP, score: 2, weightLevel: "MEDIUM" },
+        {
+          dimension: AssessmentDimension.PROBLEM_SOLVING,
+          score: 4,
+          weightLevel: "HIGH",
+        },
+        {
+          dimension: AssessmentDimension.COLLABORATION,
+          score: 3,
+          weightLevel: "HIGH",
+        },
+        {
+          dimension: AssessmentDimension.ADAPTABILITY,
+          score: 4,
+          weightLevel: "MEDIUM",
+        },
+        {
+          dimension: AssessmentDimension.LEADERSHIP,
+          score: 2,
+          weightLevel: "MEDIUM",
+        },
       ],
     });
     render(<CandidateSearchResultCard candidate={candidate} />);
@@ -508,21 +655,30 @@ describe("Acceptance Criteria", () => {
 
   it("AC4: Displays 1-sentence summary excerpt", () => {
     const candidate = createMockCandidate({
-      summaryExcerpt: "Exceptional frontend developer with strong React expertise.",
+      summaryExcerpt:
+        "Exceptional frontend developer with strong React expertise.",
     });
     render(<CandidateSearchResultCard candidate={candidate} />);
 
     expect(
-      screen.getByText("Exceptional frontend developer with strong React expertise.")
+      screen.getByText(
+        "Exceptional frontend developer with strong React expertise."
+      )
     ).toBeInTheDocument();
   });
 
   it('AC5: "View Profile" button links to full candidate profile with archetype context', () => {
-    const candidate = createMockCandidate({ id: "test-va-123", archetype: "SENIOR_FRONTEND_ENGINEER" });
+    const candidate = createMockCandidate({
+      id: "test-va-123",
+      archetype: "SENIOR_FRONTEND_ENGINEER",
+    });
     render(<CandidateSearchResultCard candidate={candidate} />);
 
     const viewProfileButton = screen.getByTestId("view-profile-button");
-    expect(viewProfileButton).toHaveAttribute("href", "/candidate/test-va-123?archetype=SENIOR_FRONTEND_ENGINEER");
+    expect(viewProfileButton).toHaveAttribute(
+      "href",
+      "/candidate/test-va-123?archetype=SENIOR_FRONTEND_ENGINEER"
+    );
     expect(viewProfileButton).toHaveTextContent("View Profile");
   });
 
@@ -549,7 +705,9 @@ describe("Acceptance Criteria", () => {
 describe("Issue #75 Acceptance Criteria", () => {
   it('AC1: Each candidate card has a "Not a fit" or "Reject" button', () => {
     const candidate = createMockCandidate();
-    render(<CandidateSearchResultCard candidate={candidate} onReject={() => {}} />);
+    render(
+      <CandidateSearchResultCard candidate={candidate} onReject={() => {}} />
+    );
 
     const rejectButton = screen.getByTestId("reject-button");
     expect(rejectButton).toBeInTheDocument();

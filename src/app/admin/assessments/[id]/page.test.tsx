@@ -300,7 +300,9 @@ describe("AssessmentTimelineClient", () => {
   describe("Candidate Info Section", () => {
     it("displays candidate name", () => {
       render(<AssessmentTimelineClient assessment={serializedAssessment} />);
-      expect(screen.getByTestId("candidate-name")).toHaveTextContent("John Doe");
+      expect(screen.getByTestId("candidate-name")).toHaveTextContent(
+        "John Doe"
+      );
     });
 
     it("displays candidate email", () => {
@@ -425,10 +427,16 @@ describe("AssessmentTimelineClient", () => {
       render(<AssessmentTimelineClient assessment={serializedAssessment} />);
       const timeline = screen.getByTestId("timeline");
       // 4 logs + 1 API call = 5 events
-      expect(within(timeline).getByText("Assessment Started")).toBeInTheDocument();
+      expect(
+        within(timeline).getByText("Assessment Started")
+      ).toBeInTheDocument();
       expect(within(timeline).getByText("Prompt Sent")).toBeInTheDocument();
-      expect(within(timeline).getByText("Response Received")).toBeInTheDocument();
-      expect(within(timeline).getByText("Assessment Completed")).toBeInTheDocument();
+      expect(
+        within(timeline).getByText("Response Received")
+      ).toBeInTheDocument();
+      expect(
+        within(timeline).getByText("Assessment Completed")
+      ).toBeInTheDocument();
       expect(within(timeline).getByText("API Call")).toBeInTheDocument();
     });
 
@@ -500,7 +508,9 @@ describe("AssessmentTimelineClient", () => {
 
       // Click on the error log event (which has metadata)
       const errorEvent = screen.getByTestId("timeline-event-log-2");
-      const clickableDiv = errorEvent.querySelector('[class*="cursor-pointer"]');
+      const clickableDiv = errorEvent.querySelector(
+        '[class*="cursor-pointer"]'
+      );
       expect(clickableDiv).toBeInTheDocument();
       fireEvent.click(clickableDiv!);
 
@@ -515,7 +525,9 @@ describe("AssessmentTimelineClient", () => {
 
       // Click to expand the API call error (which has errorMessage)
       const apiCallEvent = screen.getByTestId("timeline-event-api-2");
-      const clickableDiv = apiCallEvent.querySelector('[class*="cursor-pointer"]');
+      const clickableDiv = apiCallEvent.querySelector(
+        '[class*="cursor-pointer"]'
+      );
       fireEvent.click(clickableDiv!);
 
       expect(screen.getByText("Connection timeout")).toBeInTheDocument();
@@ -528,12 +540,12 @@ describe("AssessmentTimelineClient", () => {
 
       // Click to expand the API call error
       const apiCallEvent = screen.getByTestId("timeline-event-api-2");
-      const clickableDiv = apiCallEvent.querySelector('[class*="cursor-pointer"]');
+      const clickableDiv = apiCallEvent.querySelector(
+        '[class*="cursor-pointer"]'
+      );
       fireEvent.click(clickableDiv!);
 
-      expect(
-        screen.getByText(/Error: Connection timeout/)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Error: Connection timeout/)).toBeInTheDocument();
     });
 
     it("collapses error details when clicked again", () => {
@@ -543,7 +555,9 @@ describe("AssessmentTimelineClient", () => {
 
       // For log events with errors, use error-details
       const logErrorEvent = screen.getByTestId("timeline-event-log-2");
-      const logClickableDiv = logErrorEvent.querySelector('[class*="cursor-pointer"]');
+      const logClickableDiv = logErrorEvent.querySelector(
+        '[class*="cursor-pointer"]'
+      );
       fireEvent.click(logClickableDiv!);
       expect(screen.getByTestId("error-details-log-2")).toBeInTheDocument();
 
@@ -576,12 +590,12 @@ describe("AssessmentTimelineClient", () => {
         apiCalls: [],
       };
 
-      render(
-        <AssessmentTimelineClient assessment={longDurationAssessment} />
-      );
+      render(<AssessmentTimelineClient assessment={longDurationAssessment} />);
 
       const durationMarker = screen.getByTestId("duration-marker-log-2");
-      expect(durationMarker.querySelector("span")).toHaveClass("border-amber-500");
+      expect(durationMarker.querySelector("span")).toHaveClass(
+        "border-amber-500"
+      );
     });
   });
 });
@@ -655,7 +669,9 @@ describe("API Call Details", () => {
     fireEvent.click(clickableDiv!);
 
     const details = screen.getByTestId("api-call-details-api-1");
-    expect(within(details).getByText("gemini-3-flash-preview")).toBeInTheDocument();
+    expect(
+      within(details).getByText("gemini-3-flash-preview")
+    ).toBeInTheDocument();
   });
 
   it("displays status code in expanded details", () => {
@@ -716,7 +732,9 @@ describe("API Call Details", () => {
     const clickableDiv = apiEvent.querySelector('[class*="cursor-pointer"]');
     fireEvent.click(clickableDiv!);
 
-    expect(screen.getByTestId("response-api-1-copy-button")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("response-api-1-copy-button")
+    ).toBeInTheDocument();
   });
 
   it("expands prompt text when header is clicked", () => {
@@ -759,7 +777,9 @@ describe("API Call Details", () => {
 
     // Collapse
     fireEvent.click(clickableDiv!);
-    expect(screen.queryByTestId("api-call-details-api-1")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("api-call-details-api-1")
+    ).not.toBeInTheDocument();
   });
 
   it("displays request and response timestamps", () => {
@@ -851,7 +871,9 @@ describe("AssessmentTimelineClient - Retry Assessment", () => {
   });
 
   it("shows retry assessment button for assessment with errors", () => {
-    render(<AssessmentTimelineClient assessment={serializedAssessmentWithError} />);
+    render(
+      <AssessmentTimelineClient assessment={serializedAssessmentWithError} />
+    );
     expect(screen.getByTestId("retry-assessment-card")).toBeInTheDocument();
   });
 
@@ -861,7 +883,9 @@ describe("AssessmentTimelineClient - Retry Assessment", () => {
       supersededBy: "assess-3",
     };
     render(<AssessmentTimelineClient assessment={supersededAssessment} />);
-    expect(screen.queryByTestId("retry-assessment-card")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("retry-assessment-card")
+    ).not.toBeInTheDocument();
   });
 
   it("shows superseded notice when assessment is superseded", () => {
@@ -932,12 +956,13 @@ describe("AssessmentTimelineClient - Retry Assessment", () => {
   it("shows success toast on successful retry", async () => {
     (global.fetch as Mock).mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({
-        success: true,
-        newAssessmentId: "assess-2",
-        oldAssessmentId: "assess-1",
-        message: "Reassessment queued successfully",
-      }),
+      json: () =>
+        Promise.resolve({
+          success: true,
+          newAssessmentId: "assess-2",
+          oldAssessmentId: "assess-1",
+          message: "Reassessment queued successfully",
+        }),
     });
 
     render(<AssessmentTimelineClient assessment={serializedAssessment} />);
@@ -952,16 +977,19 @@ describe("AssessmentTimelineClient - Retry Assessment", () => {
     await vi.waitFor(() => {
       expect(screen.getByTestId("toast-success")).toBeInTheDocument();
     });
-    expect(screen.getByText("Reassessment queued successfully")).toBeInTheDocument();
+    expect(
+      screen.getByText("Reassessment queued successfully")
+    ).toBeInTheDocument();
   });
 
   it("shows error toast on failed retry", async () => {
     (global.fetch as Mock).mockResolvedValue({
       ok: false,
-      json: () => Promise.resolve({
-        success: false,
-        message: "Assessment not found",
-      }),
+      json: () =>
+        Promise.resolve({
+          success: false,
+          message: "Assessment not found",
+        }),
     });
 
     render(<AssessmentTimelineClient assessment={serializedAssessment} />);
@@ -981,12 +1009,13 @@ describe("AssessmentTimelineClient - Retry Assessment", () => {
   it("navigates to new assessment after successful retry", async () => {
     (global.fetch as Mock).mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({
-        success: true,
-        newAssessmentId: "assess-2",
-        oldAssessmentId: "assess-1",
-        message: "Reassessment queued successfully",
-      }),
+      json: () =>
+        Promise.resolve({
+          success: true,
+          newAssessmentId: "assess-2",
+          oldAssessmentId: "assess-1",
+          message: "Reassessment queued successfully",
+        }),
     });
 
     vi.useFakeTimers();

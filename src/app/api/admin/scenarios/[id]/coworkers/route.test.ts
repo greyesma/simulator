@@ -37,7 +37,9 @@ describe("GET /api/admin/scenarios/[id]/coworkers", () => {
   it("returns 401 if not authenticated", async () => {
     mockAuth.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers");
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers"
+    );
     const response = await GET(request, createContext("scenario-1"));
     const data = await response.json();
 
@@ -50,7 +52,9 @@ describe("GET /api/admin/scenarios/[id]/coworkers", () => {
       user: { id: "user-123", email: "user@test.com", role: "USER" },
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers");
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers"
+    );
     const response = await GET(request, createContext("scenario-1"));
     const data = await response.json();
 
@@ -64,7 +68,9 @@ describe("GET /api/admin/scenarios/[id]/coworkers", () => {
     });
     mockScenarioFindUnique.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/non-existent/coworkers");
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/non-existent/coworkers"
+    );
     const response = await GET(request, createContext("non-existent"));
     const data = await response.json();
 
@@ -98,7 +104,9 @@ describe("GET /api/admin/scenarios/[id]/coworkers", () => {
     ];
     mockCoworkerFindMany.mockResolvedValue(mockCoworkers);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers");
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers"
+    );
     const response = await GET(request, createContext("scenario-1"));
     const data = await response.json();
 
@@ -120,11 +128,14 @@ describe("POST /api/admin/scenarios/[id]/coworkers", () => {
   it("returns 401 if not authenticated", async () => {
     mockAuth.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "Test Coworker" }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Test Coworker" }),
+      }
+    );
 
     const response = await POST(request, createContext("scenario-1"));
     const data = await response.json();
@@ -138,11 +149,14 @@ describe("POST /api/admin/scenarios/[id]/coworkers", () => {
       user: { id: "user-123", email: "user@test.com", role: "USER" },
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "Test Coworker" }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Test Coworker" }),
+      }
+    );
 
     const response = await POST(request, createContext("scenario-1"));
     const data = await response.json();
@@ -157,16 +171,19 @@ describe("POST /api/admin/scenarios/[id]/coworkers", () => {
     });
     mockScenarioFindUnique.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/non-existent/coworkers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: "Test Coworker",
-        role: "Developer",
-        personaStyle: "casual",
-        knowledge: {},
-      }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/non-existent/coworkers",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Test Coworker",
+          role: "Developer",
+          personaStyle: "casual",
+          knowledge: {},
+        }),
+      }
+    );
 
     const response = await POST(request, createContext("non-existent"));
     const data = await response.json();
@@ -193,16 +210,19 @@ describe("POST /api/admin/scenarios/[id]/coworkers", () => {
     };
     mockCoworkerCreate.mockResolvedValue(newCoworker);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: "Sam Patel",
-        role: "Product Manager",
-        personaStyle: "friendly and casual",
-        knowledge: { expertise: ["requirements", "user research"] },
-      }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Sam Patel",
+          role: "Product Manager",
+          personaStyle: "friendly and casual",
+          knowledge: { expertise: ["requirements", "user research"] },
+        }),
+      }
+    );
 
     const response = await POST(request, createContext("scenario-1"));
     const data = await response.json();
@@ -227,20 +247,25 @@ describe("POST /api/admin/scenarios/[id]/coworkers", () => {
     });
     mockScenarioFindUnique.mockResolvedValue({ id: "scenario-1" });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: "Incomplete Coworker",
-        // Missing role, personaStyle
-      }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Incomplete Coworker",
+          // Missing role, personaStyle
+        }),
+      }
+    );
 
     const response = await POST(request, createContext("scenario-1"));
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toBe("Missing required fields: name, role, personaStyle");
+    expect(data.error).toBe(
+      "Missing required fields: name, role, personaStyle"
+    );
   });
 
   it("defaults knowledge to empty object when not provided", async () => {
@@ -257,15 +282,18 @@ describe("POST /api/admin/scenarios/[id]/coworkers", () => {
       knowledge: {},
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: "Basic Coworker",
-        role: "Developer",
-        personaStyle: "casual",
-      }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Basic Coworker",
+          role: "Developer",
+          personaStyle: "casual",
+        }),
+      }
+    );
 
     await POST(request, createContext("scenario-1"));
 

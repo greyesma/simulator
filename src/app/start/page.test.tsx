@@ -43,14 +43,18 @@ describe("/start page", () => {
     it("redirects to sign-in with callback when not authenticated", async () => {
       mockAuth.mockResolvedValueOnce(null);
 
-      await expect(StartPage()).rejects.toThrow("REDIRECT:/sign-in?callbackUrl=/start");
+      await expect(StartPage()).rejects.toThrow(
+        "REDIRECT:/sign-in?callbackUrl=/start"
+      );
       expect(mockRedirect).toHaveBeenCalledWith("/sign-in?callbackUrl=/start");
     });
 
     it("redirects to sign-in when session has no user id", async () => {
       mockAuth.mockResolvedValueOnce({ user: {} });
 
-      await expect(StartPage()).rejects.toThrow("REDIRECT:/sign-in?callbackUrl=/start");
+      await expect(StartPage()).rejects.toThrow(
+        "REDIRECT:/sign-in?callbackUrl=/start"
+      );
       expect(mockRedirect).toHaveBeenCalledWith("/sign-in?callbackUrl=/start");
     });
   });
@@ -64,8 +68,12 @@ describe("/start page", () => {
         scenario: { id: "scenario-1" },
       });
 
-      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/assessment-123/cv-upload");
-      expect(mockRedirect).toHaveBeenCalledWith("/assessment/assessment-123/cv-upload");
+      await expect(StartPage()).rejects.toThrow(
+        "REDIRECT:/assessment/assessment-123/cv-upload"
+      );
+      expect(mockRedirect).toHaveBeenCalledWith(
+        "/assessment/assessment-123/cv-upload"
+      );
     });
 
     it("redirects to congratulations for ONBOARDING status", async () => {
@@ -76,8 +84,12 @@ describe("/start page", () => {
         scenario: { id: "scenario-1" },
       });
 
-      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/assessment-123/congratulations");
-      expect(mockRedirect).toHaveBeenCalledWith("/assessment/assessment-123/congratulations");
+      await expect(StartPage()).rejects.toThrow(
+        "REDIRECT:/assessment/assessment-123/congratulations"
+      );
+      expect(mockRedirect).toHaveBeenCalledWith(
+        "/assessment/assessment-123/congratulations"
+      );
     });
 
     it("redirects to welcome for WORKING status", async () => {
@@ -88,8 +100,12 @@ describe("/start page", () => {
         scenario: { id: "scenario-1" },
       });
 
-      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/assessment-123/welcome");
-      expect(mockRedirect).toHaveBeenCalledWith("/assessment/assessment-123/welcome");
+      await expect(StartPage()).rejects.toThrow(
+        "REDIRECT:/assessment/assessment-123/welcome"
+      );
+      expect(mockRedirect).toHaveBeenCalledWith(
+        "/assessment/assessment-123/welcome"
+      );
     });
 
     it("redirects to defense for FINAL_DEFENSE status", async () => {
@@ -100,8 +116,12 @@ describe("/start page", () => {
         scenario: { id: "scenario-1" },
       });
 
-      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/assessment-123/defense");
-      expect(mockRedirect).toHaveBeenCalledWith("/assessment/assessment-123/defense");
+      await expect(StartPage()).rejects.toThrow(
+        "REDIRECT:/assessment/assessment-123/defense"
+      );
+      expect(mockRedirect).toHaveBeenCalledWith(
+        "/assessment/assessment-123/defense"
+      );
     });
 
     it("redirects to processing for PROCESSING status", async () => {
@@ -112,8 +132,12 @@ describe("/start page", () => {
         scenario: { id: "scenario-1" },
       });
 
-      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/assessment-123/processing");
-      expect(mockRedirect).toHaveBeenCalledWith("/assessment/assessment-123/processing");
+      await expect(StartPage()).rejects.toThrow(
+        "REDIRECT:/assessment/assessment-123/processing"
+      );
+      expect(mockRedirect).toHaveBeenCalledWith(
+        "/assessment/assessment-123/processing"
+      );
     });
 
     it("does not resume COMPLETED assessments", async () => {
@@ -123,7 +147,9 @@ describe("/start page", () => {
       mockScenarioFindFirst.mockResolvedValueOnce({ id: "scenario-1" });
       mockAssessmentCreate.mockResolvedValueOnce({ id: "new-assessment-123" });
 
-      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/new-assessment-123/cv-upload");
+      await expect(StartPage()).rejects.toThrow(
+        "REDIRECT:/assessment/new-assessment-123/cv-upload"
+      );
 
       // Verify the filter excludes COMPLETED status
       expect(mockAssessmentFindFirst).toHaveBeenCalledWith(
@@ -144,7 +170,9 @@ describe("/start page", () => {
         scenario: { id: "scenario-1" },
       });
 
-      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/most-recent-assessment/welcome");
+      await expect(StartPage()).rejects.toThrow(
+        "REDIRECT:/assessment/most-recent-assessment/welcome"
+      );
 
       // Verify orderBy is desc
       expect(mockAssessmentFindFirst).toHaveBeenCalledWith(
@@ -162,7 +190,9 @@ describe("/start page", () => {
       mockScenarioFindFirst.mockResolvedValueOnce({ id: "scenario-1" });
       mockAssessmentCreate.mockResolvedValueOnce({ id: "new-assessment-123" });
 
-      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/new-assessment-123/cv-upload");
+      await expect(StartPage()).rejects.toThrow(
+        "REDIRECT:/assessment/new-assessment-123/cv-upload"
+      );
 
       expect(mockScenarioFindFirst).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -179,7 +209,9 @@ describe("/start page", () => {
         },
       });
 
-      expect(mockRedirect).toHaveBeenCalledWith("/assessment/new-assessment-123/cv-upload");
+      expect(mockRedirect).toHaveBeenCalledWith(
+        "/assessment/new-assessment-123/cv-upload"
+      );
     });
 
     it("redirects new assessment to cv-upload page", async () => {
@@ -188,8 +220,12 @@ describe("/start page", () => {
       mockScenarioFindFirst.mockResolvedValueOnce({ id: "scenario-1" });
       mockAssessmentCreate.mockResolvedValueOnce({ id: "assessment-abc" });
 
-      await expect(StartPage()).rejects.toThrow("REDIRECT:/assessment/assessment-abc/cv-upload");
-      expect(mockRedirect).toHaveBeenCalledWith("/assessment/assessment-abc/cv-upload");
+      await expect(StartPage()).rejects.toThrow(
+        "REDIRECT:/assessment/assessment-abc/cv-upload"
+      );
+      expect(mockRedirect).toHaveBeenCalledWith(
+        "/assessment/assessment-abc/cv-upload"
+      );
     });
   });
 

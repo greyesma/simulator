@@ -1,6 +1,6 @@
 # tests - Test Suite
 
-850+ unit tests (Vitest, co-located as *.test.ts). E2E tests via agent-browser.
+850+ unit tests (Vitest, co-located as \*.test.ts). E2E tests via agent-browser.
 
 ## Vitest Mocking
 

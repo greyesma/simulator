@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { GoogleGenAI, Modality, type Session, type LiveServerMessage } from "@google/genai";
+import {
+  GoogleGenAI,
+  Modality,
+  type Session,
+  type LiveServerMessage,
+} from "@google/genai";
 import {
   checkAudioSupport,
   checkMicrophonePermission,
@@ -69,15 +74,20 @@ export function useVoiceConversation({
   onError,
   maxRetries = DEFAULT_MAX_RETRIES,
 }: UseVoiceConversationOptions): UseVoiceConversationReturn {
-  const [connectionState, setConnectionState] = useState<ConnectionState>("idle");
-  const [permissionState, setPermissionState] = useState<AudioPermissionState>("prompt");
+  const [connectionState, setConnectionState] =
+    useState<ConnectionState>("idle");
+  const [permissionState, setPermissionState] =
+    useState<AudioPermissionState>("prompt");
   const [transcript, setTranscript] = useState<TranscriptMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [categorizedError, setCategorizedError] = useState<CategorizedError | null>(null);
+  const [categorizedError, setCategorizedError] =
+    useState<CategorizedError | null>(null);
   const [isAudioSupported] = useState(() => checkAudioSupport());
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [interviewStartedAt, setInterviewStartedAt] = useState<Date | null>(null);
+  const [interviewStartedAt, setInterviewStartedAt] = useState<Date | null>(
+    null
+  );
   const [interviewEndedAt, setInterviewEndedAt] = useState<Date | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [hasRecoverableSession, setHasRecoverableSession] = useState(false);
@@ -201,43 +211,46 @@ export function useVoiceConversation({
   );
 
   // Initialize audio capture
-  const initializeAudioCapture = useCallback(async (stream: MediaStream, session: Session) => {
-    const audioContext = new AudioContext({ sampleRate: 16000 });
-    audioContextRef.current = audioContext;
+  const initializeAudioCapture = useCallback(
+    async (stream: MediaStream, session: Session) => {
+      const audioContext = new AudioContext({ sampleRate: 16000 });
+      audioContextRef.current = audioContext;
 
-    // Create audio worklet
-    const workletUrl = createAudioWorkletBlobUrl();
-    await audioContext.audioWorklet.addModule(workletUrl);
-    URL.revokeObjectURL(workletUrl);
+      // Create audio worklet
+      const workletUrl = createAudioWorkletBlobUrl();
+      await audioContext.audioWorklet.addModule(workletUrl);
+      URL.revokeObjectURL(workletUrl);
 
-    const source = audioContext.createMediaStreamSource(stream);
-    const workletNode = new AudioWorkletNode(audioContext, "audio-processor");
-    workletNodeRef.current = workletNode;
+      const source = audioContext.createMediaStreamSource(stream);
+      const workletNode = new AudioWorkletNode(audioContext, "audio-processor");
+      workletNodeRef.current = workletNode;
 
-    // Handle audio data from worklet
-    workletNode.port.onmessage = (event) => {
-      if (event.data.type === "audio" && session) {
-        const audioData = new Uint8Array(event.data.data);
-        const base64 = btoa(String.fromCharCode(...audioData));
+      // Handle audio data from worklet
+      workletNode.port.onmessage = (event) => {
+        if (event.data.type === "audio" && session) {
+          const audioData = new Uint8Array(event.data.data);
+          const base64 = btoa(String.fromCharCode(...audioData));
 
-        try {
-          session.sendRealtimeInput({
-            audio: {
-              data: base64,
-              mimeType: "audio/pcm;rate=16000",
-            },
-          });
-        } catch (err) {
-          console.error("Error sending audio:", err);
+          try {
+            session.sendRealtimeInput({
+              audio: {
+                data: base64,
+                mimeType: "audio/pcm;rate=16000",
+              },
+            });
+          } catch (err) {
+            console.error("Error sending audio:", err);
+          }
         }
-      }
-    };
+      };
 
-    source.connect(workletNode);
-    workletNode.connect(audioContext.destination);
+      source.connect(workletNode);
+      workletNode.connect(audioContext.destination);
 
-    setIsListening(true);
-  }, []);
+      setIsListening(true);
+    },
+    []
+  );
 
   // Connect to Gemini Live
   const connect = useCallback(async () => {
@@ -281,7 +294,7 @@ export function useVoiceConversation({
         apiKey: token,
         httpOptions: {
           apiVersion: "v1alpha",
-          baseUrl: "https://generativelanguage.googleapis.com",  // No trailing slash!
+          baseUrl: "https://generativelanguage.googleapis.com", // No trailing slash!
         },
       });
 
@@ -321,7 +334,12 @@ export function useVoiceConversation({
 
       // Start the conversation by sending a greeting trigger
       session.sendClientContent({
-        turns: [{ role: "user", parts: [{ text: "Hello, I'm ready for the interview." }] }],
+        turns: [
+          {
+            role: "user",
+            parts: [{ text: "Hello, I'm ready for the interview." }],
+          },
+        ],
         turnComplete: true,
       });
     } catch (err) {
@@ -382,7 +400,13 @@ export function useVoiceConversation({
 
     // Attempt reconnection
     await connect();
-  }, [categorizedError, retryCount, maxRetries, updateConnectionState, connect]);
+  }, [
+    categorizedError,
+    retryCount,
+    maxRetries,
+    updateConnectionState,
+    connect,
+  ]);
 
   // Recover session from saved progress
   const recoverSession = useCallback(() => {
@@ -393,7 +417,9 @@ export function useVoiceConversation({
       transcriptRef.current = savedTranscript;
 
       if (progress.data.interviewStartedAt) {
-        setInterviewStartedAt(new Date(progress.data.interviewStartedAt as string));
+        setInterviewStartedAt(
+          new Date(progress.data.interviewStartedAt as string)
+        );
       }
 
       setHasRecoverableSession(false);
@@ -449,7 +475,11 @@ export function useVoiceConversation({
 
       if (!transcriptResponse.ok) {
         const errorData = await transcriptResponse.json().catch(() => ({}));
-        console.error("[HR Interview] Failed to save transcript:", transcriptResponse.status, errorData);
+        console.error(
+          "[HR Interview] Failed to save transcript:",
+          transcriptResponse.status,
+          errorData
+        );
         return false;
       }
 
@@ -466,7 +496,10 @@ export function useVoiceConversation({
         });
 
         if (!assessmentResponse.ok) {
-          console.error("[HR Interview] Failed to generate HR assessment:", assessmentResponse.status);
+          console.error(
+            "[HR Interview] Failed to generate HR assessment:",
+            assessmentResponse.status
+          );
           // Continue anyway - transcript was saved, assessment can be generated later
         }
       }
@@ -475,7 +508,10 @@ export function useVoiceConversation({
       clearProgress(assessmentId, PROGRESS_TYPE);
       return true;
     } catch (err) {
-      console.error("[HR Interview] Error saving transcript or generating assessment:", err);
+      console.error(
+        "[HR Interview] Error saving transcript or generating assessment:",
+        err
+      );
       return false;
     }
   }, [assessmentId, disconnect, updateConnectionState, interviewStartedAt]);

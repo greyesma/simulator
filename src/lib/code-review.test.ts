@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   codeQualityFindingSchema,
   patternFindingSchema,
@@ -192,7 +192,9 @@ describe("Code Review Schemas", () => {
         testability: 3,
         notes: ["Good separation of concerns", "Could use more tests"],
       };
-      expect(() => maintainabilityAssessmentSchema.parse(assessment)).not.toThrow();
+      expect(() =>
+        maintainabilityAssessmentSchema.parse(assessment)
+      ).not.toThrow();
     });
 
     it("should reject scores outside 1-5 range", () => {
@@ -212,7 +214,9 @@ describe("Code Review Schemas", () => {
         testability: 3,
         notes: [],
       };
-      expect(() => maintainabilityAssessmentSchema.parse(assessment2)).toThrow();
+      expect(() =>
+        maintainabilityAssessmentSchema.parse(assessment2)
+      ).toThrow();
     });
   });
 
@@ -249,7 +253,8 @@ describe("Code Review Schemas", () => {
       summary: {
         strengths: ["Good code organization", "Proper error handling"],
         areasForImprovement: ["Add more tests"],
-        overallAssessment: "Solid implementation with room for improvement in test coverage",
+        overallAssessment:
+          "Solid implementation with room for improvement in test coverage",
         testCoverage: "adequate",
         codeStyleConsistency: "good",
         aiToolUsageEvident: false,
@@ -279,7 +284,13 @@ describe("Code Review Schemas", () => {
     });
 
     it("should validate all testCoverage types", () => {
-      const coverages = ["comprehensive", "adequate", "minimal", "none", "unknown"];
+      const coverages = [
+        "comprehensive",
+        "adequate",
+        "minimal",
+        "none",
+        "unknown",
+      ];
       coverages.forEach((testCoverage) => {
         const response = {
           ...validResponse,
@@ -432,7 +443,10 @@ describe("formatCodeReviewForPrompt", () => {
     },
     summary: {
       strengths: ["Clean implementation", "Good error handling"],
-      areasForImprovement: ["Add integration tests", "Reduce function complexity"],
+      areasForImprovement: [
+        "Add integration tests",
+        "Reduce function complexity",
+      ],
       overallAssessment: "Good work with some areas needing attention",
       testCoverage: "adequate",
       codeStyleConsistency: "good",
@@ -505,7 +519,8 @@ describe("formatCodeReviewForPrompt", () => {
   it("should not include minor findings in key findings section", () => {
     const prompt = formatCodeReviewForPrompt(mockReviewData);
     // The minor "naming" finding should not appear in Key Code Quality Findings
-    const keyFindingsSection = prompt.split("Key Code Quality Findings")[1]?.split("###")[0] || "";
+    const keyFindingsSection =
+      prompt.split("Key Code Quality Findings")[1]?.split("###")[0] || "";
     expect(keyFindingsSection).not.toContain("naming");
   });
 

@@ -94,11 +94,14 @@ describe("POST /api/admin/scenarios/builder", () => {
   it("returns 401 if not authenticated", async () => {
     mockAuth.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/builder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "Hello" }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/builder",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: "Hello" }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -112,11 +115,14 @@ describe("POST /api/admin/scenarios/builder", () => {
       user: { id: "user-123", email: "user@test.com", role: "USER" },
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/builder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "Hello" }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/builder",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: "Hello" }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -130,11 +136,14 @@ describe("POST /api/admin/scenarios/builder", () => {
       user: { id: "admin-123", email: "admin@test.com", role: "ADMIN" },
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/builder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/builder",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -152,15 +161,18 @@ describe("POST /api/admin/scenarios/builder", () => {
       text: "Great! Let's call your company TechFlow.",
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/builder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: "The company is called TechFlow",
-        history: [],
-        scenarioData: {},
-      }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/builder",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: "The company is called TechFlow",
+          history: [],
+          scenarioData: {},
+        }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -180,18 +192,29 @@ describe("POST /api/admin/scenarios/builder", () => {
       text: "Got it!",
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/builder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: "And the task is to build an API",
-        history: [
-          { role: "user", text: "Company is TechFlow", timestamp: new Date().toISOString() },
-          { role: "model", text: "Great!", timestamp: new Date().toISOString() },
-        ],
-        scenarioData: { companyName: "TechFlow" },
-      }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/builder",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: "And the task is to build an API",
+          history: [
+            {
+              role: "user",
+              text: "Company is TechFlow",
+              timestamp: new Date().toISOString(),
+            },
+            {
+              role: "model",
+              text: "Great!",
+              timestamp: new Date().toISOString(),
+            },
+          ],
+          scenarioData: { companyName: "TechFlow" },
+        }),
+      }
+    );
 
     const response = await POST(request);
 
@@ -223,15 +246,18 @@ describe("POST /api/admin/scenarios/builder", () => {
 
     mockGenerateContent.mockRejectedValue(new Error("Gemini API error"));
 
-    const request = new Request("http://localhost/api/admin/scenarios/builder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: "Hello",
-        history: [],
-        scenarioData: {},
-      }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/builder",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: "Hello",
+          history: [],
+          scenarioData: {},
+        }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -249,15 +275,18 @@ describe("POST /api/admin/scenarios/builder", () => {
       text: "I've updated the scenario.",
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/builder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: "Add a new coworker",
-        history: [],
-        scenarioData: { companyName: "TechFlow" },
-      }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/builder",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: "Add a new coworker",
+          history: [],
+          scenarioData: { companyName: "TechFlow" },
+        }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -277,15 +306,18 @@ describe("POST /api/admin/scenarios/builder", () => {
       text: "Hello!",
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/builder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: "Start",
-        // Missing history
-        scenarioData: {},
-      }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/builder",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: "Start",
+          // Missing history
+          scenarioData: {},
+        }),
+      }
+    );
 
     const response = await POST(request);
 
@@ -301,15 +333,18 @@ describe("POST /api/admin/scenarios/builder", () => {
       text: "Hello!",
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/builder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: "Start",
-        history: [],
-        // Missing scenarioData
-      }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/builder",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: "Start",
+          history: [],
+          // Missing scenarioData
+        }),
+      }
+    );
 
     const response = await POST(request);
 

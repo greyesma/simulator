@@ -2,7 +2,12 @@ import { auth } from "@/auth";
 import { db } from "@/server/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import type { Prisma, UserRole, AssessmentStatus, VideoAssessmentStatus } from "@prisma/client";
+import type {
+  Prisma,
+  UserRole,
+  AssessmentStatus,
+  VideoAssessmentStatus,
+} from "@prisma/client";
 import { ProfileCVSection } from "@/components/profile-cv-section";
 import { ParsedProfileDisplay } from "@/components/parsed-profile-display";
 import type { AssessmentReport } from "@/lib/assessment-aggregation";
@@ -121,7 +126,11 @@ interface TrendData {
   level: string;
 }
 
-function ImprovementTrends({ assessments }: { assessments: AssessmentWithReport[] }) {
+function ImprovementTrends({
+  assessments,
+}: {
+  assessments: AssessmentWithReport[];
+}) {
   // Filter completed assessments with reports and build trend data
   const trendData: TrendData[] = assessments
     .filter((a) => a.status === "COMPLETED" && a.report)
@@ -150,18 +159,19 @@ function ImprovementTrends({ assessments }: { assessments: AssessmentWithReport[
 
   return (
     <section className="mb-12">
-      <h2 className="text-2xl font-bold mb-6">Improvement Trends</h2>
+      <h2 className="mb-6 text-2xl font-bold">Improvement Trends</h2>
       <div className="border-2 border-foreground p-6">
         {/* Summary */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <div>
-            <p className="text-muted-foreground font-mono text-sm">
+            <p className="font-mono text-sm text-muted-foreground">
               {trendData.length} completed assessments
             </p>
-            <p className="text-lg font-bold mt-1">
+            <p className="mt-1 text-lg font-bold">
               {improvement > 0 ? (
                 <span className="text-green-600">
-                  +{improvement.toFixed(1)} points ({improvementPercentage > 0 ? "+" : ""}
+                  +{improvement.toFixed(1)} points (
+                  {improvementPercentage > 0 ? "+" : ""}
                   {improvementPercentage}%)
                 </span>
               ) : improvement < 0 ? (
@@ -174,13 +184,15 @@ function ImprovementTrends({ assessments }: { assessments: AssessmentWithReport[
             </p>
           </div>
           <div className="text-right">
-            <p className="font-mono text-xs text-muted-foreground">LATEST SCORE</p>
+            <p className="font-mono text-xs text-muted-foreground">
+              LATEST SCORE
+            </p>
             <p className="text-3xl font-bold">{lastScore.toFixed(1)}/5</p>
           </div>
         </div>
 
         {/* Visual trend chart */}
-        <div className="relative h-24 border-l-2 border-b-2 border-border">
+        <div className="relative h-24 border-b-2 border-l-2 border-border">
           {/* Y-axis labels */}
           <div className="absolute -left-8 top-0 font-mono text-xs text-muted-foreground">
             {maxScore}
@@ -205,11 +217,12 @@ function ImprovementTrends({ assessments }: { assessments: AssessmentWithReport[
                   {/* Trend line connector */}
                   {prevData && (
                     <div
-                      className="absolute w-full h-px bg-secondary opacity-50"
+                      className="absolute h-px w-full bg-secondary opacity-50"
                       style={{
                         bottom: `${((prevData.score - minScore) / (maxScore - minScore)) * 100}%`,
                         transform: `rotate(${Math.atan2(
-                          (data.score - prevData.score) * (100 / (maxScore - minScore)),
+                          (data.score - prevData.score) *
+                            (100 / (maxScore - minScore)),
                           100 / trendData.length
                         )}rad)`,
                         transformOrigin: "left center",
@@ -218,7 +231,7 @@ function ImprovementTrends({ assessments }: { assessments: AssessmentWithReport[
                   )}
                   {/* Data point */}
                   <div
-                    className="absolute w-3 h-3 bg-secondary border-2 border-foreground"
+                    className="absolute h-3 w-3 border-2 border-foreground bg-secondary"
                     style={{
                       bottom: `${heightPercentage}%`,
                       transform: "translateY(50%)",
@@ -242,11 +255,11 @@ function ImprovementTrends({ assessments }: { assessments: AssessmentWithReport[
         </div>
 
         {/* X-axis dates */}
-        <div className="flex justify-around mt-2 px-4">
+        <div className="mt-2 flex justify-around px-4">
           {trendData.map((data) => (
             <div
               key={data.assessmentId}
-              className="font-mono text-xs text-muted-foreground text-center"
+              className="text-center font-mono text-xs text-muted-foreground"
             >
               {formatDate(data.date)}
             </div>
@@ -313,21 +326,21 @@ export default async function ProfilePage() {
     <main className="min-h-screen bg-background text-foreground">
       {/* Header */}
       <header className="border-b-2 border-border">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-bold text-xl">
+        <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
+          <Link href="/" className="text-xl font-bold">
             Skillvee
           </Link>
           <nav className="flex items-center gap-4">
             <AdminNav />
             <Link
               href="/settings"
-              className="text-muted-foreground hover:text-foreground font-mono text-sm"
+              className="font-mono text-sm text-muted-foreground hover:text-foreground"
             >
               Settings
             </Link>
             <Link
               href="/"
-              className="text-muted-foreground hover:text-foreground font-mono text-sm"
+              className="font-mono text-sm text-muted-foreground hover:text-foreground"
             >
               Home
             </Link>
@@ -335,11 +348,11 @@ export default async function ProfilePage() {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="mx-auto max-w-4xl px-6 py-12">
         {/* Profile Header */}
         <section className="mb-12">
           <div className="flex items-start gap-6">
-            <div className="w-20 h-20 bg-secondary border-2 border-foreground flex items-center justify-center">
+            <div className="flex h-20 w-20 items-center justify-center border-2 border-foreground bg-secondary">
               <span className="text-3xl font-bold text-secondary-foreground">
                 {dbUser.name?.[0]?.toUpperCase() ||
                   dbUser.email?.[0]?.toUpperCase() ||
@@ -347,12 +360,12 @@ export default async function ProfilePage() {
               </span>
             </div>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-1">
+              <h1 className="mb-1 text-3xl font-bold">
                 {dbUser.name || "Anonymous User"}
               </h1>
-              <p className="text-muted-foreground font-mono">{dbUser.email}</p>
+              <p className="font-mono text-muted-foreground">{dbUser.email}</p>
               <div className="mt-3 flex items-center gap-4">
-                <span className="font-mono text-sm px-3 py-1 border-2 border-border">
+                <span className="border-2 border-border px-3 py-1 font-mono text-sm">
                   {dbUser.role}
                 </span>
                 <span className="font-mono text-sm text-muted-foreground">
@@ -364,9 +377,7 @@ export default async function ProfilePage() {
         </section>
 
         {/* CV Upload Section */}
-        <ProfileCVSection
-          initialCvUrl={dbUser.cvUrl}
-        />
+        <ProfileCVSection initialCvUrl={dbUser.cvUrl} />
 
         {/* Parsed Profile Display - shows when profile exists */}
         <ParsedProfileDisplay profile={parsedProfile} />
@@ -381,7 +392,7 @@ export default async function ProfilePage() {
 
         {/* Assessments Section */}
         <section>
-          <div className="flex items-center justify-between mb-6">
+          <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">Past Assessments</h2>
             <span className="font-mono text-sm text-muted-foreground">
               {assessments.length} total
@@ -390,12 +401,12 @@ export default async function ProfilePage() {
 
           {assessments.length === 0 ? (
             <div className="border-2 border-border p-12 text-center">
-              <p className="text-muted-foreground mb-4">
+              <p className="mb-4 text-muted-foreground">
                 No assessments yet. Start your first one to begin practicing.
               </p>
               <Link
                 href="/"
-                className="inline-block bg-foreground text-background px-6 py-3 font-semibold border-2 border-foreground hover:bg-secondary hover:text-secondary-foreground hover:border-secondary"
+                className="inline-block border-2 border-foreground bg-foreground px-6 py-3 font-semibold text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground"
               >
                 Start Practicing
               </Link>
@@ -412,14 +423,14 @@ export default async function ProfilePage() {
                 return (
                   <div
                     key={assessment.id}
-                    className="border-2 border-border p-6 hover:border-foreground transition-colors"
+                    className="border-2 border-border p-6 transition-colors hover:border-foreground"
                   >
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="font-bold text-lg">
+                        <h3 className="text-lg font-bold">
                           {assessment.scenario.name}
                         </h3>
-                        <p className="text-muted-foreground font-mono text-sm">
+                        <p className="font-mono text-sm text-muted-foreground">
                           {assessment.scenario.companyName}
                         </p>
                       </div>
@@ -428,20 +439,24 @@ export default async function ProfilePage() {
                         {report && (
                           <div className="text-right">
                             <div className="flex items-center gap-2">
-                              <ScoreBar score={Math.round(report.overallScore)} />
-                              <span className="font-bold text-lg">
+                              <ScoreBar
+                                score={Math.round(report.overallScore)}
+                              />
+                              <span className="text-lg font-bold">
                                 {report.overallScore.toFixed(1)}
                               </span>
                             </div>
                             <span
                               className={`font-mono text-xs ${getLevelColor(report.overallLevel)}`}
                             >
-                              {report.overallLevel.replace(/_/g, " ").toUpperCase()}
+                              {report.overallLevel
+                                .replace(/_/g, " ")
+                                .toUpperCase()}
                             </span>
                           </div>
                         )}
                         <span
-                          className={`font-mono text-xs px-3 py-1 ${getStatusColor(assessment.status)}`}
+                          className={`px-3 py-1 font-mono text-xs ${getStatusColor(assessment.status)}`}
                         >
                           {getStatusLabel(assessment.status)}
                         </span>
@@ -456,7 +471,7 @@ export default async function ProfilePage() {
                         </span>
                       )}
                       {assessment.completedAt && (
-                        <span className="bg-muted px-2 py-0.5 border border-border">
+                        <span className="border border-border bg-muted px-2 py-0.5">
                           Time: {timeSpent}
                         </span>
                       )}
@@ -464,28 +479,35 @@ export default async function ProfilePage() {
 
                     {/* Report Summary - only for completed assessments */}
                     {report && (
-                      <div className="mt-4 pt-4 border-t border-border">
-                        <p className="text-sm text-muted-foreground line-clamp-2">
+                      <div className="mt-4 border-t border-border pt-4">
+                        <p className="line-clamp-2 text-sm text-muted-foreground">
                           {report.narrative?.overallSummary?.substring(0, 200)}
-                          {(report.narrative?.overallSummary?.length || 0) > 200 && "..."}
+                          {(report.narrative?.overallSummary?.length || 0) >
+                            200 && "..."}
                         </p>
                       </div>
                     )}
 
                     {/* Assessment unavailable message - for failed video assessments */}
                     {assessment.videoAssessment?.status === "FAILED" && (
-                      <div className="mt-4 pt-4 border-t border-border">
-                        <div className="flex items-center gap-3 p-3 bg-red-50 border-2 border-red-200 dark:bg-red-950 dark:border-red-800">
-                          <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+                      <div className="mt-4 border-t border-border pt-4">
+                        <div className="flex items-center gap-3 border-2 border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950">
+                          <AlertTriangle className="h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
                           <div>
                             <p className="text-sm font-semibold text-red-800 dark:text-red-200">
                               Assessment unavailable
                             </p>
-                            <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">
-                              Video assessment could not be processed after {assessment.videoAssessment.retryCount} attempt{assessment.videoAssessment.retryCount !== 1 ? "s" : ""}.
+                            <p className="mt-0.5 text-xs text-red-600 dark:text-red-400">
+                              Video assessment could not be processed after{" "}
+                              {assessment.videoAssessment.retryCount} attempt
+                              {assessment.videoAssessment.retryCount !== 1
+                                ? "s"
+                                : ""}
+                              .
                               {assessment.videoAssessment.lastFailureReason && (
-                                <span className="block mt-1 font-mono">
-                                  Reason: {assessment.videoAssessment.lastFailureReason}
+                                <span className="mt-1 block font-mono">
+                                  Reason:{" "}
+                                  {assessment.videoAssessment.lastFailureReason}
                                 </span>
                               )}
                             </p>
@@ -494,31 +516,32 @@ export default async function ProfilePage() {
                       </div>
                     )}
 
-                    <div className="mt-4 pt-4 border-t border-border flex items-center gap-4">
+                    <div className="mt-4 flex items-center gap-4 border-t border-border pt-4">
                       {assessment.cvUrl && (
                         <a
                           href={assessment.cvUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-mono text-sm text-foreground hover:text-secondary border-b-2 border-secondary"
+                          className="border-b-2 border-secondary font-mono text-sm text-foreground hover:text-secondary"
                         >
                           View Submitted CV
                         </a>
                       )}
 
-                      {assessment.status === "COMPLETED" && assessment.report && (
-                        <Link
-                          href={`/assessment/${assessment.id}/results`}
-                          className="font-mono text-sm text-foreground hover:text-secondary border-b-2 border-secondary"
-                        >
-                          View Full Report
-                        </Link>
-                      )}
+                      {assessment.status === "COMPLETED" &&
+                        assessment.report && (
+                          <Link
+                            href={`/assessment/${assessment.id}/results`}
+                            className="border-b-2 border-secondary font-mono text-sm text-foreground hover:text-secondary"
+                          >
+                            View Full Report
+                          </Link>
+                        )}
 
                       {assessment.status !== "COMPLETED" && (
                         <Link
                           href={`/assessment/${assessment.id}/hr-interview`}
-                          className="font-mono text-sm bg-foreground text-background px-3 py-1 hover:bg-secondary hover:text-secondary-foreground"
+                          className="bg-foreground px-3 py-1 font-mono text-sm text-background hover:bg-secondary hover:text-secondary-foreground"
                         >
                           Continue Assessment
                         </Link>

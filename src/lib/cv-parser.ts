@@ -11,9 +11,21 @@ import type { Prisma } from "@prisma/client";
 /**
  * Helper to handle null values from Gemini (converts null to undefined)
  */
-const nullableString = z.string().nullable().transform(v => v ?? undefined).optional();
-const nullableNumber = z.number().nullable().transform(v => v ?? undefined).optional();
-const nullableStringArray = z.array(z.string()).nullable().transform(v => v ?? undefined).optional();
+const nullableString = z
+  .string()
+  .nullable()
+  .transform((v) => v ?? undefined)
+  .optional();
+const nullableNumber = z
+  .number()
+  .nullable()
+  .transform((v) => v ?? undefined)
+  .optional();
+const nullableStringArray = z
+  .array(z.string())
+  .nullable()
+  .transform((v) => v ?? undefined)
+  .optional();
 
 /**
  * Schema for work experience entries
@@ -61,7 +73,7 @@ export const skillSchema = z.object({
   proficiencyLevel: z
     .enum(["beginner", "intermediate", "advanced", "expert"])
     .nullable()
-    .transform(v => v ?? undefined)
+    .transform((v) => v ?? undefined)
     .optional(),
   yearsOfExperience: nullableNumber,
 });
@@ -80,23 +92,28 @@ export const certificationSchema = z.object({
 /**
  * Normalize language proficiency values that Gemini might return
  */
-const normalizeLanguageProficiency = (value: string): "basic" | "conversational" | "professional" | "native" => {
+const normalizeLanguageProficiency = (
+  value: string
+): "basic" | "conversational" | "professional" | "native" => {
   const normalized = value.toLowerCase();
   // Map common variations to our expected values
-  const mapping: Record<string, "basic" | "conversational" | "professional" | "native"> = {
-    "basic": "basic",
-    "beginner": "basic",
-    "elementary": "basic",
-    "conversational": "conversational",
-    "intermediate": "conversational",
-    "limited_working": "conversational",
-    "professional": "professional",
-    "advanced": "professional",
-    "fluent": "professional",
-    "full_professional": "professional",
-    "native": "native",
-    "native_or_bilingual": "native",
-    "bilingual": "native",
+  const mapping: Record<
+    string,
+    "basic" | "conversational" | "professional" | "native"
+  > = {
+    basic: "basic",
+    beginner: "basic",
+    elementary: "basic",
+    conversational: "conversational",
+    intermediate: "conversational",
+    limited_working: "conversational",
+    professional: "professional",
+    advanced: "professional",
+    fluent: "professional",
+    full_professional: "professional",
+    native: "native",
+    native_or_bilingual: "native",
+    bilingual: "native",
   };
   return mapping[normalized] || "conversational"; // Default to conversational if unknown
 };
@@ -145,7 +162,7 @@ export const parsedProfileSchema = z.object({
   seniorityLevel: z
     .enum(["junior", "mid", "senior", "lead", "principal", "unknown"])
     .nullable()
-    .transform(v => v ?? undefined)
+    .transform((v) => v ?? undefined)
     .optional(),
 
   // Metadata
@@ -232,7 +249,10 @@ export async function parseCv(cvUrl: string): Promise<ParsedProfile> {
 
   let contents: Array<{
     role: "user";
-    parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }>;
+    parts: Array<{
+      text?: string;
+      inlineData?: { mimeType: string; data: string };
+    }>;
   }>;
 
   // Check if we have a base64 file (PDF, DOC, etc.)
@@ -316,8 +336,7 @@ export async function parseCv(cvUrl: string): Promise<ParsedProfile> {
 
     // Return a minimal profile if parsing fails
     return {
-      summary:
-        "Unable to fully parse CV content. Manual review recommended.",
+      summary: "Unable to fully parse CV content. Manual review recommended.",
       workExperience: [],
       education: [],
       skills: [],

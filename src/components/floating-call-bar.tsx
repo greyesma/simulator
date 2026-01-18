@@ -2,7 +2,12 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Mic, MicOff, PhoneOff, Volume2 } from "lucide-react";
-import { GoogleGenAI, Modality, type Session, type LiveServerMessage } from "@google/genai";
+import {
+  GoogleGenAI,
+  Modality,
+  type Session,
+  type LiveServerMessage,
+} from "@google/genai";
 import {
   checkAudioSupport,
   checkMicrophonePermission,
@@ -50,7 +55,8 @@ export function FloatingCallBar({
   onError,
 }: FloatingCallBarProps) {
   const [callState, setCallState] = useState<CallState>("idle");
-  const [permissionState, setPermissionState] = useState<AudioPermissionState>("prompt");
+  const [_permissionState, setPermissionState] =
+    useState<AudioPermissionState>("prompt");
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -91,14 +97,17 @@ export function FloatingCallBar({
   }, [callType]);
 
   // Add message to transcript (for saving, not display)
-  const addToTranscript = useCallback((role: "user" | "model", text: string) => {
-    const message: TranscriptMessage = {
-      role,
-      text,
-      timestamp: new Date().toISOString(),
-    };
-    transcriptRef.current = [...transcriptRef.current, message];
-  }, []);
+  const addToTranscript = useCallback(
+    (role: "user" | "model", text: string) => {
+      const message: TranscriptMessage = {
+        role,
+        text,
+        timestamp: new Date().toISOString(),
+      };
+      transcriptRef.current = [...transcriptRef.current, message];
+    },
+    []
+  );
 
   // Play audio from queue
   const playNextAudio = useCallback(async () => {
@@ -168,43 +177,46 @@ export function FloatingCallBar({
   );
 
   // Initialize audio capture
-  const initializeAudioCapture = useCallback(async (stream: MediaStream, session: Session) => {
-    const audioContext = new AudioContext({ sampleRate: 16000 });
-    audioContextRef.current = audioContext;
+  const initializeAudioCapture = useCallback(
+    async (stream: MediaStream, session: Session) => {
+      const audioContext = new AudioContext({ sampleRate: 16000 });
+      audioContextRef.current = audioContext;
 
-    // Create audio worklet
-    const workletUrl = createAudioWorkletBlobUrl();
-    await audioContext.audioWorklet.addModule(workletUrl);
-    URL.revokeObjectURL(workletUrl);
+      // Create audio worklet
+      const workletUrl = createAudioWorkletBlobUrl();
+      await audioContext.audioWorklet.addModule(workletUrl);
+      URL.revokeObjectURL(workletUrl);
 
-    const source = audioContext.createMediaStreamSource(stream);
-    const workletNode = new AudioWorkletNode(audioContext, "audio-processor");
-    workletNodeRef.current = workletNode;
+      const source = audioContext.createMediaStreamSource(stream);
+      const workletNode = new AudioWorkletNode(audioContext, "audio-processor");
+      workletNodeRef.current = workletNode;
 
-    // Handle audio data from worklet
-    workletNode.port.onmessage = (event) => {
-      if (event.data.type === "audio" && session) {
-        const audioData = new Uint8Array(event.data.data);
-        const base64 = btoa(String.fromCharCode(...audioData));
+      // Handle audio data from worklet
+      workletNode.port.onmessage = (event) => {
+        if (event.data.type === "audio" && session) {
+          const audioData = new Uint8Array(event.data.data);
+          const base64 = btoa(String.fromCharCode(...audioData));
 
-        try {
-          session.sendRealtimeInput({
-            audio: {
-              data: base64,
-              mimeType: "audio/pcm;rate=16000",
-            },
-          });
-        } catch (err) {
-          console.error("Error sending audio:", err);
+          try {
+            session.sendRealtimeInput({
+              audio: {
+                data: base64,
+                mimeType: "audio/pcm;rate=16000",
+              },
+            });
+          } catch (err) {
+            console.error("Error sending audio:", err);
+          }
         }
-      }
-    };
+      };
 
-    source.connect(workletNode);
-    workletNode.connect(audioContext.destination);
+      source.connect(workletNode);
+      workletNode.connect(audioContext.destination);
 
-    setIsListening(true);
-  }, []);
+      setIsListening(true);
+    },
+    []
+  );
 
   // Connect to Gemini Live
   const connect = useCallback(async () => {
@@ -229,9 +241,10 @@ export function FloatingCallBar({
 
       // Get ephemeral token from server
       const tokenEndpoint = getTokenEndpoint();
-      const body = callType === "coworker"
-        ? JSON.stringify({ assessmentId, coworkerId: coworker.id })
-        : JSON.stringify({ assessmentId });
+      const body =
+        callType === "coworker"
+          ? JSON.stringify({ assessmentId, coworkerId: coworker.id })
+          : JSON.stringify({ assessmentId });
 
       const tokenResponse = await fetch(tokenEndpoint, {
         method: "POST",
@@ -290,15 +303,21 @@ export function FloatingCallBar({
 
       // Start the conversation
       session.sendClientContent({
-        turns: [{ role: "user", parts: [{ text: "Hi, thanks for taking my call." }] }],
+        turns: [
+          { role: "user", parts: [{ text: "Hi, thanks for taking my call." }] },
+        ],
         turnComplete: true,
       });
     } catch (err) {
       console.error("Connection error:", err);
-      const errorMessage = err instanceof Error ? err.message : "Connection failed";
+      const errorMessage =
+        err instanceof Error ? err.message : "Connection failed";
       setError(errorMessage);
 
-      if (errorMessage.includes("permission") || errorMessage.includes("NotAllowedError")) {
+      if (
+        errorMessage.includes("permission") ||
+        errorMessage.includes("NotAllowedError")
+      ) {
         setPermissionState("denied");
       }
 
@@ -352,16 +371,17 @@ export function FloatingCallBar({
     if (transcriptRef.current.length > 0) {
       try {
         const transcriptEndpoint = getTranscriptEndpoint();
-        const body = callType === "coworker"
-          ? JSON.stringify({
-              assessmentId,
-              coworkerId: coworker.id,
-              transcript: transcriptRef.current,
-            })
-          : JSON.stringify({
-              assessmentId,
-              transcript: transcriptRef.current,
-            });
+        const body =
+          callType === "coworker"
+            ? JSON.stringify({
+                assessmentId,
+                coworkerId: coworker.id,
+                transcript: transcriptRef.current,
+              })
+            : JSON.stringify({
+                assessmentId,
+                transcript: transcriptRef.current,
+              });
 
         await fetch(transcriptEndpoint, {
           method: "POST",
@@ -374,7 +394,14 @@ export function FloatingCallBar({
     }
 
     onCallEnd();
-  }, [assessmentId, coworker.id, callType, disconnect, getTranscriptEndpoint, onCallEnd]);
+  }, [
+    assessmentId,
+    coworker.id,
+    callType,
+    disconnect,
+    getTranscriptEndpoint,
+    onCallEnd,
+  ]);
 
   // Toggle mute
   const toggleMute = useCallback(() => {
@@ -407,22 +434,24 @@ export function FloatingCallBar({
   // Error state (matches chat footer height)
   if (callState === "error") {
     return (
-      <div className="border-t-2 border-foreground bg-red-50 dark:bg-red-950 px-4 py-3 h-[78px] flex items-center">
+      <div className="flex h-[78px] items-center border-t-2 border-foreground bg-red-50 px-4 py-3 dark:bg-red-950">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-red-500 border-2 border-foreground flex items-center justify-center">
+            <div className="flex h-10 w-10 items-center justify-center border-2 border-foreground bg-red-500">
               <PhoneOff size={16} className="text-white" />
             </div>
             <div>
-              <p className="font-bold text-sm text-red-700 dark:text-red-300">Call Failed</p>
-              <p className="text-xs text-red-600 dark:text-red-400 truncate max-w-[150px]">
+              <p className="text-sm font-bold text-red-700 dark:text-red-300">
+                Call Failed
+              </p>
+              <p className="max-w-[150px] truncate text-xs text-red-600 dark:text-red-400">
                 {error || "Connection error"}
               </p>
             </div>
           </div>
           <button
             onClick={onCallEnd}
-            className="text-xs px-2 py-1 border-2 border-foreground bg-background hover:bg-accent"
+            className="border-2 border-foreground bg-background px-2 py-1 text-xs hover:bg-accent"
           >
             Dismiss
           </button>
@@ -434,15 +463,17 @@ export function FloatingCallBar({
   // Connecting state (matches chat footer height)
   if (callState === "requesting-permission" || callState === "connecting") {
     return (
-      <div className="border-t-2 border-foreground bg-secondary/20 px-4 py-3 h-[78px] flex items-center">
+      <div className="bg-secondary/20 flex h-[78px] items-center border-t-2 border-foreground px-4 py-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-secondary border-2 border-foreground flex items-center justify-center">
-            <div className="w-4 h-4 border-2 border-secondary-foreground border-t-transparent animate-spin" />
+          <div className="flex h-10 w-10 items-center justify-center border-2 border-foreground bg-secondary">
+            <div className="h-4 w-4 animate-spin border-2 border-secondary-foreground border-t-transparent" />
           </div>
           <div>
-            <p className="font-bold text-sm">{coworker.name}</p>
-            <p className="text-xs text-muted-foreground font-mono">
-              {callState === "requesting-permission" ? "Requesting mic..." : "Connecting..."}
+            <p className="text-sm font-bold">{coworker.name}</p>
+            <p className="font-mono text-xs text-muted-foreground">
+              {callState === "requesting-permission"
+                ? "Requesting mic..."
+                : "Connecting..."}
             </p>
           </div>
         </div>
@@ -453,50 +484,50 @@ export function FloatingCallBar({
   // Connected state - the main call bar UI (matches chat footer height)
   if (callState === "connected") {
     return (
-      <div className="border-t-2 border-foreground bg-secondary/10 px-4 py-3 h-[78px] flex items-center">
+      <div className="bg-secondary/10 flex h-[78px] items-center border-t-2 border-foreground px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* Avatar with speaking indicator */}
             <div className="relative">
               <div
-                className={`w-10 h-10 bg-secondary border-2 border-foreground flex items-center justify-center ${
+                className={`flex h-10 w-10 items-center justify-center border-2 border-foreground bg-secondary ${
                   isSpeaking ? "ring-2 ring-secondary ring-offset-1" : ""
                 }`}
               >
-                <span className="font-bold text-secondary-foreground text-sm font-mono">
+                <span className="font-mono text-sm font-bold text-secondary-foreground">
                   {initials}
                 </span>
               </div>
               {/* Speaking indicator - sound wave icon */}
               {isSpeaking && (
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-secondary border border-foreground flex items-center justify-center">
+                <div className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center border border-foreground bg-secondary">
                   <Volume2 size={10} className="text-secondary-foreground" />
                 </div>
               )}
               {/* Listening indicator - mic icon (when not speaking and not muted) */}
               {!isSpeaking && isListening && !isMuted && (
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-foreground border border-foreground flex items-center justify-center">
+                <div className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center border border-foreground bg-foreground">
                   <Mic size={10} className="text-background" />
                 </div>
               )}
             </div>
 
             <div className="min-w-0">
-              <p className="font-bold text-sm truncate">{coworker.name}</p>
-              <p className="text-xs text-muted-foreground font-mono flex items-center gap-1">
+              <p className="truncate text-sm font-bold">{coworker.name}</p>
+              <p className="flex items-center gap-1 font-mono text-xs text-muted-foreground">
                 {isSpeaking ? (
                   <>
-                    <span className="inline-block w-1.5 h-1.5 bg-secondary animate-pulse" />
+                    <span className="inline-block h-1.5 w-1.5 animate-pulse bg-secondary" />
                     Speaking...
                   </>
                 ) : isListening && !isMuted ? (
                   <>
-                    <span className="inline-block w-1.5 h-1.5 bg-foreground" />
+                    <span className="inline-block h-1.5 w-1.5 bg-foreground" />
                     In call
                   </>
                 ) : (
                   <>
-                    <span className="inline-block w-1.5 h-1.5 bg-muted-foreground" />
+                    <span className="inline-block h-1.5 w-1.5 bg-muted-foreground" />
                     Muted
                   </>
                 )}
@@ -509,7 +540,7 @@ export function FloatingCallBar({
             {/* Mute button */}
             <button
               onClick={toggleMute}
-              className={`px-3 py-3 border-2 border-foreground ${
+              className={`border-2 border-foreground px-3 py-3 ${
                 isMuted
                   ? "bg-foreground text-background"
                   : "bg-background hover:bg-foreground hover:text-background"
@@ -522,7 +553,7 @@ export function FloatingCallBar({
             {/* End call button */}
             <button
               onClick={endCall}
-              className="px-3 py-3 border-2 border-foreground bg-foreground text-background hover:bg-secondary hover:text-secondary-foreground hover:border-secondary"
+              className="border-2 border-foreground bg-foreground px-3 py-3 text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground"
               aria-label="End call"
             >
               <PhoneOff size={16} />

@@ -42,21 +42,21 @@ export default async function SettingsPage() {
     <main className="min-h-screen bg-background text-foreground">
       {/* Header */}
       <header className="border-b-2 border-border">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-bold text-xl">
+        <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
+          <Link href="/" className="text-xl font-bold">
             Skillvee
           </Link>
           <nav className="flex items-center gap-4">
             <AdminNav />
             <Link
               href="/profile"
-              className="text-muted-foreground hover:text-foreground font-mono text-sm"
+              className="font-mono text-sm text-muted-foreground hover:text-foreground"
             >
               Profile
             </Link>
             <Link
               href="/"
-              className="text-muted-foreground hover:text-foreground font-mono text-sm"
+              className="font-mono text-sm text-muted-foreground hover:text-foreground"
             >
               Home
             </Link>
@@ -64,10 +64,10 @@ export default async function SettingsPage() {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="mx-auto max-w-4xl px-6 py-12">
         {/* Settings Header */}
         <section className="mb-12">
-          <h1 className="text-3xl font-bold mb-2">Settings</h1>
+          <h1 className="mb-2 text-3xl font-bold">Settings</h1>
           <p className="text-muted-foreground">
             Manage your account settings and preferences
           </p>
@@ -75,21 +75,21 @@ export default async function SettingsPage() {
 
         {/* Account Information */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">Account Information</h2>
+          <h2 className="mb-6 text-2xl font-bold">Account Information</h2>
           <div className="border-2 border-border p-6">
             <div className="space-y-4">
-              <div className="flex items-center justify-between py-3 border-b border-border">
+              <div className="flex items-center justify-between border-b border-border py-3">
                 <div>
                   <p className="font-semibold">Name</p>
-                  <p className="text-muted-foreground font-mono text-sm">
+                  <p className="font-mono text-sm text-muted-foreground">
                     {dbUser.name || "Not set"}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center justify-between py-3 border-b border-border">
+              <div className="flex items-center justify-between border-b border-border py-3">
                 <div>
                   <p className="font-semibold">Email</p>
-                  <p className="text-muted-foreground font-mono text-sm">
+                  <p className="font-mono text-sm text-muted-foreground">
                     {dbUser.email}
                   </p>
                 </div>
@@ -97,7 +97,7 @@ export default async function SettingsPage() {
               <div className="flex items-center justify-between py-3">
                 <div>
                   <p className="font-semibold">Member Since</p>
-                  <p className="text-muted-foreground font-mono text-sm">
+                  <p className="font-mono text-sm text-muted-foreground">
                     {new Intl.DateTimeFormat("en-US", {
                       year: "numeric",
                       month: "long",
@@ -112,31 +112,27 @@ export default async function SettingsPage() {
 
         {/* Privacy Section */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">Privacy</h2>
+          <h2 className="mb-6 text-2xl font-bold">Privacy</h2>
           <div className="border-2 border-border p-6">
             <Link
               href="/privacy"
-              className="flex items-center justify-between py-3 hover:text-secondary group"
+              className="group flex items-center justify-between py-3 hover:text-secondary"
             >
               <div>
                 <p className="font-semibold group-hover:text-secondary">
                   Privacy Policy
                 </p>
-                <p className="text-muted-foreground font-mono text-sm">
+                <p className="font-mono text-sm text-muted-foreground">
                   Read how we handle your data
                 </p>
               </div>
               <svg
-                className="w-5 h-5 text-muted-foreground group-hover:text-secondary"
+                className="h-5 w-5 text-muted-foreground group-hover:text-secondary"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path
-                  strokeLinecap="square"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
+                <path strokeLinecap="square" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>
           </div>

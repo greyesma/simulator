@@ -105,7 +105,10 @@ export async function POST(request: Request) {
       try {
         finalCiStatus = await fetchPrCiStatus(assessment.prUrl);
       } catch (error) {
-        console.warn(`CI status fetch warning for assessment ${assessmentId}:`, error);
+        console.warn(
+          `CI status fetch warning for assessment ${assessmentId}:`,
+          error
+        );
         // Continue without CI status - don't block finalization
       }
     }
@@ -118,7 +121,10 @@ export async function POST(request: Request) {
         const analysis = await analyzeCodeReview(assessment.prUrl);
         codeReviewData = buildCodeReviewData(assessment.prUrl, analysis);
       } catch (error) {
-        console.warn(`Code review warning for assessment ${assessmentId}:`, error);
+        console.warn(
+          `Code review warning for assessment ${assessmentId}:`,
+          error
+        );
         // Continue without code review - don't block finalization
       }
     } else if (assessment.codeReview) {
@@ -138,7 +144,10 @@ export async function POST(request: Request) {
           );
         }
       } catch (error) {
-        console.error(`PR cleanup error for assessment ${assessmentId}:`, error);
+        console.error(
+          `PR cleanup error for assessment ${assessmentId}:`,
+          error
+        );
         // Don't fail the finalization if PR cleanup fails
       }
     }
@@ -159,9 +168,10 @@ export async function POST(request: Request) {
           ciStatus: finalCiStatus as unknown as Prisma.InputJsonValue,
         }),
         // Store code review results (if newly generated)
-        ...(codeReviewData && !assessment.codeReview && {
-          codeReview: codeReviewToPrismaJson(codeReviewData),
-        }),
+        ...(codeReviewData &&
+          !assessment.codeReview && {
+            codeReview: codeReviewToPrismaJson(codeReviewData),
+          }),
       },
       select: {
         id: true,
@@ -194,7 +204,10 @@ export async function POST(request: Request) {
           );
         }
       } catch (error) {
-        console.warn(`Video assessment trigger error for ${assessmentId}:`, error);
+        console.warn(
+          `Video assessment trigger error for ${assessmentId}:`,
+          error
+        );
         // Don't fail the finalization if video assessment trigger fails
       }
     }

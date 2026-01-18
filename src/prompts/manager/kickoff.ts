@@ -47,10 +47,10 @@ export function buildManagerKickoffPrompt(context: KickoffContext): string {
 This is a test. Real managers often give vague requirements. Good candidates ask clarifying questions. Bad candidates just say "okay" and guess.
 
 **Your vague briefing (2-3 sentences max):**
-Task reference: ${context.taskDescription.split('\n')[0].substring(0, 100)}
+Task reference: ${context.taskDescription.split("\n")[0].substring(0, 100)}
 
 Say something like:
-"So we've got this thing we need to add - ${context.taskDescription.split('\n')[0].substring(0, 50)}... basically the standard approach. The team's been wanting this for a while. Repo's ready, you should be able to dive right in."
+"So we've got this thing we need to add - ${context.taskDescription.split("\n")[0].substring(0, 50)}... basically the standard approach. The team's been wanting this for a while. Repo's ready, you should be able to dive right in."
 
 **What to be vague about:**
 - Exact requirements: "just the basic functionality"

@@ -28,8 +28,7 @@ export interface CategorizedError {
  * Categorize an error for appropriate handling
  */
 export function categorizeError(error: unknown): CategorizedError {
-  const errorMessage =
-    error instanceof Error ? error.message : String(error);
+  const errorMessage = error instanceof Error ? error.message : String(error);
   const errorName = error instanceof Error ? error.name : "";
 
   // Permission errors
@@ -291,7 +290,10 @@ export function createConnectionMonitor() {
 /**
  * Session progress storage key generator
  */
-export function getProgressStorageKey(assessmentId: string, type: string): string {
+export function getProgressStorageKey(
+  assessmentId: string,
+  type: string
+): string {
   return `progress-${assessmentId}-${type}`;
 }
 

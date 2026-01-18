@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   skillCategorySchema,
   skillScoreSchema,
@@ -11,9 +11,6 @@ import {
   formatReportForDisplay,
   type AssessmentSignals,
   type SkillScore,
-  type HRSignals,
-  type RecordingSignals,
-  type ConversationSignals,
 } from "./assessment-aggregation";
 
 // Mock gemini module
@@ -96,7 +93,13 @@ describe("Assessment Aggregation Schemas", () => {
     });
 
     it("should validate all performance levels", () => {
-      const levels = ["exceptional", "strong", "adequate", "developing", "needs_improvement"];
+      const levels = [
+        "exceptional",
+        "strong",
+        "adequate",
+        "developing",
+        "needs_improvement",
+      ];
       levels.forEach((level) => {
         const score = {
           category: "code_quality",
@@ -113,7 +116,8 @@ describe("Assessment Aggregation Schemas", () => {
   describe("narrativeFeedbackSchema", () => {
     it("should validate valid narrative feedback", () => {
       const feedback = {
-        overallSummary: "The candidate performed well overall with strong technical skills.",
+        overallSummary:
+          "The candidate performed well overall with strong technical skills.",
         strengths: ["Good communication", "Strong coding"],
         areasForImprovement: ["Time management", "Testing"],
         notableObservations: ["Used AI effectively"],
@@ -136,7 +140,11 @@ describe("Assessment Aggregation Schemas", () => {
         priority: "high",
         title: "Improve test coverage",
         description: "Adding more tests will improve code reliability.",
-        actionableSteps: ["Write unit tests", "Add integration tests", "Set up CI"],
+        actionableSteps: [
+          "Write unit tests",
+          "Add integration tests",
+          "Set up CI",
+        ],
       };
       expect(() => recommendationSchema.parse(recommendation)).not.toThrow();
     });
@@ -268,14 +276,62 @@ describe("Score Calculation Functions", () => {
   describe("calculateOverallScore", () => {
     it("should calculate weighted average of skill scores", () => {
       const skillScores: SkillScore[] = [
-        { category: "communication", score: 4, level: "strong", evidence: [], notes: "" },
-        { category: "problem_decomposition", score: 4, level: "strong", evidence: [], notes: "" },
-        { category: "ai_leverage", score: 3, level: "adequate", evidence: [], notes: "" },
-        { category: "code_quality", score: 5, level: "exceptional", evidence: [], notes: "" },
-        { category: "xfn_collaboration", score: 3, level: "adequate", evidence: [], notes: "" },
-        { category: "time_management", score: 3, level: "adequate", evidence: [], notes: "" },
-        { category: "technical_decision_making", score: 4, level: "strong", evidence: [], notes: "" },
-        { category: "presentation", score: 4, level: "strong", evidence: [], notes: "" },
+        {
+          category: "communication",
+          score: 4,
+          level: "strong",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "problem_decomposition",
+          score: 4,
+          level: "strong",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "ai_leverage",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "code_quality",
+          score: 5,
+          level: "exceptional",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "xfn_collaboration",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "time_management",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "technical_decision_making",
+          score: 4,
+          level: "strong",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "presentation",
+          score: 4,
+          level: "strong",
+          evidence: [],
+          notes: "",
+        },
       ];
 
       const overall = calculateOverallScore(skillScores);
@@ -293,26 +349,122 @@ describe("Score Calculation Functions", () => {
     it("should weight code_quality higher", () => {
       // All 3s except code_quality is 5
       const highCodeQuality: SkillScore[] = [
-        { category: "communication", score: 3, level: "adequate", evidence: [], notes: "" },
-        { category: "problem_decomposition", score: 3, level: "adequate", evidence: [], notes: "" },
-        { category: "ai_leverage", score: 3, level: "adequate", evidence: [], notes: "" },
-        { category: "code_quality", score: 5, level: "exceptional", evidence: [], notes: "" },
-        { category: "xfn_collaboration", score: 3, level: "adequate", evidence: [], notes: "" },
-        { category: "time_management", score: 3, level: "adequate", evidence: [], notes: "" },
-        { category: "technical_decision_making", score: 3, level: "adequate", evidence: [], notes: "" },
-        { category: "presentation", score: 3, level: "adequate", evidence: [], notes: "" },
+        {
+          category: "communication",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "problem_decomposition",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "ai_leverage",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "code_quality",
+          score: 5,
+          level: "exceptional",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "xfn_collaboration",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "time_management",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "technical_decision_making",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "presentation",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
       ];
 
       // All 3s except ai_leverage is 5
       const highAiLeverage: SkillScore[] = [
-        { category: "communication", score: 3, level: "adequate", evidence: [], notes: "" },
-        { category: "problem_decomposition", score: 3, level: "adequate", evidence: [], notes: "" },
-        { category: "ai_leverage", score: 5, level: "exceptional", evidence: [], notes: "" },
-        { category: "code_quality", score: 3, level: "adequate", evidence: [], notes: "" },
-        { category: "xfn_collaboration", score: 3, level: "adequate", evidence: [], notes: "" },
-        { category: "time_management", score: 3, level: "adequate", evidence: [], notes: "" },
-        { category: "technical_decision_making", score: 3, level: "adequate", evidence: [], notes: "" },
-        { category: "presentation", score: 3, level: "adequate", evidence: [], notes: "" },
+        {
+          category: "communication",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "problem_decomposition",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "ai_leverage",
+          score: 5,
+          level: "exceptional",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "code_quality",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "xfn_collaboration",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "time_management",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "technical_decision_making",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
+        {
+          category: "presentation",
+          score: 3,
+          level: "adequate",
+          evidence: [],
+          notes: "",
+        },
       ];
 
       const codeQualityScore = calculateOverallScore(highCodeQuality);
@@ -325,7 +477,9 @@ describe("Score Calculation Functions", () => {
   });
 
   describe("calculateAllSkillScores", () => {
-    const createMockSignals = (overrides: Partial<AssessmentSignals> = {}): AssessmentSignals => ({
+    const createMockSignals = (
+      overrides: Partial<AssessmentSignals> = {}
+    ): AssessmentSignals => ({
       assessmentId: "test-id",
       userId: "user-id",
       scenarioName: "Test Scenario",
@@ -390,14 +544,18 @@ describe("Score Calculation Functions", () => {
       const commScore = scores.find((s) => s.category === "communication");
 
       expect(commScore?.score).toBe(5);
-      expect(commScore?.evidence).toContain("HR interview communication score: 5/5");
+      expect(commScore?.evidence).toContain(
+        "HR interview communication score: 5/5"
+      );
     });
 
     it("should score collaboration based on coworker contacts", () => {
       // No coworkers contacted
       const noCollab = createMockSignals();
       const noCollabScores = calculateAllSkillScores(noCollab);
-      const noCollabScore = noCollabScores.find((s) => s.category === "xfn_collaboration");
+      const noCollabScore = noCollabScores.find(
+        (s) => s.category === "xfn_collaboration"
+      );
       expect(noCollabScore?.score).toBe(2);
 
       // 3+ coworkers contacted
@@ -405,9 +563,24 @@ describe("Score Calculation Functions", () => {
         conversations: {
           kickoffTranscript: [],
           coworkerChats: [
-            { coworkerName: "Alice", coworkerRole: "PM", messages: [], type: "text" },
-            { coworkerName: "Bob", coworkerRole: "Dev", messages: [], type: "text" },
-            { coworkerName: "Carol", coworkerRole: "QA", messages: [], type: "text" },
+            {
+              coworkerName: "Alice",
+              coworkerRole: "PM",
+              messages: [],
+              type: "text",
+            },
+            {
+              coworkerName: "Bob",
+              coworkerRole: "Dev",
+              messages: [],
+              type: "text",
+            },
+            {
+              coworkerName: "Carol",
+              coworkerRole: "QA",
+              messages: [],
+              type: "text",
+            },
           ],
           defenseTranscript: [],
           totalCoworkerInteractions: 15,
@@ -415,7 +588,9 @@ describe("Score Calculation Functions", () => {
         },
       });
       const goodCollabScores = calculateAllSkillScores(goodCollab);
-      const goodCollabScore = goodCollabScores.find((s) => s.category === "xfn_collaboration");
+      const goodCollabScore = goodCollabScores.find(
+        (s) => s.category === "xfn_collaboration"
+      );
       expect(goodCollabScore?.score).toBe(5);
     });
 
@@ -466,7 +641,11 @@ describe("Score Calculation Functions", () => {
         recording: {
           activityTimeline: [],
           toolUsage: [
-            { tool: "Claude", usageCount: 10, contextNotes: "Used for coding help" },
+            {
+              tool: "Claude",
+              usageCount: 10,
+              contextNotes: "Used for coding help",
+            },
             { tool: "VS Code", usageCount: 50, contextNotes: "Main editor" },
           ],
           stuckMoments: [],
@@ -536,7 +715,8 @@ describe("formatReportForDisplay", () => {
       },
     ],
     narrative: {
-      overallSummary: "Jane demonstrated strong technical skills throughout the assessment.",
+      overallSummary:
+        "Jane demonstrated strong technical skills throughout the assessment.",
       strengths: ["Excellent code quality", "Clear communication"],
       areasForImprovement: ["Could improve time management"],
       notableObservations: ["Used AI tools effectively"],
@@ -547,7 +727,10 @@ describe("formatReportForDisplay", () => {
         priority: "medium" as const,
         title: "Practice time estimation",
         description: "Work on estimating task duration more accurately.",
-        actionableSteps: ["Use time tracking tools", "Break tasks into smaller chunks"],
+        actionableSteps: [
+          "Use time tracking tools",
+          "Break tasks into smaller chunks",
+        ],
       },
     ],
     metrics: {

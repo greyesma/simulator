@@ -21,10 +21,7 @@ export {
   buildManagerKickoffPrompt,
   type KickoffContext,
 } from "./manager/kickoff";
-export {
-  buildDefensePrompt,
-  type DefenseContext,
-} from "./manager/defense";
+export { buildDefensePrompt, type DefenseContext } from "./manager/defense";
 
 // Coworker Personas
 export {

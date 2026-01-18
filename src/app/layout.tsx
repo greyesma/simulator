@@ -4,7 +4,8 @@ import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
   title: "Skillvee - Practice Real Developer Scenarios",
-  description: "Assess and improve your developer skills through realistic work simulations",
+  description:
+    "Assess and improve your developer skills through realistic work simulations",
 };
 
 export default function RootLayout({

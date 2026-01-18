@@ -126,9 +126,7 @@ export function AssessmentsClient({
       // Search filter (name, email, or assessment ID)
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
-        const matchesName = assessment.user.name
-          ?.toLowerCase()
-          .includes(query);
+        const matchesName = assessment.user.name?.toLowerCase().includes(query);
         const matchesEmail = assessment.user.email
           ?.toLowerCase()
           .includes(query);
@@ -164,12 +162,12 @@ export function AssessmentsClient({
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold mb-8">Assessment Diagnostics</h1>
+    <div className="mx-auto max-w-6xl px-6 py-12">
+      <h1 className="mb-8 text-3xl font-bold">Assessment Diagnostics</h1>
 
       {/* Aggregate Stats */}
       <div
-        className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+        className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4"
         data-testid="stats-grid"
       >
         <StatCard label="TOTAL ASSESSMENTS" value={stats.total} />
@@ -180,7 +178,9 @@ export function AssessmentsClient({
         />
         <StatCard
           label="AVG DURATION"
-          value={stats.avgDurationMs ? formatDuration(stats.avgDurationMs) : "-"}
+          value={
+            stats.avgDurationMs ? formatDuration(stats.avgDurationMs) : "-"
+          }
         />
         <StatCard
           label="FAILED"
@@ -191,18 +191,18 @@ export function AssessmentsClient({
 
       {/* Filters */}
       <div
-        className="flex flex-wrap items-center gap-4 mb-6"
+        className="mb-6 flex flex-wrap items-center gap-4"
         data-testid="filters"
       >
         {/* Search */}
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <div className="relative min-w-[200px] flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search by name, email, or ID..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-10 py-2 border-2 border-border bg-background font-mono text-sm focus:outline-none focus:border-foreground"
+            className="w-full border-2 border-border bg-background py-2 pl-10 pr-10 font-mono text-sm focus:border-foreground focus:outline-none"
             data-testid="search-input"
           />
           {searchQuery && (
@@ -211,7 +211,7 @@ export function AssessmentsClient({
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               aria-label="Clear search"
             >
-              <X className="w-4 h-4" />
+              <X className="h-4 w-4" />
             </button>
           )}
         </div>
@@ -222,7 +222,7 @@ export function AssessmentsClient({
           onChange={(e) =>
             setStatusFilter(e.target.value as AssessmentStatus | "all")
           }
-          className="px-3 py-2 border-2 border-border bg-background font-mono text-sm focus:outline-none focus:border-foreground"
+          className="border-2 border-border bg-background px-3 py-2 font-mono text-sm focus:border-foreground focus:outline-none"
           data-testid="status-filter"
         >
           <option value="all">All Status</option>
@@ -239,10 +239,10 @@ export function AssessmentsClient({
             <button
               key={option.value}
               onClick={() => setDateRange(option.value)}
-              className={`px-3 py-2 border-2 font-mono text-xs ${
+              className={`border-2 px-3 py-2 font-mono text-xs ${
                 dateRange === option.value
-                  ? "bg-foreground text-background border-foreground"
-                  : "bg-background text-foreground border-border hover:border-foreground"
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-border bg-background text-foreground hover:border-foreground"
               }`}
             >
               {option.label}
@@ -252,7 +252,7 @@ export function AssessmentsClient({
       </div>
 
       {/* Results count */}
-      <p className="font-mono text-sm text-muted-foreground mb-4">
+      <p className="mb-4 font-mono text-sm text-muted-foreground">
         Showing {filteredAssessments.length} of {assessments.length} assessments
       </p>
 
@@ -267,19 +267,19 @@ export function AssessmentsClient({
             <thead>
               <tr className="border-b-2 border-border">
                 <th className="w-8 p-4"></th>
-                <th className="text-left p-4 font-mono text-xs text-muted-foreground">
+                <th className="p-4 text-left font-mono text-xs text-muted-foreground">
                   CANDIDATE
                 </th>
-                <th className="text-left p-4 font-mono text-xs text-muted-foreground">
+                <th className="p-4 text-left font-mono text-xs text-muted-foreground">
                   STATUS
                 </th>
-                <th className="text-left p-4 font-mono text-xs text-muted-foreground">
+                <th className="p-4 text-left font-mono text-xs text-muted-foreground">
                   CREATED
                 </th>
-                <th className="text-left p-4 font-mono text-xs text-muted-foreground">
+                <th className="p-4 text-left font-mono text-xs text-muted-foreground">
                   DURATION
                 </th>
-                <th className="text-left p-4 font-mono text-xs text-muted-foreground">
+                <th className="p-4 text-left font-mono text-xs text-muted-foreground">
                   ERRORS
                 </th>
               </tr>
@@ -318,7 +318,7 @@ function StatCard({
         error ? "border-red-500 bg-red-50 dark:bg-red-950" : "border-border"
       }`}
     >
-      <p className="font-mono text-xs text-muted-foreground mb-2">{label}</p>
+      <p className="mb-2 font-mono text-xs text-muted-foreground">{label}</p>
       <p
         className={`text-2xl font-bold ${
           error
@@ -353,7 +353,7 @@ function AssessmentRow({
   return (
     <>
       <tr
-        className={`border-b border-border cursor-pointer hover:bg-muted/30 ${
+        className={`hover:bg-muted/30 cursor-pointer border-b border-border ${
           isExpanded ? "bg-muted/20" : ""
         }`}
         onClick={onToggle}
@@ -361,22 +361,20 @@ function AssessmentRow({
       >
         <td className="p-4">
           {isExpanded ? (
-            <ChevronDown className="w-4 h-4" />
+            <ChevronDown className="h-4 w-4" />
           ) : (
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="h-4 w-4" />
           )}
         </td>
         <td className="p-4">
-          <p className="font-semibold">
-            {assessment.user.name || "Anonymous"}
-          </p>
+          <p className="font-semibold">{assessment.user.name || "Anonymous"}</p>
           <p className="font-mono text-xs text-muted-foreground">
             {assessment.user.email || "No email"}
           </p>
         </td>
         <td className="p-4">
           <span
-            className={`font-mono text-xs px-2 py-1 ${
+            className={`px-2 py-1 font-mono text-xs ${
               assessment.status === "COMPLETED"
                 ? "bg-secondary text-secondary-foreground"
                 : "bg-muted text-muted-foreground"
@@ -393,20 +391,20 @@ function AssessmentRow({
         </td>
         <td className="p-4">
           {hasErrors ? (
-            <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 font-mono text-xs">
-              <AlertCircle className="w-3 h-3" />
+            <span className="inline-flex items-center gap-1 bg-red-100 px-2 py-1 font-mono text-xs text-red-600 dark:bg-red-900 dark:text-red-400">
+              <AlertCircle className="h-3 w-3" />
               ERROR
             </span>
           ) : (
             <span className="inline-flex items-center gap-1 text-green-600 dark:text-green-400">
-              <CheckCircle2 className="w-4 h-4" />
+              <CheckCircle2 className="h-4 w-4" />
             </span>
           )}
         </td>
       </tr>
       {isExpanded && (
         <tr>
-          <td colSpan={6} className="p-0 border-b-2 border-border">
+          <td colSpan={6} className="border-b-2 border-border p-0">
             <AssessmentDetails assessment={assessment} />
           </td>
         </tr>
@@ -422,16 +420,15 @@ function AssessmentDetails({
 }) {
   return (
     <div className="bg-muted/10 p-6" data-testid={`details-${assessment.id}`}>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Assessment Info */}
         <div>
-          <h4 className="font-mono text-xs text-muted-foreground mb-3">
+          <h4 className="mb-3 font-mono text-xs text-muted-foreground">
             ASSESSMENT INFO
           </h4>
           <div className="space-y-2 font-mono text-sm">
             <p>
-              <span className="text-muted-foreground">ID:</span>{" "}
-              {assessment.id}
+              <span className="text-muted-foreground">ID:</span> {assessment.id}
             </p>
             <p>
               <span className="text-muted-foreground">Scenario:</span>{" "}
@@ -451,23 +448,23 @@ function AssessmentDetails({
           {/* View Timeline Link */}
           <Link
             href={`/admin/assessments/${assessment.id}`}
-            className="inline-flex items-center gap-2 mt-4 px-4 py-2 border-2 border-foreground bg-foreground text-background hover:bg-background hover:text-foreground font-mono text-xs"
+            className="mt-4 inline-flex items-center gap-2 border-2 border-foreground bg-foreground px-4 py-2 font-mono text-xs text-background hover:bg-background hover:text-foreground"
             data-testid={`view-timeline-${assessment.id}`}
           >
-            <ExternalLink className="w-3 h-3" />
+            <ExternalLink className="h-3 w-3" />
             View Full Timeline
           </Link>
         </div>
 
         {/* Event Logs */}
         <div>
-          <h4 className="font-mono text-xs text-muted-foreground mb-3">
+          <h4 className="mb-3 font-mono text-xs text-muted-foreground">
             EVENT LOG ({assessment.logs.length} events)
           </h4>
           {assessment.logs.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No events recorded</p>
+            <p className="text-sm text-muted-foreground">No events recorded</p>
           ) : (
-            <div className="space-y-1 max-h-48 overflow-y-auto">
+            <div className="max-h-48 space-y-1 overflow-y-auto">
               {assessment.logs.map((log) => (
                 <LogEntry key={log.id} log={log} />
               ))}
@@ -477,29 +474,31 @@ function AssessmentDetails({
 
         {/* API Calls */}
         <div className="md:col-span-2">
-          <h4 className="font-mono text-xs text-muted-foreground mb-3">
+          <h4 className="mb-3 font-mono text-xs text-muted-foreground">
             API CALLS ({assessment.apiCalls.length} calls)
           </h4>
           {assessment.apiCalls.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No API calls recorded</p>
+            <p className="text-sm text-muted-foreground">
+              No API calls recorded
+            </p>
           ) : (
             <div className="border border-border">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border bg-muted/30">
-                    <th className="text-left p-2 font-mono text-xs text-muted-foreground">
+                  <tr className="bg-muted/30 border-b border-border">
+                    <th className="p-2 text-left font-mono text-xs text-muted-foreground">
                       TIME
                     </th>
-                    <th className="text-left p-2 font-mono text-xs text-muted-foreground">
+                    <th className="p-2 text-left font-mono text-xs text-muted-foreground">
                       MODEL
                     </th>
-                    <th className="text-left p-2 font-mono text-xs text-muted-foreground">
+                    <th className="p-2 text-left font-mono text-xs text-muted-foreground">
                       DURATION
                     </th>
-                    <th className="text-left p-2 font-mono text-xs text-muted-foreground">
+                    <th className="p-2 text-left font-mono text-xs text-muted-foreground">
                       TOKENS
                     </th>
-                    <th className="text-left p-2 font-mono text-xs text-muted-foreground">
+                    <th className="p-2 text-left font-mono text-xs text-muted-foreground">
                       STATUS
                     </th>
                   </tr>
@@ -523,11 +522,13 @@ function LogEntry({ log }: { log: SerializedLog }) {
 
   return (
     <div
-      className={`flex items-center gap-2 py-1 px-2 font-mono text-xs ${
-        isError ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400" : ""
+      className={`flex items-center gap-2 px-2 py-1 font-mono text-xs ${
+        isError
+          ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400"
+          : ""
       }`}
     >
-      <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+      <Clock className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
       <span className="text-muted-foreground">
         {new Date(log.timestamp).toLocaleTimeString()}
       </span>
@@ -553,8 +554,7 @@ function LogEntry({ log }: { log: SerializedLog }) {
 
 function ApiCallRow({ call }: { call: SerializedApiCall }) {
   const hasError = call.errorMessage !== null;
-  const totalTokens =
-    (call.promptTokens ?? 0) + (call.responseTokens ?? 0);
+  const totalTokens = (call.promptTokens ?? 0) + (call.responseTokens ?? 0);
 
   return (
     <tr
@@ -575,14 +575,14 @@ function ApiCallRow({ call }: { call: SerializedApiCall }) {
       <td className="p-2">
         {hasError ? (
           <span
-            className="text-red-600 dark:text-red-400 text-xs"
+            className="text-xs text-red-600 dark:text-red-400"
             title={call.errorMessage ?? undefined}
           >
-            <AlertCircle className="w-4 h-4 inline" /> Error
+            <AlertCircle className="inline h-4 w-4" /> Error
           </span>
         ) : (
-          <span className="text-green-600 dark:text-green-400 text-xs">
-            <CheckCircle2 className="w-4 h-4 inline" />{" "}
+          <span className="text-xs text-green-600 dark:text-green-400">
+            <CheckCircle2 className="inline h-4 w-4" />{" "}
             {call.statusCode ?? "OK"}
           </span>
         )}

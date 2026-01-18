@@ -83,7 +83,9 @@ describe("ARCHETYPE_CONFIGS", () => {
     it("should prioritize communication, creativity, and technical knowledge", () => {
       expect(weights[AssessmentDimension.COMMUNICATION]).toBe("VERY_HIGH");
       expect(weights[AssessmentDimension.CREATIVITY]).toBe("VERY_HIGH");
-      expect(weights[AssessmentDimension.TECHNICAL_KNOWLEDGE]).toBe("VERY_HIGH");
+      expect(weights[AssessmentDimension.TECHNICAL_KNOWLEDGE]).toBe(
+        "VERY_HIGH"
+      );
     });
 
     it("should have high weight for problem solving and collaboration", () => {
@@ -113,14 +115,17 @@ describe("ARCHETYPE_CONFIGS", () => {
 
 describe("calculateFitScore", () => {
   it("should calculate fit score for perfect scores (all 5s)", () => {
-    const perfectScores: DimensionScoreInput[] = Object.values(AssessmentDimension).map(
-      (dimension) => ({
-        dimension,
-        score: 5,
-      })
-    );
+    const perfectScores: DimensionScoreInput[] = Object.values(
+      AssessmentDimension
+    ).map((dimension) => ({
+      dimension,
+      score: 5,
+    }));
 
-    const result = calculateFitScore(perfectScores, "GENERAL_SOFTWARE_ENGINEER");
+    const result = calculateFitScore(
+      perfectScores,
+      "GENERAL_SOFTWARE_ENGINEER"
+    );
 
     // Perfect scores should give 100%
     expect(result.fitScore).toBe(100);
@@ -129,12 +134,12 @@ describe("calculateFitScore", () => {
   });
 
   it("should calculate fit score for minimum scores (all 1s)", () => {
-    const minScores: DimensionScoreInput[] = Object.values(AssessmentDimension).map(
-      (dimension) => ({
-        dimension,
-        score: 1,
-      })
-    );
+    const minScores: DimensionScoreInput[] = Object.values(
+      AssessmentDimension
+    ).map((dimension) => ({
+      dimension,
+      score: 1,
+    }));
 
     const result = calculateFitScore(minScores, "GENERAL_SOFTWARE_ENGINEER");
 
@@ -143,12 +148,12 @@ describe("calculateFitScore", () => {
   });
 
   it("should calculate fit score for average scores (all 3s)", () => {
-    const avgScores: DimensionScoreInput[] = Object.values(AssessmentDimension).map(
-      (dimension) => ({
-        dimension,
-        score: 3,
-      })
-    );
+    const avgScores: DimensionScoreInput[] = Object.values(
+      AssessmentDimension
+    ).map((dimension) => ({
+      dimension,
+      score: 3,
+    }));
 
     const result = calculateFitScore(avgScores, "GENERAL_SOFTWARE_ENGINEER");
 
@@ -248,12 +253,12 @@ describe("calculateFitScore", () => {
   });
 
   it("should normalize to 0-100 scale", () => {
-    const scores: DimensionScoreInput[] = Object.values(AssessmentDimension).map(
-      (dimension) => ({
-        dimension,
-        score: 3.5, // Non-integer score
-      })
-    );
+    const scores: DimensionScoreInput[] = Object.values(
+      AssessmentDimension
+    ).map((dimension) => ({
+      dimension,
+      score: 3.5, // Non-integer score
+    }));
 
     const result = calculateFitScore(scores, "GENERAL_SOFTWARE_ENGINEER");
 
@@ -273,7 +278,8 @@ describe("calculateFitScore", () => {
     const result = calculateFitScore(scores, "ENGINEERING_MANAGER");
 
     // Check that fit score has at most 1 decimal place
-    const decimalPlaces = (result.fitScore.toString().split(".")[1] || "").length;
+    const decimalPlaces = (result.fitScore.toString().split(".")[1] || "")
+      .length;
     expect(decimalPlaces).toBeLessThanOrEqual(1);
   });
 });
@@ -284,12 +290,12 @@ describe("calculateFitScore", () => {
 
 describe("calculateFitScoresForMultipleArchetypes", () => {
   it("should calculate fit scores for all archetypes by default", () => {
-    const scores: DimensionScoreInput[] = Object.values(AssessmentDimension).map(
-      (dimension) => ({
-        dimension,
-        score: 4,
-      })
-    );
+    const scores: DimensionScoreInput[] = Object.values(
+      AssessmentDimension
+    ).map((dimension) => ({
+      dimension,
+      score: 4,
+    }));
 
     const results = calculateFitScoresForMultipleArchetypes(scores);
 
@@ -297,12 +303,12 @@ describe("calculateFitScoresForMultipleArchetypes", () => {
   });
 
   it("should calculate fit scores for specified archetypes only", () => {
-    const scores: DimensionScoreInput[] = Object.values(AssessmentDimension).map(
-      (dimension) => ({
-        dimension,
-        score: 4,
-      })
-    );
+    const scores: DimensionScoreInput[] = Object.values(
+      AssessmentDimension
+    ).map((dimension) => ({
+      dimension,
+      score: 4,
+    }));
 
     const results = calculateFitScoresForMultipleArchetypes(scores, [
       "SENIOR_FRONTEND_ENGINEER",
@@ -310,7 +316,9 @@ describe("calculateFitScoresForMultipleArchetypes", () => {
     ]);
 
     expect(results).toHaveLength(2);
-    expect(results.map((r) => r.archetype)).toContain("SENIOR_FRONTEND_ENGINEER");
+    expect(results.map((r) => r.archetype)).toContain(
+      "SENIOR_FRONTEND_ENGINEER"
+    );
     expect(results.map((r) => r.archetype)).toContain("ENGINEERING_MANAGER");
   });
 
@@ -331,7 +339,9 @@ describe("calculateFitScoresForMultipleArchetypes", () => {
 
     // Results should be sorted descending
     for (let i = 0; i < results.length - 1; i++) {
-      expect(results[i].fitScore).toBeGreaterThanOrEqual(results[i + 1].fitScore);
+      expect(results[i].fitScore).toBeGreaterThanOrEqual(
+        results[i + 1].fitScore
+      );
     }
 
     // Engineering Manager should rank high due to communication/leadership/collaboration focus
@@ -367,18 +377,27 @@ describe("calculateFitScoresForMultipleArchetypes", () => {
 describe("getWeightForDimension", () => {
   it("should return correct weight multiplier", () => {
     // ENGINEERING_MANAGER has VERY_HIGH (1.5) for Communication
-    expect(getWeightForDimension("ENGINEERING_MANAGER", AssessmentDimension.COMMUNICATION)).toBe(
-      1.5
-    );
+    expect(
+      getWeightForDimension(
+        "ENGINEERING_MANAGER",
+        AssessmentDimension.COMMUNICATION
+      )
+    ).toBe(1.5);
 
     // ENGINEERING_MANAGER has HIGH (1.25) for Problem Solving
-    expect(getWeightForDimension("ENGINEERING_MANAGER", AssessmentDimension.PROBLEM_SOLVING)).toBe(
-      1.25
-    );
+    expect(
+      getWeightForDimension(
+        "ENGINEERING_MANAGER",
+        AssessmentDimension.PROBLEM_SOLVING
+      )
+    ).toBe(1.25);
 
     // ENGINEERING_MANAGER has MEDIUM (1.0) for Technical Knowledge
     expect(
-      getWeightForDimension("ENGINEERING_MANAGER", AssessmentDimension.TECHNICAL_KNOWLEDGE)
+      getWeightForDimension(
+        "ENGINEERING_MANAGER",
+        AssessmentDimension.TECHNICAL_KNOWLEDGE
+      )
     ).toBe(1.0);
   });
 });
@@ -386,29 +405,48 @@ describe("getWeightForDimension", () => {
 describe("getWeightLevelForDimension", () => {
   it("should return correct weight level", () => {
     expect(
-      getWeightLevelForDimension("SENIOR_FRONTEND_ENGINEER", AssessmentDimension.CREATIVITY)
+      getWeightLevelForDimension(
+        "SENIOR_FRONTEND_ENGINEER",
+        AssessmentDimension.CREATIVITY
+      )
     ).toBe("VERY_HIGH");
 
     expect(
-      getWeightLevelForDimension("SENIOR_BACKEND_ENGINEER", AssessmentDimension.COLLABORATION)
+      getWeightLevelForDimension(
+        "SENIOR_BACKEND_ENGINEER",
+        AssessmentDimension.COLLABORATION
+      )
     ).toBe("HIGH");
 
     expect(
-      getWeightLevelForDimension("GENERAL_SOFTWARE_ENGINEER", AssessmentDimension.LEADERSHIP)
+      getWeightLevelForDimension(
+        "GENERAL_SOFTWARE_ENGINEER",
+        AssessmentDimension.LEADERSHIP
+      )
     ).toBe("MEDIUM");
   });
 });
 
 describe("getArchetypeDisplayName", () => {
   it("should return human-readable names for all archetypes", () => {
-    expect(getArchetypeDisplayName("SENIOR_FRONTEND_ENGINEER")).toBe("Senior Frontend Engineer");
-    expect(getArchetypeDisplayName("SENIOR_BACKEND_ENGINEER")).toBe("Senior Backend Engineer");
-    expect(getArchetypeDisplayName("FULLSTACK_ENGINEER")).toBe("Fullstack Engineer");
-    expect(getArchetypeDisplayName("ENGINEERING_MANAGER")).toBe("Engineering Manager");
+    expect(getArchetypeDisplayName("SENIOR_FRONTEND_ENGINEER")).toBe(
+      "Senior Frontend Engineer"
+    );
+    expect(getArchetypeDisplayName("SENIOR_BACKEND_ENGINEER")).toBe(
+      "Senior Backend Engineer"
+    );
+    expect(getArchetypeDisplayName("FULLSTACK_ENGINEER")).toBe(
+      "Fullstack Engineer"
+    );
+    expect(getArchetypeDisplayName("ENGINEERING_MANAGER")).toBe(
+      "Engineering Manager"
+    );
     expect(getArchetypeDisplayName("TECH_LEAD")).toBe("Tech Lead");
     expect(getArchetypeDisplayName("DEVOPS_ENGINEER")).toBe("DevOps Engineer");
     expect(getArchetypeDisplayName("DATA_ENGINEER")).toBe("Data Engineer");
-    expect(getArchetypeDisplayName("GENERAL_SOFTWARE_ENGINEER")).toBe("General Software Engineer");
+    expect(getArchetypeDisplayName("GENERAL_SOFTWARE_ENGINEER")).toBe(
+      "General Software Engineer"
+    );
   });
 });
 
@@ -439,7 +477,10 @@ describe("Edge Cases", () => {
       { dimension: AssessmentDimension.PROBLEM_SOLVING, score: 5 },
     ];
 
-    const result = calculateFitScore(boundaryScores, "GENERAL_SOFTWARE_ENGINEER");
+    const result = calculateFitScore(
+      boundaryScores,
+      "GENERAL_SOFTWARE_ENGINEER"
+    );
 
     expect(result.fitScore).toBeGreaterThanOrEqual(0);
     expect(result.fitScore).toBeLessThanOrEqual(100);
@@ -452,7 +493,10 @@ describe("Edge Cases", () => {
       { dimension: AssessmentDimension.COMMUNICATION, score: 5 },
     ];
 
-    const result = calculateFitScore(duplicateScores, "GENERAL_SOFTWARE_ENGINEER");
+    const result = calculateFitScore(
+      duplicateScores,
+      "GENERAL_SOFTWARE_ENGINEER"
+    );
 
     const commBreakdown = result.breakdown.find(
       (b) => b.dimension === AssessmentDimension.COMMUNICATION
@@ -505,7 +549,9 @@ describe("Acceptance Criteria", () => {
     // - COMMUNICATION, COLLABORATION, TIME_MANAGEMENT, ADAPTABILITY: HIGH (1.25)
     // - LEADERSHIP, CREATIVITY: MEDIUM (1.0)
 
-    const scores: DimensionScoreInput[] = Object.values(AssessmentDimension).map((d) => ({
+    const scores: DimensionScoreInput[] = Object.values(
+      AssessmentDimension
+    ).map((d) => ({
       dimension: d,
       score: 4,
     }));
@@ -530,7 +576,9 @@ describe("Acceptance Criteria", () => {
     ];
 
     for (const tc of testCases) {
-      const scores: DimensionScoreInput[] = Object.values(AssessmentDimension).map((d) => ({
+      const scores: DimensionScoreInput[] = Object.values(
+        AssessmentDimension
+      ).map((d) => ({
         dimension: d,
         score: tc.scores,
       }));
@@ -553,7 +601,10 @@ describe("Acceptance Criteria", () => {
     ];
 
     // Same scores, different archetypes = different results
-    const resultFrontend = calculateFitScore(scores, "SENIOR_FRONTEND_ENGINEER");
+    const resultFrontend = calculateFitScore(
+      scores,
+      "SENIOR_FRONTEND_ENGINEER"
+    );
     const resultManager = calculateFitScore(scores, "ENGINEERING_MANAGER");
 
     // Both should use the same input scores but apply different weights
@@ -567,7 +618,10 @@ describe("Acceptance Criteria", () => {
       { dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE, score: 5 },
     ];
 
-    const techFrontend = calculateFitScore(techScores, "SENIOR_FRONTEND_ENGINEER");
+    const techFrontend = calculateFitScore(
+      techScores,
+      "SENIOR_FRONTEND_ENGINEER"
+    );
     const techManager = calculateFitScore(techScores, "ENGINEERING_MANAGER");
 
     // Frontend: TECHNICAL_KNOWLEDGE is VERY_HIGH (1.5)

@@ -47,7 +47,10 @@ vi.mock("@/lib/supabase", () => ({
   supabaseAdmin: {
     storage: {
       from: () => ({
-        createSignedUrl: () => Promise.resolve({ data: { signedUrl: "https://test.com/screenshot.png" } }),
+        createSignedUrl: () =>
+          Promise.resolve({
+            data: { signedUrl: "https://test.com/screenshot.png" },
+          }),
       }),
     },
   },

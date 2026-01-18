@@ -31,7 +31,10 @@ export default async function CandidateProfilePage({ params }: PageProps) {
   });
 
   // Only show completed assessments
-  if (!videoAssessment || videoAssessment.status !== VideoAssessmentStatus.COMPLETED) {
+  if (
+    !videoAssessment ||
+    videoAssessment.status !== VideoAssessmentStatus.COMPLETED
+  ) {
     notFound();
   }
 

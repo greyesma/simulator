@@ -223,16 +223,16 @@ export function ScenarioBuilderClient() {
   return (
     <div className="flex flex-1 overflow-hidden">
       {/* Chat Panel */}
-      <div className="flex-1 flex flex-col border-r-2 border-foreground">
+      <div className="flex flex-1 flex-col border-r-2 border-foreground">
         {/* Header */}
-        <header className="border-b-2 border-foreground bg-background px-4 py-3 flex items-center gap-3">
-          <div className="w-10 h-10 bg-secondary border-2 border-foreground flex items-center justify-center">
-            <span className="font-bold text-secondary-foreground text-sm font-mono">
+        <header className="flex items-center gap-3 border-b-2 border-foreground bg-background px-4 py-3">
+          <div className="flex h-10 w-10 items-center justify-center border-2 border-foreground bg-secondary">
+            <span className="font-mono text-sm font-bold text-secondary-foreground">
               AI
             </span>
           </div>
           <div>
-            <h1 className="font-bold text-lg">Scenario Builder</h1>
+            <h1 className="text-lg font-bold">Scenario Builder</h1>
             <p className="text-sm text-muted-foreground">
               Chat with AI to create your scenario
             </p>
@@ -248,30 +248,30 @@ export function ScenarioBuilderClient() {
         {/* Messages area */}
         <main className="flex-1 overflow-auto px-4 py-6">
           {isLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-muted-foreground font-mono">Loading...</div>
+            <div className="flex h-full items-center justify-center">
+              <div className="font-mono text-muted-foreground">Loading...</div>
             </div>
           ) : (
-            <div className="space-y-4 max-w-3xl mx-auto">
+            <div className="mx-auto max-w-3xl space-y-4">
               {/* Date divider */}
-              <div className="flex items-center gap-4 mb-6">
-                <div className="flex-1 h-px bg-border" />
-                <span className="text-sm font-mono text-muted-foreground px-2 border border-foreground bg-background">
+              <div className="mb-6 flex items-center gap-4">
+                <div className="h-px flex-1 bg-border" />
+                <span className="border border-foreground bg-background px-2 font-mono text-sm text-muted-foreground">
                   Today
                 </span>
-                <div className="flex-1 h-px bg-border" />
+                <div className="h-px flex-1 bg-border" />
               </div>
 
               {messages.map((message, index) => (
                 <div key={index} className="flex gap-3">
                   {/* Avatar */}
                   <div
-                    className={`w-10 h-10 border-2 border-foreground flex items-center justify-center flex-shrink-0 ${
+                    className={`flex h-10 w-10 flex-shrink-0 items-center justify-center border-2 border-foreground ${
                       message.role === "user" ? "bg-foreground" : "bg-secondary"
                     }`}
                   >
                     <span
-                      className={`font-bold text-sm font-mono ${
+                      className={`font-mono text-sm font-bold ${
                         message.role === "user"
                           ? "text-background"
                           : "text-secondary-foreground"
@@ -282,12 +282,12 @@ export function ScenarioBuilderClient() {
                   </div>
 
                   {/* Message content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline gap-2 mb-1">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-baseline gap-2">
                       <span className="font-bold">
                         {message.role === "user" ? "You" : "Scenario Builder"}
                       </span>
-                      <span className="text-sm text-muted-foreground font-mono">
+                      <span className="font-mono text-sm text-muted-foreground">
                         {formatTimestamp(message.timestamp)}
                       </span>
                     </div>
@@ -301,13 +301,13 @@ export function ScenarioBuilderClient() {
               {/* Typing indicator when sending */}
               {isSending && (
                 <div className="flex gap-3">
-                  <div className="w-10 h-10 bg-secondary border-2 border-foreground flex items-center justify-center flex-shrink-0">
-                    <span className="font-bold text-secondary-foreground text-sm font-mono">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center border-2 border-foreground bg-secondary">
+                    <span className="font-mono text-sm font-bold text-secondary-foreground">
                       AI
                     </span>
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-baseline gap-2 mb-1">
+                    <div className="mb-1 flex items-baseline gap-2">
                       <span className="font-bold">Scenario Builder</span>
                     </div>
                     <TypingIndicator />
@@ -322,14 +322,14 @@ export function ScenarioBuilderClient() {
 
         {/* Error message */}
         {error && (
-          <div className="px-4 py-2 bg-red-100 border-t-2 border-red-500 text-red-700 font-mono text-sm">
+          <div className="border-t-2 border-red-500 bg-red-100 px-4 py-2 font-mono text-sm text-red-700">
             {error}
           </div>
         )}
 
         {/* Input area */}
         <footer className="border-t-2 border-foreground bg-background px-4 py-3">
-          <div className="flex gap-2 max-w-3xl mx-auto">
+          <div className="mx-auto flex max-w-3xl gap-2">
             <input
               ref={inputRef}
               type="text"
@@ -338,12 +338,12 @@ export function ScenarioBuilderClient() {
               onKeyDown={handleKeyDown}
               placeholder="Describe your scenario..."
               disabled={isSending || isLoading}
-              className="flex-1 px-4 py-3 border-2 border-foreground bg-background text-foreground font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-50"
+              className="flex-1 border-2 border-foreground bg-background px-4 py-3 font-mono text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-50"
             />
             <button
               onClick={sendMessage}
               disabled={!input.trim() || isSending || isLoading}
-              className="px-6 py-3 bg-foreground text-background font-bold border-2 border-foreground hover:bg-secondary hover:text-secondary-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+              className="border-2 border-foreground bg-foreground px-6 py-3 font-bold text-background hover:bg-secondary hover:text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
             >
               Send
             </button>
@@ -352,9 +352,9 @@ export function ScenarioBuilderClient() {
       </div>
 
       {/* Preview Panel */}
-      <div className="w-96 flex flex-col bg-muted/20">
+      <div className="bg-muted/20 flex w-96 flex-col">
         <header className="border-b-2 border-foreground bg-background px-4 py-3">
-          <h2 className="font-bold text-lg">Preview</h2>
+          <h2 className="text-lg font-bold">Preview</h2>
           <p className="text-sm text-muted-foreground">
             Scenario data collected so far
           </p>
@@ -368,16 +368,16 @@ export function ScenarioBuilderClient() {
           <button
             onClick={saveScenario}
             disabled={!isReadyToSave || isSaving}
-            className={`w-full px-6 py-3 font-bold border-2 border-foreground ${
+            className={`w-full border-2 border-foreground px-6 py-3 font-bold ${
               isReadyToSave
-                ? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                : "bg-muted text-muted-foreground cursor-not-allowed"
+                ? "hover:bg-secondary/80 bg-secondary text-secondary-foreground"
+                : "cursor-not-allowed bg-muted text-muted-foreground"
             }`}
           >
             {isSaving ? "Saving..." : "Save Scenario"}
           </button>
           {!isReadyToSave && (
-            <p className="text-xs text-muted-foreground mt-2 text-center font-mono">
+            <p className="mt-2 text-center font-mono text-xs text-muted-foreground">
               Complete all required fields to save
             </p>
           )}
@@ -393,19 +393,19 @@ function TypingIndicator() {
     <div className="flex items-center gap-1 py-1">
       <div className="flex gap-1">
         <span
-          className="w-2 h-2 bg-foreground animate-pulse"
+          className="h-2 w-2 animate-pulse bg-foreground"
           style={{ animationDelay: "0ms" }}
         />
         <span
-          className="w-2 h-2 bg-foreground animate-pulse"
+          className="h-2 w-2 animate-pulse bg-foreground"
           style={{ animationDelay: "150ms" }}
         />
         <span
-          className="w-2 h-2 bg-foreground animate-pulse"
+          className="h-2 w-2 animate-pulse bg-foreground"
           style={{ animationDelay: "300ms" }}
         />
       </div>
-      <span className="text-sm text-muted-foreground ml-2 font-mono">
+      <span className="ml-2 font-mono text-sm text-muted-foreground">
         thinking...
       </span>
     </div>
@@ -425,13 +425,13 @@ function ScenarioPreview({ data }: { data: ScenarioBuilderData }) {
 
   if (!hasAnyData) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center px-4">
-        <div className="w-16 h-16 bg-muted border-2 border-foreground flex items-center justify-center mb-4">
+      <div className="flex h-full flex-col items-center justify-center px-4 text-center">
+        <div className="mb-4 flex h-16 w-16 items-center justify-center border-2 border-foreground bg-muted">
           <span className="text-2xl">?</span>
         </div>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           Start chatting to build your scenario. Information will appear here as
-          it's collected.
+          it&apos;s collected.
         </p>
       </div>
     );
@@ -441,7 +441,7 @@ function ScenarioPreview({ data }: { data: ScenarioBuilderData }) {
     <div className="space-y-4">
       {/* Basic Info Section */}
       <div className="space-y-2">
-        <h3 className="font-bold text-sm font-mono text-muted-foreground uppercase tracking-wider">
+        <h3 className="font-mono text-sm font-bold uppercase tracking-wider text-muted-foreground">
           Basic Info
         </h3>
         <div className="space-y-2">
@@ -462,14 +462,14 @@ function ScenarioPreview({ data }: { data: ScenarioBuilderData }) {
           <PreviewField label="Repo" value={data.repoUrl} />
           {data.techStack && data.techStack.length > 0 && (
             <div>
-              <span className="text-sm font-mono text-muted-foreground">
+              <span className="font-mono text-sm text-muted-foreground">
                 Tech Stack:
               </span>
-              <div className="flex flex-wrap gap-1 mt-1">
+              <div className="mt-1 flex flex-wrap gap-1">
                 {data.techStack.map((tech, i) => (
                   <span
                     key={i}
-                    className="px-2 py-0.5 text-xs font-mono border border-foreground bg-muted"
+                    className="border border-foreground bg-muted px-2 py-0.5 font-mono text-xs"
                   >
                     {tech}
                   </span>
@@ -483,7 +483,7 @@ function ScenarioPreview({ data }: { data: ScenarioBuilderData }) {
       {/* Coworkers Section */}
       {data.coworkers && data.coworkers.length > 0 && (
         <div className="space-y-2">
-          <h3 className="font-bold text-sm font-mono text-muted-foreground uppercase tracking-wider">
+          <h3 className="font-mono text-sm font-bold uppercase tracking-wider text-muted-foreground">
             Coworkers ({data.coworkers.length})
           </h3>
           <div className="space-y-3">
@@ -492,9 +492,9 @@ function ScenarioPreview({ data }: { data: ScenarioBuilderData }) {
                 key={i}
                 className="border-2 border-foreground bg-background p-3"
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-8 h-8 bg-secondary border-2 border-foreground flex items-center justify-center">
-                    <span className="font-bold text-xs font-mono">
+                <div className="mb-2 flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center border-2 border-foreground bg-secondary">
+                    <span className="font-mono text-xs font-bold">
                       {coworker.name
                         .split(" ")
                         .map((n) => n[0])
@@ -503,19 +503,20 @@ function ScenarioPreview({ data }: { data: ScenarioBuilderData }) {
                     </span>
                   </div>
                   <div>
-                    <div className="font-bold text-sm">{coworker.name}</div>
+                    <div className="text-sm font-bold">{coworker.name}</div>
                     <div className="text-xs text-muted-foreground">
                       {coworker.role}
                     </div>
                   </div>
                 </div>
-                <div className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                <div className="mb-2 line-clamp-2 text-xs text-muted-foreground">
                   {coworker.personaStyle}
                 </div>
-                <div className="text-xs font-mono">
+                <div className="font-mono text-xs">
                   {coworker.knowledge.length} knowledge item
                   {coworker.knowledge.length !== 1 ? "s" : ""}
-                  {coworker.knowledge.filter((k) => k.isCritical).length > 0 && (
+                  {coworker.knowledge.filter((k) => k.isCritical).length >
+                    0 && (
                     <span className="ml-1 text-secondary">
                       ({coworker.knowledge.filter((k) => k.isCritical).length}{" "}
                       critical)
@@ -545,27 +546,28 @@ function PreviewField({
   if (!value) {
     return (
       <div className="opacity-50">
-        <span className="text-sm font-mono text-muted-foreground">
+        <span className="font-mono text-sm text-muted-foreground">
           {label}:
         </span>
-        <span className="text-sm text-muted-foreground ml-1 italic">
+        <span className="ml-1 text-sm italic text-muted-foreground">
           Not set
         </span>
       </div>
     );
   }
 
-  const displayValue = truncate && value.length > 100 ? value.slice(0, 100) + "..." : value;
+  const displayValue =
+    truncate && value.length > 100 ? value.slice(0, 100) + "..." : value;
 
   return (
     <div>
-      <span className="text-sm font-mono text-muted-foreground">{label}:</span>
+      <span className="font-mono text-sm text-muted-foreground">{label}:</span>
       {markdown ? (
-        <div className="text-sm mt-1">
+        <div className="mt-1 text-sm">
           <Markdown>{displayValue}</Markdown>
         </div>
       ) : (
-        <span className="text-sm ml-1">{displayValue}</span>
+        <span className="ml-1 text-sm">{displayValue}</span>
       )}
     </div>
   );

@@ -188,7 +188,9 @@ describe("Markdown component", () => {
 
   describe("horizontal rule", () => {
     it("renders hr with thick border", () => {
-      const { container } = render(<Markdown>{"Above\n\n---\n\nBelow"}</Markdown>);
+      const { container } = render(
+        <Markdown>{"Above\n\n---\n\nBelow"}</Markdown>
+      );
       const hr = container.querySelector("hr");
       expect(hr).toBeInTheDocument();
       expect(hr).toHaveClass("border-t-2");
@@ -281,9 +283,7 @@ const greeting = "hello";
     });
 
     it("has no rounded corners on code blocks", () => {
-      const { container } = render(
-        <Markdown>{"```\ncode\n```"}</Markdown>
-      );
+      const { container } = render(<Markdown>{"```\ncode\n```"}</Markdown>);
       const pre = container.querySelector("pre");
       // No rounded-* classes should be present
       const classes = pre?.className || "";
@@ -291,9 +291,7 @@ const greeting = "hello";
     });
 
     it("has no shadow classes", () => {
-      const { container } = render(
-        <Markdown>{"```\ncode\n```"}</Markdown>
-      );
+      const { container } = render(<Markdown>{"```\ncode\n```"}</Markdown>);
       const pre = container.querySelector("pre");
       const classes = pre?.className || "";
       expect(classes).not.toMatch(/shadow/);

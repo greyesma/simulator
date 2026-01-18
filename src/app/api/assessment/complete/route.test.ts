@@ -313,16 +313,24 @@ describe("isValidPrUrl", () => {
   it("should accept valid GitHub PR URLs", () => {
     expect(isValidPrUrl("https://github.com/owner/repo/pull/123")).toBe(true);
     expect(isValidPrUrl("https://github.com/my-org/my-repo/pull/1")).toBe(true);
-    expect(isValidPrUrl("https://github.com/user123/project-name/pull/9999")).toBe(true);
+    expect(
+      isValidPrUrl("https://github.com/user123/project-name/pull/9999")
+    ).toBe(true);
   });
 
   it("should accept valid GitLab MR URLs", () => {
-    expect(isValidPrUrl("https://gitlab.com/owner/repo/-/merge_requests/123")).toBe(true);
-    expect(isValidPrUrl("https://gitlab.company.com/org/repo/-/merge_requests/456")).toBe(true);
+    expect(
+      isValidPrUrl("https://gitlab.com/owner/repo/-/merge_requests/123")
+    ).toBe(true);
+    expect(
+      isValidPrUrl("https://gitlab.company.com/org/repo/-/merge_requests/456")
+    ).toBe(true);
   });
 
   it("should accept valid Bitbucket PR URLs", () => {
-    expect(isValidPrUrl("https://bitbucket.org/owner/repo/pull-requests/123")).toBe(true);
+    expect(
+      isValidPrUrl("https://bitbucket.org/owner/repo/pull-requests/123")
+    ).toBe(true);
   });
 
   it("should reject invalid URLs", () => {
@@ -330,6 +338,8 @@ describe("isValidPrUrl", () => {
     expect(isValidPrUrl("http://github.com/owner/repo/pull/123")).toBe(false); // HTTP not allowed
     expect(isValidPrUrl("https://example.com")).toBe(false);
     expect(isValidPrUrl("https://github.com/owner/repo")).toBe(false); // No PR number
-    expect(isValidPrUrl("https://github.com/owner/repo/issues/123")).toBe(false); // Issues, not PR
+    expect(isValidPrUrl("https://github.com/owner/repo/issues/123")).toBe(
+      false
+    ); // Issues, not PR
   });
 });

@@ -87,7 +87,10 @@ describe("POST /api/kickoff/transcript", () => {
 
     const request = new Request("http://localhost/api/kickoff/transcript", {
       method: "POST",
-      body: JSON.stringify({ assessmentId: "test-id", transcript: "not an array" }),
+      body: JSON.stringify({
+        assessmentId: "test-id",
+        transcript: "not an array",
+      }),
     });
 
     const response = await POST(request);
@@ -164,7 +167,11 @@ describe("POST /api/kickoff/transcript", () => {
     mockConversationFindFirst.mockResolvedValue({
       id: "existing-conv-id",
       transcript: [
-        { role: "user", text: "Previous message", timestamp: "2024-01-01T00:00:00Z" },
+        {
+          role: "user",
+          text: "Previous message",
+          timestamp: "2024-01-01T00:00:00Z",
+        },
       ],
     });
     mockConversationUpdate.mockResolvedValue({
@@ -172,7 +179,11 @@ describe("POST /api/kickoff/transcript", () => {
     });
 
     const newTranscript = [
-      { role: "model", text: "New response", timestamp: "2024-01-01T00:00:02Z" },
+      {
+        role: "model",
+        text: "New response",
+        timestamp: "2024-01-01T00:00:02Z",
+      },
     ];
 
     const request = new Request("http://localhost/api/kickoff/transcript", {

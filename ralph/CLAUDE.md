@@ -41,15 +41,20 @@ RALPH_POLL_INTERVAL=30 ./ralph/ralph.sh
 Ralph has access to the following skills and tools:
 
 ### Frontend Design
+
 When building UI components, the `frontend-design` skill activates automatically. It creates distinctive interfaces that avoid generic AI aesthetics (no Inter font, no purple gradients on white).
 
 ### Superpowers (TDD & Planning)
+
 For complex tasks, use the superpowers workflow:
+
 - Write tests first (RED), make them pass (GREEN), then refactor
 - Use `/superpowers:brainstorm` before implementing new features
 
 ### Agent-Browser (Visual Testing)
+
 For tasks involving web UIs, use agent-browser for E2E and visual testing:
+
 ```bash
 agent-browser open "http://localhost:3000"
 agent-browser screenshot ./tests/screenshot.png

@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { AssessmentStatus, type Prisma } from "@prisma/client";
+import { AssessmentStatus } from "@prisma/client";
 import type { CodeReviewData } from "@/lib/code-review";
 import type { PrCiStatus } from "@/lib/github";
 import type { ChatMessage } from "@/lib/conversation-memory";
-import { aggregateSegmentAnalyses, type SegmentAnalysisResponse } from "@/lib/recording-analysis";
+import {
+  aggregateSegmentAnalyses,
+  type SegmentAnalysisResponse,
+} from "@/lib/recording-analysis";
 import {
   generateAssessmentReport,
   reportToPrismaJson,
@@ -70,11 +73,12 @@ async function collectAssessmentSignals(
       technicalDepthScore: hr.technicalDepthScore,
       cultureFitNotes: hr.cultureFitNotes,
       interviewDurationSeconds: hr.interviewDurationSeconds,
-      verifiedClaims: (hr.verifiedClaims as Array<{
-        claim: string;
-        status: "verified" | "unverified" | "inconsistent" | "flagged";
-        notes?: string;
-      }>) || [],
+      verifiedClaims:
+        (hr.verifiedClaims as Array<{
+          claim: string;
+          status: "verified" | "unverified" | "inconsistent" | "flagged";
+          notes?: string;
+        }>) || [],
     };
   }
 
@@ -121,24 +125,45 @@ async function collectAssessmentSignals(
         if (segment.analysis) {
           // Reconstruct SegmentAnalysisResponse from database data
           const analysis: SegmentAnalysisResponse = {
-            activityTimeline: (segment.analysis.activityTimeline as Array<{
-              timestamp: string;
-              activity: "coding" | "reading_docs" | "browsing" | "debugging" | "testing" | "searching" | "idle" | "planning" | "reviewing" | "communicating" | "other";
-              description: string;
-              applicationVisible?: string;
-            }>) || [],
-            toolUsage: (segment.analysis.toolUsage as Array<{
-              tool: string;
-              usageCount: number;
-              contextNotes: string;
-            }>) || [],
-            stuckMoments: (segment.analysis.stuckMoments as Array<{
-              startTime: string;
-              endTime: string;
-              description: string;
-              potentialCause: "unclear_requirements" | "technical_difficulty" | "debugging" | "searching_for_solution" | "context_switching" | "environment_issues" | "unknown";
-              durationSeconds: number;
-            }>) || [],
+            activityTimeline:
+              (segment.analysis.activityTimeline as Array<{
+                timestamp: string;
+                activity:
+                  | "coding"
+                  | "reading_docs"
+                  | "browsing"
+                  | "debugging"
+                  | "testing"
+                  | "searching"
+                  | "idle"
+                  | "planning"
+                  | "reviewing"
+                  | "communicating"
+                  | "other";
+                description: string;
+                applicationVisible?: string;
+              }>) || [],
+            toolUsage:
+              (segment.analysis.toolUsage as Array<{
+                tool: string;
+                usageCount: number;
+                contextNotes: string;
+              }>) || [],
+            stuckMoments:
+              (segment.analysis.stuckMoments as Array<{
+                startTime: string;
+                endTime: string;
+                description: string;
+                potentialCause:
+                  | "unclear_requirements"
+                  | "technical_difficulty"
+                  | "debugging"
+                  | "searching_for_solution"
+                  | "context_switching"
+                  | "environment_issues"
+                  | "unknown";
+                durationSeconds: number;
+              }>) || [],
             summary: {
               totalActiveTimeSeconds: segment.analysis.totalActiveTime || 0,
               totalIdleTimeSeconds: segment.analysis.totalIdleTime || 0,
@@ -150,12 +175,18 @@ async function collectAssessmentSignals(
           };
 
           // Extract additional summary data from aiAnalysis if available
-          const aiAnalysis = segment.analysis.aiAnalysis as Record<string, unknown> | null;
+          const aiAnalysis = segment.analysis.aiAnalysis as Record<
+            string,
+            unknown
+          > | null;
           if (aiAnalysis?.summary) {
             const summary = aiAnalysis.summary as Record<string, unknown>;
-            analysis.summary.dominantActivity = (summary.dominantActivity as string) || "unknown";
-            analysis.summary.aiToolsUsed = (summary.aiToolsUsed as boolean) || false;
-            analysis.summary.keyObservations = (summary.keyObservations as string[]) || [];
+            analysis.summary.dominantActivity =
+              (summary.dominantActivity as string) || "unknown";
+            analysis.summary.aiToolsUsed =
+              (summary.aiToolsUsed as boolean) || false;
+            analysis.summary.keyObservations =
+              (summary.keyObservations as string[]) || [];
           }
 
           allSegmentAnalyses.push(analysis);
@@ -326,7 +357,9 @@ export async function POST(request: Request) {
       })
         .then((result) => {
           if (result.success) {
-            console.log(`Report email sent successfully to ${assessment.user?.email}`);
+            console.log(
+              `Report email sent successfully to ${assessment.user?.email}`
+            );
           } else {
             console.warn(`Failed to send report email: ${result.error}`);
           }

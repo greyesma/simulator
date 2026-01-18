@@ -71,11 +71,23 @@ const JOB_TITLE_ARCHETYPE_MAP: Array<{
     archetype: "DATA_ENGINEER",
   },
   {
-    keywords: ["frontend", "front-end", "front end", "ui engineer", "ui developer"],
+    keywords: [
+      "frontend",
+      "front-end",
+      "front end",
+      "ui engineer",
+      "ui developer",
+    ],
     archetype: "SENIOR_FRONTEND_ENGINEER",
   },
   {
-    keywords: ["backend", "back-end", "back end", "server engineer", "api engineer"],
+    keywords: [
+      "backend",
+      "back-end",
+      "back end",
+      "server engineer",
+      "api engineer",
+    ],
     archetype: "SENIOR_BACKEND_ENGINEER",
   },
   {
@@ -83,15 +95,33 @@ const JOB_TITLE_ARCHETYPE_MAP: Array<{
     archetype: "FULLSTACK_ENGINEER",
   },
   {
-    keywords: ["engineering manager", "eng manager", "em ", "manager of engineering"],
+    keywords: [
+      "engineering manager",
+      "eng manager",
+      "em ",
+      "manager of engineering",
+    ],
     archetype: "ENGINEERING_MANAGER",
   },
   {
-    keywords: ["tech lead", "technical lead", "lead engineer", "staff engineer", "principal engineer", "architect"],
+    keywords: [
+      "tech lead",
+      "technical lead",
+      "lead engineer",
+      "staff engineer",
+      "principal engineer",
+      "architect",
+    ],
     archetype: "TECH_LEAD",
   },
   {
-    keywords: ["devops", "sre", "site reliability", "infrastructure engineer", "platform engineer"],
+    keywords: [
+      "devops",
+      "sre",
+      "site reliability",
+      "infrastructure engineer",
+      "platform engineer",
+    ],
     archetype: "DEVOPS_ENGINEER",
   },
   {
@@ -110,7 +140,9 @@ const JOB_TITLE_ARCHETYPE_MAP: Array<{
  * @param jobTitle - The job title extracted from the query
  * @returns The matching archetype or null if no match
  */
-export function mapJobTitleToArchetype(jobTitle: string | null): RoleArchetype | null {
+export function mapJobTitleToArchetype(
+  jobTitle: string | null
+): RoleArchetype | null {
   if (!jobTitle) return null;
 
   const normalizedTitle = jobTitle.toLowerCase().trim();
@@ -147,7 +179,9 @@ const SENIORITY_THRESHOLDS = {
  * @param yearsExperience - Number of years of experience
  * @returns The inferred seniority level or null if not provided
  */
-export function inferSeniorityFromYears(yearsExperience: number | null): SeniorityLevel | null {
+export function inferSeniorityFromYears(
+  yearsExperience: number | null
+): SeniorityLevel | null {
   if (yearsExperience === null || yearsExperience < 0) return null;
 
   if (yearsExperience <= SENIORITY_THRESHOLDS.JUNIOR_MAX) {
@@ -197,7 +231,9 @@ Query to parse: `;
  * @param query - The natural language search query
  * @returns Extraction result with structured intent, archetype, and seniority
  */
-export async function extractEntities(query: string): Promise<EntityExtractionResult> {
+export async function extractEntities(
+  query: string
+): Promise<EntityExtractionResult> {
   const startTime = Date.now();
 
   // Handle empty queries
@@ -277,7 +313,10 @@ function createEmptyIntent(): ExtractedIntent {
 /**
  * Creates an error result with the given message.
  */
-function createErrorResult(message: string, startTime: number): EntityExtractionResult {
+function createErrorResult(
+  message: string,
+  startTime: number
+): EntityExtractionResult {
   return {
     intent: createEmptyIntent(),
     archetype: null,
@@ -355,7 +394,10 @@ export function getSupportedJobTitleKeywords(): string[] {
 /**
  * Gets the seniority thresholds for years of experience.
  */
-export function getSeniorityThresholds(): { juniorMax: number; midMax: number } {
+export function getSeniorityThresholds(): {
+  juniorMax: number;
+  midMax: number;
+} {
   return {
     juniorMax: SENIORITY_THRESHOLDS.JUNIOR_MAX,
     midMax: SENIORITY_THRESHOLDS.MID_MAX,

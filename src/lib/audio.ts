@@ -1,6 +1,10 @@
 // Audio utilities for capturing and playing audio in the browser
 
-export type AudioPermissionState = "prompt" | "granted" | "denied" | "unavailable";
+export type AudioPermissionState =
+  | "prompt"
+  | "granted"
+  | "denied"
+  | "unavailable";
 
 // Check if browser supports required audio APIs
 export function checkAudioSupport(): boolean {
@@ -134,7 +138,11 @@ export class AudioStreamer {
     try {
       // Convert Int16 to Float32
       const float32Array = new Float32Array(chunk.length / 2);
-      const dataView = new DataView(chunk.buffer, chunk.byteOffset, chunk.byteLength);
+      const dataView = new DataView(
+        chunk.buffer,
+        chunk.byteOffset,
+        chunk.byteLength
+      );
 
       for (let i = 0; i < chunk.length / 2; i++) {
         const int16 = dataView.getInt16(i * 2, true); // little-endian
@@ -142,7 +150,9 @@ export class AudioStreamer {
       }
 
       // Accumulate in processing buffer
-      const newBuffer = new Float32Array(this.processingBuffer.length + float32Array.length);
+      const newBuffer = new Float32Array(
+        this.processingBuffer.length + float32Array.length
+      );
       newBuffer.set(this.processingBuffer);
       newBuffer.set(float32Array, this.processingBuffer.length);
       this.processingBuffer = newBuffer;
@@ -188,15 +198,22 @@ export class AudioStreamer {
         source.buffer = audioBuffer;
         source.connect(this.gainNode);
 
-        const startTime = Math.max(this.scheduledTime, this.context.currentTime);
+        const startTime = Math.max(
+          this.scheduledTime,
+          this.context.currentTime
+        );
         source.start(startTime);
         this.scheduledTime = startTime + audioBuffer.duration;
       }
 
       // Schedule next check
       if (this.audioQueue.length > 0) {
-        const nextCheckTime = (this.scheduledTime - this.context.currentTime) * 1000;
-        setTimeout(() => this.scheduleNextBuffer(), Math.max(0, nextCheckTime - 50));
+        const nextCheckTime =
+          (this.scheduledTime - this.context.currentTime) * 1000;
+        setTimeout(
+          () => this.scheduleNextBuffer(),
+          Math.max(0, nextCheckTime - 50)
+        );
       } else {
         this.isPlaying = false;
       }
@@ -207,7 +224,11 @@ export class AudioStreamer {
   }
 
   private createAudioBuffer(audioData: Float32Array): AudioBuffer {
-    const audioBuffer = this.context.createBuffer(1, audioData.length, this.sampleRate);
+    const audioBuffer = this.context.createBuffer(
+      1,
+      audioData.length,
+      this.sampleRate
+    );
     audioBuffer.getChannelData(0).set(audioData);
     return audioBuffer;
   }
@@ -304,6 +325,8 @@ registerProcessor('audio-processor', AudioProcessor);
 
 // Create a blob URL for the audio worklet
 export function createAudioWorkletBlobUrl(): string {
-  const blob = new Blob([AUDIO_WORKLET_CODE], { type: "application/javascript" });
+  const blob = new Blob([AUDIO_WORKLET_CODE], {
+    type: "application/javascript",
+  });
   return URL.createObjectURL(blob);
 }

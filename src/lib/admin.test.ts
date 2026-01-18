@@ -98,7 +98,9 @@ describe("admin utilities", () => {
 
       mockAuth.mockResolvedValueOnce(null);
 
-      await expect(requireAdmin()).rejects.toThrow("REDIRECT: /sign-in?callbackUrl=/admin");
+      await expect(requireAdmin()).rejects.toThrow(
+        "REDIRECT: /sign-in?callbackUrl=/admin"
+      );
       expect(mockRedirect).toHaveBeenCalledWith("/sign-in?callbackUrl=/admin");
     });
 

@@ -25,9 +25,8 @@ export function AccountDeletionSection({
   const [isRequesting, setIsRequesting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
-  const [hasPendingRequest, setHasPendingRequest] = useState(
-    !!deletionRequestedAt
-  );
+  const [hasPendingRequest, setHasPendingRequest] =
+    useState(!!deletionRequestedAt);
   const [requestDate, setRequestDate] = useState<Date | null>(
     deletionRequestedAt
   );
@@ -88,9 +87,7 @@ export function AccountDeletionSection({
       }
 
       // Account deleted - redirect to sign-out
-      setSuccess(
-        "Account deleted successfully. Redirecting to homepage..."
-      );
+      setSuccess("Account deleted successfully. Redirecting to homepage...");
       setTimeout(() => {
         router.push("/api/auth/signout");
       }, 2000);
@@ -129,13 +126,13 @@ export function AccountDeletionSection({
 
   return (
     <section className="mb-12">
-      <h2 className="text-2xl font-bold mb-6 text-destructive">Danger Zone</h2>
+      <h2 className="mb-6 text-2xl font-bold text-destructive">Danger Zone</h2>
 
       <div className="border-2 border-destructive p-6">
-        <div className="flex items-start gap-4 mb-6">
-          <div className="w-12 h-12 bg-destructive flex items-center justify-center flex-shrink-0">
+        <div className="mb-6 flex items-start gap-4">
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center bg-destructive">
             <svg
-              className="w-6 h-6 text-white"
+              className="h-6 w-6 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -149,8 +146,8 @@ export function AccountDeletionSection({
             </svg>
           </div>
           <div className="flex-1">
-            <h3 className="font-bold mb-1">Delete Account</h3>
-            <p className="text-muted-foreground text-sm">
+            <h3 className="mb-1 font-bold">Delete Account</h3>
+            <p className="text-sm text-muted-foreground">
               Permanently delete your account and all associated data. This
               includes your profile, all assessments, recordings, uploaded CVs,
               and reports.
@@ -159,14 +156,14 @@ export function AccountDeletionSection({
         </div>
 
         {/* Privacy Policy Link */}
-        <div className="mb-6 pb-6 border-b border-border">
+        <div className="mb-6 border-b border-border pb-6">
           <Link
             href="/privacy"
-            className="inline-flex items-center gap-2 text-foreground font-semibold border-b-2 border-secondary hover:text-secondary"
+            className="inline-flex items-center gap-2 border-b-2 border-secondary font-semibold text-foreground hover:text-secondary"
           >
             <span>Read our Privacy Policy</span>
             <svg
-              className="w-4 h-4"
+              className="h-4 w-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -178,25 +175,25 @@ export function AccountDeletionSection({
 
         {/* Error message */}
         {error && (
-          <div className="mb-4 p-4 border-2 border-destructive bg-destructive/10 text-destructive font-mono text-sm">
+          <div className="bg-destructive/10 mb-4 border-2 border-destructive p-4 font-mono text-sm text-destructive">
             {error}
           </div>
         )}
 
         {/* Success message */}
         {success && (
-          <div className="mb-4 p-4 border-2 border-green-600 bg-green-50 text-green-700 font-mono text-sm">
+          <div className="mb-4 border-2 border-green-600 bg-green-50 p-4 font-mono text-sm text-green-700">
             {success}
           </div>
         )}
 
         {/* Pending deletion request */}
         {hasPendingRequest && requestDate && (
-          <div className="mb-6 p-4 border-2 border-yellow-500 bg-yellow-50">
+          <div className="mb-6 border-2 border-yellow-500 bg-yellow-50 p-4">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-yellow-500 text-white flex items-center justify-center flex-shrink-0">
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center bg-yellow-500 text-white">
                 <svg
-                  className="w-5 h-5"
+                  className="h-5 w-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -213,7 +210,7 @@ export function AccountDeletionSection({
                 <h4 className="font-bold text-yellow-800">
                   Deletion Scheduled
                 </h4>
-                <p className="text-sm text-yellow-700 mt-1">
+                <p className="mt-1 text-sm text-yellow-700">
                   Requested on {formatDate(requestDate)}. Your account and all
                   data will be permanently deleted within 30 days.
                 </p>
@@ -223,7 +220,7 @@ export function AccountDeletionSection({
               <button
                 onClick={handleCancelRequest}
                 disabled={isCancelling}
-                className="px-4 py-2 text-sm font-semibold border-2 border-yellow-700 text-yellow-800 hover:bg-yellow-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="border-2 border-yellow-700 px-4 py-2 text-sm font-semibold text-yellow-800 hover:bg-yellow-100 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isCancelling ? "Cancelling..." : "Cancel Deletion"}
               </button>
@@ -235,7 +232,7 @@ export function AccountDeletionSection({
         {!hasPendingRequest && !showConfirmation && (
           <button
             onClick={() => setShowConfirmation(true)}
-            className="px-4 py-2 text-sm font-semibold border-2 border-destructive text-destructive hover:bg-destructive hover:text-white"
+            className="border-2 border-destructive px-4 py-2 text-sm font-semibold text-destructive hover:bg-destructive hover:text-white"
           >
             Delete Account
           </button>
@@ -243,14 +240,14 @@ export function AccountDeletionSection({
 
         {/* Confirmation dialog */}
         {!hasPendingRequest && showConfirmation && (
-          <div className="p-6 border-2 border-destructive bg-destructive/5">
-            <h4 className="font-bold text-destructive mb-4">
+          <div className="bg-destructive/5 border-2 border-destructive p-6">
+            <h4 className="mb-4 font-bold text-destructive">
               Choose Deletion Method
             </h4>
 
             {/* Deletion mode selector */}
             <div className="mb-6 space-y-3">
-              <label className="flex items-start gap-3 cursor-pointer">
+              <label className="flex cursor-pointer items-start gap-3">
                 <input
                   type="radio"
                   name="deletionMode"
@@ -267,7 +264,7 @@ export function AccountDeletionSection({
                 </div>
               </label>
 
-              <label className="flex items-start gap-3 cursor-pointer">
+              <label className="flex cursor-pointer items-start gap-3">
                 <input
                   type="radio"
                   name="deletionMode"
@@ -286,27 +283,27 @@ export function AccountDeletionSection({
             </div>
 
             {/* What will be deleted */}
-            <div className="mb-6 p-4 border-2 border-border bg-background">
-              <p className="font-semibold mb-2">What will be deleted:</p>
-              <ul className="text-sm text-muted-foreground space-y-1">
+            <div className="mb-6 border-2 border-border bg-background p-4">
+              <p className="mb-2 font-semibold">What will be deleted:</p>
+              <ul className="space-y-1 text-sm text-muted-foreground">
                 <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-destructive"></span>
+                  <span className="h-1.5 w-1.5 bg-destructive"></span>
                   Your profile information
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-destructive"></span>
+                  <span className="h-1.5 w-1.5 bg-destructive"></span>
                   All assessments and reports
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-destructive"></span>
+                  <span className="h-1.5 w-1.5 bg-destructive"></span>
                   Screen recordings and screenshots
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-destructive"></span>
+                  <span className="h-1.5 w-1.5 bg-destructive"></span>
                   Uploaded CVs and resumes
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-destructive"></span>
+                  <span className="h-1.5 w-1.5 bg-destructive"></span>
                   Conversation transcripts
                 </li>
               </ul>
@@ -315,9 +312,9 @@ export function AccountDeletionSection({
             {/* Immediate deletion confirmation */}
             {deletionMode === "immediate" && (
               <div className="mb-6">
-                <label className="block text-sm font-semibold mb-2">
+                <label className="mb-2 block text-sm font-semibold">
                   Type{" "}
-                  <span className="font-mono bg-muted px-1">
+                  <span className="bg-muted px-1 font-mono">
                     DELETE MY ACCOUNT
                   </span>{" "}
                   to confirm:
@@ -327,7 +324,7 @@ export function AccountDeletionSection({
                   value={confirmText}
                   onChange={(e) => setConfirmText(e.target.value)}
                   placeholder="DELETE MY ACCOUNT"
-                  className="w-full px-4 py-2 border-2 border-border font-mono text-sm focus:border-destructive focus:outline-none"
+                  className="w-full border-2 border-border px-4 py-2 font-mono text-sm focus:border-destructive focus:outline-none"
                 />
               </div>
             )}
@@ -338,7 +335,7 @@ export function AccountDeletionSection({
                 <button
                   onClick={handleScheduleDeletion}
                   disabled={isRequesting}
-                  className="px-4 py-2 text-sm font-semibold bg-destructive text-white border-2 border-destructive hover:bg-destructive/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="hover:bg-destructive/90 border-2 border-destructive bg-destructive px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isRequesting ? "Scheduling..." : "Schedule Deletion"}
                 </button>
@@ -346,7 +343,7 @@ export function AccountDeletionSection({
                 <button
                   onClick={handleImmediateDeletion}
                   disabled={isDeleting || confirmText !== "DELETE MY ACCOUNT"}
-                  className="px-4 py-2 text-sm font-semibold bg-destructive text-white border-2 border-destructive hover:bg-destructive/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="hover:bg-destructive/90 border-2 border-destructive bg-destructive px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isDeleting ? "Deleting..." : "Delete Now"}
                 </button>
@@ -357,7 +354,7 @@ export function AccountDeletionSection({
                   setConfirmText("");
                   setDeletionMode("schedule");
                 }}
-                className="px-4 py-2 text-sm font-semibold border-2 border-border hover:bg-accent"
+                className="border-2 border-border px-4 py-2 text-sm font-semibold hover:bg-accent"
               >
                 Cancel
               </button>

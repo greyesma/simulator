@@ -19,8 +19,8 @@ export default async function AdminDashboard() {
   ]);
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
+    <div className="mx-auto max-w-6xl px-6 py-12">
+      <h1 className="mb-8 text-3xl font-bold">Admin Dashboard</h1>
 
       {/* Analytics Dashboard */}
       <section className="mb-12">
@@ -29,23 +29,23 @@ export default async function AdminDashboard() {
 
       {/* Quick Actions */}
       <section className="mb-12">
-        <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
+        <h2 className="mb-4 text-xl font-bold">Quick Actions</h2>
         <div className="flex flex-wrap gap-4">
           <Link
             href="/admin/scenarios/new"
-            className="bg-foreground text-background px-6 py-3 font-semibold border-2 border-foreground hover:bg-secondary hover:text-secondary-foreground hover:border-secondary"
+            className="border-2 border-foreground bg-foreground px-6 py-3 font-semibold text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground"
           >
             Create Scenario
           </Link>
           <Link
             href="/admin/scenarios"
-            className="bg-background text-foreground px-6 py-3 font-semibold border-2 border-foreground hover:bg-muted"
+            className="border-2 border-foreground bg-background px-6 py-3 font-semibold text-foreground hover:bg-muted"
           >
             Manage Scenarios ({scenarioCount})
           </Link>
           <Link
             href="/admin/users"
-            className="bg-background text-foreground px-6 py-3 font-semibold border-2 border-foreground hover:bg-muted"
+            className="border-2 border-foreground bg-background px-6 py-3 font-semibold text-foreground hover:bg-muted"
           >
             Manage Users
           </Link>
@@ -54,11 +54,11 @@ export default async function AdminDashboard() {
 
       {/* Recent Assessments */}
       <section>
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold">Recent Assessments</h2>
           <Link
             href="/admin/assessments"
-            className="font-mono text-sm text-foreground hover:text-secondary border-b-2 border-secondary"
+            className="border-b-2 border-secondary font-mono text-sm text-foreground hover:text-secondary"
           >
             View All
           </Link>
@@ -72,16 +72,16 @@ export default async function AdminDashboard() {
             <table className="w-full">
               <thead>
                 <tr className="border-b-2 border-border">
-                  <th className="text-left p-4 font-mono text-xs text-muted-foreground">
+                  <th className="p-4 text-left font-mono text-xs text-muted-foreground">
                     USER
                   </th>
-                  <th className="text-left p-4 font-mono text-xs text-muted-foreground">
+                  <th className="p-4 text-left font-mono text-xs text-muted-foreground">
                     SCENARIO
                   </th>
-                  <th className="text-left p-4 font-mono text-xs text-muted-foreground">
+                  <th className="p-4 text-left font-mono text-xs text-muted-foreground">
                     STATUS
                   </th>
-                  <th className="text-left p-4 font-mono text-xs text-muted-foreground">
+                  <th className="p-4 text-left font-mono text-xs text-muted-foreground">
                     DATE
                   </th>
                 </tr>
@@ -102,7 +102,7 @@ export default async function AdminDashboard() {
                     </td>
                     <td className="p-4">
                       <span
-                        className={`font-mono text-xs px-2 py-1 ${
+                        className={`px-2 py-1 font-mono text-xs ${
                           assessment.status === "COMPLETED"
                             ? "bg-secondary text-secondary-foreground"
                             : "bg-muted text-muted-foreground"

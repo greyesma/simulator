@@ -66,7 +66,10 @@ export async function POST(request: Request) {
     });
 
     if (!coworker) {
-      return NextResponse.json({ error: "Coworker not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Coworker not found" },
+        { status: 404 }
+      );
     }
 
     // Get ALL conversations for this assessment (for cross-coworker context)
@@ -99,7 +102,10 @@ export async function POST(request: Request) {
       }));
 
     // Build memory context for this coworker (with summarization)
-    const memory = await buildCoworkerMemory(coworkerConversations, coworker.name);
+    const memory = await buildCoworkerMemory(
+      coworkerConversations,
+      coworker.name
+    );
     const memoryContext = formatMemoryForPrompt(memory, coworker.name);
 
     // Build cross-coworker context (awareness of other conversations)

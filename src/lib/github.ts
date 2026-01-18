@@ -126,7 +126,11 @@ export async function fetchGitHubPrContent(prUrl: string): Promise<PrSnapshot> {
       diff = await diffResponse.text();
       // Truncate very large diffs (limit to ~500KB)
       if (diff.length > 500000) {
-        diff = diff.substring(0, 500000) + "\n\n[DIFF TRUNCATED - original was " + diff.length + " bytes]";
+        diff =
+          diff.substring(0, 500000) +
+          "\n\n[DIFF TRUNCATED - original was " +
+          diff.length +
+          " bytes]";
       }
     }
 
@@ -149,7 +153,8 @@ export async function fetchGitHubPrContent(prUrl: string): Promise<PrSnapshot> {
   } catch (error) {
     return {
       ...snapshot,
-      fetchError: error instanceof Error ? error.message : "Unknown error fetching PR",
+      fetchError:
+        error instanceof Error ? error.message : "Unknown error fetching PR",
     };
   }
 }
@@ -231,7 +236,8 @@ export async function closeGitHubPr(prUrl: string): Promise<PrCleanupResult> {
     return {
       success: false,
       action: "error",
-      message: error instanceof Error ? error.message : "Unknown error closing PR",
+      message:
+        error instanceof Error ? error.message : "Unknown error closing PR",
     };
   }
 }
@@ -242,7 +248,9 @@ export async function closeGitHubPr(prUrl: string): Promise<PrCleanupResult> {
  * 2. Closes the PR (GitHub only - can't delete via API)
  * Returns snapshot for storage regardless of close success
  */
-export async function cleanupPrAfterAssessment(prUrl: string): Promise<PrCleanupResult> {
+export async function cleanupPrAfterAssessment(
+  prUrl: string
+): Promise<PrCleanupResult> {
   // Determine provider
   if (prUrl.includes("github.com")) {
     return closeGitHubPr(prUrl);
@@ -253,10 +261,15 @@ export async function cleanupPrAfterAssessment(prUrl: string): Promise<PrCleanup
   return {
     success: true,
     action: "none",
-    message: "Non-GitHub PR - cleanup not supported, content snapshot not available",
+    message:
+      "Non-GitHub PR - cleanup not supported, content snapshot not available",
     prSnapshot: {
       url: prUrl,
-      provider: prUrl.includes("gitlab") ? "gitlab" : prUrl.includes("bitbucket") ? "bitbucket" : "unknown",
+      provider: prUrl.includes("gitlab")
+        ? "gitlab"
+        : prUrl.includes("bitbucket")
+          ? "bitbucket"
+          : "unknown",
       fetchedAt: new Date().toISOString(),
       fetchError: "Only GitHub PR cleanup is currently supported",
     },
@@ -274,7 +287,15 @@ export interface CheckRun {
   id: number;
   name: string;
   status: "queued" | "in_progress" | "completed";
-  conclusion: "success" | "failure" | "cancelled" | "skipped" | "neutral" | "timed_out" | "action_required" | null;
+  conclusion:
+    | "success"
+    | "failure"
+    | "cancelled"
+    | "skipped"
+    | "neutral"
+    | "timed_out"
+    | "action_required"
+    | null;
   startedAt?: string;
   completedAt?: string;
   htmlUrl?: string;
@@ -457,7 +478,9 @@ export async function fetchPrCiStatus(prUrl: string): Promise<PrCiStatus> {
         testResults = {
           passedTests: passedMatch ? parseInt(passedMatch[1], 10) : undefined,
           failedTests: failedMatch ? parseInt(failedMatch[1], 10) : undefined,
-          skippedTests: skippedMatch ? parseInt(skippedMatch[1], 10) : undefined,
+          skippedTests: skippedMatch
+            ? parseInt(skippedMatch[1], 10)
+            : undefined,
           totalTests: totalMatch ? parseInt(totalMatch[1], 10) : undefined,
           testSummary: summary.substring(0, 500), // Limit summary length
         };
@@ -478,7 +501,9 @@ export async function fetchPrCiStatus(prUrl: string): Promise<PrCiStatus> {
     return {
       ...status,
       fetchError:
-        error instanceof Error ? error.message : "Unknown error fetching CI status",
+        error instanceof Error
+          ? error.message
+          : "Unknown error fetching CI status",
     };
   }
 }

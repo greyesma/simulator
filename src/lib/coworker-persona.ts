@@ -103,7 +103,9 @@ function buildKnowledgeSection(knowledge: CoworkerKnowledge[]): string {
   }
 
   const sections = knowledge.map((k) => {
-    const criticalMarker = k.isCritical ? " [CRITICAL - candidate should discover this]" : "";
+    const criticalMarker = k.isCritical
+      ? " [CRITICAL - candidate should discover this]"
+      : "";
     return `### ${k.topic}${criticalMarker}
 When asked about: ${k.triggerKeywords.join(", ")}
 Your response: ${k.response}`;
@@ -172,7 +174,9 @@ function getStyleGuidelines(personaStyle: string): string {
 /**
  * Parse coworker knowledge from the JSON stored in the database
  */
-export function parseCoworkerKnowledge(knowledge: unknown): CoworkerKnowledge[] {
+export function parseCoworkerKnowledge(
+  knowledge: unknown
+): CoworkerKnowledge[] {
   if (!knowledge || !Array.isArray(knowledge)) {
     return [];
   }
@@ -277,7 +281,13 @@ export const EXAMPLE_COWORKERS: CoworkerPersona[] = [
       },
       {
         topic: "code_review_process",
-        triggerKeywords: ["code review", "PR", "pull request", "review", "approval"],
+        triggerKeywords: [
+          "code review",
+          "PR",
+          "pull request",
+          "review",
+          "approval",
+        ],
         response:
           "For code reviews, we need at least one approval from a senior dev before merging. Tag Jordan for technical reviews. Keep PRs small and focused - under 400 lines ideally. We use the PR template for consistency.",
         isCritical: true,
@@ -299,14 +309,28 @@ export const EXAMPLE_COWORKERS: CoworkerPersona[] = [
     knowledge: [
       {
         topic: "authentication",
-        triggerKeywords: ["auth", "login", "session", "jwt", "token", "authentication"],
+        triggerKeywords: [
+          "auth",
+          "login",
+          "session",
+          "jwt",
+          "token",
+          "authentication",
+        ],
         response:
           "We use JWT tokens with a 24-hour expiry. The auth middleware is in src/middleware/auth.ts. For API routes, use the withAuth wrapper. Make sure to handle the 401 case - users get redirected to /login automatically by the client.",
         isCritical: true,
       },
       {
         topic: "database",
-        triggerKeywords: ["database", "db", "prisma", "query", "schema", "migration"],
+        triggerKeywords: [
+          "database",
+          "db",
+          "prisma",
+          "query",
+          "schema",
+          "migration",
+        ],
         response:
           "We use Prisma with PostgreSQL. Schema is in prisma/schema.prisma. Run 'npm run db:migrate' for migrations. Pro tip: use the Prisma Studio ('npm run db:studio') to explore data while debugging.",
         isCritical: true,
@@ -320,7 +344,13 @@ export const EXAMPLE_COWORKERS: CoworkerPersona[] = [
       },
       {
         topic: "codebase_architecture",
-        triggerKeywords: ["architecture", "structure", "folder", "organize", "where"],
+        triggerKeywords: [
+          "architecture",
+          "structure",
+          "folder",
+          "organize",
+          "where",
+        ],
         response:
           "We follow a feature-based structure. src/features/ has the main business logic, src/lib/ has shared utilities, src/components/ has UI. API routes are in src/app/api/. Check the README for the full map.",
         isCritical: false,
@@ -335,7 +365,13 @@ export const EXAMPLE_COWORKERS: CoworkerPersona[] = [
     knowledge: [
       {
         topic: "requirements",
-        triggerKeywords: ["requirement", "spec", "user story", "acceptance", "criteria"],
+        triggerKeywords: [
+          "requirement",
+          "spec",
+          "user story",
+          "acceptance",
+          "criteria",
+        ],
         response:
           "The acceptance criteria are in the ticket! But basically: the feature should handle the happy path and show clear error messages for edge cases. Users hate generic errors - always tell them what went wrong and how to fix it.",
         isCritical: true,
@@ -371,7 +407,13 @@ export const EXAMPLE_COWORKERS: CoworkerPersona[] = [
       },
       {
         topic: "known_issues",
-        triggerKeywords: ["known issue", "bug", "problem", "broken", "not working"],
+        triggerKeywords: [
+          "known issue",
+          "bug",
+          "problem",
+          "broken",
+          "not working",
+        ],
         response:
           "Good question! Check our known issues doc in the wiki. There's a race condition in the auth flow that sometimes causes double redirects - if you see that, it's a known thing. Also, the staging environment can be flaky with file uploads.",
         isCritical: false,

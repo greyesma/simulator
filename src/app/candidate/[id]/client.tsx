@@ -15,11 +15,9 @@ import {
   X,
   Clock,
   Briefcase,
-  Target,
   ToggleLeft,
   ToggleRight,
   Star,
-  TrendingUp,
 } from "lucide-react";
 import {
   type RoleArchetype,
@@ -142,7 +140,7 @@ function TimestampLink({
     <button
       type="button"
       onClick={() => onTimestampClick(seconds)}
-      className="inline-flex items-center gap-1 font-mono text-sm px-2 py-1 border border-secondary bg-secondary/10 hover:bg-secondary hover:text-secondary-foreground"
+      className="bg-secondary/10 inline-flex items-center gap-1 border border-secondary px-2 py-1 font-mono text-sm hover:bg-secondary hover:text-secondary-foreground"
       data-testid="timestamp-link"
     >
       <Clock size={12} />
@@ -167,7 +165,7 @@ function WeightLevelBadge({ level }: { level: WeightLevel }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1 font-mono text-xs px-2 py-0.5 border ${styles[level]}`}
+      className={`inline-flex items-center gap-1 border px-2 py-0.5 font-mono text-xs ${styles[level]}`}
       data-testid="weight-level-badge"
     >
       {level === "VERY_HIGH" && <Star size={10} className="fill-current" />}
@@ -235,16 +233,20 @@ function DimensionScoreCard({
         data-testid="dimension-header"
       >
         <div className="flex-1">
-          <div className="flex items-center justify-between gap-4 mb-2">
+          <div className="mb-2 flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <span className={`font-bold ${isDeemphasized ? "text-muted-foreground" : ""}`}>
+              <span
+                className={`font-bold ${isDeemphasized ? "text-muted-foreground" : ""}`}
+              >
                 {dimensionLabels[dimension]}
               </span>
               {showWeightLevel && weightLevel && (
                 <WeightLevelBadge level={weightLevel} />
               )}
             </div>
-            <div className={`font-mono text-lg font-bold ${isDeemphasized ? "text-muted-foreground" : ""}`}>
+            <div
+              className={`font-mono text-lg font-bold ${isDeemphasized ? "text-muted-foreground" : ""}`}
+            >
               {score}/5
             </div>
           </div>
@@ -256,7 +258,9 @@ function DimensionScoreCard({
             />
           </div>
         </div>
-        <div className={`ml-4 ${isDeemphasized ? "text-muted-foreground" : ""}`}>
+        <div
+          className={`ml-4 ${isDeemphasized ? "text-muted-foreground" : ""}`}
+        >
           {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
         </div>
       </button>
@@ -264,12 +268,12 @@ function DimensionScoreCard({
       {/* Expandable details section */}
       {isExpanded && (
         <div
-          className={`border-t-2 ${cardBorderClass} p-4 bg-muted/10`}
+          className={`border-t-2 ${cardBorderClass} bg-muted/10 p-4`}
           data-testid="dimension-details"
         >
           {/* Observable behaviors */}
           <div className="mb-4">
-            <h4 className="font-mono text-xs font-bold mb-2 text-muted-foreground">
+            <h4 className="mb-2 font-mono text-xs font-bold text-muted-foreground">
               OBSERVABLE BEHAVIORS
             </h4>
             <p className="text-sm">{observableBehaviors}</p>
@@ -278,7 +282,7 @@ function DimensionScoreCard({
           {/* Timestamps */}
           {validTimestamps.length > 0 && (
             <div className="mb-4">
-              <h4 className="font-mono text-xs font-bold mb-2 text-muted-foreground">
+              <h4 className="mb-2 font-mono text-xs font-bold text-muted-foreground">
                 VIDEO TIMESTAMPS
               </h4>
               <div className="flex flex-wrap gap-2">
@@ -296,7 +300,7 @@ function DimensionScoreCard({
           {/* Trainable gap indicator */}
           {trainableGap && (
             <div>
-              <span className="inline-block font-mono text-xs px-2 py-1 border border-secondary bg-secondary/10">
+              <span className="bg-secondary/10 inline-block border border-secondary px-2 py-1 font-mono text-xs">
                 Trainable Gap
               </span>
             </div>
@@ -369,7 +373,7 @@ function VideoPlayerModal({
       data-testid="video-modal"
     >
       <div
-        className="relative w-full max-w-4xl mx-4"
+        className="relative mx-4 w-full max-w-4xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
@@ -398,7 +402,7 @@ function VideoPlayerModal({
         </div>
 
         {/* Timestamp and controls bar */}
-        <div className="mt-2 flex items-center justify-between text-white font-mono text-sm">
+        <div className="mt-2 flex items-center justify-between font-mono text-sm text-white">
           {/* Current time / Duration */}
           <div data-testid="time-display">
             <span data-testid="current-time">{formatTime(currentTime)}</span>
@@ -408,13 +412,13 @@ function VideoPlayerModal({
 
           {/* Playback speed controls */}
           <div className="flex items-center gap-1" data-testid="speed-controls">
-            <span className="text-muted-foreground text-xs mr-2">Speed:</span>
+            <span className="mr-2 text-xs text-muted-foreground">Speed:</span>
             {PLAYBACK_SPEEDS.map((speed) => (
               <button
                 key={speed}
                 type="button"
                 onClick={() => handleSpeedChange(speed)}
-                className={`px-2 py-1 text-xs border ${
+                className={`border px-2 py-1 text-xs ${
                   playbackSpeed === speed
                     ? "border-secondary bg-secondary text-secondary-foreground"
                     : "border-white/30 hover:border-white"
@@ -443,17 +447,17 @@ function RoleBanner({ archetype }: { archetype: RoleArchetype }) {
 
   return (
     <div
-      className="border-2 border-secondary bg-secondary/10 p-4 flex items-center gap-4"
+      className="bg-secondary/10 flex items-center gap-4 border-2 border-secondary p-4"
       data-testid="role-banner"
     >
-      <div className="w-10 h-10 bg-secondary flex items-center justify-center">
+      <div className="flex h-10 w-10 items-center justify-center bg-secondary">
         <Briefcase size={20} className="text-secondary-foreground" />
       </div>
       <div>
-        <p className="font-mono text-xs text-muted-foreground uppercase tracking-wider">
+        <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
           Viewing as
         </p>
-        <p className="font-bold text-lg" data-testid="role-name">
+        <p className="text-lg font-bold" data-testid="role-name">
           {displayName} role
         </p>
       </div>
@@ -491,16 +495,17 @@ function FitScoreBreakdown({
       className="border-2 border-foreground p-6"
       data-testid="fit-score-breakdown"
     >
-      <div className="flex items-start justify-between gap-6 mb-6">
+      <div className="mb-6 flex items-start justify-between gap-6">
         <div>
-          <h2 className="text-lg font-bold font-mono mb-1">FIT SCORE</h2>
+          <h2 className="mb-1 font-mono text-lg font-bold">FIT SCORE</h2>
           <p className="text-sm text-muted-foreground">
-            How well this candidate matches the {getArchetypeDisplayName(archetype)} role
+            How well this candidate matches the{" "}
+            {getArchetypeDisplayName(archetype)} role
           </p>
         </div>
         <div className="flex items-center gap-2">
           <div
-            className="w-20 h-20 bg-secondary border-2 border-foreground flex items-center justify-center"
+            className="flex h-20 w-20 items-center justify-center border-2 border-foreground bg-secondary"
             data-testid="fit-score-value"
           >
             <span className="font-mono text-3xl font-bold text-secondary-foreground">
@@ -512,7 +517,7 @@ function FitScoreBreakdown({
 
       {/* Score calculation explanation */}
       <div className="mb-4">
-        <h3 className="font-mono text-xs font-bold mb-3 text-muted-foreground">
+        <h3 className="mb-3 font-mono text-xs font-bold text-muted-foreground">
           TOP CONTRIBUTING DIMENSIONS
         </h3>
         <div className="space-y-3">
@@ -523,7 +528,7 @@ function FitScoreBreakdown({
               data-testid="contribution-item"
             >
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="mb-1 flex items-center gap-2">
                   <span className="font-medium">
                     {dimensionLabels[item.dimension]}
                   </span>
@@ -532,7 +537,7 @@ function FitScoreBreakdown({
                   </span>
                 </div>
                 {/* Contribution bar */}
-                <div className="h-2 bg-muted border border-foreground overflow-hidden">
+                <div className="h-2 overflow-hidden border border-foreground bg-muted">
                   <div
                     className="h-full bg-secondary"
                     style={{
@@ -550,9 +555,10 @@ function FitScoreBreakdown({
       </div>
 
       {/* Formula explanation */}
-      <div className="pt-4 border-t border-muted">
+      <div className="border-t border-muted pt-4">
         <p className="font-mono text-xs text-muted-foreground">
-          Score = {result.weightedSum.toFixed(1)} / {result.maxPossible.toFixed(1)} × 100 = {result.fitScore.toFixed(1)}
+          Score = {result.weightedSum.toFixed(1)} /{" "}
+          {result.maxPossible.toFixed(1)} × 100 = {result.fitScore.toFixed(1)}
         </p>
       </div>
     </div>
@@ -573,7 +579,7 @@ function ViewModeToggle({
     <button
       type="button"
       onClick={onToggle}
-      className="inline-flex items-center gap-2 px-4 py-2 border-2 border-foreground hover:bg-accent/50"
+      className="hover:bg-accent/50 inline-flex items-center gap-2 border-2 border-foreground px-4 py-2"
       data-testid="view-mode-toggle"
     >
       {showRawAssessment ? (
@@ -627,11 +633,7 @@ export interface CandidateProfileData {
 }
 
 // Inner component that uses useSearchParams
-function CandidateProfileInner({
-  data,
-}: {
-  data: CandidateProfileData;
-}) {
+function CandidateProfileInner({ data }: { data: CandidateProfileData }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -644,8 +646,15 @@ function CandidateProfileInner({
   // Toggle for raw assessment view
   const [showRawAssessment, setShowRawAssessment] = useState(false);
 
-  const { candidate, scores, summary, assessment, completedAt, isSearchable, videoUrl } =
-    data;
+  const {
+    candidate,
+    scores,
+    summary,
+    assessment,
+    completedAt,
+    isSearchable,
+    videoUrl,
+  } = data;
 
   // Get archetype from URL parameters (if coming from search)
   const archetypeParam = searchParams.get("archetype");
@@ -663,20 +672,25 @@ function CandidateProfileInner({
   }, [searchParams]);
 
   // Update URL when timestamp changes
-  const handleTimestampClick = useCallback((seconds: number) => {
-    // Update URL with timestamp parameter
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("t", String(seconds));
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  const handleTimestampClick = useCallback(
+    (seconds: number) => {
+      // Update URL with timestamp parameter
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("t", String(seconds));
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
 
-    setVideoModal({ isOpen: true, initialTime: seconds });
-  }, [searchParams, router, pathname]);
+      setVideoModal({ isOpen: true, initialTime: seconds });
+    },
+    [searchParams, router, pathname]
+  );
 
   // Clear URL parameter when closing modal
   const handleCloseModal = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete("t");
-    const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+    const newUrl = params.toString()
+      ? `${pathname}?${params.toString()}`
+      : pathname;
     router.replace(newUrl, { scroll: false });
 
     setVideoModal({ isOpen: false, initialTime: 0 });
@@ -707,7 +721,9 @@ function CandidateProfileInner({
   const showRoleSpecificView = archetype !== null && !showRawAssessment;
 
   // Get weight level for a dimension
-  const getWeightLevel = (dimension: AssessmentDimension): WeightLevel | undefined => {
+  const getWeightLevel = (
+    dimension: AssessmentDimension
+  ): WeightLevel | undefined => {
     if (!archetype || showRawAssessment) return undefined;
     return getWeightLevelForDimension(archetype, dimension);
   };
@@ -717,7 +733,11 @@ function CandidateProfileInner({
     ? [...dimensionOrder].sort((a, b) => {
         const weightA = getWeightLevel(a);
         const weightB = getWeightLevel(b);
-        const order: Record<WeightLevel, number> = { VERY_HIGH: 0, HIGH: 1, MEDIUM: 2 };
+        const order: Record<WeightLevel, number> = {
+          VERY_HIGH: 0,
+          HIGH: 1,
+          MEDIUM: 2,
+        };
         return (weightA ? order[weightA] : 3) - (weightB ? order[weightB] : 3);
       })
     : dimensionOrder;
@@ -726,7 +746,7 @@ function CandidateProfileInner({
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b-2 border-foreground">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
           <Link
             href={archetype ? "/candidate_search" : "/"}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -744,7 +764,7 @@ function CandidateProfileInner({
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-8 space-y-8">
+      <main className="mx-auto max-w-4xl space-y-8 px-6 py-8">
         {/* Role Banner (only when viewing with archetype context) */}
         {showRoleSpecificView && archetype && (
           <RoleBanner archetype={archetype} />
@@ -754,7 +774,7 @@ function CandidateProfileInner({
         <section className="border-2 border-foreground p-6">
           <div className="flex items-start gap-6">
             {/* Avatar */}
-            <div className="w-16 h-16 bg-secondary border-2 border-foreground flex items-center justify-center">
+            <div className="flex h-16 w-16 items-center justify-center border-2 border-foreground bg-secondary">
               <span className="text-xl font-bold text-secondary-foreground">
                 {initials}
               </span>
@@ -762,9 +782,9 @@ function CandidateProfileInner({
 
             {/* Info */}
             <div className="flex-1">
-              <h1 className="text-2xl font-bold mb-1">{displayName}</h1>
+              <h1 className="mb-1 text-2xl font-bold">{displayName}</h1>
               {candidate.email && (
-                <p className="text-muted-foreground mb-2">{candidate.email}</p>
+                <p className="mb-2 text-muted-foreground">{candidate.email}</p>
               )}
               {formattedDate && (
                 <p className="text-sm text-muted-foreground">
@@ -776,14 +796,14 @@ function CandidateProfileInner({
             {/* Searchable Status Badge */}
             <div className="flex items-center gap-2">
               {isSearchable ? (
-                <span className="inline-flex items-center gap-2 px-3 py-2 border-2 border-foreground bg-secondary/10">
+                <span className="bg-secondary/10 inline-flex items-center gap-2 border-2 border-foreground px-3 py-2">
                   <Eye size={16} />
                   <span className="font-mono text-sm">
                     Searchable by hiring managers
                   </span>
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-2 px-3 py-2 border-2 border-foreground bg-muted">
+                <span className="inline-flex items-center gap-2 border-2 border-foreground bg-muted px-3 py-2">
                   <EyeOff size={16} />
                   <span className="font-mono text-sm">Private</span>
                 </span>
@@ -795,37 +815,41 @@ function CandidateProfileInner({
         {/* Fit Score Breakdown (only when viewing with archetype context) */}
         {showRoleSpecificView && archetype && scores.length > 0 && (
           <FitScoreBreakdown
-            scores={scores.map((s) => ({ dimension: s.dimension, score: s.score }))}
+            scores={scores.map((s) => ({
+              dimension: s.dimension,
+              score: s.score,
+            }))}
             archetype={archetype}
           />
         )}
 
         {/* Overall Summary Section */}
         <section className="border-2 border-foreground p-6">
-          <h2 className="text-lg font-bold mb-4 font-mono">OVERALL SUMMARY</h2>
+          <h2 className="mb-4 font-mono text-lg font-bold">OVERALL SUMMARY</h2>
           {summary?.overallSummary ? (
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="leading-relaxed text-muted-foreground">
               {summary.overallSummary}
             </p>
           ) : (
-            <p className="text-muted-foreground italic">No summary available</p>
+            <p className="italic text-muted-foreground">No summary available</p>
           )}
         </section>
 
         {/* Dimension Scores Section */}
         <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold font-mono">ASSESSMENT SCORES</h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-mono text-lg font-bold">ASSESSMENT SCORES</h2>
             {showRoleSpecificView && (
               <p className="font-mono text-xs text-muted-foreground">
-                Sorted by importance for {archetype && getArchetypeDisplayName(archetype)}
+                Sorted by importance for{" "}
+                {archetype && getArchetypeDisplayName(archetype)}
               </p>
             )}
           </div>
-          <p className="text-sm text-muted-foreground mb-4">
+          <p className="mb-4 text-sm text-muted-foreground">
             Click on a dimension to expand details and view video evidence.
             {showRoleSpecificView && (
-              <span className="block mt-1">
+              <span className="mt-1 block">
                 Emphasized dimensions are most critical for this role.
               </span>
             )}
@@ -860,7 +884,9 @@ function CandidateProfileInner({
             </div>
           ) : (
             <div className="border-2 border-foreground p-6 text-center">
-              <p className="text-muted-foreground italic">No scores available</p>
+              <p className="italic text-muted-foreground">
+                No scores available
+              </p>
             </div>
           )}
         </section>
@@ -868,12 +894,12 @@ function CandidateProfileInner({
         {/* Recording Link Section */}
         {assessment && (
           <section className="border-2 border-foreground p-6">
-            <h2 className="text-lg font-bold mb-4 font-mono">
+            <h2 className="mb-4 font-mono text-lg font-bold">
               SIMULATION RECORDING
             </h2>
             <Link
               href={`/assessment/${assessment.id}/results`}
-              className="inline-flex items-center gap-2 px-4 py-2 border-2 border-foreground bg-foreground text-background hover:bg-secondary hover:text-secondary-foreground"
+              className="inline-flex items-center gap-2 border-2 border-foreground bg-foreground px-4 py-2 text-background hover:bg-secondary hover:text-secondary-foreground"
             >
               <Video size={16} />
               View Simulation Recording
@@ -884,8 +910,8 @@ function CandidateProfileInner({
       </main>
 
       {/* Footer */}
-      <footer className="border-t-2 border-foreground mt-16">
-        <div className="max-w-4xl mx-auto px-6 py-6 text-center text-sm text-muted-foreground">
+      <footer className="mt-16 border-t-2 border-foreground">
+        <div className="mx-auto max-w-4xl px-6 py-6 text-center text-sm text-muted-foreground">
           <p>Candidate profile generated by Skillvee Simulator</p>
         </div>
       </footer>
@@ -905,16 +931,16 @@ function CandidateProfileInner({
 // Loading skeleton for Suspense boundary
 function CandidateProfileSkeleton() {
   return (
-    <div className="min-h-screen bg-background animate-pulse">
+    <div className="min-h-screen animate-pulse bg-background">
       <header className="border-b-2 border-foreground">
-        <div className="max-w-4xl mx-auto px-6 py-4">
+        <div className="mx-auto max-w-4xl px-6 py-4">
           <div className="h-4 w-32 bg-muted" />
         </div>
       </header>
-      <main className="max-w-4xl mx-auto px-6 py-8 space-y-8">
+      <main className="mx-auto max-w-4xl space-y-8 px-6 py-8">
         <div className="border-2 border-foreground p-6">
           <div className="flex items-start gap-6">
-            <div className="w-16 h-16 bg-muted border-2 border-foreground" />
+            <div className="h-16 w-16 border-2 border-foreground bg-muted" />
             <div className="flex-1 space-y-2">
               <div className="h-6 w-48 bg-muted" />
               <div className="h-4 w-32 bg-muted" />

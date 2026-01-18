@@ -60,7 +60,10 @@ export async function POST(request: Request) {
     });
 
     if (!coworker) {
-      return NextResponse.json({ error: "Coworker not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Coworker not found" },
+        { status: 404 }
+      );
     }
 
     // Check if there's already a voice conversation for this coworker

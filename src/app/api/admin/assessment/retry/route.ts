@@ -94,10 +94,7 @@ export async function POST(
     );
 
     // Validate status - only allow retry for failed or completed assessments
-    if (
-      !RETRIABLE_STATUSES.includes(originalAssessment.status) &&
-      !hasErrors
-    ) {
+    if (!RETRIABLE_STATUSES.includes(originalAssessment.status) && !hasErrors) {
       return NextResponse.json(
         {
           success: false,
@@ -115,11 +112,19 @@ export async function POST(
         status: AssessmentStatus.PROCESSING,
         // Copy relevant data from original assessment
         cvUrl: originalAssessment.cvUrl,
-        parsedProfile: originalAssessment.parsedProfile as Prisma.InputJsonValue | undefined,
+        parsedProfile: originalAssessment.parsedProfile as
+          | Prisma.InputJsonValue
+          | undefined,
         prUrl: originalAssessment.prUrl,
-        prSnapshot: originalAssessment.prSnapshot as Prisma.InputJsonValue | undefined,
-        ciStatus: originalAssessment.ciStatus as Prisma.InputJsonValue | undefined,
-        codeReview: originalAssessment.codeReview as Prisma.InputJsonValue | undefined,
+        prSnapshot: originalAssessment.prSnapshot as
+          | Prisma.InputJsonValue
+          | undefined,
+        ciStatus: originalAssessment.ciStatus as
+          | Prisma.InputJsonValue
+          | undefined,
+        codeReview: originalAssessment.codeReview as
+          | Prisma.InputJsonValue
+          | undefined,
       },
     });
 

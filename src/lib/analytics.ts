@@ -189,10 +189,12 @@ export async function getSignupTrends(
   const startDate = getStartDateForPeriod(period);
   const endDate = getEndDateForPeriod(period);
 
-  const whereClause: { createdAt?: { gte?: Date; lt?: Date }; deletedAt: null } =
-    {
-      deletedAt: null,
-    };
+  const whereClause: {
+    createdAt?: { gte?: Date; lt?: Date };
+    deletedAt: null;
+  } = {
+    deletedAt: null,
+  };
 
   if (startDate) {
     whereClause.createdAt = { gte: startDate };
@@ -468,7 +470,13 @@ export async function getCompletionFunnel(): Promise<FunnelStep[]> {
   const onboarding = await db.assessment.count({
     where: {
       status: {
-        in: ["ONBOARDING", "WORKING", "FINAL_DEFENSE", "PROCESSING", "COMPLETED"],
+        in: [
+          "ONBOARDING",
+          "WORKING",
+          "FINAL_DEFENSE",
+          "PROCESSING",
+          "COMPLETED",
+        ],
       },
     },
   });
@@ -502,26 +510,40 @@ export async function getCompletionFunnel(): Promise<FunnelStep[]> {
     {
       step: "HR Interview",
       count: onboarding,
-      percentage: hrInterview > 0 ? Math.round((onboarding / hrInterview) * 100) : 0,
-      dropoffRate: hrInterview > 0 ? Math.round(((hrInterview - onboarding) / hrInterview) * 100) : 0,
+      percentage:
+        hrInterview > 0 ? Math.round((onboarding / hrInterview) * 100) : 0,
+      dropoffRate:
+        hrInterview > 0
+          ? Math.round(((hrInterview - onboarding) / hrInterview) * 100)
+          : 0,
     },
     {
       step: "Onboarding",
       count: working,
       percentage: onboarding > 0 ? Math.round((working / onboarding) * 100) : 0,
-      dropoffRate: onboarding > 0 ? Math.round(((onboarding - working) / onboarding) * 100) : 0,
+      dropoffRate:
+        onboarding > 0
+          ? Math.round(((onboarding - working) / onboarding) * 100)
+          : 0,
     },
     {
       step: "Working",
       count: finalDefense,
       percentage: working > 0 ? Math.round((finalDefense / working) * 100) : 0,
-      dropoffRate: working > 0 ? Math.round(((working - finalDefense) / working) * 100) : 0,
+      dropoffRate:
+        working > 0
+          ? Math.round(((working - finalDefense) / working) * 100)
+          : 0,
     },
     {
       step: "Completed",
       count: completed,
-      percentage: finalDefense > 0 ? Math.round((completed / finalDefense) * 100) : 0,
-      dropoffRate: finalDefense > 0 ? Math.round(((finalDefense - completed) / finalDefense) * 100) : 0,
+      percentage:
+        finalDefense > 0 ? Math.round((completed / finalDefense) * 100) : 0,
+      dropoffRate:
+        finalDefense > 0
+          ? Math.round(((finalDefense - completed) / finalDefense) * 100)
+          : 0,
     },
   ];
 
@@ -543,9 +565,10 @@ export async function getOverviewMetrics(period: TimePeriod): Promise<{
   const startDate = getStartDateForPeriod(period);
   const endDate = getEndDateForPeriod(period);
 
-  const userWhere: { createdAt?: { gte?: Date; lt?: Date }; deletedAt: null } = {
-    deletedAt: null,
-  };
+  const userWhere: { createdAt?: { gte?: Date; lt?: Date }; deletedAt: null } =
+    {
+      deletedAt: null,
+    };
   if (startDate) {
     userWhere.createdAt = { gte: startDate };
   }
@@ -561,22 +584,32 @@ export async function getOverviewMetrics(period: TimePeriod): Promise<{
     assessmentWhere.startedAt = { ...assessmentWhere.startedAt, lt: endDate };
   }
 
-  const [totalUsers, totalAssessments, completedAssessments, activeAssessments] =
-    await Promise.all([
-      db.user.count({ where: userWhere }),
-      db.assessment.count({ where: assessmentWhere }),
-      db.assessment.count({
-        where: { ...assessmentWhere, status: "COMPLETED" },
-      }),
-      db.assessment.count({
-        where: {
-          ...assessmentWhere,
-          status: {
-            in: ["HR_INTERVIEW", "ONBOARDING", "WORKING", "FINAL_DEFENSE", "PROCESSING"],
-          },
+  const [
+    totalUsers,
+    totalAssessments,
+    completedAssessments,
+    activeAssessments,
+  ] = await Promise.all([
+    db.user.count({ where: userWhere }),
+    db.assessment.count({ where: assessmentWhere }),
+    db.assessment.count({
+      where: { ...assessmentWhere, status: "COMPLETED" },
+    }),
+    db.assessment.count({
+      where: {
+        ...assessmentWhere,
+        status: {
+          in: [
+            "HR_INTERVIEW",
+            "ONBOARDING",
+            "WORKING",
+            "FINAL_DEFENSE",
+            "PROCESSING",
+          ],
         },
-      }),
-    ]);
+      },
+    }),
+  ]);
 
   // Calculate average completion time
   const completedWithTiming = await db.assessment.findMany({
@@ -663,7 +696,11 @@ export async function getAnalytics(period: TimePeriod): Promise<AnalyticsData> {
  * Privacy: Logs only event type and count, no PII.
  */
 export function logAnalyticsEvent(
-  eventType: "signup" | "assessment_start" | "assessment_complete" | "phase_transition",
+  eventType:
+    | "signup"
+    | "assessment_start"
+    | "assessment_complete"
+    | "phase_transition",
   metadata?: { phase?: string; scenarioId?: string }
 ): void {
   const logEntry = {

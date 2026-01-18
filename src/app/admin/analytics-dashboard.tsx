@@ -34,9 +34,9 @@ export function AnalyticsDashboard({ initialData }: AnalyticsDashboardProps) {
   }, [period, initialData.period, fetchAnalytics]);
 
   return (
-    <div className={isLoading ? "opacity-60 pointer-events-none" : ""}>
+    <div className={isLoading ? "pointer-events-none opacity-60" : ""}>
       {/* Period Selector */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="mb-8 flex items-center justify-between">
         <h2 className="text-xl font-bold">Analytics</h2>
         <div className="flex gap-2">
           {(
@@ -51,10 +51,10 @@ export function AnalyticsDashboard({ initialData }: AnalyticsDashboardProps) {
             <button
               key={option.value}
               onClick={() => setPeriod(option.value)}
-              className={`font-mono text-xs px-3 py-1 border-2 ${
+              className={`border-2 px-3 py-1 font-mono text-xs ${
                 period === option.value
-                  ? "bg-foreground text-background border-foreground"
-                  : "bg-background text-foreground border-border hover:border-foreground"
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-border bg-background text-foreground hover:border-foreground"
               }`}
             >
               {option.label}
@@ -64,7 +64,7 @@ export function AnalyticsDashboard({ initialData }: AnalyticsDashboardProps) {
       </div>
 
       {/* Overview Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-5">
         <StatCard
           label="SIGNUPS"
           value={data.overview.totalUsers}
@@ -97,7 +97,7 @@ export function AnalyticsDashboard({ initialData }: AnalyticsDashboardProps) {
       </div>
 
       {/* Trends Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
         <TrendChart
           title="Signups"
           data={data.trends.signups}
@@ -116,20 +116,20 @@ export function AnalyticsDashboard({ initialData }: AnalyticsDashboardProps) {
       </div>
 
       {/* Phase Durations and Funnel */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* Phase Durations */}
         <div className="border-2 border-border p-6">
-          <h3 className="font-mono text-xs text-muted-foreground mb-4">
+          <h3 className="mb-4 font-mono text-xs text-muted-foreground">
             TIME PER PHASE
           </h3>
           {data.phaseDurations.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No data yet</p>
+            <p className="text-sm text-muted-foreground">No data yet</p>
           ) : (
             <div className="space-y-4">
               {data.phaseDurations.map((phase) => (
                 <div key={phase.phase}>
-                  <div className="flex justify-between mb-1">
-                    <span className="font-semibold text-sm">{phase.phase}</span>
+                  <div className="mb-1 flex justify-between">
+                    <span className="text-sm font-semibold">{phase.phase}</span>
                     <span className="font-mono text-sm">
                       {phase.avgDurationMinutes}m avg
                     </span>
@@ -149,11 +149,11 @@ export function AnalyticsDashboard({ initialData }: AnalyticsDashboardProps) {
 
         {/* Completion Funnel */}
         <div className="border-2 border-border p-6">
-          <h3 className="font-mono text-xs text-muted-foreground mb-4">
+          <h3 className="mb-4 font-mono text-xs text-muted-foreground">
             COMPLETION FUNNEL
           </h3>
           {data.completionFunnel.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No data yet</p>
+            <p className="text-sm text-muted-foreground">No data yet</p>
           ) : (
             <div className="space-y-3">
               {data.completionFunnel.map((step, index) => (
@@ -174,10 +174,10 @@ export function AnalyticsDashboard({ initialData }: AnalyticsDashboardProps) {
 
       {/* Status Distribution */}
       <div className="border-2 border-border p-6">
-        <h3 className="font-mono text-xs text-muted-foreground mb-4">
+        <h3 className="mb-4 font-mono text-xs text-muted-foreground">
           STATUS DISTRIBUTION
         </h3>
-        <div className="flex gap-2 h-8">
+        <div className="flex h-8 gap-2">
           {data.statusDistribution.map((status) => (
             <div
               key={status.status}
@@ -198,11 +198,11 @@ export function AnalyticsDashboard({ initialData }: AnalyticsDashboardProps) {
             </div>
           ))}
         </div>
-        <div className="flex flex-wrap gap-4 mt-4">
+        <div className="mt-4 flex flex-wrap gap-4">
           {data.statusDistribution.map((status) => (
             <div key={status.status} className="flex items-center gap-2">
               <div
-                className={`w-3 h-3 ${
+                className={`h-3 w-3 ${
                   status.status === "COMPLETED" ? "bg-secondary" : "bg-muted"
                 }`}
               />
@@ -228,10 +228,8 @@ function StatCard({
 }) {
   return (
     <div className="border-2 border-border p-4">
-      <p className="font-mono text-xs text-muted-foreground mb-2">{label}</p>
-      <p
-        className={`text-2xl font-bold ${highlight ? "text-secondary" : ""}`}
-      >
+      <p className="mb-2 font-mono text-xs text-muted-foreground">{label}</p>
+      <p className={`text-2xl font-bold ${highlight ? "text-secondary" : ""}`}>
         {value}
       </p>
     </div>
@@ -254,15 +252,15 @@ function TrendChart({
 
   return (
     <div className="border-2 border-border p-4">
-      <div className="flex justify-between items-center mb-3">
+      <div className="mb-3 flex items-center justify-between">
         <h4 className="font-mono text-xs text-muted-foreground">{title}</h4>
-        <span className="font-bold text-lg">{total}</span>
+        <span className="text-lg font-bold">{total}</span>
       </div>
-      <div className="flex items-end gap-1 h-16">
+      <div className="flex h-16 items-end gap-1">
         {recentData.map((day) => (
           <div
             key={day.date}
-            className="flex-1 flex flex-col items-center gap-1"
+            className="flex flex-1 flex-col items-center gap-1"
           >
             <div
               className={`w-full ${color}`}
@@ -275,7 +273,7 @@ function TrendChart({
           </div>
         ))}
       </div>
-      <div className="flex justify-between mt-1">
+      <div className="mt-1 flex justify-between">
         <span className="font-mono text-xs text-muted-foreground">
           {recentData[0]?.date.slice(5) || ""}
         </span>
@@ -308,8 +306,8 @@ function FunnelStep({
         className={`h-6 ${isLast ? "bg-secondary" : "bg-muted"}`}
         style={{ width: `${Math.max(percentage, 10)}%` }}
       />
-      <div className="flex-1 flex items-center justify-between">
-        <span className="font-semibold text-sm">{step}</span>
+      <div className="flex flex-1 items-center justify-between">
+        <span className="text-sm font-semibold">{step}</span>
         <div className="flex items-center gap-2">
           <span className="font-mono text-sm">{count}</span>
           {!isFirst && dropoffRate > 0 && (

@@ -22,27 +22,44 @@ const gemini = new GoogleGenAI({
 });
 
 // Helper to handle null values from Gemini (converts null to undefined)
-const nullableString = z.string().nullable().transform(v => v ?? undefined).optional();
-const nullableNumber = z.number().nullable().transform(v => v ?? undefined).optional();
-const nullableStringArray = z.array(z.string()).nullable().transform(v => v ?? undefined).optional();
+const nullableString = z
+  .string()
+  .nullable()
+  .transform((v) => v ?? undefined)
+  .optional();
+const nullableNumber = z
+  .number()
+  .nullable()
+  .transform((v) => v ?? undefined)
+  .optional();
+const nullableStringArray = z
+  .array(z.string())
+  .nullable()
+  .transform((v) => v ?? undefined)
+  .optional();
 
 // Normalize language proficiency values that Gemini might return
-const normalizeLanguageProficiency = (value: string): "basic" | "conversational" | "professional" | "native" => {
+const normalizeLanguageProficiency = (
+  value: string
+): "basic" | "conversational" | "professional" | "native" => {
   const normalized = value.toLowerCase();
-  const mapping: Record<string, "basic" | "conversational" | "professional" | "native"> = {
-    "basic": "basic",
-    "beginner": "basic",
-    "elementary": "basic",
-    "conversational": "conversational",
-    "intermediate": "conversational",
-    "limited_working": "conversational",
-    "professional": "professional",
-    "advanced": "professional",
-    "fluent": "professional",
-    "full_professional": "professional",
-    "native": "native",
-    "native_or_bilingual": "native",
-    "bilingual": "native",
+  const mapping: Record<
+    string,
+    "basic" | "conversational" | "professional" | "native"
+  > = {
+    basic: "basic",
+    beginner: "basic",
+    elementary: "basic",
+    conversational: "conversational",
+    intermediate: "conversational",
+    limited_working: "conversational",
+    professional: "professional",
+    advanced: "professional",
+    fluent: "professional",
+    full_professional: "professional",
+    native: "native",
+    native_or_bilingual: "native",
+    bilingual: "native",
   };
   return mapping[normalized] || "conversational";
 };
@@ -63,7 +80,7 @@ const skillSchema = z.object({
   proficiencyLevel: z
     .enum(["beginner", "intermediate", "advanced", "expert"])
     .nullable()
-    .transform(v => v ?? undefined)
+    .transform((v) => v ?? undefined)
     .optional(),
   yearsOfExperience: nullableNumber,
 });
@@ -77,43 +94,51 @@ const parsedProfileSchema = z.object({
   github: nullableString,
   website: nullableString,
   summary: z.string(),
-  workExperience: z.array(z.object({
-    company: z.string(),
-    title: z.string(),
-    startDate: z.string(),
-    endDate: nullableString,
-    duration: nullableString,
-    location: nullableString,
-    description: nullableString,
-    highlights: nullableStringArray,
-    technologies: nullableStringArray,
-  })),
-  education: z.array(z.object({
-    institution: z.string(),
-    degree: z.string(),
-    field: nullableString,
-    startDate: nullableString,
-    endDate: nullableString,
-    gpa: nullableString,
-    honors: nullableStringArray,
-  })),
+  workExperience: z.array(
+    z.object({
+      company: z.string(),
+      title: z.string(),
+      startDate: z.string(),
+      endDate: nullableString,
+      duration: nullableString,
+      location: nullableString,
+      description: nullableString,
+      highlights: nullableStringArray,
+      technologies: nullableStringArray,
+    })
+  ),
+  education: z.array(
+    z.object({
+      institution: z.string(),
+      degree: z.string(),
+      field: nullableString,
+      startDate: nullableString,
+      endDate: nullableString,
+      gpa: nullableString,
+      honors: nullableStringArray,
+    })
+  ),
   skills: z.array(skillSchema),
-  certifications: z.array(z.object({
-    name: z.string(),
-    issuer: z.string(),
-    dateObtained: nullableString,
-    expirationDate: nullableString,
-    credentialId: nullableString,
-  })),
-  languages: z.array(z.object({
-    language: z.string(),
-    proficiency: z.string().transform(normalizeLanguageProficiency),
-  })),
+  certifications: z.array(
+    z.object({
+      name: z.string(),
+      issuer: z.string(),
+      dateObtained: nullableString,
+      expirationDate: nullableString,
+      credentialId: nullableString,
+    })
+  ),
+  languages: z.array(
+    z.object({
+      language: z.string(),
+      proficiency: z.string().transform(normalizeLanguageProficiency),
+    })
+  ),
   totalYearsOfExperience: nullableNumber,
   seniorityLevel: z
     .enum(["junior", "mid", "senior", "lead", "principal", "unknown"])
     .nullable()
-    .transform(v => v ?? undefined)
+    .transform((v) => v ?? undefined)
     .optional(),
   parsedAt: z.string(),
   parseQuality: z.enum(["high", "medium", "low"]),
@@ -300,7 +325,7 @@ async function main() {
 
     if (modifications.length > 0) {
       console.log("🔧 Response cleaning:");
-      modifications.forEach(m => console.log(`   - ${m}`));
+      modifications.forEach((m) => console.log(`   - ${m}`));
       console.log();
     }
 
@@ -340,12 +365,14 @@ async function main() {
       console.log(`   Skills: ${data.skills.length} entries`);
       console.log(`   Certifications: ${data.certifications.length} entries`);
       console.log(`   Languages: ${data.languages.length} entries`);
-      console.log(`   Total years: ${data.totalYearsOfExperience || "(not calculated)"}`);
+      console.log(
+        `   Total years: ${data.totalYearsOfExperience || "(not calculated)"}`
+      );
       console.log(`   Seniority: ${data.seniorityLevel || "(not determined)"}`);
 
       if (data.parseNotes?.length) {
         console.log("\n📝 Parse notes:");
-        data.parseNotes.forEach(note => console.log(`   - ${note}`));
+        data.parseNotes.forEach((note) => console.log(`   - ${note}`));
       }
     } else {
       console.error("❌ ZOD VALIDATION ERRORS:\n");
@@ -376,37 +403,69 @@ async function main() {
       const parsedObj = parsed as Record<string, unknown>;
 
       // Check skills
-      const skills = (parsedObj.skills || []) as Array<{ category?: string; proficiencyLevel?: string }>;
-      const validCategories = ["programming_language", "framework", "database", "cloud", "tool", "soft_skill", "methodology", "other"];
-      const invalidCategories = skills.filter(s => s.category && !validCategories.includes(s.category));
+      const skills = (parsedObj.skills || []) as Array<{
+        category?: string;
+        proficiencyLevel?: string;
+      }>;
+      const validCategories = [
+        "programming_language",
+        "framework",
+        "database",
+        "cloud",
+        "tool",
+        "soft_skill",
+        "methodology",
+        "other",
+      ];
+      const invalidCategories = skills.filter(
+        (s) => s.category && !validCategories.includes(s.category)
+      );
       if (invalidCategories.length > 0) {
         console.log("⚠️ Invalid skill categories found:");
-        invalidCategories.forEach(s => console.log(`   - "${s.category}"`));
+        invalidCategories.forEach((s) => console.log(`   - "${s.category}"`));
         console.log(`   Valid categories: ${validCategories.join(", ")}\n`);
       }
 
       // Check proficiency
-      const validProficiency = ["beginner", "intermediate", "advanced", "expert"];
-      const invalidProficiency = skills.filter(s => s.proficiencyLevel && !validProficiency.includes(s.proficiencyLevel));
+      const validProficiency = [
+        "beginner",
+        "intermediate",
+        "advanced",
+        "expert",
+      ];
+      const invalidProficiency = skills.filter(
+        (s) =>
+          s.proficiencyLevel && !validProficiency.includes(s.proficiencyLevel)
+      );
       if (invalidProficiency.length > 0) {
         console.log("⚠️ Invalid proficiency levels found:");
-        invalidProficiency.forEach(s => console.log(`   - "${s.proficiencyLevel}"`));
+        invalidProficiency.forEach((s) =>
+          console.log(`   - "${s.proficiencyLevel}"`)
+        );
         console.log(`   Valid levels: ${validProficiency.join(", ")}\n`);
       }
 
       // Check languages
-      const languages = (parsedObj.languages || []) as Array<{ proficiency?: string }>;
-      const validLangProf = ["basic", "conversational", "professional", "native"];
-      const invalidLang = languages.filter(l => l.proficiency && !validLangProf.includes(l.proficiency));
+      const languages = (parsedObj.languages || []) as Array<{
+        proficiency?: string;
+      }>;
+      const validLangProf = [
+        "basic",
+        "conversational",
+        "professional",
+        "native",
+      ];
+      const invalidLang = languages.filter(
+        (l) => l.proficiency && !validLangProf.includes(l.proficiency)
+      );
       if (invalidLang.length > 0) {
         console.log("⚠️ Invalid language proficiency found:");
-        invalidLang.forEach(l => console.log(`   - "${l.proficiency}"`));
+        invalidLang.forEach((l) => console.log(`   - "${l.proficiency}"`));
         console.log(`   Valid levels: ${validLangProf.join(", ")}\n`);
       }
 
       process.exit(1);
     }
-
   } catch (error) {
     console.error("❌ API Error:", error);
     process.exit(1);

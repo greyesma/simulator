@@ -97,8 +97,16 @@ describe("POST /api/interview/transcript", () => {
     mockAssessmentUpdate.mockResolvedValue({});
 
     const transcript = [
-      { role: "user" as const, text: "Hello", timestamp: "2025-01-01T00:00:00Z" },
-      { role: "model" as const, text: "Hi there", timestamp: "2025-01-01T00:00:01Z" },
+      {
+        role: "user" as const,
+        text: "Hello",
+        timestamp: "2025-01-01T00:00:00Z",
+      },
+      {
+        role: "model" as const,
+        text: "Hi there",
+        timestamp: "2025-01-01T00:00:01Z",
+      },
     ];
 
     const request = new Request("http://localhost/api/interview/transcript", {
@@ -136,7 +144,11 @@ describe("POST /api/interview/transcript", () => {
     mockAssessmentUpdate.mockResolvedValue({});
 
     const transcript = [
-      { role: "user" as const, text: "Hello", timestamp: "2025-01-01T00:00:00Z" },
+      {
+        role: "user" as const,
+        text: "Hello",
+        timestamp: "2025-01-01T00:00:00Z",
+      },
     ];
 
     const request = new Request("http://localhost/api/interview/transcript", {

@@ -98,7 +98,10 @@ export default async function ProcessingPage({ params }: ProcessingPageProps) {
       uniqueCoworkerIds.add(conv.coworkerId);
     }
     // Count messages in transcript
-    const transcript = conv.transcript as Array<{ role: string; text: string }> | null;
+    const transcript = conv.transcript as Array<{
+      role: string;
+      text: string;
+    }> | null;
     if (transcript && Array.isArray(transcript)) {
       totalMessages += transcript.length;
     }

@@ -22,7 +22,12 @@ interface ChatProps {
   showDoneButton?: boolean;
 }
 
-export function Chat({ assessmentId, coworker, onDoneClick, showDoneButton }: ChatProps) {
+export function Chat({
+  assessmentId,
+  coworker,
+  onDoneClick,
+  showDoneButton,
+}: ChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -129,43 +134,45 @@ export function Chat({ assessmentId, coworker, onDoneClick, showDoneButton }: Ch
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       {/* Header */}
-      <header className="border-b-2 border-foreground bg-background px-4 py-3 flex items-center gap-3">
+      <header className="flex items-center gap-3 border-b-2 border-foreground bg-background px-4 py-3">
         {/* Coworker avatar */}
-        <div className="w-10 h-10 bg-secondary border-2 border-foreground flex items-center justify-center">
-          <span className="font-bold text-secondary-foreground text-sm font-mono">
+        <div className="flex h-10 w-10 items-center justify-center border-2 border-foreground bg-secondary">
+          <span className="font-mono text-sm font-bold text-secondary-foreground">
             {initials}
           </span>
         </div>
         <div>
-          <h1 className="font-bold text-lg">{coworker.name}</h1>
+          <h1 className="text-lg font-bold">{coworker.name}</h1>
           <p className="text-sm text-muted-foreground">{coworker.role}</p>
         </div>
         {/* Online indicator */}
         <div className="ml-auto flex items-center gap-2">
-          <div className="w-3 h-3 bg-secondary border border-foreground" />
-          <span className="text-sm text-muted-foreground font-mono">online</span>
+          <div className="h-3 w-3 border border-foreground bg-secondary" />
+          <span className="font-mono text-sm text-muted-foreground">
+            online
+          </span>
         </div>
       </header>
 
       {/* Messages area */}
       <main className="flex-1 overflow-auto px-4 py-6">
         {isLoading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-muted-foreground font-mono">Loading...</div>
+          <div className="flex h-full items-center justify-center">
+            <div className="font-mono text-muted-foreground">Loading...</div>
           </div>
         ) : messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="w-16 h-16 bg-secondary border-2 border-foreground flex items-center justify-center mb-4">
-              <span className="font-bold text-secondary-foreground text-2xl font-mono">
+          <div className="flex h-full flex-col items-center justify-center text-center">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center border-2 border-foreground bg-secondary">
+              <span className="font-mono text-2xl font-bold text-secondary-foreground">
                 {initials}
               </span>
             </div>
-            <h2 className="font-bold text-lg mb-2">
+            <h2 className="mb-2 text-lg font-bold">
               Start a conversation with {coworker.name}
             </h2>
-            <p className="text-muted-foreground text-sm max-w-md">
+            <p className="max-w-md text-sm text-muted-foreground">
               {coworker.name} is a {coworker.role}. Ask questions about the
               project, codebase, or anything else you need help with.
             </p>
@@ -173,24 +180,24 @@ export function Chat({ assessmentId, coworker, onDoneClick, showDoneButton }: Ch
         ) : (
           <div className="space-y-4">
             {/* Date divider */}
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex-1 h-px bg-border" />
-              <span className="text-sm font-mono text-muted-foreground px-2 border border-foreground bg-background">
+            <div className="mb-6 flex items-center gap-4">
+              <div className="h-px flex-1 bg-border" />
+              <span className="border border-foreground bg-background px-2 font-mono text-sm text-muted-foreground">
                 Today
               </span>
-              <div className="flex-1 h-px bg-border" />
+              <div className="h-px flex-1 bg-border" />
             </div>
 
             {messages.map((message, index) => (
               <div key={index} className="flex gap-3">
                 {/* Avatar */}
                 <div
-                  className={`w-10 h-10 border-2 border-foreground flex items-center justify-center flex-shrink-0 ${
+                  className={`flex h-10 w-10 flex-shrink-0 items-center justify-center border-2 border-foreground ${
                     message.role === "user" ? "bg-foreground" : "bg-secondary"
                   }`}
                 >
                   <span
-                    className={`font-bold text-sm font-mono ${
+                    className={`font-mono text-sm font-bold ${
                       message.role === "user"
                         ? "text-background"
                         : "text-secondary-foreground"
@@ -201,16 +208,16 @@ export function Chat({ assessmentId, coworker, onDoneClick, showDoneButton }: Ch
                 </div>
 
                 {/* Message content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-baseline gap-2 mb-1">
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex items-baseline gap-2">
                     <span className="font-bold">
                       {message.role === "user" ? "You" : coworker.name}
                     </span>
-                    <span className="text-sm text-muted-foreground font-mono">
+                    <span className="font-mono text-sm text-muted-foreground">
                       {formatTimestamp(message.timestamp)}
                     </span>
                   </div>
-                  <div className="text-foreground whitespace-pre-wrap">
+                  <div className="whitespace-pre-wrap text-foreground">
                     {message.text}
                   </div>
                 </div>
@@ -220,13 +227,13 @@ export function Chat({ assessmentId, coworker, onDoneClick, showDoneButton }: Ch
             {/* Typing indicator when sending */}
             {isSending && (
               <div className="flex gap-3">
-                <div className="w-10 h-10 bg-secondary border-2 border-foreground flex items-center justify-center flex-shrink-0">
-                  <span className="font-bold text-secondary-foreground text-sm font-mono">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center border-2 border-foreground bg-secondary">
+                  <span className="font-mono text-sm font-bold text-secondary-foreground">
                     {initials}
                   </span>
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-baseline gap-2 mb-1">
+                  <div className="mb-1 flex items-baseline gap-2">
                     <span className="font-bold">{coworker.name}</span>
                   </div>
                   <TypingIndicator />
@@ -250,12 +257,12 @@ export function Chat({ assessmentId, coworker, onDoneClick, showDoneButton }: Ch
             onKeyDown={handleKeyDown}
             placeholder={`Message ${coworker.name}...`}
             disabled={isSending}
-            className="flex-1 px-4 py-3 border-2 border-foreground bg-background text-foreground font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-50"
+            className="flex-1 border-2 border-foreground bg-background px-4 py-3 font-mono text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-50"
           />
           <button
             onClick={sendMessage}
             disabled={!input.trim() || isSending}
-            className="px-6 py-3 bg-foreground text-background font-bold border-2 border-foreground hover:bg-secondary hover:text-secondary-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+            className="border-2 border-foreground bg-foreground px-6 py-3 font-bold text-background hover:bg-secondary hover:text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
             Send
           </button>
@@ -263,9 +270,9 @@ export function Chat({ assessmentId, coworker, onDoneClick, showDoneButton }: Ch
             <button
               onClick={onDoneClick}
               disabled={isSending}
-              className="px-6 py-3 bg-secondary text-secondary-foreground font-bold border-2 border-foreground hover:bg-secondary/80 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="hover:bg-secondary/80 border-2 border-foreground bg-secondary px-6 py-3 font-bold text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
             >
-              I'm Done
+              I&apos;m Done
             </button>
           )}
         </div>
@@ -280,19 +287,19 @@ function TypingIndicator() {
     <div className="flex items-center gap-1 py-1">
       <div className="flex gap-1">
         <span
-          className="w-2 h-2 bg-foreground animate-pulse"
+          className="h-2 w-2 animate-pulse bg-foreground"
           style={{ animationDelay: "0ms" }}
         />
         <span
-          className="w-2 h-2 bg-foreground animate-pulse"
+          className="h-2 w-2 animate-pulse bg-foreground"
           style={{ animationDelay: "150ms" }}
         />
         <span
-          className="w-2 h-2 bg-foreground animate-pulse"
+          className="h-2 w-2 animate-pulse bg-foreground"
           style={{ animationDelay: "300ms" }}
         />
       </div>
-      <span className="text-sm text-muted-foreground ml-2 font-mono">
+      <span className="ml-2 font-mono text-sm text-muted-foreground">
         typing...
       </span>
     </div>

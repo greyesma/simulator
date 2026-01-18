@@ -6,7 +6,7 @@ export default async function ScenarioBuilderPage() {
   await requireAdmin();
 
   return (
-    <div className="h-[calc(100vh-73px)] flex flex-col">
+    <div className="flex h-[calc(100vh-73px)] flex-col">
       <ScenarioBuilderClient />
     </div>
   );

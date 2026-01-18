@@ -15,8 +15,13 @@ export default async function AdminUsersPage() {
   // Calculate aggregate stats
   const totalUsers = users.length;
   const adminUsers = users.filter((u) => u.role === "ADMIN").length;
-  const usersWithAssessments = users.filter((u) => u._count.assessments > 0).length;
-  const totalAssessments = users.reduce((sum, u) => sum + u._count.assessments, 0);
+  const usersWithAssessments = users.filter(
+    (u) => u._count.assessments > 0
+  ).length;
+  const totalAssessments = users.reduce(
+    (sum, u) => sum + u._count.assessments,
+    0
+  );
 
   // Serialize dates to strings for client component
   const serializedUsers = users.map((u) => ({

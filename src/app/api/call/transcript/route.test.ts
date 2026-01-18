@@ -132,7 +132,9 @@ describe("POST /api/call/transcript", () => {
       id: "conv-1",
     });
 
-    const transcript = [{ role: "user", text: "Hello", timestamp: "2024-01-01" }];
+    const transcript = [
+      { role: "user", text: "Hello", timestamp: "2024-01-01" },
+    ];
     const request = new Request("http://localhost/api/call/transcript", {
       method: "POST",
       body: JSON.stringify({
@@ -168,13 +170,17 @@ describe("POST /api/call/transcript", () => {
     });
     mockConversationFindFirst.mockResolvedValue({
       id: "conv-1",
-      transcript: [{ role: "model", text: "Hey there", timestamp: "2024-01-01" }],
+      transcript: [
+        { role: "model", text: "Hey there", timestamp: "2024-01-01" },
+      ],
     });
     mockConversationUpdate.mockResolvedValue({
       id: "conv-1",
     });
 
-    const newTranscript = [{ role: "user", text: "Hello", timestamp: "2024-01-02" }];
+    const newTranscript = [
+      { role: "user", text: "Hello", timestamp: "2024-01-02" },
+    ];
     const request = new Request("http://localhost/api/call/transcript", {
       method: "POST",
       body: JSON.stringify({

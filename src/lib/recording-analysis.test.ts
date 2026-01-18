@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   activityEntrySchema,
   toolUsageSchema,
@@ -190,7 +190,9 @@ describe("aggregateSegmentAnalyses", () => {
         activityTimeline: [
           { timestamp: "0:00", activity: "coding", description: "Setup" },
         ],
-        toolUsage: [{ tool: "VS Code", usageCount: 5, contextNotes: "Editing" }],
+        toolUsage: [
+          { tool: "VS Code", usageCount: 5, contextNotes: "Editing" },
+        ],
         stuckMoments: [
           {
             startTime: "1:00",
@@ -211,7 +213,11 @@ describe("aggregateSegmentAnalyses", () => {
       },
       {
         activityTimeline: [
-          { timestamp: "10:00", activity: "testing", description: "Running tests" },
+          {
+            timestamp: "10:00",
+            activity: "testing",
+            description: "Running tests",
+          },
         ],
         toolUsage: [
           { tool: "VS Code", usageCount: 3, contextNotes: "More editing" },
@@ -237,7 +243,9 @@ describe("aggregateSegmentAnalyses", () => {
     // Check tool usage is aggregated
     const vscodeUsage = aggregated.toolUsage.find((t) => t.tool === "VS Code");
     expect(vscodeUsage?.usageCount).toBe(8); // 5 + 3
-    expect(aggregated.toolUsage.find((t) => t.tool === "Terminal")).toBeTruthy();
+    expect(
+      aggregated.toolUsage.find((t) => t.tool === "Terminal")
+    ).toBeTruthy();
 
     // Check stuck moments are combined
     expect(aggregated.stuckMoments.length).toBe(1);

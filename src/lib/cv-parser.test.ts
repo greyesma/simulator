@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   workExperienceSchema,
   educationSchema,
@@ -298,7 +298,14 @@ describe("CV Parser Schemas", () => {
     });
 
     it("should validate seniority levels", () => {
-      const levels = ["junior", "mid", "senior", "lead", "principal", "unknown"];
+      const levels = [
+        "junior",
+        "mid",
+        "senior",
+        "lead",
+        "principal",
+        "unknown",
+      ];
       levels.forEach((level) => {
         const profile = {
           ...validProfile,
@@ -450,11 +457,15 @@ describe("CV Parser Utilities", () => {
       expect(formatted).toContain("### Work Experience");
       expect(formatted).toContain("**Staff Engineer** at **BigTech Inc.**");
       expect(formatted).toContain("Jan 2022 - Present");
-      expect(formatted).toContain("Technologies: TypeScript, Kubernetes, PostgreSQL");
+      expect(formatted).toContain(
+        "Technologies: TypeScript, Kubernetes, PostgreSQL"
+      );
 
       // Check for education
       expect(formatted).toContain("### Education");
-      expect(formatted).toContain("**Master of Science in Software Engineering**");
+      expect(formatted).toContain(
+        "**Master of Science in Software Engineering**"
+      );
       expect(formatted).toContain("Carnegie Mellon University");
 
       // Check for skills

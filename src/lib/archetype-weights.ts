@@ -324,7 +324,8 @@ export function calculateFitScoresForMultipleArchetypes(
   dimensionScores: DimensionScoreInput[],
   archetypes?: RoleArchetype[]
 ): FitScoreResult[] {
-  const targetArchetypes = archetypes ?? (Object.keys(ARCHETYPE_CONFIGS) as RoleArchetype[]);
+  const targetArchetypes =
+    archetypes ?? (Object.keys(ARCHETYPE_CONFIGS) as RoleArchetype[]);
 
   const results = targetArchetypes.map((archetype) =>
     calculateFitScore(dimensionScores, archetype)

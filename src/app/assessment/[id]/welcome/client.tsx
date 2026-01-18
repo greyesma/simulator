@@ -43,7 +43,11 @@ export function WelcomeClient({
   coworkers,
 }: WelcomeClientProps) {
   return (
-    <SlackLayout assessmentId={assessmentId} coworkers={coworkers} selectedCoworkerId={managerId}>
+    <SlackLayout
+      assessmentId={assessmentId}
+      coworkers={coworkers}
+      selectedCoworkerId={managerId}
+    >
       <WelcomeContent
         userName={userName}
         managerId={managerId}
@@ -170,29 +174,29 @@ function WelcomeContent({
   const isInCall = activeCall?.coworkerId === managerId;
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex flex-1 flex-col">
       {/* Header - Slack-like channel header */}
       <header className="border-b-2 border-foreground bg-background">
-        <div className="px-4 md:px-6 py-3 flex items-center gap-3">
+        <div className="flex items-center gap-3 px-4 py-3 md:px-6">
           {/* Spacer for mobile menu button */}
           <div className="w-10 md:hidden" />
           {/* Manager avatar */}
-          <div className="w-10 h-10 bg-secondary border-2 border-foreground flex items-center justify-center">
-            <span className="font-bold text-secondary-foreground text-sm font-mono">
+          <div className="flex h-10 w-10 items-center justify-center border-2 border-foreground bg-secondary">
+            <span className="font-mono text-sm font-bold text-secondary-foreground">
               {managerInitials}
             </span>
           </div>
           <div className="flex-1">
-            <h1 className="font-bold text-lg">{managerName}</h1>
+            <h1 className="text-lg font-bold">{managerName}</h1>
             <p className="text-sm text-muted-foreground">{managerRole}</p>
           </div>
           {/* Call button */}
           <button
             onClick={handleScheduleCall}
             disabled={isInCall}
-            className={`p-2 border-2 border-foreground ${
+            className={`border-2 border-foreground p-2 ${
               isInCall
-                ? "bg-muted text-muted-foreground cursor-not-allowed"
+                ? "cursor-not-allowed bg-muted text-muted-foreground"
                 : "bg-secondary text-secondary-foreground hover:bg-foreground hover:text-background"
             }`}
             aria-label={isInCall ? "In call" : `Call ${managerName}`}
@@ -204,14 +208,14 @@ function WelcomeContent({
 
       {/* Chat area */}
       <main className="flex-1 overflow-auto">
-        <div className="px-4 md:px-6 py-6">
+        <div className="px-4 py-6 md:px-6">
           {/* Date divider */}
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex-1 h-px bg-border" />
-            <span className="text-sm font-mono text-muted-foreground px-2 border border-foreground bg-background">
+          <div className="mb-6 flex items-center gap-4">
+            <div className="h-px flex-1 bg-border" />
+            <span className="border border-foreground bg-background px-2 font-mono text-sm text-muted-foreground">
               Today
             </span>
-            <div className="flex-1 h-px bg-border" />
+            <div className="h-px flex-1 bg-border" />
           </div>
 
           {/* Messages */}
@@ -219,18 +223,18 @@ function WelcomeContent({
             {displayMessages.map((message) => (
               <div key={message.id} className="flex gap-3">
                 {/* Avatar */}
-                <div className="w-10 h-10 bg-secondary border-2 border-foreground flex items-center justify-center flex-shrink-0">
-                  <span className="font-bold text-secondary-foreground text-sm font-mono">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center border-2 border-foreground bg-secondary">
+                  <span className="font-mono text-sm font-bold text-secondary-foreground">
                     {managerInitials}
                   </span>
                 </div>
 
                 {/* Message content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-baseline gap-2 mb-1">
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex items-baseline gap-2">
                     <span className="font-bold">{managerName}</span>
                     {!message.isTyping && (
-                      <span className="text-sm text-muted-foreground font-mono">
+                      <span className="font-mono text-sm text-muted-foreground">
                         {message.timestamp}
                       </span>
                     )}
@@ -239,7 +243,7 @@ function WelcomeContent({
                   {message.isTyping ? (
                     <TypingIndicator />
                   ) : (
-                    <div className="text-foreground whitespace-pre-wrap">
+                    <div className="whitespace-pre-wrap text-foreground">
                       {formatMessageContent(message.content, repoUrl)}
                     </div>
                   )}
@@ -259,19 +263,19 @@ function TypingIndicator() {
     <div className="flex items-center gap-1 py-1">
       <div className="flex gap-1">
         <span
-          className="w-2 h-2 bg-foreground animate-pulse"
+          className="h-2 w-2 animate-pulse bg-foreground"
           style={{ animationDelay: "0ms" }}
         />
         <span
-          className="w-2 h-2 bg-foreground animate-pulse"
+          className="h-2 w-2 animate-pulse bg-foreground"
           style={{ animationDelay: "150ms" }}
         />
         <span
-          className="w-2 h-2 bg-foreground animate-pulse"
+          className="h-2 w-2 animate-pulse bg-foreground"
           style={{ animationDelay: "300ms" }}
         />
       </div>
-      <span className="text-sm text-muted-foreground ml-2 font-mono">
+      <span className="ml-2 font-mono text-sm text-muted-foreground">
         typing...
       </span>
     </div>
@@ -290,7 +294,7 @@ function formatMessageContent(content: string, repoUrl: string) {
           href={repoUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-secondary bg-foreground px-1 hover:underline font-mono"
+          className="bg-foreground px-1 font-mono text-secondary hover:underline"
         >
           {repoUrl}
         </a>

@@ -23,12 +23,14 @@ Convert Product Requirements Documents (PRDs) into GitHub Issues for Ralph to ex
 Ralph operates with fresh context per iteration. Oversized stories result in incomplete work.
 
 **Right-sized stories**:
+
 - Add a database column with migration
 - Create a single UI component
 - Add one API endpoint
 - Update server logic for one feature
 
 **Too large - split these**:
+
 - "Build the entire dashboard" → Split into individual components
 - "Add authentication" → Split into: schema, login endpoint, logout endpoint, middleware, UI
 - "Refactor the API" → Split into specific endpoints or layers
@@ -38,6 +40,7 @@ Ralph operates with fresh context per iteration. Oversized stories result in inc
 Ralph processes issues by priority: **P0 → P1 → P2 → no label** (oldest first within each priority).
 
 Use priority labels for urgency:
+
 - **P0**: Critical/blocking - must be done first
 - **P1**: High priority - important but not blocking
 - **P2**: Normal priority - standard work
@@ -59,18 +62,21 @@ Within the same priority, create issues in dependency order (Ralph processes old
 Criteria must be **verifiable**, not vague.
 
 **Good criteria**:
+
 - "Add status column to tasks table with default 'pending'"
 - "Endpoint returns 200 with JSON body containing 'id' and 'name'"
 - "Button is disabled when input is empty"
 - "Tests pass"
 
 **Bad criteria - avoid these**:
+
 - "Works correctly"
 - "Good UX"
 - "Handles edge cases"
 - "Is fast"
 
 **Always include**:
+
 - "Tests pass" (for any testable code)
 - "Typecheck passes" (for TypeScript projects)
 
@@ -124,11 +130,14 @@ EOF
 ## Example Conversion
 
 **PRD User Story**:
+
 ```markdown
 ### US-001: Add task status field
+
 **Description**: As a user, I want tasks to have a status so I can track progress.
 
 **Acceptance Criteria**:
+
 - [ ] Add 'status' column to tasks table
 - [ ] Default value is 'pending'
 - [ ] Valid values: pending, in_progress, completed
@@ -136,6 +145,7 @@ EOF
 ```
 
 **Created Issue**:
+
 ```bash
 gh issue create \
   --title "US-001: Add task status field" \
@@ -157,6 +167,7 @@ This is a schema change that must be completed before any backend or UI work tha
 ## Pre-Creation Checklist
 
 Before creating issues, verify:
+
 - [ ] PRD exists at `tasks/prd-[feature-name].md`
 - [ ] Each story is completable in one iteration
 - [ ] Stories are ordered by dependency

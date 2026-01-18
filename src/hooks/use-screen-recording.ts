@@ -104,10 +104,7 @@ export function useScreenRecording(
         setError(
           "Screen sharing permission was denied. Please allow screen sharing to continue."
         );
-      } else if (
-        err instanceof DOMException &&
-        err.name === "NotFoundError"
-      ) {
+      } else if (err instanceof DOMException && err.name === "NotFoundError") {
         setPermissionState("unavailable");
         setError("No screen available to share.");
       } else {

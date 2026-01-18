@@ -29,11 +29,12 @@ import {
   getSupportedJobTitleKeywords,
   getSeniorityThresholds,
   type ExtractedIntent,
-  type EntityExtractionResult,
 } from "./entity-extraction";
 
 // Cast the mock for type safety
-const mockGenerateContent = gemini.models.generateContent as ReturnType<typeof vi.fn>;
+const mockGenerateContent = gemini.models.generateContent as ReturnType<
+  typeof vi.fn
+>;
 
 describe("entity-extraction", () => {
   beforeEach(() => {
@@ -159,23 +160,33 @@ describe("entity-extraction", () => {
 
     describe("AI/ML and General Software Engineer mapping", () => {
       it("maps ML Engineer to GENERAL_SOFTWARE_ENGINEER", () => {
-        expect(mapJobTitleToArchetype("ML Engineer")).toBe("GENERAL_SOFTWARE_ENGINEER");
+        expect(mapJobTitleToArchetype("ML Engineer")).toBe(
+          "GENERAL_SOFTWARE_ENGINEER"
+        );
       });
 
       it("maps Machine Learning Engineer to GENERAL_SOFTWARE_ENGINEER", () => {
-        expect(mapJobTitleToArchetype("Machine Learning Engineer")).toBe("GENERAL_SOFTWARE_ENGINEER");
+        expect(mapJobTitleToArchetype("Machine Learning Engineer")).toBe(
+          "GENERAL_SOFTWARE_ENGINEER"
+        );
       });
 
       it("maps AI Engineer to GENERAL_SOFTWARE_ENGINEER", () => {
-        expect(mapJobTitleToArchetype("AI Engineer")).toBe("GENERAL_SOFTWARE_ENGINEER");
+        expect(mapJobTitleToArchetype("AI Engineer")).toBe(
+          "GENERAL_SOFTWARE_ENGINEER"
+        );
       });
 
       it("maps Software Engineer to GENERAL_SOFTWARE_ENGINEER", () => {
-        expect(mapJobTitleToArchetype("Software Engineer")).toBe("GENERAL_SOFTWARE_ENGINEER");
+        expect(mapJobTitleToArchetype("Software Engineer")).toBe(
+          "GENERAL_SOFTWARE_ENGINEER"
+        );
       });
 
       it("maps Software Developer to GENERAL_SOFTWARE_ENGINEER", () => {
-        expect(mapJobTitleToArchetype("Software Developer")).toBe("GENERAL_SOFTWARE_ENGINEER");
+        expect(mapJobTitleToArchetype("Software Developer")).toBe(
+          "GENERAL_SOFTWARE_ENGINEER"
+        );
       });
 
       it("maps SWE to GENERAL_SOFTWARE_ENGINEER", () => {
@@ -184,12 +195,18 @@ describe("entity-extraction", () => {
     });
 
     it("is case-insensitive", () => {
-      expect(mapJobTitleToArchetype("FRONTEND ENGINEER")).toBe("SENIOR_FRONTEND_ENGINEER");
-      expect(mapJobTitleToArchetype("Backend developer")).toBe("SENIOR_BACKEND_ENGINEER");
+      expect(mapJobTitleToArchetype("FRONTEND ENGINEER")).toBe(
+        "SENIOR_FRONTEND_ENGINEER"
+      );
+      expect(mapJobTitleToArchetype("Backend developer")).toBe(
+        "SENIOR_BACKEND_ENGINEER"
+      );
     });
 
     it("handles extra whitespace", () => {
-      expect(mapJobTitleToArchetype("  Frontend Engineer  ")).toBe("SENIOR_FRONTEND_ENGINEER");
+      expect(mapJobTitleToArchetype("  Frontend Engineer  ")).toBe(
+        "SENIOR_FRONTEND_ENGINEER"
+      );
     });
   });
 
@@ -592,7 +609,9 @@ describe("entity-extraction", () => {
           }),
         });
 
-        const result = await extractEntities("python llms react node developer");
+        const result = await extractEntities(
+          "python llms react node developer"
+        );
         expect(result.intent.skills).toContain("Python");
         expect(result.intent.skills).toContain("LLMs");
         expect(result.intent.skills).toContain("React");
@@ -610,7 +629,9 @@ describe("entity-extraction", () => {
           }),
         });
 
-        const result = await extractEntities("startup or enterprise, VC backed");
+        const result = await extractEntities(
+          "startup or enterprise, VC backed"
+        );
         expect(result.intent.company_type).toContain("startup");
         expect(result.intent.company_type).toContain("VC backed");
       });
@@ -707,7 +728,9 @@ describe("entity-extraction", () => {
           }),
         });
 
-        const result = await extractEntities("software engineer nyc 4 years typescript fintech startup");
+        const result = await extractEntities(
+          "software engineer nyc 4 years typescript fintech startup"
+        );
 
         expect(result.intent).toEqual({
           job_title: "Software Engineer",

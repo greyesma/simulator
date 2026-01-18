@@ -63,7 +63,10 @@ export async function POST(request: NextRequest) {
 
     if (!assessment.prUrl) {
       return NextResponse.json(
-        { error: "No PR URL found for this assessment. Please submit your PR first." },
+        {
+          error:
+            "No PR URL found for this assessment. Please submit your PR first.",
+        },
         { status: 400 }
       );
     }
@@ -73,13 +76,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         analyzed: false,
-        message: "Code review already exists. Use forceReanalyze: true to re-analyze.",
+        message:
+          "Code review already exists. Use forceReanalyze: true to re-analyze.",
         codeReview: assessment.codeReview as unknown as CodeReviewData,
       });
     }
 
     // Use existing PR snapshot if available, otherwise fetch fresh
-    let prSnapshot = assessment.prSnapshot as unknown as Parameters<typeof analyzeCodeReview>[1];
+    let prSnapshot = assessment.prSnapshot as unknown as Parameters<
+      typeof analyzeCodeReview
+    >[1];
 
     if (!prSnapshot) {
       try {

@@ -306,7 +306,9 @@ describe("POST /api/defense/token", () => {
         {
           type: "kickoff",
           coworkerId: "manager-id",
-          transcript: [{ role: "user", text: "Hello", timestamp: "2024-01-01" }],
+          transcript: [
+            { role: "user", text: "Hello", timestamp: "2024-01-01" },
+          ],
           createdAt: new Date(),
           updatedAt: new Date(),
         },

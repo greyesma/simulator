@@ -93,7 +93,13 @@ export const codeReviewResponseSchema = z.object({
     strengths: z.array(z.string()),
     areasForImprovement: z.array(z.string()),
     overallAssessment: z.string(),
-    testCoverage: z.enum(["comprehensive", "adequate", "minimal", "none", "unknown"]),
+    testCoverage: z.enum([
+      "comprehensive",
+      "adequate",
+      "minimal",
+      "none",
+      "unknown",
+    ]),
     codeStyleConsistency: z.enum(["excellent", "good", "fair", "poor"]),
     aiToolUsageEvident: z.boolean(),
   }),
@@ -109,7 +115,9 @@ export const codeReviewResponseSchema = z.object({
 export type CodeQualityFinding = z.infer<typeof codeQualityFindingSchema>;
 export type PatternFinding = z.infer<typeof patternFindingSchema>;
 export type SecurityFinding = z.infer<typeof securityFindingSchema>;
-export type MaintainabilityAssessment = z.infer<typeof maintainabilityAssessmentSchema>;
+export type MaintainabilityAssessment = z.infer<
+  typeof maintainabilityAssessmentSchema
+>;
 export type CodeReviewResponse = z.infer<typeof codeReviewResponseSchema>;
 
 // ============================================================================
@@ -163,7 +171,7 @@ export async function analyzeCodeReview(
   prSnapshot?: PrSnapshot
 ): Promise<CodeReviewResponse> {
   // Fetch PR content if not provided
-  const pr = prSnapshot || await fetchGitHubPrContent(prUrl);
+  const pr = prSnapshot || (await fetchGitHubPrContent(prUrl));
 
   if (pr.fetchError) {
     // Return a minimal response if we can't fetch the PR

@@ -4,9 +4,12 @@ import { ParsedProfileDisplay } from "./parsed-profile-display";
 import type { ParsedProfile } from "@/lib/cv-parser";
 
 // Factory function to create test profiles
-function createTestProfile(overrides: Partial<ParsedProfile> = {}): ParsedProfile {
+function createTestProfile(
+  overrides: Partial<ParsedProfile> = {}
+): ParsedProfile {
   return {
-    summary: "Experienced software engineer with 5+ years in full-stack development.",
+    summary:
+      "Experienced software engineer with 5+ years in full-stack development.",
     workExperience: [],
     education: [],
     skills: [],
@@ -26,7 +29,9 @@ describe("ParsedProfileDisplay component", () => {
     });
 
     it("renders nothing when profile is undefined", () => {
-      const { container } = render(<ParsedProfileDisplay profile={undefined} />);
+      const { container } = render(
+        <ParsedProfileDisplay profile={undefined} />
+      );
       expect(container.firstChild).toBeNull();
     });
   });
@@ -69,7 +74,9 @@ describe("ParsedProfileDisplay component", () => {
         linkedIn: "https://linkedin.com/in/janesmith",
       });
       const { container } = render(<ParsedProfileDisplay profile={profile} />);
-      const link = container.querySelector('a[href="https://linkedin.com/in/janesmith"]');
+      const link = container.querySelector(
+        'a[href="https://linkedin.com/in/janesmith"]'
+      );
       expect(link).toBeInTheDocument();
       expect(link).toHaveTextContent("LinkedIn");
     });
@@ -79,7 +86,9 @@ describe("ParsedProfileDisplay component", () => {
         github: "https://github.com/janesmith",
       });
       const { container } = render(<ParsedProfileDisplay profile={profile} />);
-      const link = container.querySelector('a[href="https://github.com/janesmith"]');
+      const link = container.querySelector(
+        'a[href="https://github.com/janesmith"]'
+      );
       expect(link).toBeInTheDocument();
       expect(link).toHaveTextContent("GitHub");
     });
@@ -135,7 +144,9 @@ describe("ParsedProfileDisplay component", () => {
     it("does not display badge when seniority is not set", () => {
       const profile = createTestProfile({ seniorityLevel: undefined });
       const { container } = render(<ParsedProfileDisplay profile={profile} />);
-      const badges = container.querySelectorAll('[data-testid="seniority-badge"]');
+      const badges = container.querySelectorAll(
+        '[data-testid="seniority-badge"]'
+      );
       expect(badges).toHaveLength(0);
     });
   });
@@ -403,9 +414,7 @@ describe("ParsedProfileDisplay component", () => {
   describe("skills section", () => {
     it("renders skills section when skills exist", () => {
       const profile = createTestProfile({
-        skills: [
-          { name: "TypeScript", category: "programming_language" },
-        ],
+        skills: [{ name: "TypeScript", category: "programming_language" }],
       });
       render(<ParsedProfileDisplay profile={profile} />);
       expect(screen.getByText("Skills")).toBeInTheDocument();
@@ -445,7 +454,11 @@ describe("ParsedProfileDisplay component", () => {
     it("displays proficiency level when available", () => {
       const profile = createTestProfile({
         skills: [
-          { name: "TypeScript", category: "programming_language", proficiencyLevel: "expert" },
+          {
+            name: "TypeScript",
+            category: "programming_language",
+            proficiencyLevel: "expert",
+          },
         ],
       });
       render(<ParsedProfileDisplay profile={profile} />);
@@ -480,9 +493,7 @@ describe("ParsedProfileDisplay component", () => {
   describe("certifications section", () => {
     it("renders certifications section when entries exist", () => {
       const profile = createTestProfile({
-        certifications: [
-          { name: "AWS Solutions Architect", issuer: "Amazon" },
-        ],
+        certifications: [{ name: "AWS Solutions Architect", issuer: "Amazon" }],
       });
       render(<ParsedProfileDisplay profile={profile} />);
       expect(screen.getByText("Certifications")).toBeInTheDocument();
@@ -558,9 +569,7 @@ describe("ParsedProfileDisplay component", () => {
     it("uses border-2 for sections", () => {
       const profile = createTestProfile({
         name: "Test User",
-        workExperience: [
-          { company: "Test", title: "Dev", startDate: "2020" },
-        ],
+        workExperience: [{ company: "Test", title: "Dev", startDate: "2020" }],
       });
       const { container } = render(<ParsedProfileDisplay profile={profile} />);
       const sections = container.querySelectorAll(".border-2");
@@ -591,7 +600,12 @@ describe("ParsedProfileDisplay component", () => {
     it("uses font-mono for dates and metadata", () => {
       const profile = createTestProfile({
         workExperience: [
-          { company: "Test", title: "Dev", startDate: "Jan 2020", endDate: "Dec 2022" },
+          {
+            company: "Test",
+            title: "Dev",
+            startDate: "Jan 2020",
+            endDate: "Dec 2022",
+          },
         ],
       });
       const { container } = render(<ParsedProfileDisplay profile={profile} />);

@@ -75,9 +75,9 @@ export function ChatPageClient({
             onDoneClick={handleDoneClick}
           />
         ) : (
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-1 items-center justify-center">
             <div className="text-center">
-              <h2 className="font-bold text-xl mb-2">No Coworkers Available</h2>
+              <h2 className="mb-2 text-xl font-bold">No Coworkers Available</h2>
               <p className="text-muted-foreground">
                 There are no coworkers configured for this scenario.
               </p>

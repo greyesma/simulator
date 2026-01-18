@@ -114,7 +114,9 @@ export async function POST(request: Request) {
       where: { id: userId },
       data: {
         cvUrl: signedUrlData.signedUrl,
-        ...(parsedProfile && { parsedProfile: profileToPrismaJson(parsedProfile) }),
+        ...(parsedProfile && {
+          parsedProfile: profileToPrismaJson(parsedProfile),
+        }),
       },
     });
 
@@ -132,7 +134,9 @@ export async function POST(request: Request) {
           where: { id: assessmentId },
           data: {
             cvUrl: signedUrlData.signedUrl,
-            ...(parsedProfile && { parsedProfile: profileToPrismaJson(parsedProfile) }),
+            ...(parsedProfile && {
+              parsedProfile: profileToPrismaJson(parsedProfile),
+            }),
           },
         });
         console.log(`CV also saved to assessment ${assessmentId}`);

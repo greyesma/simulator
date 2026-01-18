@@ -48,14 +48,10 @@ const mockOriginalAssessment = {
   prSnapshot: { title: "Add feature" },
   ciStatus: { status: "passed" },
   codeReview: { score: 85 },
-  logs: [
-    { eventType: "COMPLETED" },
-  ],
+  logs: [{ eventType: "COMPLETED" }],
   user: { id: "user-1" },
   scenario: { id: "scenario-1", taskDescription: "Build a feature" },
-  recordings: [
-    { storageUrl: "https://storage.example.com/video.webm" },
-  ],
+  recordings: [{ storageUrl: "https://storage.example.com/video.webm" }],
 };
 
 const mockNewAssessment = {
@@ -118,7 +114,9 @@ describe("POST /api/admin/assessment/retry", () => {
   });
 
   it("allows retry for COMPLETED assessments", async () => {
-    (db.assessment.findUnique as Mock).mockResolvedValue(mockOriginalAssessment);
+    (db.assessment.findUnique as Mock).mockResolvedValue(
+      mockOriginalAssessment
+    );
 
     const request = createRequest({ assessmentId: "assess-1" });
     const response = await POST(request);
@@ -135,10 +133,7 @@ describe("POST /api/admin/assessment/retry", () => {
     const assessmentWithError = {
       ...mockOriginalAssessment,
       status: "WORKING",
-      logs: [
-        { eventType: "STARTED" },
-        { eventType: "ERROR" },
-      ],
+      logs: [{ eventType: "STARTED" }, { eventType: "ERROR" }],
     };
     (db.assessment.findUnique as Mock).mockResolvedValue(assessmentWithError);
 
@@ -151,7 +146,9 @@ describe("POST /api/admin/assessment/retry", () => {
   });
 
   it("creates new assessment with PROCESSING status", async () => {
-    (db.assessment.findUnique as Mock).mockResolvedValue(mockOriginalAssessment);
+    (db.assessment.findUnique as Mock).mockResolvedValue(
+      mockOriginalAssessment
+    );
 
     const request = createRequest({ assessmentId: "assess-1" });
     await POST(request);
@@ -168,7 +165,9 @@ describe("POST /api/admin/assessment/retry", () => {
   });
 
   it("marks original assessment as superseded", async () => {
-    (db.assessment.findUnique as Mock).mockResolvedValue(mockOriginalAssessment);
+    (db.assessment.findUnique as Mock).mockResolvedValue(
+      mockOriginalAssessment
+    );
 
     const request = createRequest({ assessmentId: "assess-1" });
     await POST(request);
@@ -180,7 +179,9 @@ describe("POST /api/admin/assessment/retry", () => {
   });
 
   it("logs admin retry event with metadata", async () => {
-    (db.assessment.findUnique as Mock).mockResolvedValue(mockOriginalAssessment);
+    (db.assessment.findUnique as Mock).mockResolvedValue(
+      mockOriginalAssessment
+    );
 
     const request = createRequest({ assessmentId: "assess-1" });
     await POST(request);
@@ -198,7 +199,9 @@ describe("POST /api/admin/assessment/retry", () => {
   });
 
   it("triggers video assessment when recording exists", async () => {
-    (db.assessment.findUnique as Mock).mockResolvedValue(mockOriginalAssessment);
+    (db.assessment.findUnique as Mock).mockResolvedValue(
+      mockOriginalAssessment
+    );
 
     const request = createRequest({ assessmentId: "assess-1" });
     await POST(request);
@@ -216,7 +219,9 @@ describe("POST /api/admin/assessment/retry", () => {
       ...mockOriginalAssessment,
       recordings: [],
     };
-    (db.assessment.findUnique as Mock).mockResolvedValue(assessmentWithoutRecording);
+    (db.assessment.findUnique as Mock).mockResolvedValue(
+      assessmentWithoutRecording
+    );
 
     const request = createRequest({ assessmentId: "assess-1" });
     const response = await POST(request);
@@ -227,7 +232,9 @@ describe("POST /api/admin/assessment/retry", () => {
   });
 
   it("returns video assessment info in response", async () => {
-    (db.assessment.findUnique as Mock).mockResolvedValue(mockOriginalAssessment);
+    (db.assessment.findUnique as Mock).mockResolvedValue(
+      mockOriginalAssessment
+    );
 
     const request = createRequest({ assessmentId: "assess-1" });
     const response = await POST(request);
@@ -240,7 +247,9 @@ describe("POST /api/admin/assessment/retry", () => {
   });
 
   it("handles video assessment trigger failure gracefully", async () => {
-    (db.assessment.findUnique as Mock).mockResolvedValue(mockOriginalAssessment);
+    (db.assessment.findUnique as Mock).mockResolvedValue(
+      mockOriginalAssessment
+    );
     (triggerVideoAssessment as Mock).mockResolvedValue({
       success: false,
       videoAssessmentId: null,
@@ -269,7 +278,9 @@ describe("POST /api/admin/assessment/retry", () => {
   });
 
   it("returns 500 when database error occurs", async () => {
-    (db.assessment.findUnique as Mock).mockResolvedValue(mockOriginalAssessment);
+    (db.assessment.findUnique as Mock).mockResolvedValue(
+      mockOriginalAssessment
+    );
     (db.assessment.create as Mock).mockRejectedValue(new Error("DB error"));
 
     const request = createRequest({ assessmentId: "assess-1" });

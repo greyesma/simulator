@@ -27,7 +27,10 @@ export async function POST(request: Request, context: RouteContext) {
 
   const user = session.user as SessionUser;
   if (user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Admin access required" },
+      { status: 403 }
+    );
   }
 
   const { id } = await context.params;

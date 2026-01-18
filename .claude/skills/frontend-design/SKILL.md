@@ -15,16 +15,17 @@ The user provides frontend requirements: a component, page, application, or inte
 **This project uses a neo-brutalist design system. ALL frontend code MUST follow these rules.**
 
 ### Theme File
+
 Import and use the theme from `styles/theme.css`. All CSS variables are defined there.
 
 ### Core Principles
 
-| Rule | Value | Rationale |
-|------|-------|-----------|
-| Border radius | `0rem` | Sharp corners only. Never rounded. |
-| Shadows | None | Flat design. No drop shadows, box shadows, or blur. |
-| Primary colors | Black `#000000`, White `#ffffff`, Gold `#f7da50` | High contrast, minimal palette. |
-| Borders | Hard 1px black | Define containers with lines, not shadows. |
+| Rule           | Value                                            | Rationale                                           |
+| -------------- | ------------------------------------------------ | --------------------------------------------------- |
+| Border radius  | `0rem`                                           | Sharp corners only. Never rounded.                  |
+| Shadows        | None                                             | Flat design. No drop shadows, box shadows, or blur. |
+| Primary colors | Black `#000000`, White `#ffffff`, Gold `#f7da50` | High contrast, minimal palette.                     |
+| Borders        | Hard 1px black                                   | Define containers with lines, not shadows.          |
 
 ### Typography
 
@@ -49,6 +50,7 @@ Dark mode:
 ```
 
 The gold `#f7da50` is the "hero" accent. Use it sparingly for:
+
 - Active states
 - Important highlights
 - Call-to-action buttons
@@ -58,6 +60,7 @@ The gold `#f7da50` is the "hero" accent. Use it sparingly for:
 ### Visual Language
 
 The logo uses **tangram-style geometric shapes** (triangles, parallelograms). Extend this motif:
+
 - Loading animations: geometric pieces assembling
 - Section dividers: angular lines
 - Decorative elements: triangle patterns
@@ -96,11 +99,13 @@ The logo uses **tangram-style geometric shapes** (triangles, parallelograms). Ex
 ## General Design Thinking
 
 Beyond the mandatory project rules above, consider:
+
 - **Purpose**: What problem does this interface solve? Who uses it?
 - **Constraints**: Technical requirements (framework, performance, accessibility).
 - **Differentiation**: What detail will make this memorable within the design system?
 
 Implement working code (HTML/CSS/JS, React, Vue, etc.) that is:
+
 - Production-grade and functional
 - Visually striking within the brutalist constraints
 - Cohesive with the established design system
@@ -109,6 +114,7 @@ Implement working code (HTML/CSS/JS, React, Vue, etc.) that is:
 ## Frontend Implementation Guidelines
 
 Focus on:
+
 - **Typography**: Use DM Sans and Space Mono as specified. Create hierarchy through weight, size, and spacing—not font variety.
 - **Color & Theme**: Use CSS variables from `styles/theme.css`. The black/white/gold palette is non-negotiable.
 - **Motion**: Use animations sparingly. When used, make them sharp and immediate. CSS-only preferred. Focus on high-impact moments with instant reveals rather than gradual fades.

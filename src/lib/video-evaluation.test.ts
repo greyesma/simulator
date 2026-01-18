@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { VideoAssessmentStatus, AssessmentDimension } from "@prisma/client";
+import type {
+  VideoAssessmentStatus,
+  AssessmentDimension,
+} from "@prisma/client";
 
 // Mock gemini module
 vi.mock("@/lib/gemini", () => ({
@@ -50,7 +53,6 @@ vi.mock("@/lib/error-recovery", () => ({
   }),
 }));
 
-
 // Import after mocks are set up
 import {
   evaluateVideo,
@@ -66,15 +68,29 @@ import { gemini } from "@/lib/gemini";
 import { db } from "@/server/db";
 
 // Cast to mocked types for easier access
-const mockGenerateContent = gemini.models.generateContent as ReturnType<typeof vi.fn>;
-const mockVideoAssessmentUpdate = db.videoAssessment.update as ReturnType<typeof vi.fn>;
-const mockVideoAssessmentFindUnique = db.videoAssessment.findUnique as ReturnType<typeof vi.fn>;
-const mockVideoAssessmentCreate = db.videoAssessment.create as ReturnType<typeof vi.fn>;
-const mockDimensionScoreUpsert = db.dimensionScore.upsert as ReturnType<typeof vi.fn>;
-const mockVideoAssessmentSummaryUpsert = db.videoAssessmentSummary.upsert as ReturnType<typeof vi.fn>;
-const mockVideoAssessmentLogCreate = db.videoAssessmentLog.create as ReturnType<typeof vi.fn>;
-const mockVideoAssessmentApiCallCreate = db.videoAssessmentApiCall.create as ReturnType<typeof vi.fn>;
-const mockVideoAssessmentApiCallUpdate = db.videoAssessmentApiCall.update as ReturnType<typeof vi.fn>;
+const mockGenerateContent = gemini.models.generateContent as ReturnType<
+  typeof vi.fn
+>;
+const mockVideoAssessmentUpdate = db.videoAssessment.update as ReturnType<
+  typeof vi.fn
+>;
+const mockVideoAssessmentFindUnique = db.videoAssessment
+  .findUnique as ReturnType<typeof vi.fn>;
+const mockVideoAssessmentCreate = db.videoAssessment.create as ReturnType<
+  typeof vi.fn
+>;
+const mockDimensionScoreUpsert = db.dimensionScore.upsert as ReturnType<
+  typeof vi.fn
+>;
+const mockVideoAssessmentSummaryUpsert = db.videoAssessmentSummary
+  .upsert as ReturnType<typeof vi.fn>;
+const mockVideoAssessmentLogCreate = db.videoAssessmentLog.create as ReturnType<
+  typeof vi.fn
+>;
+const mockVideoAssessmentApiCallCreate = db.videoAssessmentApiCall
+  .create as ReturnType<typeof vi.fn>;
+const mockVideoAssessmentApiCallUpdate = db.videoAssessmentApiCall
+  .update as ReturnType<typeof vi.fn>;
 
 // ============================================================================
 // Test Data
@@ -174,10 +190,16 @@ describe("evaluateVideo", () => {
     vi.clearAllMocks();
     mockVideoAssessmentUpdate.mockResolvedValue({ id: "test-assessment-id" });
     mockDimensionScoreUpsert.mockResolvedValue({ id: "test-score-id" });
-    mockVideoAssessmentSummaryUpsert.mockResolvedValue({ id: "test-summary-id" });
+    mockVideoAssessmentSummaryUpsert.mockResolvedValue({
+      id: "test-summary-id",
+    });
     mockVideoAssessmentLogCreate.mockResolvedValue({ id: "test-log-id" });
-    mockVideoAssessmentApiCallCreate.mockResolvedValue({ id: "test-api-call-id" });
-    mockVideoAssessmentApiCallUpdate.mockResolvedValue({ id: "test-api-call-id" });
+    mockVideoAssessmentApiCallCreate.mockResolvedValue({
+      id: "test-api-call-id",
+    });
+    mockVideoAssessmentApiCallUpdate.mockResolvedValue({
+      id: "test-api-call-id",
+    });
   });
 
   it("should successfully evaluate a video and store results", async () => {
@@ -281,7 +303,9 @@ describe("evaluateVideo", () => {
               },
             },
             {
-              text: expect.stringContaining("objective, evidence-based evaluator"),
+              text: expect.stringContaining(
+                "objective, evidence-based evaluator"
+              ),
             },
           ],
         },
@@ -370,8 +394,11 @@ describe("evaluateVideo", () => {
     // LEADERSHIP has null score, should not be upserted
     const leadershipCall = mockDimensionScoreUpsert.mock.calls.find(
       (call: unknown[]) =>
-        (call[0] as { where: { assessmentId_dimension: { dimension: string } } })
-          .where.assessmentId_dimension.dimension === "LEADERSHIP"
+        (
+          call[0] as {
+            where: { assessmentId_dimension: { dimension: string } };
+          }
+        ).where.assessmentId_dimension.dimension === "LEADERSHIP"
     );
     expect(leadershipCall).toBeUndefined();
   });
@@ -401,7 +428,8 @@ describe("evaluateVideo", () => {
   });
 
   it("should handle JSON response wrapped in markdown code blocks", async () => {
-    const wrappedResponse = "```json\n" + JSON.stringify(mockEvaluationResponse) + "\n```";
+    const wrappedResponse =
+      "```json\n" + JSON.stringify(mockEvaluationResponse) + "\n```";
     mockGenerateContent.mockResolvedValue({
       text: wrappedResponse,
     });
@@ -502,8 +530,12 @@ describe("evaluateVideo", () => {
     });
 
     expect(result.dimensionScores).toBeInstanceOf(Map);
-    expect(result.dimensionScores.get("COMMUNICATION" as AssessmentDimension)).toBe(4);
-    expect(result.dimensionScores.get("LEADERSHIP" as AssessmentDimension)).toBeNull();
+    expect(
+      result.dimensionScores.get("COMMUNICATION" as AssessmentDimension)
+    ).toBe(4);
+    expect(
+      result.dimensionScores.get("LEADERSHIP" as AssessmentDimension)
+    ).toBeNull();
   });
 
   it("should filter invalid timestamps", async () => {
@@ -530,12 +562,17 @@ describe("evaluateVideo", () => {
     // Check that upsert was called with filtered timestamps
     const communicationCall = mockDimensionScoreUpsert.mock.calls.find(
       (call: unknown[]) =>
-        (call[0] as { where: { assessmentId_dimension: { dimension: string } } })
-          .where.assessmentId_dimension.dimension === "COMMUNICATION"
+        (
+          call[0] as {
+            where: { assessmentId_dimension: { dimension: string } };
+          }
+        ).where.assessmentId_dimension.dimension === "COMMUNICATION"
     );
 
     expect(communicationCall).toBeDefined();
-    const timestamps = (communicationCall![0] as { create: { timestamps: string[] } }).create.timestamps;
+    const timestamps = (
+      communicationCall![0] as { create: { timestamps: string[] } }
+    ).create.timestamps;
     expect(timestamps).toContain("01:23");
     expect(timestamps).toContain("05:45");
     expect(timestamps).toContain("1:23:45");
@@ -560,11 +597,15 @@ describe("evaluateVideo", () => {
     // Check STARTED event was logged first
     const startedCall = mockVideoAssessmentLogCreate.mock.calls.find(
       (call: unknown[]) =>
-        (call[0] as { data: { eventType: string } }).data.eventType === "STARTED"
+        (call[0] as { data: { eventType: string } }).data.eventType ===
+        "STARTED"
     );
 
     expect(startedCall).toBeDefined();
-    expect((startedCall![0] as { data: { metadata: { job_id: string } } }).data.metadata).toHaveProperty("job_id");
+    expect(
+      (startedCall![0] as { data: { metadata: { job_id: string } } }).data
+        .metadata
+    ).toHaveProperty("job_id");
   });
 
   it("should log PROMPT_SENT event with prompt_length", async () => {
@@ -579,11 +620,15 @@ describe("evaluateVideo", () => {
 
     const promptSentCall = mockVideoAssessmentLogCreate.mock.calls.find(
       (call: unknown[]) =>
-        (call[0] as { data: { eventType: string } }).data.eventType === "PROMPT_SENT"
+        (call[0] as { data: { eventType: string } }).data.eventType ===
+        "PROMPT_SENT"
     );
 
     expect(promptSentCall).toBeDefined();
-    expect((promptSentCall![0] as { data: { metadata: { prompt_length: number } } }).data.metadata).toHaveProperty("prompt_length");
+    expect(
+      (promptSentCall![0] as { data: { metadata: { prompt_length: number } } })
+        .data.metadata
+    ).toHaveProperty("prompt_length");
   });
 
   it("should log RESPONSE_RECEIVED event with response_length and status_code", async () => {
@@ -598,11 +643,16 @@ describe("evaluateVideo", () => {
 
     const responseReceivedCall = mockVideoAssessmentLogCreate.mock.calls.find(
       (call: unknown[]) =>
-        (call[0] as { data: { eventType: string } }).data.eventType === "RESPONSE_RECEIVED"
+        (call[0] as { data: { eventType: string } }).data.eventType ===
+        "RESPONSE_RECEIVED"
     );
 
     expect(responseReceivedCall).toBeDefined();
-    const metadata = (responseReceivedCall![0] as { data: { metadata: { response_length: number; status_code: number } } }).data.metadata;
+    const metadata = (
+      responseReceivedCall![0] as {
+        data: { metadata: { response_length: number; status_code: number } };
+      }
+    ).data.metadata;
     expect(metadata).toHaveProperty("response_length");
     expect(metadata).toHaveProperty("status_code");
     expect(metadata.status_code).toBe(200);
@@ -620,7 +670,8 @@ describe("evaluateVideo", () => {
 
     const parsingStartedCall = mockVideoAssessmentLogCreate.mock.calls.find(
       (call: unknown[]) =>
-        (call[0] as { data: { eventType: string } }).data.eventType === "PARSING_STARTED"
+        (call[0] as { data: { eventType: string } }).data.eventType ===
+        "PARSING_STARTED"
     );
 
     expect(parsingStartedCall).toBeDefined();
@@ -638,11 +689,16 @@ describe("evaluateVideo", () => {
 
     const parsingCompletedCall = mockVideoAssessmentLogCreate.mock.calls.find(
       (call: unknown[]) =>
-        (call[0] as { data: { eventType: string } }).data.eventType === "PARSING_COMPLETED"
+        (call[0] as { data: { eventType: string } }).data.eventType ===
+        "PARSING_COMPLETED"
     );
 
     expect(parsingCompletedCall).toBeDefined();
-    const metadata = (parsingCompletedCall![0] as { data: { metadata: { parsed_dimension_count: number } } }).data.metadata;
+    const metadata = (
+      parsingCompletedCall![0] as {
+        data: { metadata: { parsed_dimension_count: number } };
+      }
+    ).data.metadata;
     expect(metadata).toHaveProperty("parsed_dimension_count");
     // 7 dimensions have scores (LEADERSHIP is null)
     expect(metadata.parsed_dimension_count).toBe(7);
@@ -660,7 +716,8 @@ describe("evaluateVideo", () => {
 
     const completedCall = mockVideoAssessmentLogCreate.mock.calls.find(
       (call: unknown[]) =>
-        (call[0] as { data: { eventType: string } }).data.eventType === "COMPLETED"
+        (call[0] as { data: { eventType: string } }).data.eventType ===
+        "COMPLETED"
     );
 
     expect(completedCall).toBeDefined();
@@ -680,7 +737,11 @@ describe("evaluateVideo", () => {
     );
 
     expect(errorCall).toBeDefined();
-    const metadata = (errorCall![0] as { data: { metadata: { error_message: string; stack_trace: string } } }).data.metadata;
+    const metadata = (
+      errorCall![0] as {
+        data: { metadata: { error_message: string; stack_trace: string } };
+      }
+    ).data.metadata;
     expect(metadata).toHaveProperty("error_message");
     expect(metadata).toHaveProperty("stack_trace");
   });
@@ -696,7 +757,8 @@ describe("evaluateVideo", () => {
     });
 
     const eventTypes = mockVideoAssessmentLogCreate.mock.calls.map(
-      (call: unknown[]) => (call[0] as { data: { eventType: string } }).data.eventType
+      (call: unknown[]) =>
+        (call[0] as { data: { eventType: string } }).data.eventType
     );
 
     expect(eventTypes).toEqual([
@@ -753,16 +815,24 @@ describe("evaluateVideo", () => {
     // First event (STARTED) should have null durationMs
     const startedCall = mockVideoAssessmentLogCreate.mock.calls.find(
       (call: unknown[]) =>
-        (call[0] as { data: { eventType: string } }).data.eventType === "STARTED"
+        (call[0] as { data: { eventType: string } }).data.eventType ===
+        "STARTED"
     );
-    expect((startedCall![0] as { data: { durationMs: number | null } }).data.durationMs).toBeNull();
+    expect(
+      (startedCall![0] as { data: { durationMs: number | null } }).data
+        .durationMs
+    ).toBeNull();
 
     // Subsequent events should have durationMs calculated
     const promptSentCall = mockVideoAssessmentLogCreate.mock.calls.find(
       (call: unknown[]) =>
-        (call[0] as { data: { eventType: string } }).data.eventType === "PROMPT_SENT"
+        (call[0] as { data: { eventType: string } }).data.eventType ===
+        "PROMPT_SENT"
     );
-    expect((promptSentCall![0] as { data: { durationMs: number | null } }).data.durationMs).not.toBeNull();
+    expect(
+      (promptSentCall![0] as { data: { durationMs: number | null } }).data
+        .durationMs
+    ).not.toBeNull();
   });
 });
 
@@ -922,10 +992,16 @@ describe("triggerVideoAssessment", () => {
     mockVideoAssessmentUpdate.mockResolvedValue({ id: "video-assessment-123" });
     mockVideoAssessmentCreate.mockResolvedValue({ id: "video-assessment-123" });
     mockDimensionScoreUpsert.mockResolvedValue({ id: "test-score-id" });
-    mockVideoAssessmentSummaryUpsert.mockResolvedValue({ id: "test-summary-id" });
+    mockVideoAssessmentSummaryUpsert.mockResolvedValue({
+      id: "test-summary-id",
+    });
     mockVideoAssessmentLogCreate.mockResolvedValue({ id: "test-log-id" });
-    mockVideoAssessmentApiCallCreate.mockResolvedValue({ id: "test-api-call-id" });
-    mockVideoAssessmentApiCallUpdate.mockResolvedValue({ id: "test-api-call-id" });
+    mockVideoAssessmentApiCallCreate.mockResolvedValue({
+      id: "test-api-call-id",
+    });
+    mockVideoAssessmentApiCallUpdate.mockResolvedValue({
+      id: "test-api-call-id",
+    });
     mockGenerateContent.mockResolvedValue({
       text: JSON.stringify(mockEvaluationResponse),
     });
@@ -1078,10 +1154,16 @@ describe("retryVideoAssessment", () => {
     vi.clearAllMocks();
     mockVideoAssessmentUpdate.mockResolvedValue({ id: "video-assessment-123" });
     mockDimensionScoreUpsert.mockResolvedValue({ id: "test-score-id" });
-    mockVideoAssessmentSummaryUpsert.mockResolvedValue({ id: "test-summary-id" });
+    mockVideoAssessmentSummaryUpsert.mockResolvedValue({
+      id: "test-summary-id",
+    });
     mockVideoAssessmentLogCreate.mockResolvedValue({ id: "test-log-id" });
-    mockVideoAssessmentApiCallCreate.mockResolvedValue({ id: "test-api-call-id" });
-    mockVideoAssessmentApiCallUpdate.mockResolvedValue({ id: "test-api-call-id" });
+    mockVideoAssessmentApiCallCreate.mockResolvedValue({
+      id: "test-api-call-id",
+    });
+    mockVideoAssessmentApiCallUpdate.mockResolvedValue({
+      id: "test-api-call-id",
+    });
     mockGenerateContent.mockResolvedValue({
       text: JSON.stringify(mockEvaluationResponse),
     });
@@ -1147,7 +1229,9 @@ describe("retryVideoAssessment", () => {
     const result = await retryVideoAssessment("video-assessment-123");
 
     expect(result.success).toBe(false);
-    expect(result.error).toContain("Cannot retry assessment with status COMPLETED");
+    expect(result.error).toContain(
+      "Cannot retry assessment with status COMPLETED"
+    );
     expect(result.error).toContain("Only FAILED assessments can be retried");
   });
 
@@ -1179,10 +1263,16 @@ describe("forceRetryVideoAssessment", () => {
     vi.clearAllMocks();
     mockVideoAssessmentUpdate.mockResolvedValue({ id: "video-assessment-123" });
     mockDimensionScoreUpsert.mockResolvedValue({ id: "test-score-id" });
-    mockVideoAssessmentSummaryUpsert.mockResolvedValue({ id: "test-summary-id" });
+    mockVideoAssessmentSummaryUpsert.mockResolvedValue({
+      id: "test-summary-id",
+    });
     mockVideoAssessmentLogCreate.mockResolvedValue({ id: "test-log-id" });
-    mockVideoAssessmentApiCallCreate.mockResolvedValue({ id: "test-api-call-id" });
-    mockVideoAssessmentApiCallUpdate.mockResolvedValue({ id: "test-api-call-id" });
+    mockVideoAssessmentApiCallCreate.mockResolvedValue({
+      id: "test-api-call-id",
+    });
+    mockVideoAssessmentApiCallUpdate.mockResolvedValue({
+      id: "test-api-call-id",
+    });
     mockGenerateContent.mockResolvedValue({
       text: JSON.stringify(mockEvaluationResponse),
     });

@@ -42,7 +42,9 @@ describe("/api/user/delete", () => {
     it("returns 401 if not authenticated", async () => {
       mockAuth.mockResolvedValueOnce(null);
 
-      const response = await POST(createRequest({ confirm: "DELETE MY ACCOUNT" }));
+      const response = await POST(
+        createRequest({ confirm: "DELETE MY ACCOUNT" })
+      );
       const data = await response.json();
 
       expect(response.status).toBe(401);
@@ -73,7 +75,9 @@ describe("/api/user/delete", () => {
       mockAuth.mockResolvedValueOnce({ user: { id: "user-123" } });
       mockFindUnique.mockResolvedValueOnce(null);
 
-      const response = await POST(createRequest({ confirm: "DELETE MY ACCOUNT" }));
+      const response = await POST(
+        createRequest({ confirm: "DELETE MY ACCOUNT" })
+      );
       const data = await response.json();
 
       expect(response.status).toBe(404);
@@ -87,7 +91,9 @@ describe("/api/user/delete", () => {
         deletedAt: new Date(),
       });
 
-      const response = await POST(createRequest({ confirm: "DELETE MY ACCOUNT" }));
+      const response = await POST(
+        createRequest({ confirm: "DELETE MY ACCOUNT" })
+      );
       const data = await response.json();
 
       expect(response.status).toBe(400);
@@ -113,7 +119,9 @@ describe("/api/user/delete", () => {
         errors: [],
       });
 
-      const response = await POST(createRequest({ confirm: "DELETE MY ACCOUNT" }));
+      const response = await POST(
+        createRequest({ confirm: "DELETE MY ACCOUNT" })
+      );
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -142,7 +150,9 @@ describe("/api/user/delete", () => {
         errors: ["Database error"],
       });
 
-      const response = await POST(createRequest({ confirm: "DELETE MY ACCOUNT" }));
+      const response = await POST(
+        createRequest({ confirm: "DELETE MY ACCOUNT" })
+      );
       const data = await response.json();
 
       expect(response.status).toBe(500);
@@ -152,9 +162,13 @@ describe("/api/user/delete", () => {
 
     it("handles exceptions gracefully", async () => {
       mockAuth.mockResolvedValueOnce({ user: { id: "user-123" } });
-      mockFindUnique.mockRejectedValueOnce(new Error("Database connection error"));
+      mockFindUnique.mockRejectedValueOnce(
+        new Error("Database connection error")
+      );
 
-      const response = await POST(createRequest({ confirm: "DELETE MY ACCOUNT" }));
+      const response = await POST(
+        createRequest({ confirm: "DELETE MY ACCOUNT" })
+      );
       const data = await response.json();
 
       expect(response.status).toBe(500);

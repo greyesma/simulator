@@ -131,7 +131,6 @@ export async function POST(request: Request) {
       .join("\n\n");
 
     // Analyze the transcript using Gemini
-    const model = gemini.models.generateContent;
     const result = await gemini.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: [
@@ -173,7 +172,9 @@ export async function POST(request: Request) {
     if (interviewStartedAt && interviewEndedAt) {
       const start = new Date(interviewStartedAt);
       const end = new Date(interviewEndedAt);
-      interviewDurationSeconds = Math.round((end.getTime() - start.getTime()) / 1000);
+      interviewDurationSeconds = Math.round(
+        (end.getTime() - start.getTime()) / 1000
+      );
     }
 
     // Create or update HR assessment record
@@ -192,8 +193,12 @@ export async function POST(request: Request) {
         analyzedAt: new Date().toISOString(),
         transcriptLength: transcript.length,
       } as Prisma.InputJsonValue,
-      interviewStartedAt: interviewStartedAt ? new Date(interviewStartedAt) : undefined,
-      interviewEndedAt: interviewEndedAt ? new Date(interviewEndedAt) : undefined,
+      interviewStartedAt: interviewStartedAt
+        ? new Date(interviewStartedAt)
+        : undefined,
+      interviewEndedAt: interviewEndedAt
+        ? new Date(interviewEndedAt)
+        : undefined,
       interviewDurationSeconds,
     };
 

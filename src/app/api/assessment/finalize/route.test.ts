@@ -25,8 +25,7 @@ const mockFetchPrCiStatus = vi.fn();
 vi.mock("@/lib/github", () => ({
   cleanupPrAfterAssessment: (...args: unknown[]) =>
     mockCleanupPrAfterAssessment(...args),
-  fetchPrCiStatus: (...args: unknown[]) =>
-    mockFetchPrCiStatus(...args),
+  fetchPrCiStatus: (...args: unknown[]) => mockFetchPrCiStatus(...args),
 }));
 
 // Mock code review module
@@ -36,13 +35,15 @@ const mockCodeReviewToPrismaJson = vi.fn();
 vi.mock("@/lib/code-review", () => ({
   analyzeCodeReview: (...args: unknown[]) => mockAnalyzeCodeReview(...args),
   buildCodeReviewData: (...args: unknown[]) => mockBuildCodeReviewData(...args),
-  codeReviewToPrismaJson: (...args: unknown[]) => mockCodeReviewToPrismaJson(...args),
+  codeReviewToPrismaJson: (...args: unknown[]) =>
+    mockCodeReviewToPrismaJson(...args),
 }));
 
 // Mock video-evaluation module
 const mockTriggerVideoAssessment = vi.fn();
 vi.mock("@/lib/video-evaluation", () => ({
-  triggerVideoAssessment: (...args: unknown[]) => mockTriggerVideoAssessment(...args),
+  triggerVideoAssessment: (...args: unknown[]) =>
+    mockTriggerVideoAssessment(...args),
 }));
 
 import { POST } from "./route";

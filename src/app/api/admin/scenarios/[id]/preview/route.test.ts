@@ -35,9 +35,12 @@ describe("POST /api/admin/scenarios/[id]/preview", () => {
   it("returns 401 if not authenticated", async () => {
     mockAuth.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/preview", {
-      method: "POST",
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/preview",
+      {
+        method: "POST",
+      }
+    );
     const response = await POST(request, createContext("scenario-1"));
     const data = await response.json();
 
@@ -50,9 +53,12 @@ describe("POST /api/admin/scenarios/[id]/preview", () => {
       user: { id: "user-123", email: "user@test.com", role: "USER" },
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/preview", {
-      method: "POST",
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/preview",
+      {
+        method: "POST",
+      }
+    );
     const response = await POST(request, createContext("scenario-1"));
     const data = await response.json();
 
@@ -66,9 +72,12 @@ describe("POST /api/admin/scenarios/[id]/preview", () => {
     });
     mockScenarioFindUnique.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/non-existent/preview", {
-      method: "POST",
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/non-existent/preview",
+      {
+        method: "POST",
+      }
+    );
     const response = await POST(request, createContext("non-existent"));
     const data = await response.json();
 
@@ -107,9 +116,12 @@ describe("POST /api/admin/scenarios/[id]/preview", () => {
       status: "HR_INTERVIEW",
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/preview", {
-      method: "POST",
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/preview",
+      {
+        method: "POST",
+      }
+    );
     const response = await POST(request, createContext("scenario-1"));
     const data = await response.json();
 
@@ -146,9 +158,12 @@ describe("POST /api/admin/scenarios/[id]/preview", () => {
       status: "HR_INTERVIEW",
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/preview", {
-      method: "POST",
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/preview",
+      {
+        method: "POST",
+      }
+    );
     const response = await POST(request, createContext("scenario-1"));
     const data = await response.json();
 
@@ -176,11 +191,14 @@ describe("POST /api/admin/scenarios/[id]/preview", () => {
       status: "WORKING",
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/preview", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ skipTo: "coworkers" }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/preview",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ skipTo: "coworkers" }),
+      }
+    );
     const response = await POST(request, createContext("scenario-1"));
     const data = await response.json();
 

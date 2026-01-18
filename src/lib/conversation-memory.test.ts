@@ -2,7 +2,7 @@
  * Tests for Conversation Memory System
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   buildCoworkerMemory,
   formatMemoryForPrompt,
@@ -63,7 +63,9 @@ describe("conversation-memory", () => {
         createMessage("model", "I'm doing well, thanks!"),
       ];
 
-      const conversations = [createConversation("text", "coworker-1", messages)];
+      const conversations = [
+        createConversation("text", "coworker-1", messages),
+      ];
       const memory = await buildCoworkerMemory(conversations, "Alex Chen");
 
       expect(memory.hasPriorConversations).toBe(true);
@@ -80,7 +82,9 @@ describe("conversation-memory", () => {
         messages.push(createMessage("model", `Answer ${i}`));
       }
 
-      const conversations = [createConversation("text", "coworker-1", messages)];
+      const conversations = [
+        createConversation("text", "coworker-1", messages),
+      ];
       const memory = await buildCoworkerMemory(conversations, "Alex Chen");
 
       expect(memory.hasPriorConversations).toBe(true);
@@ -182,7 +186,9 @@ describe("conversation-memory", () => {
       const result = formatMemoryForPrompt(memory, "Alex Chen");
 
       expect(result).toContain("Continue the conversation naturally");
-      expect(result).toContain("Don't repeat information you've already shared");
+      expect(result).toContain(
+        "Don't repeat information you've already shared"
+      );
     });
   });
 
@@ -279,9 +285,7 @@ describe("conversation-memory", () => {
 
     it("should handle conversations with empty messages", () => {
       const currentCoworkerId = "coworker-1";
-      const conversations = [
-        createConversation("text", "coworker-2", []),
-      ];
+      const conversations = [createConversation("text", "coworker-2", [])];
       const coworkerMap = new Map([["coworker-2", "Jordan Rivera"]]);
 
       const result = buildCrossCoworkerContext(

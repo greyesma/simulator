@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -22,8 +22,8 @@
   --input: #000000;
   --ring: #f7da50;
 
-  --font-dm-sans: 'DM Sans', system-ui, sans-serif;
-  --font-space-mono: 'Space Mono', monospace;
+  --font-dm-sans: "DM Sans", system-ui, sans-serif;
+  --font-space-mono: "Space Mono", monospace;
 }
 
 .dark {
@@ -56,17 +56,21 @@ body {
 }
 
 /* Neo-brutalist: no smooth transitions on colors */
-button, a {
+button,
+a {
   transition: none;
 }
 
 /* Instant hover state flip */
-button:hover, a:hover {
+button:hover,
+a:hover {
   transition: none;
 }
 
 /* Code and technical text */
-code, pre, .font-mono {
+code,
+pre,
+.font-mono {
   font-family: var(--font-space-mono);
 }
 

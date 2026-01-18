@@ -26,7 +26,10 @@ export async function GET(request: Request, context: RouteContext) {
 
   const user = session.user as SessionUser;
   if (user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Admin access required" },
+      { status: 403 }
+    );
   }
 
   const { id: scenarioId, coworkerId } = await context.params;
@@ -40,7 +43,10 @@ export async function GET(request: Request, context: RouteContext) {
   }
 
   if (coworker.scenarioId !== scenarioId) {
-    return NextResponse.json({ error: "Coworker not found in this scenario" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Coworker not found in this scenario" },
+      { status: 404 }
+    );
   }
 
   return NextResponse.json({ coworker });
@@ -59,7 +65,10 @@ export async function PUT(request: Request, context: RouteContext) {
 
   const user = session.user as SessionUser;
   if (user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Admin access required" },
+      { status: 403 }
+    );
   }
 
   const { id: scenarioId, coworkerId } = await context.params;
@@ -74,7 +83,10 @@ export async function PUT(request: Request, context: RouteContext) {
   }
 
   if (existing.scenarioId !== scenarioId) {
-    return NextResponse.json({ error: "Coworker not found in this scenario" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Coworker not found in this scenario" },
+      { status: 404 }
+    );
   }
 
   const body = await request.json();
@@ -109,7 +121,10 @@ export async function DELETE(request: Request, context: RouteContext) {
 
   const user = session.user as SessionUser;
   if (user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Admin access required" },
+      { status: 403 }
+    );
   }
 
   const { id: scenarioId, coworkerId } = await context.params;
@@ -124,7 +139,10 @@ export async function DELETE(request: Request, context: RouteContext) {
   }
 
   if (existing.scenarioId !== scenarioId) {
-    return NextResponse.json({ error: "Coworker not found in this scenario" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Coworker not found in this scenario" },
+      { status: 404 }
+    );
   }
 
   await db.coworker.delete({

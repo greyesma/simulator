@@ -35,7 +35,9 @@ describe("GET /api/admin/scenarios/[id]", () => {
   it("returns 401 if not authenticated", async () => {
     mockAuth.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1");
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1"
+    );
     const response = await GET(request, createContext("scenario-1"));
     const data = await response.json();
 
@@ -48,7 +50,9 @@ describe("GET /api/admin/scenarios/[id]", () => {
       user: { id: "user-123", email: "user@test.com", role: "USER" },
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1");
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1"
+    );
     const response = await GET(request, createContext("scenario-1"));
     const data = await response.json();
 
@@ -62,7 +66,9 @@ describe("GET /api/admin/scenarios/[id]", () => {
     });
     mockFindUnique.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/non-existent");
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/non-existent"
+    );
     const response = await GET(request, createContext("non-existent"));
     const data = await response.json();
 
@@ -97,7 +103,9 @@ describe("GET /api/admin/scenarios/[id]", () => {
 
     mockFindUnique.mockResolvedValue(mockScenario);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1");
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1"
+    );
     const response = await GET(request, createContext("scenario-1"));
     const data = await response.json();
 
@@ -119,11 +127,14 @@ describe("PUT /api/admin/scenarios/[id]", () => {
   it("returns 401 if not authenticated", async () => {
     mockAuth.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "Updated Name" }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Updated Name" }),
+      }
+    );
 
     const response = await PUT(request, createContext("scenario-1"));
     const data = await response.json();
@@ -137,11 +148,14 @@ describe("PUT /api/admin/scenarios/[id]", () => {
       user: { id: "user-123", email: "user@test.com", role: "USER" },
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "Updated Name" }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Updated Name" }),
+      }
+    );
 
     const response = await PUT(request, createContext("scenario-1"));
     const data = await response.json();
@@ -156,11 +170,14 @@ describe("PUT /api/admin/scenarios/[id]", () => {
     });
     mockFindUnique.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/non-existent", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "Updated Name" }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/non-existent",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Updated Name" }),
+      }
+    );
 
     const response = await PUT(request, createContext("non-existent"));
     const data = await response.json();
@@ -186,15 +203,18 @@ describe("PUT /api/admin/scenarios/[id]", () => {
       isPublished: true,
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: "Updated Scenario",
-        techStack: ["typescript", "react"],
-        isPublished: true,
-      }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Updated Scenario",
+          techStack: ["typescript", "react"],
+          isPublished: true,
+        }),
+      }
+    );
 
     const response = await PUT(request, createContext("scenario-1"));
     const data = await response.json();
@@ -215,13 +235,16 @@ describe("PUT /api/admin/scenarios/[id]", () => {
       name: "Updated Name Only",
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: "Updated Name Only",
-      }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Updated Name Only",
+        }),
+      }
+    );
 
     await PUT(request, createContext("scenario-1"));
 
@@ -237,13 +260,16 @@ describe("PUT /api/admin/scenarios/[id]", () => {
     });
     mockFindUnique.mockResolvedValue({ id: "scenario-1" });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        techStack: "not-an-array",
-      }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          techStack: "not-an-array",
+        }),
+      }
+    );
 
     const response = await PUT(request, createContext("scenario-1"));
     const data = await response.json();
@@ -261,9 +287,12 @@ describe("DELETE /api/admin/scenarios/[id]", () => {
   it("returns 401 if not authenticated", async () => {
     mockAuth.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1", {
-      method: "DELETE",
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1",
+      {
+        method: "DELETE",
+      }
+    );
 
     const response = await DELETE(request, createContext("scenario-1"));
     const data = await response.json();
@@ -277,9 +306,12 @@ describe("DELETE /api/admin/scenarios/[id]", () => {
       user: { id: "user-123", email: "user@test.com", role: "USER" },
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1", {
-      method: "DELETE",
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1",
+      {
+        method: "DELETE",
+      }
+    );
 
     const response = await DELETE(request, createContext("scenario-1"));
     const data = await response.json();
@@ -294,9 +326,12 @@ describe("DELETE /api/admin/scenarios/[id]", () => {
     });
     mockFindUnique.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/non-existent", {
-      method: "DELETE",
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/non-existent",
+      {
+        method: "DELETE",
+      }
+    );
 
     const response = await DELETE(request, createContext("non-existent"));
     const data = await response.json();
@@ -310,12 +345,18 @@ describe("DELETE /api/admin/scenarios/[id]", () => {
       user: { id: "admin-123", email: "admin@test.com", role: "ADMIN" },
     });
 
-    mockFindUnique.mockResolvedValue({ id: "scenario-1", name: "Test Scenario" });
+    mockFindUnique.mockResolvedValue({
+      id: "scenario-1",
+      name: "Test Scenario",
+    });
     mockDelete.mockResolvedValue({ id: "scenario-1" });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1", {
-      method: "DELETE",
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1",
+      {
+        method: "DELETE",
+      }
+    );
 
     const response = await DELETE(request, createContext("scenario-1"));
     const data = await response.json();

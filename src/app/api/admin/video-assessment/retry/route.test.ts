@@ -21,8 +21,10 @@ vi.mock("@/server/db", () => ({
 const mockRetryVideoAssessment = vi.fn();
 const mockForceRetryVideoAssessment = vi.fn();
 vi.mock("@/lib/video-evaluation", () => ({
-  retryVideoAssessment: (...args: unknown[]) => mockRetryVideoAssessment(...args),
-  forceRetryVideoAssessment: (...args: unknown[]) => mockForceRetryVideoAssessment(...args),
+  retryVideoAssessment: (...args: unknown[]) =>
+    mockRetryVideoAssessment(...args),
+  forceRetryVideoAssessment: (...args: unknown[]) =>
+    mockForceRetryVideoAssessment(...args),
 }));
 
 import { POST, GET } from "./route";
@@ -76,7 +78,9 @@ describe("POST /api/admin/video-assessment/retry", () => {
     const data = await response.json();
     expect(data.success).toBe(true);
     expect(data.videoAssessmentId).toBe("video-123");
-    expect(data.message).toBe("Video assessment force-retry initiated (retry count reset)");
+    expect(data.message).toBe(
+      "Video assessment force-retry initiated (retry count reset)"
+    );
 
     // Should call forceRetryVideoAssessment instead of retryVideoAssessment
     expect(mockForceRetryVideoAssessment).toHaveBeenCalledWith("video-123");

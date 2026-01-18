@@ -5,7 +5,10 @@
  * Designed to feel like real Slack conversations and phone calls.
  */
 
-import type { CoworkerKnowledge, CoworkerPersona } from "@/lib/coworker-persona";
+import type {
+  CoworkerKnowledge,
+  CoworkerPersona,
+} from "@/lib/coworker-persona";
 
 export interface CoworkerContext {
   companyName: string;
@@ -84,7 +87,9 @@ function buildKnowledgeSection(knowledge: CoworkerKnowledge[]): string {
   }
 
   const sections = knowledge.map((k) => {
-    const criticalNote = k.isCritical ? " ⚠️ Important info they should discover" : "";
+    const criticalNote = k.isCritical
+      ? " ⚠️ Important info they should discover"
+      : "";
     return `**${k.topic}**${criticalNote}
 When they ask about: ${k.triggerKeywords.join(", ")}
 What you know: ${k.response}`;

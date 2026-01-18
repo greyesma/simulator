@@ -41,7 +41,8 @@ export async function GET(request: Request) {
   if (!periodResult.success) {
     return NextResponse.json(
       {
-        error: "Invalid period. Must be one of: today, yesterday, last7days, last30days, last90days, all",
+        error:
+          "Invalid period. Must be one of: today, yesterday, last7days, last30days, last90days, all",
       },
       { status: 400 }
     );

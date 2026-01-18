@@ -42,7 +42,9 @@ import {
 } from "./candidate-search";
 
 // Cast mocks for type-safe access
-const mockGenerateQueryEmbedding = generateQueryEmbedding as ReturnType<typeof vi.fn>;
+const mockGenerateQueryEmbedding = generateQueryEmbedding as ReturnType<
+  typeof vi.fn
+>;
 const mockBuildQueryText = buildQueryText as ReturnType<typeof vi.fn>;
 const mockQueryRaw = db.$queryRaw as unknown as ReturnType<typeof vi.fn>;
 const mockExecuteRaw = db.$executeRaw as unknown as ReturnType<typeof vi.fn>;
@@ -167,9 +169,21 @@ describe("searchCandidates", () => {
         status: VideoAssessmentStatus.COMPLETED,
         candidate: { id: "user-1", name: "Alice", email: "alice@test.com" },
         scores: [
-          { dimension: AssessmentDimension.COMMUNICATION, score: 4, observableBehaviors: "Good" },
-          { dimension: AssessmentDimension.CREATIVITY, score: 5, observableBehaviors: "Excellent" },
-          { dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE, score: 4, observableBehaviors: "Strong" },
+          {
+            dimension: AssessmentDimension.COMMUNICATION,
+            score: 4,
+            observableBehaviors: "Good",
+          },
+          {
+            dimension: AssessmentDimension.CREATIVITY,
+            score: 5,
+            observableBehaviors: "Excellent",
+          },
+          {
+            dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE,
+            score: 4,
+            observableBehaviors: "Strong",
+          },
         ],
         summary: { overallSummary: "Strong frontend candidate" },
       },
@@ -178,9 +192,21 @@ describe("searchCandidates", () => {
         status: VideoAssessmentStatus.COMPLETED,
         candidate: { id: "user-2", name: "Bob", email: "bob@test.com" },
         scores: [
-          { dimension: AssessmentDimension.COMMUNICATION, score: 3, observableBehaviors: "Average" },
-          { dimension: AssessmentDimension.CREATIVITY, score: 4, observableBehaviors: "Good" },
-          { dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE, score: 3, observableBehaviors: "Moderate" },
+          {
+            dimension: AssessmentDimension.COMMUNICATION,
+            score: 3,
+            observableBehaviors: "Average",
+          },
+          {
+            dimension: AssessmentDimension.CREATIVITY,
+            score: 4,
+            observableBehaviors: "Good",
+          },
+          {
+            dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE,
+            score: 3,
+            observableBehaviors: "Moderate",
+          },
         ],
         summary: { overallSummary: "Adequate frontend candidate" },
       },
@@ -223,24 +249,56 @@ describe("searchCandidates", () => {
       {
         id: "va-1",
         status: VideoAssessmentStatus.COMPLETED,
-        candidate: { id: "user-1", name: "Senior Dev", email: "senior@test.com" },
+        candidate: {
+          id: "user-1",
+          name: "Senior Dev",
+          email: "senior@test.com",
+        },
         scores: [
           // High scores in key dimensions for SENIOR_BACKEND_ENGINEER (TECHNICAL, PROBLEM_SOLVING, TIME_MGMT)
-          { dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE, score: 5, observableBehaviors: "Expert" },
-          { dimension: AssessmentDimension.PROBLEM_SOLVING, score: 4, observableBehaviors: "Strong" },
-          { dimension: AssessmentDimension.TIME_MANAGEMENT, score: 4, observableBehaviors: "Good" },
+          {
+            dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE,
+            score: 5,
+            observableBehaviors: "Expert",
+          },
+          {
+            dimension: AssessmentDimension.PROBLEM_SOLVING,
+            score: 4,
+            observableBehaviors: "Strong",
+          },
+          {
+            dimension: AssessmentDimension.TIME_MANAGEMENT,
+            score: 4,
+            observableBehaviors: "Good",
+          },
         ],
         summary: { overallSummary: "Senior level engineer" },
       },
       {
         id: "va-2",
         status: VideoAssessmentStatus.COMPLETED,
-        candidate: { id: "user-2", name: "Junior Dev", email: "junior@test.com" },
+        candidate: {
+          id: "user-2",
+          name: "Junior Dev",
+          email: "junior@test.com",
+        },
         scores: [
           // Low scores - won't meet senior threshold
-          { dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE, score: 2, observableBehaviors: "Basic" },
-          { dimension: AssessmentDimension.PROBLEM_SOLVING, score: 2, observableBehaviors: "Needs work" },
-          { dimension: AssessmentDimension.TIME_MANAGEMENT, score: 2, observableBehaviors: "Developing" },
+          {
+            dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE,
+            score: 2,
+            observableBehaviors: "Basic",
+          },
+          {
+            dimension: AssessmentDimension.PROBLEM_SOLVING,
+            score: 2,
+            observableBehaviors: "Needs work",
+          },
+          {
+            dimension: AssessmentDimension.TIME_MANAGEMENT,
+            score: 2,
+            observableBehaviors: "Developing",
+          },
         ],
         summary: { overallSummary: "Junior level engineer" },
       },
@@ -277,9 +335,17 @@ describe("searchCandidates", () => {
       ["va-1", "va-2", "va-3"].map((id, index) => ({
         id,
         status: VideoAssessmentStatus.COMPLETED,
-        candidate: { id: `user-${index + 1}`, name: `User ${index + 1}`, email: `user${index + 1}@test.com` },
+        candidate: {
+          id: `user-${index + 1}`,
+          name: `User ${index + 1}`,
+          email: `user${index + 1}@test.com`,
+        },
         scores: [
-          { dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE, score: 4, observableBehaviors: "Good" },
+          {
+            dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE,
+            score: 4,
+            observableBehaviors: "Good",
+          },
         ],
         summary: { overallSummary: `Candidate ${index + 1}` },
       }))
@@ -398,7 +464,9 @@ describe("Search Flow Integration", () => {
   it("should handle complete search flow with archetype and seniority", async () => {
     const mockEmbedding = Array(768).fill(0.1);
     mockGenerateQueryEmbedding.mockResolvedValue(mockEmbedding);
-    mockBuildQueryText.mockReturnValue("Frontend developer with React experience");
+    mockBuildQueryText.mockReturnValue(
+      "Frontend developer with React experience"
+    );
 
     mockQueryRaw.mockResolvedValue([
       { video_assessment_id: "va-1", similarity: 0.82 },
@@ -414,17 +482,50 @@ describe("Search Flow Integration", () => {
           email: "jane@company.com",
         },
         scores: [
-          { dimension: AssessmentDimension.COMMUNICATION, score: 4, observableBehaviors: "Articulate speaker" },
-          { dimension: AssessmentDimension.CREATIVITY, score: 5, observableBehaviors: "Innovative solutions" },
-          { dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE, score: 5, observableBehaviors: "Deep React expertise" },
-          { dimension: AssessmentDimension.PROBLEM_SOLVING, score: 4, observableBehaviors: "Systematic approach" },
-          { dimension: AssessmentDimension.COLLABORATION, score: 4, observableBehaviors: "Team player" },
-          { dimension: AssessmentDimension.TIME_MANAGEMENT, score: 3, observableBehaviors: "Generally punctual" },
-          { dimension: AssessmentDimension.ADAPTABILITY, score: 4, observableBehaviors: "Flexible" },
-          { dimension: AssessmentDimension.LEADERSHIP, score: 3, observableBehaviors: "Emerging leader" },
+          {
+            dimension: AssessmentDimension.COMMUNICATION,
+            score: 4,
+            observableBehaviors: "Articulate speaker",
+          },
+          {
+            dimension: AssessmentDimension.CREATIVITY,
+            score: 5,
+            observableBehaviors: "Innovative solutions",
+          },
+          {
+            dimension: AssessmentDimension.TECHNICAL_KNOWLEDGE,
+            score: 5,
+            observableBehaviors: "Deep React expertise",
+          },
+          {
+            dimension: AssessmentDimension.PROBLEM_SOLVING,
+            score: 4,
+            observableBehaviors: "Systematic approach",
+          },
+          {
+            dimension: AssessmentDimension.COLLABORATION,
+            score: 4,
+            observableBehaviors: "Team player",
+          },
+          {
+            dimension: AssessmentDimension.TIME_MANAGEMENT,
+            score: 3,
+            observableBehaviors: "Generally punctual",
+          },
+          {
+            dimension: AssessmentDimension.ADAPTABILITY,
+            score: 4,
+            observableBehaviors: "Flexible",
+          },
+          {
+            dimension: AssessmentDimension.LEADERSHIP,
+            score: 3,
+            observableBehaviors: "Emerging leader",
+          },
         ],
         summary: {
-          overallSummary: "Strong frontend developer with excellent React skills and creative problem-solving abilities.",
+          overallSummary:
+            "Strong frontend developer with excellent React skills and creative problem-solving abilities.",
         },
       },
     ]);

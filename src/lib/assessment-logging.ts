@@ -65,7 +65,8 @@ export interface ApiCallTracker {
 export async function logVideoAssessmentEvent(
   options: LogEventOptions
 ): Promise<Date> {
-  const { videoAssessmentId, eventType, metadata, previousEventTimestamp } = options;
+  const { videoAssessmentId, eventType, metadata, previousEventTimestamp } =
+    options;
 
   const now = new Date();
   let durationMs: number | null = null;
@@ -119,7 +120,8 @@ export async function logVideoAssessmentApiCall(
     requestTimestamp,
     updateWithResponse: async (result: ApiCallResult) => {
       const responseTimestamp = new Date();
-      const durationMs = responseTimestamp.getTime() - requestTimestamp.getTime();
+      const durationMs =
+        responseTimestamp.getTime() - requestTimestamp.getTime();
 
       await db.videoAssessmentApiCall.update({
         where: { id: apiCall.id },
@@ -178,8 +180,12 @@ export function createVideoAssessmentLogger(
      * Starts tracking an API call.
      * Returns a tracker that should be completed or failed when the call finishes.
      */
-    startApiCall: (promptText: string, modelVersion: string): ApiCallTracker => {
-      let apiCallPromise: ReturnType<typeof logVideoAssessmentApiCall> | null = null;
+    startApiCall: (
+      promptText: string,
+      modelVersion: string
+    ): ApiCallTracker => {
+      let apiCallPromise: ReturnType<typeof logVideoAssessmentApiCall> | null =
+        null;
 
       // Start the API call logging (don't await here)
       const initPromise = logVideoAssessmentApiCall({

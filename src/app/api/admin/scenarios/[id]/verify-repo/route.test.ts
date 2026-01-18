@@ -48,7 +48,9 @@ describe("GET /api/admin/scenarios/[id]/verify-repo", () => {
   it("returns 401 if not authenticated", async () => {
     mockAuth.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/verify-repo");
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/verify-repo"
+    );
     const response = await GET(request, createContext("scenario-1"));
     const data = await response.json();
 
@@ -61,7 +63,9 @@ describe("GET /api/admin/scenarios/[id]/verify-repo", () => {
       user: { id: "user-123", email: "user@test.com", role: "USER" },
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/verify-repo");
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/verify-repo"
+    );
     const response = await GET(request, createContext("scenario-1"));
     const data = await response.json();
 
@@ -75,7 +79,9 @@ describe("GET /api/admin/scenarios/[id]/verify-repo", () => {
     });
     mockScenarioFindUnique.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/non-existent/verify-repo");
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/non-existent/verify-repo"
+    );
     const response = await GET(request, createContext("non-existent"));
     const data = await response.json();
 
@@ -105,7 +111,9 @@ describe("GET /api/admin/scenarios/[id]/verify-repo", () => {
       }),
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/verify-repo");
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/verify-repo"
+    );
     const response = await GET(request, createContext("scenario-1"));
     const data = await response.json();
 
@@ -133,7 +141,9 @@ describe("GET /api/admin/scenarios/[id]/verify-repo", () => {
       statusText: "Not Found",
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/verify-repo");
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/verify-repo"
+    );
     const response = await GET(request, createContext("scenario-1"));
     const data = await response.json();
 
@@ -153,7 +163,9 @@ describe("GET /api/admin/scenarios/[id]/verify-repo", () => {
       repoUrl: "https://gitlab.com/owner/repo",
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/verify-repo");
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/verify-repo"
+    );
     const response = await GET(request, createContext("scenario-1"));
     const data = await response.json();
 
@@ -191,7 +203,9 @@ describe("GET /api/admin/scenarios/[id]/verify-repo", () => {
         }),
       });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/verify-repo");
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/verify-repo"
+    );
     const response = await GET(request, createContext("scenario-1"));
     const data = await response.json();
 

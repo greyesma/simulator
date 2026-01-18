@@ -20,15 +20,17 @@ export async function GET() {
   try {
     const hasApiKey = !!env.GEMINI_API_KEY && env.GEMINI_API_KEY.length > 0;
     diagnostics.tests = {
-      ...diagnostics.tests as object,
+      ...(diagnostics.tests as object),
       apiKeyConfigured: {
         passed: hasApiKey,
-        message: hasApiKey ? "API key is configured" : "GEMINI_API_KEY is missing",
+        message: hasApiKey
+          ? "API key is configured"
+          : "GEMINI_API_KEY is missing",
       },
     };
   } catch (error) {
     diagnostics.tests = {
-      ...diagnostics.tests as object,
+      ...(diagnostics.tests as object),
       apiKeyConfigured: {
         passed: false,
         message: `Error checking API key: ${error}`,
@@ -44,7 +46,7 @@ export async function GET() {
     });
 
     diagnostics.tests = {
-      ...diagnostics.tests as object,
+      ...(diagnostics.tests as object),
       clientInitialized: {
         passed: true,
         message: "GoogleGenAI client initialized successfully",
@@ -66,19 +68,22 @@ export async function GET() {
       });
 
       diagnostics.tests = {
-        ...diagnostics.tests as object,
+        ...(diagnostics.tests as object),
         tokenGeneration: {
           passed: !!response.name,
           message: response.name
             ? `Token generated successfully: ${response.name.substring(0, 20)}...`
             : "Token generation returned empty name",
-          tokenName: response.name ? `${response.name.substring(0, 30)}...` : null,
+          tokenName: response.name
+            ? `${response.name.substring(0, 30)}...`
+            : null,
         },
       };
     } catch (tokenError) {
-      const errorMessage = tokenError instanceof Error ? tokenError.message : String(tokenError);
+      const errorMessage =
+        tokenError instanceof Error ? tokenError.message : String(tokenError);
       diagnostics.tests = {
-        ...diagnostics.tests as object,
+        ...(diagnostics.tests as object),
         tokenGeneration: {
           passed: false,
           message: `Token generation failed: ${errorMessage}`,
@@ -87,9 +92,10 @@ export async function GET() {
       };
     }
   } catch (clientError) {
-    const errorMessage = clientError instanceof Error ? clientError.message : String(clientError);
+    const errorMessage =
+      clientError instanceof Error ? clientError.message : String(clientError);
     diagnostics.tests = {
-      ...diagnostics.tests as object,
+      ...(diagnostics.tests as object),
       clientInitialized: {
         passed: false,
         message: `Client initialization failed: ${errorMessage}`,
@@ -114,7 +120,7 @@ export async function GET() {
     }
 
     diagnostics.tests = {
-      ...diagnostics.tests as object,
+      ...(diagnostics.tests as object),
       availableModels: {
         passed: true,
         message: `Found ${liveModels.length} potentially compatible models`,
@@ -122,9 +128,10 @@ export async function GET() {
       },
     };
   } catch (modelError) {
-    const errorMessage = modelError instanceof Error ? modelError.message : String(modelError);
+    const errorMessage =
+      modelError instanceof Error ? modelError.message : String(modelError);
     diagnostics.tests = {
-      ...diagnostics.tests as object,
+      ...(diagnostics.tests as object),
       availableModels: {
         passed: false,
         message: `Could not list models: ${errorMessage}`,

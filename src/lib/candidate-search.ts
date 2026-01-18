@@ -148,7 +148,11 @@ export async function searchCandidates(
   } = criteria;
 
   // Build the query text
-  const queryText = buildQueryText(skills, experienceDomains, additionalContext);
+  const queryText = buildQueryText(
+    skills,
+    experienceDomains,
+    additionalContext
+  );
 
   // Generate query embedding
   const queryEmbedding = await generateQueryEmbedding(
@@ -287,9 +291,7 @@ async function performSemanticSearch(
  * @param videoAssessmentIds - Array of video assessment IDs
  * @returns Map of video assessment ID to candidate data
  */
-async function fetchCandidateData(
-  videoAssessmentIds: string[]
-): Promise<
+async function fetchCandidateData(videoAssessmentIds: string[]): Promise<
   Map<
     string,
     {

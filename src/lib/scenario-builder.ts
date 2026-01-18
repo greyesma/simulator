@@ -202,9 +202,7 @@ Start the conversation by warmly greeting the admin and asking what kind of scen
 /**
  * Format the current scenario state for including in the conversation
  */
-export function formatCurrentStateForPrompt(
-  data: ScenarioBuilderData
-): string {
+export function formatCurrentStateForPrompt(data: ScenarioBuilderData): string {
   const status = getCompletionStatus(data);
 
   let statePrompt = `\n\n## Current Collected Information\n`;
@@ -266,9 +264,7 @@ Only include the extraction block when you've learned NEW information that shoul
 /**
  * Parse extraction data from AI response
  */
-export function parseExtractionFromResponse(
-  response: string
-): Partial<{
+export function parseExtractionFromResponse(response: string): Partial<{
   name: string;
   companyName: string;
   companyDescription: string;

@@ -9,12 +9,14 @@ Condensed learnings from 82 issues. For detailed per-issue logs, see git history
 **Skillvee Simulator** is a developer assessment platform simulating a realistic "day at work." Candidates experience an AI-powered assessment flow while their screen is recorded.
 
 ### Assessment Flow
+
 ```
 CV Upload → HR Interview → Congratulations → Welcome (Slack DM with screen share modal)
 → Manager Kickoff → Coworker Chat/Call → PR Submission → Final Defense → Processing → Results
 ```
 
 ### What It Assesses
+
 - Communication & professionalism
 - Problem decomposition & AI leverage
 - Code quality & technical decisions
@@ -30,6 +32,7 @@ CV Upload → HR Interview → Congratulations → Welcome (Slack DM with screen
 **Design System:** Neo-brutalist - 0px radius, no shadows, black/white/gold (#f7da50) palette, DM Sans + Space Mono fonts
 
 ### Key Directories
+
 ```
 src/
 ├── app/           # Next.js pages + API routes
@@ -45,6 +48,7 @@ tests/e2e/         # E2E tests using agent-browser
 ```
 
 ### Database Models
+
 - **User** - id, email, name, role (USER/ADMIN), cvUrl, parsedProfile
 - **Scenario** - id, name, companyName, companyDescription, taskDescription, repoUrl, techStack[], isPublished
 - **Coworker** - id, scenarioId, name, role, personaStyle, knowledge (JSON)
@@ -58,6 +62,7 @@ tests/e2e/         # E2E tests using agent-browser
 ## 3. Core Patterns
 
 ### Gemini Live Voice
+
 ```typescript
 // Server: Generate ephemeral token with transcription enabled
 const authToken = await gemini.authTokens.create({
@@ -67,26 +72,28 @@ const authToken = await gemini.authTokens.create({
       config: {
         systemInstruction,
         responseModalities: [Modality.AUDIO],
-        inputAudioTranscription: {},  // REQUIRED for transcript capture
+        inputAudioTranscription: {}, // REQUIRED for transcript capture
         outputAudioTranscription: {}, // REQUIRED for transcript capture
-      }
-    }
-  }
+      },
+    },
+  },
 });
 // Client: Connect with token as apiKey
 const client = new GoogleGenAI({ apiKey: ephemeralToken });
 ```
 
 ### Prisma JSON Fields
+
 ```typescript
 // Always double-cast for type safety
 const data = assessment.report as unknown as AssessmentReport;
 await db.assessment.update({
-  data: { report: reportData as unknown as Prisma.InputJsonValue }
+  data: { report: reportData as unknown as Prisma.InputJsonValue },
 });
 ```
 
 ### Test Mocking Pattern
+
 ```typescript
 // Define mock functions BEFORE vi.mock() due to hoisting
 const mockAuth = vi.fn();
@@ -94,6 +101,7 @@ vi.mock("@/auth", () => ({ auth: mockAuth }));
 ```
 
 ### Server/Client Component Split
+
 ```typescript
 // page.tsx - Server component fetches data
 export default async function Page({ params }) {
@@ -111,6 +119,7 @@ export function ClientComponent({ data }) { ... }
 ## 4. Critical Learnings
 
 ### Gemini Integration
+
 - Gemini Live API requires `v1alpha` for ephemeral token creation
 - **Transcription MUST be enabled server-side** in ephemeral token config, not just client-side
 - Use `Modality.AUDIO` import from `@google/genai` - string "AUDIO" fails type check
@@ -120,6 +129,7 @@ export function ClientComponent({ data }) { ... }
 - Gemini 3 Flash: `gemini-3-flash-preview` (text), Gemini 2.5 Flash: `gemini-2.5-flash-native-audio-latest` (voice)
 
 ### Next.js 15 / React
+
 - NextAuth v5 with Credentials provider requires **JWT strategy** (not database)
 - `useSearchParams()` requires Suspense boundary
 - API routes can ONLY export HTTP methods - constants/helpers must be in separate lib files
@@ -127,6 +137,7 @@ export function ClientComponent({ data }) { ... }
 - Next.js 15 params are async - must `await params` before using
 
 ### Prisma / Database
+
 - JSON fields require `as unknown as Type` double cast
 - Use `upsert` pattern for idempotent operations
 - `Prisma.JsonNull` needs value import, not type import
@@ -134,6 +145,7 @@ export function ClientComponent({ data }) { ... }
 - Cascade deletes (`onDelete: Cascade`) handle related records automatically
 
 ### Testing
+
 - Vitest mock hoisting: define mock functions inside `vi.mock()` factory
 - Test redirects with `expect().rejects.toThrow()` pattern
 - jsdom's File/Blob `arrayBuffer()` hangs with large files - skip in unit tests
@@ -141,6 +153,7 @@ export function ClientComponent({ data }) { ... }
 - Global fetch mock needs `beforeEach`/`afterEach` cleanup
 
 ### Voice Conversations
+
 - AudioContext requires user interaction to resume from suspended state
 - Session callbacks need `sessionConnected` flag since refs can be stale in closures
 - Track "ended" event on MediaStream to detect when user stops browser sharing
@@ -150,20 +163,20 @@ export function ClientComponent({ data }) { ... }
 
 ## 5. Important Gotchas
 
-| Issue | Solution |
-|-------|----------|
-| Build fails with useSearchParams | Wrap component in Suspense boundary |
-| Gemini systemInstruction not working | Use first user/model message pair instead |
-| Prisma JSON type errors | Double cast: `as unknown as Type` |
-| Tests fail with mock errors | Define mock functions inside `vi.mock()` factory |
-| API route exports constant | Move constants to `src/lib/` files |
-| AudioContext suspended | Require user interaction (button click) first |
-| File upload tests timeout | Skip integration tests in jsdom, use mocks |
-| GitHub can't delete PRs | Use close (PATCH with `state: "closed"`) instead |
-| Supabase storage 404 | Create `recordings` and `screenshots` buckets first |
-| Transcript not captured | Enable transcription in server-side ephemeral token config |
-| pgvector operations fail | Use raw SQL (`$executeRaw`, `$queryRaw`) not Prisma ORM |
-| Clear `.next/` cache | After removing Prisma fields or major changes |
+| Issue                                | Solution                                                   |
+| ------------------------------------ | ---------------------------------------------------------- |
+| Build fails with useSearchParams     | Wrap component in Suspense boundary                        |
+| Gemini systemInstruction not working | Use first user/model message pair instead                  |
+| Prisma JSON type errors              | Double cast: `as unknown as Type`                          |
+| Tests fail with mock errors          | Define mock functions inside `vi.mock()` factory           |
+| API route exports constant           | Move constants to `src/lib/` files                         |
+| AudioContext suspended               | Require user interaction (button click) first              |
+| File upload tests timeout            | Skip integration tests in jsdom, use mocks                 |
+| GitHub can't delete PRs              | Use close (PATCH with `state: "closed"`) instead           |
+| Supabase storage 404                 | Create `recordings` and `screenshots` buckets first        |
+| Transcript not captured              | Enable transcription in server-side ephemeral token config |
+| pgvector operations fail             | Use raw SQL (`$executeRaw`, `$queryRaw`) not Prisma ORM    |
+| Clear `.next/` cache                 | After removing Prisma fields or major changes              |
 
 ---
 
@@ -190,6 +203,7 @@ src/prompts/
 ```
 
 **Key principles:**
+
 - Voice: Use filler words ("um", "so"), react naturally ("mm-hmm", "gotcha")
 - Chat: Keep messages short (1-3 sentences), don't write paragraphs
 - Gradual context: Don't front-load info, build through back-and-forth
@@ -199,6 +213,7 @@ src/prompts/
 ## 7. Video Assessment System
 
 ### 8 Assessment Dimensions
+
 1. COMMUNICATION - Verbal and written clarity
 2. PROBLEM_SOLVING - Analytical approach
 3. TECHNICAL_KNOWLEDGE - Domain expertise
@@ -209,17 +224,21 @@ src/prompts/
 8. TIME_MANAGEMENT - Prioritization
 
 ### Archetype Weights
+
 Weights applied at search time (never stored):
+
 - VERY_HIGH (1.5x) - Critical for role
 - HIGH (1.25x) - Important for role
 - MEDIUM (1.0x) - Standard
 
 ### Seniority Thresholds
+
 - JUNIOR: No minimum
 - MID: Key dimensions >= 3
 - SENIOR: Key dimensions >= 4
 
 ### Semantic Search
+
 - pgvector for similarity search
 - Combined score: 40% semantic + 60% fit score
 - Embeddings generated async after video evaluation
@@ -229,6 +248,7 @@ Weights applied at search time (never stored):
 ## 8. Admin Features
 
 ### Pages
+
 - `/admin/scenarios` - Scenario CRUD with coworker management
 - `/admin/assessments` - Diagnostics with logs and API calls
 - `/admin/assessments/[id]` - Timeline view with expandable details
@@ -236,6 +256,7 @@ Weights applied at search time (never stored):
 - `/admin/analytics` - Dashboard metrics
 
 ### Key Patterns
+
 - Protected by `requireAdmin()` in layout
 - Server/client split for data fetching + interactivity
 - Serialized dates (ISO strings) passed to client
@@ -273,18 +294,21 @@ RESEND_API_KEY=         # For email delivery
 ## 10. Recent Implementation Patterns
 
 ### CV Parsing (Issue #41-45)
+
 - Gemini 2.0 Flash supports vision for PDF parsing
 - Use `inlineData` with base64 for non-text files
 - Async parsing with `.then().catch()` for non-blocking
 - Store on User (not just Assessment) for profile page access
 
 ### Slack-like Layout (Issues #54-56)
+
 - `SlackLayout` component with sidebar + main content
 - `CallContext` for managing call state across components
 - `FloatingCallBar` for Slack huddles-style voice calls
 - Mobile responsive with hamburger menu
 
 ### Candidate Search (Issues #65-77)
+
 - Entity extraction from natural language queries
 - Archetype weights + seniority thresholds for filtering
 - Semantic search with pgvector embeddings
@@ -292,6 +316,7 @@ RESEND_API_KEY=         # For email delivery
 - Role-specific profile views with fit scores
 
 ### Admin Diagnostics (Issues #78-82)
+
 - Timeline view combining logs and API calls
 - Expandable prompt/response viewing with copy buttons
 - Manual reassessment with `supersededBy` chain
@@ -306,18 +331,23 @@ RESEND_API_KEY=         # For email delivery
 - Screenshots saved to `screenshots/issue-<number>.png` for PR verification
 
 ### Test Patterns
+
 ```typescript
 // Server component with notFound
 vi.mock("next/navigation", () => ({
-  notFound: () => { throw new Error("NOT_FOUND"); },
+  notFound: () => {
+    throw new Error("NOT_FOUND");
+  },
 }));
 await expect(Page({ params })).rejects.toThrow("NOT_FOUND");
 
 // Vitest mock hoisting
 vi.mock("@/lib/db", () => ({
-  db: { assessment: { findUnique: vi.fn() } }
+  db: { assessment: { findUnique: vi.fn() } },
 }));
-const mockDb = (await import("@/lib/db")).db as { assessment: { findUnique: ReturnType<typeof vi.fn> } };
+const mockDb = (await import("@/lib/db")).db as {
+  assessment: { findUnique: ReturnType<typeof vi.fn> };
+};
 ```
 
 ---
@@ -335,6 +365,7 @@ const mockDb = (await import("@/lib/db")).db as { assessment: { findUnique: Retu
 ---
 
 ## Issue #83: US-022 Simplify Sidebar Contact Interaction
+
 - Simplified sidebar by removing Chat/Call buttons, making entire person box clickable for chat
 - Replaced call button text with Headphones icon (Slack-style) in top-right of person box
 - Removed "online/offline" text labels, kept only green/red dot indicators

@@ -271,7 +271,7 @@ export function useDefenseCall({
         apiKey: tokenData.token,
         httpOptions: {
           apiVersion: "v1alpha",
-          baseUrl: "https://generativelanguage.googleapis.com",  // No trailing slash!
+          baseUrl: "https://generativelanguage.googleapis.com", // No trailing slash!
         },
       });
 
@@ -312,7 +312,10 @@ export function useDefenseCall({
       // Start the conversation by sending a greeting trigger
       session.sendClientContent({
         turns: [
-          { role: "user", parts: [{ text: "Hi, I'm ready to walk you through my PR!" }] },
+          {
+            role: "user",
+            parts: [{ text: "Hi, I'm ready to walk you through my PR!" }],
+          },
         ],
         turnComplete: true,
       });

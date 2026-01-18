@@ -66,7 +66,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: "Deletion partially failed",
-          message: "Some data may not have been deleted. Please contact support.",
+          message:
+            "Some data may not have been deleted. Please contact support.",
           details: result.errors,
           deletedItems: result.deletedItems,
         },

@@ -38,7 +38,9 @@ export async function POST(request: Request) {
     // Validate PR URL format
     if (!isValidPrUrl(prUrl)) {
       return NextResponse.json(
-        { error: "Invalid PR URL. Must be a valid GitHub or GitLab PR/MR link" },
+        {
+          error: "Invalid PR URL. Must be a valid GitHub or GitLab PR/MR link",
+        },
         { status: 400 }
       );
     }
@@ -190,4 +192,3 @@ export async function GET(request: Request) {
     );
   }
 }
-

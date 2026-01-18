@@ -35,8 +35,13 @@ describe("GET /api/admin/scenarios/[id]/coworkers/[coworkerId]", () => {
   it("returns 401 if not authenticated", async () => {
     mockAuth.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1");
-    const response = await GET(request, createContext("scenario-1", "coworker-1"));
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1"
+    );
+    const response = await GET(
+      request,
+      createContext("scenario-1", "coworker-1")
+    );
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -48,8 +53,13 @@ describe("GET /api/admin/scenarios/[id]/coworkers/[coworkerId]", () => {
       user: { id: "user-123", email: "user@test.com", role: "USER" },
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1");
-    const response = await GET(request, createContext("scenario-1", "coworker-1"));
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1"
+    );
+    const response = await GET(
+      request,
+      createContext("scenario-1", "coworker-1")
+    );
     const data = await response.json();
 
     expect(response.status).toBe(403);
@@ -62,8 +72,13 @@ describe("GET /api/admin/scenarios/[id]/coworkers/[coworkerId]", () => {
     });
     mockCoworkerFindUnique.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers/non-existent");
-    const response = await GET(request, createContext("scenario-1", "non-existent"));
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers/non-existent"
+    );
+    const response = await GET(
+      request,
+      createContext("scenario-1", "non-existent")
+    );
     const data = await response.json();
 
     expect(response.status).toBe(404);
@@ -79,8 +94,13 @@ describe("GET /api/admin/scenarios/[id]/coworkers/[coworkerId]", () => {
       scenarioId: "scenario-2", // Different scenario
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1");
-    const response = await GET(request, createContext("scenario-1", "coworker-1"));
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1"
+    );
+    const response = await GET(
+      request,
+      createContext("scenario-1", "coworker-1")
+    );
     const data = await response.json();
 
     expect(response.status).toBe(404);
@@ -102,13 +122,20 @@ describe("GET /api/admin/scenarios/[id]/coworkers/[coworkerId]", () => {
     };
     mockCoworkerFindUnique.mockResolvedValue(mockCoworker);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1");
-    const response = await GET(request, createContext("scenario-1", "coworker-1"));
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1"
+    );
+    const response = await GET(
+      request,
+      createContext("scenario-1", "coworker-1")
+    );
     const data = await response.json();
 
     expect(response.status).toBe(200);
     expect(data.coworker.name).toBe("Alex Chen");
-    expect(data.coworker.knowledge).toEqual({ expertise: ["team structure", "processes"] });
+    expect(data.coworker.knowledge).toEqual({
+      expertise: ["team structure", "processes"],
+    });
   });
 });
 
@@ -120,13 +147,19 @@ describe("PUT /api/admin/scenarios/[id]/coworkers/[coworkerId]", () => {
   it("returns 401 if not authenticated", async () => {
     mockAuth.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "Updated Name" }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Updated Name" }),
+      }
+    );
 
-    const response = await PUT(request, createContext("scenario-1", "coworker-1"));
+    const response = await PUT(
+      request,
+      createContext("scenario-1", "coworker-1")
+    );
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -138,13 +171,19 @@ describe("PUT /api/admin/scenarios/[id]/coworkers/[coworkerId]", () => {
       user: { id: "user-123", email: "user@test.com", role: "USER" },
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "Updated Name" }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Updated Name" }),
+      }
+    );
 
-    const response = await PUT(request, createContext("scenario-1", "coworker-1"));
+    const response = await PUT(
+      request,
+      createContext("scenario-1", "coworker-1")
+    );
     const data = await response.json();
 
     expect(response.status).toBe(403);
@@ -157,13 +196,19 @@ describe("PUT /api/admin/scenarios/[id]/coworkers/[coworkerId]", () => {
     });
     mockCoworkerFindUnique.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers/non-existent", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "Updated Name" }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers/non-existent",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Updated Name" }),
+      }
+    );
 
-    const response = await PUT(request, createContext("scenario-1", "non-existent"));
+    const response = await PUT(
+      request,
+      createContext("scenario-1", "non-existent")
+    );
     const data = await response.json();
 
     expect(response.status).toBe(404);
@@ -190,18 +235,24 @@ describe("PUT /api/admin/scenarios/[id]/coworkers/[coworkerId]", () => {
     };
     mockCoworkerUpdate.mockResolvedValue(updatedCoworker);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: "Alex Chen Updated",
-        role: "Director of Engineering",
-        personaStyle: "executive and strategic",
-        knowledge: { expertise: ["leadership", "strategy"] },
-      }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Alex Chen Updated",
+          role: "Director of Engineering",
+          personaStyle: "executive and strategic",
+          knowledge: { expertise: ["leadership", "strategy"] },
+        }),
+      }
+    );
 
-    const response = await PUT(request, createContext("scenario-1", "coworker-1"));
+    const response = await PUT(
+      request,
+      createContext("scenario-1", "coworker-1")
+    );
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -223,13 +274,16 @@ describe("PUT /api/admin/scenarios/[id]/coworkers/[coworkerId]", () => {
       name: "Updated Name Only",
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: "Updated Name Only",
-      }),
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Updated Name Only",
+        }),
+      }
+    );
 
     await PUT(request, createContext("scenario-1", "coworker-1"));
 
@@ -248,11 +302,17 @@ describe("DELETE /api/admin/scenarios/[id]/coworkers/[coworkerId]", () => {
   it("returns 401 if not authenticated", async () => {
     mockAuth.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1", {
-      method: "DELETE",
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1",
+      {
+        method: "DELETE",
+      }
+    );
 
-    const response = await DELETE(request, createContext("scenario-1", "coworker-1"));
+    const response = await DELETE(
+      request,
+      createContext("scenario-1", "coworker-1")
+    );
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -264,11 +324,17 @@ describe("DELETE /api/admin/scenarios/[id]/coworkers/[coworkerId]", () => {
       user: { id: "user-123", email: "user@test.com", role: "USER" },
     });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1", {
-      method: "DELETE",
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1",
+      {
+        method: "DELETE",
+      }
+    );
 
-    const response = await DELETE(request, createContext("scenario-1", "coworker-1"));
+    const response = await DELETE(
+      request,
+      createContext("scenario-1", "coworker-1")
+    );
     const data = await response.json();
 
     expect(response.status).toBe(403);
@@ -281,11 +347,17 @@ describe("DELETE /api/admin/scenarios/[id]/coworkers/[coworkerId]", () => {
     });
     mockCoworkerFindUnique.mockResolvedValue(null);
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers/non-existent", {
-      method: "DELETE",
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers/non-existent",
+      {
+        method: "DELETE",
+      }
+    );
 
-    const response = await DELETE(request, createContext("scenario-1", "non-existent"));
+    const response = await DELETE(
+      request,
+      createContext("scenario-1", "non-existent")
+    );
     const data = await response.json();
 
     expect(response.status).toBe(404);
@@ -304,11 +376,17 @@ describe("DELETE /api/admin/scenarios/[id]/coworkers/[coworkerId]", () => {
     });
     mockCoworkerDelete.mockResolvedValue({ id: "coworker-1" });
 
-    const request = new Request("http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1", {
-      method: "DELETE",
-    });
+    const request = new Request(
+      "http://localhost/api/admin/scenarios/scenario-1/coworkers/coworker-1",
+      {
+        method: "DELETE",
+      }
+    );
 
-    const response = await DELETE(request, createContext("scenario-1", "coworker-1"));
+    const response = await DELETE(
+      request,
+      createContext("scenario-1", "coworker-1")
+    );
     const data = await response.json();
 
     expect(response.status).toBe(200);

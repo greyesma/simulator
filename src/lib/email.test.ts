@@ -58,7 +58,12 @@ function createMockSkillScore(
 ): {
   category: SkillCategory;
   score: number;
-  level: "exceptional" | "strong" | "adequate" | "developing" | "needs_improvement";
+  level:
+    | "exceptional"
+    | "strong"
+    | "adequate"
+    | "developing"
+    | "needs_improvement";
   evidence: string[];
   notes: string;
 } {
@@ -110,7 +115,10 @@ function createMockReport(): AssessmentReport {
         "Could improve collaboration with cross-functional team members",
         "Time management during complex tasks could be more efficient",
       ],
-      notableObservations: ["Showed strong debugging skills", "Asked insightful questions"],
+      notableObservations: [
+        "Showed strong debugging skills",
+        "Asked insightful questions",
+      ],
     },
     recommendations: [
       {
@@ -118,7 +126,10 @@ function createMockReport(): AssessmentReport {
         priority: "high",
         title: "Improve Cross-Functional Collaboration",
         description: "Work on proactively reaching out to team members.",
-        actionableSteps: ["Schedule regular check-ins", "Ask for feedback early"],
+        actionableSteps: [
+          "Schedule regular check-ins",
+          "Ask for feedback early",
+        ],
       },
       {
         category: "time_management",
@@ -224,8 +235,12 @@ describe("Email Module", () => {
       const params = createReportEmailParams();
       const html = generateReportEmailHtml(params);
 
-      expect(html).toContain("Excellent verbal communication during interviews");
-      expect(html).toContain("Strong code quality with clear naming conventions");
+      expect(html).toContain(
+        "Excellent verbal communication during interviews"
+      );
+      expect(html).toContain(
+        "Strong code quality with clear naming conventions"
+      );
     });
 
     it("should include recommendations", () => {
@@ -239,7 +254,9 @@ describe("Email Module", () => {
       const params = createReportEmailParams();
       const html = generateReportEmailHtml(params);
 
-      expect(html).toContain("https://skillvee.com/assessment/test-assessment-123/results");
+      expect(html).toContain(
+        "https://skillvee.com/assessment/test-assessment-123/results"
+      );
       expect(html).toContain("View Full Report");
     });
 
@@ -293,7 +310,9 @@ describe("Email Module", () => {
       const params = createReportEmailParams();
       const text = generateReportEmailText(params);
 
-      expect(text).toContain("https://skillvee.com/assessment/test-assessment-123/results");
+      expect(text).toContain(
+        "https://skillvee.com/assessment/test-assessment-123/results"
+      );
     });
 
     it("should handle missing candidate name", () => {
@@ -325,7 +344,10 @@ describe("Email Module", () => {
 
     it("should call Resend API when configured", async () => {
       mockEnv.RESEND_API_KEY = "re_test_key";
-      mockResendEmailsSend.mockResolvedValue({ data: { id: "email-123" }, error: null });
+      mockResendEmailsSend.mockResolvedValue({
+        data: { id: "email-123" },
+        error: null,
+      });
 
       const result = await sendEmail({
         to: "test@example.com",
@@ -402,7 +424,10 @@ describe("Email Module", () => {
 
     it("should send email with proper subject including name", async () => {
       mockEnv.RESEND_API_KEY = "re_test_key";
-      mockResendEmailsSend.mockResolvedValue({ data: { id: "email-123" }, error: null });
+      mockResendEmailsSend.mockResolvedValue({
+        data: { id: "email-123" },
+        error: null,
+      });
 
       const params = createReportEmailParams();
       await sendReportEmail(params);
@@ -416,7 +441,10 @@ describe("Email Module", () => {
 
     it("should send email with generic subject when no name", async () => {
       mockEnv.RESEND_API_KEY = "re_test_key";
-      mockResendEmailsSend.mockResolvedValue({ data: { id: "email-123" }, error: null });
+      mockResendEmailsSend.mockResolvedValue({
+        data: { id: "email-123" },
+        error: null,
+      });
 
       const params = createReportEmailParams({ candidateName: undefined });
       await sendReportEmail(params);
@@ -430,7 +458,10 @@ describe("Email Module", () => {
 
     it("should include both HTML and text versions", async () => {
       mockEnv.RESEND_API_KEY = "re_test_key";
-      mockResendEmailsSend.mockResolvedValue({ data: { id: "email-123" }, error: null });
+      mockResendEmailsSend.mockResolvedValue({
+        data: { id: "email-123" },
+        error: null,
+      });
 
       const params = createReportEmailParams();
       await sendReportEmail(params);

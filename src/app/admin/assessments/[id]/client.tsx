@@ -160,18 +160,18 @@ const EVENT_TYPE_LABELS: Record<AssessmentLogEventType, string> = {
 // Get icon for event type
 function getEventIcon(event: TimelineEvent) {
   if (event.isError) {
-    return <AlertCircle className="w-4 h-4" />;
+    return <AlertCircle className="h-4 w-4" />;
   }
   if (event.eventType === "COMPLETED") {
-    return <CheckCircle2 className="w-4 h-4" />;
+    return <CheckCircle2 className="h-4 w-4" />;
   }
   if (event.eventType === "STARTED") {
-    return <Play className="w-4 h-4" />;
+    return <Play className="h-4 w-4" />;
   }
   if (event.type === "apiCall") {
-    return <ExternalLink className="w-4 h-4" />;
+    return <ExternalLink className="h-4 w-4" />;
   }
-  return <Clock className="w-4 h-4" />;
+  return <Clock className="h-4 w-4" />;
 }
 
 // Copy button component with visual feedback
@@ -202,9 +202,9 @@ function CopyButton({
         e.stopPropagation();
         handleCopy();
       }}
-      className={`inline-flex items-center gap-1.5 px-2 py-1 border text-xs font-mono ${
+      className={`inline-flex items-center gap-1.5 border px-2 py-1 font-mono text-xs ${
         copied
-          ? "border-green-500 bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300"
+          ? "border-green-500 bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300"
           : "border-border hover:bg-muted"
       }`}
       title={`Copy ${label}`}
@@ -212,12 +212,12 @@ function CopyButton({
     >
       {copied ? (
         <>
-          <Check className="w-3 h-3" />
+          <Check className="h-3 w-3" />
           Copied
         </>
       ) : (
         <>
-          <Copy className="w-3 h-3" />
+          <Copy className="h-3 w-3" />
           Copy {label}
         </>
       )}
@@ -258,7 +258,7 @@ function CollapsibleCodeSection({
       data-testid={`${testIdPrefix}-section`}
     >
       <div
-        className="flex items-center justify-between p-3 bg-muted/30 cursor-pointer hover:bg-muted/50"
+        className="bg-muted/30 hover:bg-muted/50 flex cursor-pointer items-center justify-between p-3"
         onClick={(e) => {
           e.stopPropagation();
           onToggle();
@@ -267,11 +267,11 @@ function CollapsibleCodeSection({
       >
         <div className="flex items-center gap-2">
           {isExpanded ? (
-            <ChevronDown className="w-4 h-4" />
+            <ChevronDown className="h-4 w-4" />
           ) : (
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="h-4 w-4" />
           )}
-          <span className="font-mono text-xs text-muted-foreground uppercase tracking-wider">
+          <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
             {title}
           </span>
           <span className="font-mono text-xs text-muted-foreground">
@@ -285,8 +285,11 @@ function CollapsibleCodeSection({
         />
       </div>
       {isExpanded && (
-        <div className="max-h-96 overflow-auto" data-testid={`${testIdPrefix}-content`}>
-          <pre className="p-4 bg-foreground text-background font-mono text-xs whitespace-pre-wrap overflow-x-auto">
+        <div
+          className="max-h-96 overflow-auto"
+          data-testid={`${testIdPrefix}-content`}
+        >
+          <pre className="overflow-x-auto whitespace-pre-wrap bg-foreground p-4 font-mono text-xs text-background">
             <code className={`language-${language}`}>{displayContent}</code>
           </pre>
         </div>
@@ -316,7 +319,7 @@ function ApiCallDetails({
       data-testid={`api-call-details-${event.id}`}
     >
       {/* Metadata section */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 border-2 border-border bg-muted/10">
+      <div className="bg-muted/10 grid grid-cols-2 gap-4 border-2 border-border p-4 md:grid-cols-4">
         <div>
           <p className="font-mono text-xs text-muted-foreground">MODEL</p>
           <p className="font-mono text-sm">{event.modelVersion}</p>
@@ -357,7 +360,7 @@ function ApiCallDetails({
       </div>
 
       {/* Timestamps section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border-2 border-border bg-muted/10">
+      <div className="bg-muted/10 grid grid-cols-1 gap-4 border-2 border-border p-4 md:grid-cols-2">
         <div>
           <p className="font-mono text-xs text-muted-foreground">
             REQUEST TIMESTAMP
@@ -402,10 +405,10 @@ function ApiCallDetails({
 
       {/* Error section (if applicable) */}
       {event.isError && (event.errorMessage || event.stackTrace) && (
-        <div className="p-4 border-2 border-red-300 dark:border-red-700 bg-red-100 dark:bg-red-900/50">
+        <div className="border-2 border-red-300 bg-red-100 p-4 dark:border-red-700 dark:bg-red-900/50">
           {event.errorMessage && (
             <div className="mb-3">
-              <p className="font-mono text-xs text-red-600 dark:text-red-400 mb-1">
+              <p className="mb-1 font-mono text-xs text-red-600 dark:text-red-400">
                 ERROR MESSAGE
               </p>
               <p className="font-mono text-sm text-red-800 dark:text-red-200">
@@ -415,10 +418,10 @@ function ApiCallDetails({
           )}
           {event.stackTrace && (
             <div>
-              <p className="font-mono text-xs text-red-600 dark:text-red-400 mb-1">
+              <p className="mb-1 font-mono text-xs text-red-600 dark:text-red-400">
                 STACK TRACE
               </p>
-              <pre className="font-mono text-xs text-red-800 dark:text-red-200 whitespace-pre-wrap overflow-x-auto max-h-48 overflow-y-auto bg-red-50 dark:bg-red-900/30 p-2 border border-red-300 dark:border-red-700">
+              <pre className="max-h-48 overflow-x-auto overflow-y-auto whitespace-pre-wrap border border-red-300 bg-red-50 p-2 font-mono text-xs text-red-800 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200">
                 {event.stackTrace}
               </pre>
             </div>
@@ -452,27 +455,28 @@ function ConfirmationDialog({
       data-testid="confirmation-dialog-overlay"
     >
       <div
-        className="w-full max-w-md mx-4 border-2 border-border bg-background p-6"
+        className="mx-4 w-full max-w-md border-2 border-border bg-background p-6"
         onClick={(e) => e.stopPropagation()}
         data-testid="confirmation-dialog"
       >
-        <div className="flex items-start gap-4 mb-6">
-          <div className="w-12 h-12 border-2 border-amber-500 bg-amber-100 dark:bg-amber-900 flex items-center justify-center flex-shrink-0">
-            <AlertTriangle className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+        <div className="mb-6 flex items-start gap-4">
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center border-2 border-amber-500 bg-amber-100 dark:bg-amber-900">
+            <AlertTriangle className="h-6 w-6 text-amber-600 dark:text-amber-400" />
           </div>
           <div>
-            <h2 className="text-xl font-bold mb-2">Retry Assessment</h2>
+            <h2 className="mb-2 text-xl font-bold">Retry Assessment</h2>
             <p className="text-muted-foreground">
-              This will create a <strong>new assessment</strong> and mark this one as superseded.
-              The original assessment data will be preserved for historical reference.
+              This will create a <strong>new assessment</strong> and mark this
+              one as superseded. The original assessment data will be preserved
+              for historical reference.
             </p>
           </div>
         </div>
 
-        <div className="p-4 border-2 border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 mb-6">
+        <div className="mb-6 border-2 border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-950">
           <p className="font-mono text-sm text-amber-800 dark:text-amber-200">
-            <strong>Warning:</strong> A new assessment record will be created with fresh logs.
-            This operation cannot be undone.
+            <strong>Warning:</strong> A new assessment record will be created
+            with fresh logs. This operation cannot be undone.
           </p>
         </div>
 
@@ -480,7 +484,7 @@ function ConfirmationDialog({
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="px-4 py-2 border-2 border-border font-mono text-sm hover:bg-muted disabled:opacity-50"
+            className="border-2 border-border px-4 py-2 font-mono text-sm hover:bg-muted disabled:opacity-50"
             data-testid="cancel-retry-button"
           >
             Cancel
@@ -488,17 +492,17 @@ function ConfirmationDialog({
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className="inline-flex items-center gap-2 px-4 py-2 border-2 border-foreground bg-foreground text-background font-mono text-sm hover:bg-background hover:text-foreground disabled:opacity-50"
+            className="inline-flex items-center gap-2 border-2 border-foreground bg-foreground px-4 py-2 font-mono text-sm text-background hover:bg-background hover:text-foreground disabled:opacity-50"
             data-testid="confirm-retry-button"
           >
             {isLoading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Processing...
               </>
             ) : (
               <>
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="h-4 w-4" />
                 Confirm Retry
               </>
             )}
@@ -539,16 +543,16 @@ function ToastNotification({
 
   return (
     <div
-      className={`flex items-center justify-between gap-4 p-4 border-2 ${bgClass} ${textClass}`}
+      className={`flex items-center justify-between gap-4 border-2 p-4 ${bgClass} ${textClass}`}
       data-testid={`toast-${toast.type}`}
     >
       <div className="flex items-center gap-2">
         {toast.type === "success" ? (
-          <CheckCircle2 className="w-5 h-5" />
+          <CheckCircle2 className="h-5 w-5" />
         ) : toast.type === "error" ? (
-          <AlertCircle className="w-5 h-5" />
+          <AlertCircle className="h-5 w-5" />
         ) : (
-          <AlertCircle className="w-5 h-5" />
+          <AlertCircle className="h-5 w-5" />
         )}
         <span className="font-mono text-sm">{toast.message}</span>
       </div>
@@ -557,7 +561,7 @@ function ToastNotification({
         className="p-1 hover:opacity-70"
         aria-label="Dismiss"
       >
-        <X className="w-4 h-4" />
+        <X className="h-4 w-4" />
       </button>
     </div>
   );
@@ -568,9 +572,13 @@ export function AssessmentTimelineClient({
 }: AssessmentTimelineClientProps) {
   const router = useRouter();
   // Track expanded API call events (for showing details)
-  const [expandedApiCalls, setExpandedApiCalls] = useState<Set<string>>(new Set());
+  const [expandedApiCalls, setExpandedApiCalls] = useState<Set<string>>(
+    new Set()
+  );
   // Track expanded code sections within API call details (prompt/response)
-  const [expandedCodeSections, setExpandedCodeSections] = useState<Set<string>>(new Set());
+  const [expandedCodeSections, setExpandedCodeSections] = useState<Set<string>>(
+    new Set()
+  );
   // Track expanded error details (existing functionality)
   const [expandedErrors, setExpandedErrors] = useState<Set<string>>(new Set());
 
@@ -606,7 +614,9 @@ export function AssessmentTimelineClient({
       responseText: call.responseText,
       responseTimestamp: call.responseTimestamp,
     })),
-  ].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  ].sort(
+    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  );
 
   // Calculate total duration
   const totalDurationMs =
@@ -619,7 +629,9 @@ export function AssessmentTimelineClient({
   const hasErrors = timelineEvents.some((e) => e.isError);
 
   // Get screen recording
-  const screenRecording = assessment.recordings.find((r) => r.type === "screen");
+  const screenRecording = assessment.recordings.find(
+    (r) => r.type === "screen"
+  );
 
   // Toggle error expansion
   const toggleErrorExpansion = (id: string) => {
@@ -716,47 +728,50 @@ export function AssessmentTimelineClient({
     !assessment.supersededBy;
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="mx-auto max-w-4xl px-6 py-12">
       {/* Header with back link */}
       <Link
         href="/admin/assessments"
-        className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6"
+        className="mb-6 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground"
         data-testid="back-link"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="h-4 w-4" />
         <span className="font-mono text-sm">Back to Assessments</span>
       </Link>
 
-      <h1 className="text-3xl font-bold mb-8">Assessment Timeline</h1>
+      <h1 className="mb-8 text-3xl font-bold">Assessment Timeline</h1>
 
       {/* Candidate Info Card */}
       <div
-        className="border-2 border-border p-6 mb-8"
+        className="mb-8 border-2 border-border p-6"
         data-testid="candidate-info"
       >
-        <h2 className="font-mono text-xs text-muted-foreground mb-4">
+        <h2 className="mb-4 font-mono text-xs text-muted-foreground">
           CANDIDATE INFO
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 border-2 border-border bg-secondary flex items-center justify-center">
-              <User className="w-5 h-5" />
+            <div className="flex h-10 w-10 items-center justify-center border-2 border-border bg-secondary">
+              <User className="h-5 w-5" />
             </div>
             <div>
               <p className="font-semibold" data-testid="candidate-name">
                 {assessment.user.name || "Anonymous"}
               </p>
               <div className="flex items-center gap-1 text-muted-foreground">
-                <Mail className="w-3 h-3" />
-                <span className="font-mono text-xs" data-testid="candidate-email">
+                <Mail className="h-3 w-3" />
+                <span
+                  className="font-mono text-xs"
+                  data-testid="candidate-email"
+                >
                   {assessment.user.email || "No email"}
                 </span>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 border-2 border-border bg-muted flex items-center justify-center">
-              <Calendar className="w-5 h-5" />
+            <div className="flex h-10 w-10 items-center justify-center border-2 border-border bg-muted">
+              <Calendar className="h-5 w-5" />
             </div>
             <div>
               <p className="font-mono text-xs text-muted-foreground">
@@ -774,41 +789,42 @@ export function AssessmentTimelineClient({
 
       {/* Total Duration Card */}
       <div
-        className={`border-2 p-6 mb-8 ${
-          hasErrors ? "border-red-500 bg-red-50 dark:bg-red-950" : "border-border"
+        className={`mb-8 border-2 p-6 ${
+          hasErrors
+            ? "border-red-500 bg-red-50 dark:bg-red-950"
+            : "border-border"
         }`}
         data-testid="total-duration-card"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div
-              className={`w-12 h-12 border-2 flex items-center justify-center ${
+              className={`flex h-12 w-12 items-center justify-center border-2 ${
                 hasErrors
                   ? "border-red-500 bg-red-100 dark:bg-red-900"
                   : "border-border bg-secondary"
               }`}
             >
-              <Timer className="w-6 h-6" />
+              <Timer className="h-6 w-6" />
             </div>
             <div>
               <p className="font-mono text-xs text-muted-foreground">
                 TOTAL ASSESSMENT DURATION
               </p>
-              <p
-                className="text-3xl font-bold"
-                data-testid="total-duration"
-              >
-                {totalDurationMs ? formatDuration(totalDurationMs) : "In Progress"}
+              <p className="text-3xl font-bold" data-testid="total-duration">
+                {totalDurationMs
+                  ? formatDuration(totalDurationMs)
+                  : "In Progress"}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <span
-              className={`font-mono text-xs px-3 py-1 ${
+              className={`px-3 py-1 font-mono text-xs ${
                 assessment.status === "COMPLETED"
                   ? "bg-secondary text-secondary-foreground"
                   : hasErrors
-                    ? "bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200"
+                    ? "bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200"
                     : "bg-muted text-muted-foreground"
               }`}
               data-testid="status-badge"
@@ -816,8 +832,8 @@ export function AssessmentTimelineClient({
               {assessment.status}
             </span>
             {hasErrors && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200 font-mono text-xs">
-                <AlertCircle className="w-3 h-3" />
+              <span className="inline-flex items-center gap-1 bg-red-200 px-2 py-1 font-mono text-xs text-red-800 dark:bg-red-800 dark:text-red-200">
+                <AlertCircle className="h-3 w-3" />
                 HAS ERRORS
               </span>
             )}
@@ -828,12 +844,12 @@ export function AssessmentTimelineClient({
       {/* Video Recording Link */}
       {screenRecording && (
         <div
-          className="border-2 border-border p-4 mb-8 flex items-center justify-between"
+          className="mb-8 flex items-center justify-between border-2 border-border p-4"
           data-testid="video-recording-link"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 border-2 border-border bg-secondary flex items-center justify-center">
-              <Video className="w-5 h-5" />
+            <div className="flex h-10 w-10 items-center justify-center border-2 border-border bg-secondary">
+              <Video className="h-5 w-5" />
             </div>
             <div>
               <p className="font-mono text-xs text-muted-foreground">
@@ -846,10 +862,10 @@ export function AssessmentTimelineClient({
             href={screenRecording.storageUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2 border-2 border-foreground bg-foreground text-background hover:bg-background hover:text-foreground font-mono text-sm"
+            className="inline-flex items-center gap-2 border-2 border-foreground bg-foreground px-4 py-2 font-mono text-sm text-background hover:bg-background hover:text-foreground"
             data-testid="view-recording-button"
           >
-            <Play className="w-4 h-4" />
+            <Play className="h-4 w-4" />
             View Recording
           </a>
         </div>
@@ -858,12 +874,12 @@ export function AssessmentTimelineClient({
       {/* Retry Assessment Card */}
       {canRetry && (
         <div
-          className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950 p-4 mb-8 flex items-center justify-between"
+          className="mb-8 flex items-center justify-between border-2 border-amber-500 bg-amber-50 p-4 dark:bg-amber-950"
           data-testid="retry-assessment-card"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 border-2 border-amber-500 bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
-              <RefreshCw className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            <div className="flex h-10 w-10 items-center justify-center border-2 border-amber-500 bg-amber-100 dark:bg-amber-900">
+              <RefreshCw className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
               <p className="font-mono text-xs text-amber-700 dark:text-amber-300">
@@ -879,17 +895,17 @@ export function AssessmentTimelineClient({
           <button
             onClick={() => setShowRetryDialog(true)}
             disabled={isRetrying}
-            className="inline-flex items-center gap-2 px-4 py-2 border-2 border-amber-600 bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-50 font-mono text-sm"
+            className="inline-flex items-center gap-2 border-2 border-amber-600 bg-amber-600 px-4 py-2 font-mono text-sm text-white hover:bg-amber-700 disabled:opacity-50"
             data-testid="retry-assessment-button"
           >
             {isRetrying ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Processing...
               </>
             ) : (
               <>
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="h-4 w-4" />
                 Retry Assessment
               </>
             )}
@@ -900,12 +916,12 @@ export function AssessmentTimelineClient({
       {/* Superseded Notice */}
       {assessment.supersededBy && (
         <div
-          className="border-2 border-muted-foreground/30 bg-muted/30 p-4 mb-8"
+          className="border-muted-foreground/30 bg-muted/30 mb-8 border-2 p-4"
           data-testid="superseded-notice"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 border-2 border-muted-foreground/30 bg-muted flex items-center justify-center">
-              <AlertCircle className="w-5 h-5 text-muted-foreground" />
+            <div className="border-muted-foreground/30 flex h-10 w-10 items-center justify-center border-2 bg-muted">
+              <AlertCircle className="h-5 w-5 text-muted-foreground" />
             </div>
             <div>
               <p className="font-mono text-xs text-muted-foreground">
@@ -926,27 +942,30 @@ export function AssessmentTimelineClient({
       )}
 
       {/* Assessment Info */}
-      <div className="border-2 border-border p-4 mb-8" data-testid="assessment-info">
-        <h2 className="font-mono text-xs text-muted-foreground mb-3">
+      <div
+        className="mb-8 border-2 border-border p-4"
+        data-testid="assessment-info"
+      >
+        <h2 className="mb-3 font-mono text-xs text-muted-foreground">
           ASSESSMENT INFO
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono text-sm">
+        <div className="grid grid-cols-2 gap-4 font-mono text-sm md:grid-cols-4">
           <div>
-            <p className="text-muted-foreground text-xs">ID</p>
+            <p className="text-xs text-muted-foreground">ID</p>
             <p className="truncate" title={assessment.id}>
               {assessment.id}
             </p>
           </div>
           <div>
-            <p className="text-muted-foreground text-xs">SCENARIO</p>
+            <p className="text-xs text-muted-foreground">SCENARIO</p>
             <p>{assessment.scenario.name}</p>
           </div>
           <div>
-            <p className="text-muted-foreground text-xs">STARTED</p>
+            <p className="text-xs text-muted-foreground">STARTED</p>
             <p>{formatDate(assessment.startedAt)}</p>
           </div>
           <div>
-            <p className="text-muted-foreground text-xs">EVENTS</p>
+            <p className="text-xs text-muted-foreground">EVENTS</p>
             <p>{timelineEvents.length} total</p>
           </div>
         </div>
@@ -954,7 +973,7 @@ export function AssessmentTimelineClient({
 
       {/* Timeline */}
       <div className="border-2 border-border" data-testid="timeline">
-        <div className="border-b-2 border-border p-4 bg-muted/10">
+        <div className="bg-muted/10 border-b-2 border-border p-4">
           <h2 className="font-mono text-xs text-muted-foreground">
             EVENT TIMELINE ({timelineEvents.length} events)
           </h2>
@@ -967,10 +986,11 @@ export function AssessmentTimelineClient({
         ) : (
           <div className="relative">
             {/* Vertical timeline line */}
-            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-border" />
+            <div className="absolute bottom-0 left-8 top-0 w-0.5 bg-border" />
 
             {timelineEvents.map((event, index) => {
-              const previousEvent = index > 0 ? timelineEvents[index - 1] : null;
+              const previousEvent =
+                index > 0 ? timelineEvents[index - 1] : null;
               const durationFromPrevious = previousEvent
                 ? calculateDurationBetweenEvents(
                     event.timestamp,
@@ -982,12 +1002,16 @@ export function AssessmentTimelineClient({
               const isApiCallExpanded = expandedApiCalls.has(event.id);
               const hasExpandableErrorContent =
                 event.isError &&
-                Boolean(event.errorMessage || event.stackTrace || event.metadata);
+                Boolean(
+                  event.errorMessage || event.stackTrace || event.metadata
+                );
               const hasExpandableApiContent =
                 event.type === "apiCall" &&
                 Boolean(event.promptText || event.responseText);
-              const hasExpandableContent = hasExpandableErrorContent || hasExpandableApiContent;
-              const isExpanded = event.type === "apiCall" ? isApiCallExpanded : isErrorExpanded;
+              const hasExpandableContent =
+                hasExpandableErrorContent || hasExpandableApiContent;
+              const isExpanded =
+                event.type === "apiCall" ? isApiCallExpanded : isErrorExpanded;
 
               return (
                 <div
@@ -996,24 +1020,25 @@ export function AssessmentTimelineClient({
                   data-testid={`timeline-event-${event.id}`}
                 >
                   {/* Duration marker between events */}
-                  {durationFromPrevious !== null && durationFromPrevious > 0 && (
-                    <div
-                      className="relative py-2 pl-16 pr-4"
-                      data-testid={`duration-marker-${event.id}`}
-                    >
-                      <div className="flex items-center gap-2 text-muted-foreground font-mono text-xs">
-                        <span
-                          className={`px-2 py-0.5 border ${
-                            durationFromPrevious > 30000
-                              ? "border-amber-500 bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300"
-                              : "border-border bg-muted/50"
-                          }`}
-                        >
-                          +{formatDuration(durationFromPrevious)}
-                        </span>
+                  {durationFromPrevious !== null &&
+                    durationFromPrevious > 0 && (
+                      <div
+                        className="relative py-2 pl-16 pr-4"
+                        data-testid={`duration-marker-${event.id}`}
+                      >
+                        <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
+                          <span
+                            className={`border px-2 py-0.5 ${
+                              durationFromPrevious > 30000
+                                ? "border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300"
+                                : "bg-muted/50 border-border"
+                            }`}
+                          >
+                            +{formatDuration(durationFromPrevious)}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
                   {/* Event card */}
                   <div
@@ -1034,9 +1059,9 @@ export function AssessmentTimelineClient({
                   >
                     {/* Timeline dot */}
                     <div
-                      className={`relative z-10 w-8 h-8 border-2 flex items-center justify-center flex-shrink-0 ${
+                      className={`relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center border-2 ${
                         event.isError
-                          ? "border-red-500 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400"
+                          ? "border-red-500 bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400"
                           : event.eventType === "COMPLETED"
                             ? "border-secondary bg-secondary text-secondary-foreground"
                             : "border-border bg-background"
@@ -1046,10 +1071,10 @@ export function AssessmentTimelineClient({
                     </div>
 
                     {/* Event content */}
-                    <div className="flex-1 min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-4">
                         <div>
-                          <p className="font-semibold flex items-center gap-2">
+                          <p className="flex items-center gap-2 font-semibold">
                             {event.type === "log" && event.eventType
                               ? EVENT_TYPE_LABELS[event.eventType]
                               : event.type === "apiCall"
@@ -1058,9 +1083,9 @@ export function AssessmentTimelineClient({
                             {hasExpandableContent && (
                               <span className="text-muted-foreground">
                                 {isExpanded ? (
-                                  <ChevronDown className="w-4 h-4" />
+                                  <ChevronDown className="h-4 w-4" />
                                 ) : (
-                                  <ChevronRight className="w-4 h-4" />
+                                  <ChevronRight className="h-4 w-4" />
                                 )}
                               </span>
                             )}
@@ -1071,26 +1096,32 @@ export function AssessmentTimelineClient({
                             </p>
                           )}
                         </div>
-                        <div className="text-right flex-shrink-0">
+                        <div className="flex-shrink-0 text-right">
                           <p className="font-mono text-xs text-muted-foreground">
                             {formatTime(event.timestamp)}
                           </p>
-                          {event.durationMs !== null && event.durationMs > 0 && (
-                            <p className="font-mono text-xs text-muted-foreground">
-                              Duration: {formatDuration(event.durationMs)}
-                            </p>
-                          )}
+                          {event.durationMs !== null &&
+                            event.durationMs > 0 && (
+                              <p className="font-mono text-xs text-muted-foreground">
+                                Duration: {formatDuration(event.durationMs)}
+                              </p>
+                            )}
                         </div>
                       </div>
 
                       {/* API call details */}
                       {event.type === "apiCall" && (
                         <div className="mt-2 flex items-center gap-4 font-mono text-xs">
-                          {event.promptTokens != null && event.responseTokens != null && (
-                            <span className="text-muted-foreground">
-                              Tokens: {((event.promptTokens ?? 0) + (event.responseTokens ?? 0)).toLocaleString()}
-                            </span>
-                          )}
+                          {event.promptTokens != null &&
+                            event.responseTokens != null && (
+                              <span className="text-muted-foreground">
+                                Tokens:{" "}
+                                {(
+                                  (event.promptTokens ?? 0) +
+                                  (event.responseTokens ?? 0)
+                                ).toLocaleString()}
+                              </span>
+                            )}
                           <span
                             className={
                               event.isError
@@ -1108,43 +1139,45 @@ export function AssessmentTimelineClient({
                       )}
 
                       {/* Expandable error content (for log events with errors) */}
-                      {isErrorExpanded && hasExpandableErrorContent && event.type === "log" && (
-                        <div
-                          className="mt-4 p-4 border-2 border-red-300 dark:border-red-700 bg-red-100 dark:bg-red-900/50"
-                          data-testid={`error-details-${event.id}`}
-                        >
-                          {event.errorMessage && (
-                            <div className="mb-3">
-                              <p className="font-mono text-xs text-red-600 dark:text-red-400 mb-1">
-                                ERROR MESSAGE
-                              </p>
-                              <p className="font-mono text-sm text-red-800 dark:text-red-200">
-                                {event.errorMessage}
-                              </p>
-                            </div>
-                          )}
-                          {event.stackTrace && (
-                            <div className="mb-3">
-                              <p className="font-mono text-xs text-red-600 dark:text-red-400 mb-1">
-                                STACK TRACE
-                              </p>
-                              <pre className="font-mono text-xs text-red-800 dark:text-red-200 whitespace-pre-wrap overflow-x-auto max-h-48 overflow-y-auto bg-red-50 dark:bg-red-900/30 p-2 border border-red-300 dark:border-red-700">
-                                {event.stackTrace}
-                              </pre>
-                            </div>
-                          )}
-                          {event.metadata != null && (
-                            <div>
-                              <p className="font-mono text-xs text-red-600 dark:text-red-400 mb-1">
-                                METADATA
-                              </p>
-                              <pre className="font-mono text-xs text-red-800 dark:text-red-200 whitespace-pre-wrap overflow-x-auto max-h-48 overflow-y-auto bg-red-50 dark:bg-red-900/30 p-2 border border-red-300 dark:border-red-700">
-                                {JSON.stringify(event.metadata, null, 2)}
-                              </pre>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                      {isErrorExpanded &&
+                        hasExpandableErrorContent &&
+                        event.type === "log" && (
+                          <div
+                            className="mt-4 border-2 border-red-300 bg-red-100 p-4 dark:border-red-700 dark:bg-red-900/50"
+                            data-testid={`error-details-${event.id}`}
+                          >
+                            {event.errorMessage && (
+                              <div className="mb-3">
+                                <p className="mb-1 font-mono text-xs text-red-600 dark:text-red-400">
+                                  ERROR MESSAGE
+                                </p>
+                                <p className="font-mono text-sm text-red-800 dark:text-red-200">
+                                  {event.errorMessage}
+                                </p>
+                              </div>
+                            )}
+                            {event.stackTrace && (
+                              <div className="mb-3">
+                                <p className="mb-1 font-mono text-xs text-red-600 dark:text-red-400">
+                                  STACK TRACE
+                                </p>
+                                <pre className="max-h-48 overflow-x-auto overflow-y-auto whitespace-pre-wrap border border-red-300 bg-red-50 p-2 font-mono text-xs text-red-800 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200">
+                                  {event.stackTrace}
+                                </pre>
+                              </div>
+                            )}
+                            {event.metadata != null && (
+                              <div>
+                                <p className="mb-1 font-mono text-xs text-red-600 dark:text-red-400">
+                                  METADATA
+                                </p>
+                                <pre className="max-h-48 overflow-x-auto overflow-y-auto whitespace-pre-wrap border border-red-300 bg-red-50 p-2 font-mono text-xs text-red-800 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200">
+                                  {JSON.stringify(event.metadata, null, 2)}
+                                </pre>
+                              </div>
+                            )}
+                          </div>
+                        )}
 
                       {/* Expandable API call details */}
                       {isApiCallExpanded && event.type === "apiCall" && (
@@ -1174,7 +1207,7 @@ export function AssessmentTimelineClient({
       {/* Toast Notifications */}
       {toasts.length > 0 && (
         <div
-          className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 max-w-md"
+          className="fixed bottom-6 right-6 z-50 flex max-w-md flex-col gap-2"
           data-testid="toast-container"
         >
           {toasts.map((toast) => (

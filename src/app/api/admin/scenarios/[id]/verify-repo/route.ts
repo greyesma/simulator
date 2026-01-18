@@ -17,7 +17,9 @@ interface RouteContext {
 /**
  * Parses a GitHub repo URL to extract owner and repo name
  */
-function parseGitHubRepoUrl(url: string): { owner: string; repo: string } | null {
+function parseGitHubRepoUrl(
+  url: string
+): { owner: string; repo: string } | null {
   try {
     const parsed = new URL(url);
     if (!parsed.hostname.includes("github.com")) {
@@ -67,7 +69,10 @@ export async function GET(request: Request, context: RouteContext) {
 
   const user = session.user as SessionUser;
   if (user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Admin access required" },
+      { status: 403 }
+    );
   }
 
   const { id } = await context.params;
@@ -91,7 +96,8 @@ export async function GET(request: Request, context: RouteContext) {
   if (!parsed) {
     return NextResponse.json({
       ...result,
-      error: "Only GitHub repositories are currently supported for verification",
+      error:
+        "Only GitHub repositories are currently supported for verification",
     });
   }
 
@@ -150,7 +156,8 @@ export async function GET(request: Request, context: RouteContext) {
   } catch (error) {
     return NextResponse.json({
       ...result,
-      error: error instanceof Error ? error.message : "Failed to verify repository",
+      error:
+        error instanceof Error ? error.message : "Failed to verify repository",
     });
   }
 }

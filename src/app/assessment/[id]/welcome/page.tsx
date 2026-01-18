@@ -58,7 +58,10 @@ export default async function WelcomePage({ params }: WelcomePageProps) {
   }));
 
   return (
-    <AssessmentScreenWrapper assessmentId={id} companyName={assessment.scenario.companyName}>
+    <AssessmentScreenWrapper
+      assessmentId={id}
+      companyName={assessment.scenario.companyName}
+    >
       <WelcomeClient
         assessmentId={id}
         userName={userName}

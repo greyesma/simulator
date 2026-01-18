@@ -28,6 +28,7 @@ Each has its own CLAUDE.md with specific patterns and gotchas.
 **Design:** Neo-brutalist - 0px radius, no shadows, 2px black borders, gold (#f7da50). See `.claude/skills/frontend-design/SKILL.md`.
 
 **Key docs:**
+
 - `docs/prd.md` - PRD summary
 - `ralph/progress.md` - Learnings from 83+ issues
 

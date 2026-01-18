@@ -11,7 +11,10 @@ interface CallPageProps {
  * Redirects to chat page - calls now happen via the floating call bar in sidebar.
  * This maintains backwards compatibility for any direct links to /call.
  */
-export default async function CallPage({ params, searchParams }: CallPageProps) {
+export default async function CallPage({
+  params,
+  searchParams,
+}: CallPageProps) {
   const session = await auth();
   const { id: assessmentId } = await params;
   const { coworkerId } = await searchParams;

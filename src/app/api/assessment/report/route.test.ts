@@ -59,10 +59,13 @@ describe("Assessment Report API", () => {
     it("should return 401 if not authenticated", async () => {
       mockAuthFn.mockResolvedValue(null);
 
-      const request = new Request("http://localhost:3000/api/assessment/report", {
-        method: "POST",
-        body: JSON.stringify({ assessmentId: "test-id" }),
-      });
+      const request = new Request(
+        "http://localhost:3000/api/assessment/report",
+        {
+          method: "POST",
+          body: JSON.stringify({ assessmentId: "test-id" }),
+        }
+      );
 
       const response = await POST(request);
       const data = await response.json();
@@ -74,10 +77,13 @@ describe("Assessment Report API", () => {
     it("should return 400 if assessmentId is missing", async () => {
       mockAuthFn.mockResolvedValue({ user: { id: "user-1" } });
 
-      const request = new Request("http://localhost:3000/api/assessment/report", {
-        method: "POST",
-        body: JSON.stringify({}),
-      });
+      const request = new Request(
+        "http://localhost:3000/api/assessment/report",
+        {
+          method: "POST",
+          body: JSON.stringify({}),
+        }
+      );
 
       const response = await POST(request);
       const data = await response.json();
@@ -90,10 +96,13 @@ describe("Assessment Report API", () => {
       mockAuthFn.mockResolvedValue({ user: { id: "user-1" } });
       mockFindUnique.mockResolvedValue(null);
 
-      const request = new Request("http://localhost:3000/api/assessment/report", {
-        method: "POST",
-        body: JSON.stringify({ assessmentId: "nonexistent-id" }),
-      });
+      const request = new Request(
+        "http://localhost:3000/api/assessment/report",
+        {
+          method: "POST",
+          body: JSON.stringify({ assessmentId: "nonexistent-id" }),
+        }
+      );
 
       const response = await POST(request);
       const data = await response.json();
@@ -112,10 +121,13 @@ describe("Assessment Report API", () => {
         user: { name: "Other User" },
       });
 
-      const request = new Request("http://localhost:3000/api/assessment/report", {
-        method: "POST",
-        body: JSON.stringify({ assessmentId: "assessment-1" }),
-      });
+      const request = new Request(
+        "http://localhost:3000/api/assessment/report",
+        {
+          method: "POST",
+          body: JSON.stringify({ assessmentId: "assessment-1" }),
+        }
+      );
 
       const response = await POST(request);
       const data = await response.json();
@@ -138,10 +150,13 @@ describe("Assessment Report API", () => {
         user: { name: "Test User" },
       });
 
-      const request = new Request("http://localhost:3000/api/assessment/report", {
-        method: "POST",
-        body: JSON.stringify({ assessmentId: "assessment-1" }),
-      });
+      const request = new Request(
+        "http://localhost:3000/api/assessment/report",
+        {
+          method: "POST",
+          body: JSON.stringify({ assessmentId: "assessment-1" }),
+        }
+      );
 
       const response = await POST(request);
       const data = await response.json();
@@ -178,7 +193,11 @@ describe("Assessment Report API", () => {
           status: "COMPLETED",
           report: existingReport,
           user: { id: "user-1", name: "Test User", email: "test@example.com" },
-          scenario: { id: "scenario-1", name: "Test Scenario", companyName: "Test Co" },
+          scenario: {
+            id: "scenario-1",
+            name: "Test Scenario",
+            companyName: "Test Co",
+          },
           hrAssessment: null,
           conversations: [],
           recordings: [],
@@ -195,13 +214,16 @@ describe("Assessment Report API", () => {
         report: newReport,
       });
 
-      const request = new Request("http://localhost:3000/api/assessment/report", {
-        method: "POST",
-        body: JSON.stringify({
-          assessmentId: "assessment-1",
-          forceRegenerate: true,
-        }),
-      });
+      const request = new Request(
+        "http://localhost:3000/api/assessment/report",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            assessmentId: "assessment-1",
+            forceRegenerate: true,
+          }),
+        }
+      );
 
       const response = await POST(request);
       const data = await response.json();
@@ -233,7 +255,11 @@ describe("Assessment Report API", () => {
           status: "COMPLETED",
           report: null,
           user: { id: "user-1", name: "Test User", email: "test@example.com" },
-          scenario: { id: "scenario-1", name: "Test Scenario", companyName: "Test Co" },
+          scenario: {
+            id: "scenario-1",
+            name: "Test Scenario",
+            companyName: "Test Co",
+          },
           hrAssessment: null,
           conversations: [],
           recordings: [],
@@ -250,10 +276,13 @@ describe("Assessment Report API", () => {
         report: newReport,
       });
 
-      const request = new Request("http://localhost:3000/api/assessment/report", {
-        method: "POST",
-        body: JSON.stringify({ assessmentId: "assessment-1" }),
-      });
+      const request = new Request(
+        "http://localhost:3000/api/assessment/report",
+        {
+          method: "POST",
+          body: JSON.stringify({ assessmentId: "assessment-1" }),
+        }
+      );
 
       const response = await POST(request);
       const data = await response.json();
@@ -283,7 +312,9 @@ describe("Assessment Report API", () => {
     it("should return 400 if assessmentId is missing", async () => {
       mockAuthFn.mockResolvedValue({ user: { id: "user-1" } });
 
-      const request = new Request("http://localhost:3000/api/assessment/report");
+      const request = new Request(
+        "http://localhost:3000/api/assessment/report"
+      );
 
       const response = await GET(request);
       const data = await response.json();

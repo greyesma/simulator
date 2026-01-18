@@ -16,7 +16,10 @@ export function AssessmentScreenWrapper({
 }: AssessmentScreenWrapperProps) {
   return (
     <ScreenRecordingProvider assessmentId={assessmentId}>
-      <ScreenRecordingGuard assessmentId={assessmentId} companyName={companyName}>
+      <ScreenRecordingGuard
+        assessmentId={assessmentId}
+        companyName={companyName}
+      >
         {children}
       </ScreenRecordingGuard>
     </ScreenRecordingProvider>

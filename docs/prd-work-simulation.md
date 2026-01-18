@@ -18,9 +18,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 ## User Stories
 
 ### US-001: Create simulation database schema
+
 **Description:** As a developer, I need to store simulation data so candidate progress and results persist.
 
 **Acceptance Criteria:**
+
 - [ ] Add `WorkSimulation` model with fields: id, userId, scenarioId, status (NOT_STARTED/IN_PROGRESS/COMPLETED/ABANDONED/TIMED_OUT), startedAt, completedAt, duration, recordingUrl, recordingChunks (string array), submissionUrl, submissionNotes, evaluationStatus (PENDING/PROCESSING/COMPLETED/FAILED), evaluationResult (JSON)
 - [ ] Add `SimulationScenario` model with fields: id, name, description, difficulty, duration (minutes), codebaseUrl, documentationContent (JSON), stakeholders (JSON), initialMessage, evaluationCriteria (JSON), expectedSolution, isActive, createdBy
 - [ ] Add `SimulationMessage` model with fields: id, simulationId, channel, sender, content, timestamp
@@ -29,9 +31,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Typecheck passes
 
 ### US-002: Create simulation entry point on profile page
+
 **Description:** As a candidate, I want to access work simulations from my profile so I can validate my skills after completing my Sky call.
 
 **Acceptance Criteria:**
+
 - [ ] Add "Validate Your Skills" button on profile page (visible only after Sky call completed)
 - [ ] Button navigates to `/simulation` route
 - [ ] Button is visually prominent (primary CTA styling)
@@ -39,9 +43,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Verify in browser using dev-browser skill
 
 ### US-003: Build simulation tutorial/onboarding flow
+
 **Description:** As a candidate, I want to understand how the simulation works before starting so I know what to expect.
 
 **Acceptance Criteria:**
+
 - [ ] Tutorial displays 6 screens: Welcome, Your Tools, Your Team, Tips for Success, Permissions, Download Codebase
 - [ ] Each screen has Next/Back navigation
 - [ ] Welcome screen explains the scenario (first day at FinFlow, payment bug investigation)
@@ -55,9 +61,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Verify in browser using dev-browser skill
 
 ### US-004: Implement screen share permission request
+
 **Description:** As a candidate, I need to share my screen before starting so the simulation can be recorded.
 
 **Acceptance Criteria:**
+
 - [ ] Request desktop screen share using `getDisplayMedia()` API with video (1080p, 30fps) and system audio
 - [ ] Request microphone access using `getUserMedia()` API
 - [ ] Display clear UI showing which permissions are granted (checkmarks)
@@ -67,9 +75,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Verify in browser using dev-browser skill
 
 ### US-005: Build main simulation workspace layout
+
 **Description:** As a candidate, I want a workspace interface during the simulation so I can access all tools.
 
 **Acceptance Criteria:**
+
 - [ ] Header bar shows: "Skillvee Work Simulation", screen sharing indicator (red dot when active), countdown timer (MM:SS)
 - [ ] Left sidebar with 4 navigation items: Slack, Calls, Docs, Submit (with icons)
 - [ ] Main content area changes based on sidebar selection
@@ -80,9 +90,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Verify in browser using dev-browser skill
 
 ### US-006: Build Slack-like messaging interface
+
 **Description:** As a candidate, I want to message stakeholders via Slack so I can gather information asynchronously.
 
 **Acceptance Criteria:**
+
 - [ ] Left panel shows channels (#general, #engineering) and Direct Messages (3 stakeholders)
 - [ ] Each DM shows stakeholder name, role, and unread indicator
 - [ ] Message thread displays: sender avatar, name, timestamp, message content
@@ -95,9 +107,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Verify in browser using dev-browser skill
 
 ### US-007: Implement AI stakeholder Slack responses
+
 **Description:** As a candidate, I want stakeholders to respond to my Slack messages so I can gather information.
 
 **Acceptance Criteria:**
+
 - [ ] AI responds to messages within 5-30 seconds (simulating async)
 - [ ] Each stakeholder has distinct personality and knowledge (see Stakeholder Definitions below)
 - [ ] Sarah Chen: supportive but busy, gives high-level direction, refers to others for details
@@ -110,9 +124,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Typecheck passes
 
 ### US-008: Build voice call interface
+
 **Description:** As a candidate, I want to voice call stakeholders so I can have detailed discussions.
 
 **Acceptance Criteria:**
+
 - [ ] Calls view shows 3 stakeholder cards with: avatar, name, role, brief description, Call button
 - [ ] Clicking Call initiates voice call using existing Gemini Live implementation
 - [ ] Active call view shows: stakeholder avatar/name, speaking indicator, call duration timer, Mute button, End Call button
@@ -124,9 +140,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Verify in browser using dev-browser skill
 
 ### US-009: Implement AI stakeholder voice conversations
+
 **Description:** As a candidate, I want realistic voice conversations with stakeholders so I can gather information verbally.
 
 **Acceptance Criteria:**
+
 - [ ] Integrate with Gemini Live API for real-time voice (reuse existing implementation)
 - [ ] Each stakeholder has unique system prompt defining personality, knowledge, and communication style
 - [ ] Sarah Chen prompt: supportive, high-level, delegates to others, trusts candidate judgment
@@ -140,9 +158,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Typecheck passes
 
 ### US-010: Build documentation browser interface
+
 **Description:** As a candidate, I want to browse internal documentation so I can understand the codebase and processes.
 
 **Acceptance Criteria:**
+
 - [ ] Left panel shows expandable folder tree of documentation
 - [ ] Right panel renders selected markdown document
 - [ ] Documentation structure includes: README, Architecture docs, Incident runbooks, Team processes
@@ -152,9 +172,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Verify in browser using dev-browser skill
 
 ### US-011: Build submission interface
+
 **Description:** As a candidate, I want to upload my solution and submit so I can complete the simulation.
 
 **Acceptance Criteria:**
+
 - [ ] Drag-and-drop zone for .zip file upload (or click to browse)
 - [ ] Shows uploaded filename with checkmark when complete
 - [ ] Optional notes textarea for candidate to describe approach
@@ -168,9 +190,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Verify in browser using dev-browser skill
 
 ### US-012: Implement screen recording with chunk upload
+
 **Description:** As a developer, I need to record the candidate's screen throughout the simulation so employers can review.
 
 **Acceptance Criteria:**
+
 - [ ] Record screen + microphone audio using MediaRecorder API
 - [ ] Format: WebM or MP4, 1080p, 30fps minimum
 - [ ] Upload recording chunks every 30 seconds to prevent data loss
@@ -182,9 +206,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Typecheck passes
 
 ### US-013: Implement timer and time warnings
+
 **Description:** As a candidate, I want to see remaining time and receive warnings so I can manage my time.
 
 **Acceptance Criteria:**
+
 - [ ] Timer counts down from 60:00 in MM:SS format
 - [ ] Timer visible in header at all times
 - [ ] At 15 minutes remaining: toast notification "15 minutes remaining"
@@ -195,9 +221,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Verify in browser using dev-browser skill
 
 ### US-014: Create payment bug scenario codebase
+
 **Description:** As a developer, I need to create the codebase that candidates will debug during the simulation.
 
 **Acceptance Criteria:**
+
 - [ ] Node.js + TypeScript + Express + PostgreSQL + Prisma stack
 - [ ] 50-60 files total across: api/routes, api/middleware, services/payment, services/providers, services/webhooks, db/models, db/migrations, utils, config, types, tests
 - [ ] Bug location: `src/services/webhooks/handler.ts` and `processor.ts`
@@ -211,9 +239,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Typecheck passes (codebase itself)
 
 ### US-015: Create stakeholder system prompts
+
 **Description:** As a developer, I need detailed AI prompts for each stakeholder so they behave consistently and realistically.
 
 **Acceptance Criteria:**
+
 - [ ] Sarah Chen (Engineering Manager) prompt includes: personality (supportive, busy), knowledge (high-level issue, team context), doesn't know (technical details, specific customers), communication style (professional, delegates)
 - [ ] Mike Torres (Product Manager) prompt includes: personality (verbose, enthusiastic), knowledge (customer names/amounts, timeline, business impact), doesn't know (code, debugging), communication style (over-shares, tangential)
 - [ ] Alex Kim (Senior Engineer) prompt includes: personality (concise, skeptical), knowledge (codebase, recent webhook optimization, TODO comment), doesn't know (customer complaints), communication style (hints not answers, asks clarifying questions)
@@ -224,9 +254,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Typecheck passes
 
 ### US-016: Build post-submission waiting screen
+
 **Description:** As a candidate, I want to see that my submission is being evaluated so I know what to expect.
 
 **Acceptance Criteria:**
+
 - [ ] Route: `/simulation/[id]/complete`
 - [ ] Shows "Thanks! We're evaluating your submission" message
 - [ ] Shows loading spinner/animation
@@ -237,9 +269,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Verify in browser using dev-browser skill
 
 ### US-017: Implement AI evaluation pipeline
+
 **Description:** As a developer, I need to evaluate candidate performance using AI so employers receive actionable insights.
 
 **Acceptance Criteria:**
+
 - [ ] Trigger evaluation automatically after submission
 - [ ] Input to AI: screen recording, all Slack transcripts, all call transcripts, submitted code, original codebase
 - [ ] Evaluate 5 dimensions: Information Gathering (25%), Communication Clarity (20%), Technical Judgment (25%), Problem-Solving Approach (20%), Solution Quality (10%)
@@ -254,9 +288,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Typecheck passes
 
 ### US-018: Build candidate results page
+
 **Description:** As a candidate, I want to see my evaluation results so I understand my performance.
 
 **Acceptance Criteria:**
+
 - [ ] Route: `/simulation/[id]/results`
 - [ ] Shows overall score (1-5) with recommendation badge
 - [ ] Shows 5 dimension scores with progress bars and summaries
@@ -268,9 +304,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Verify in browser using dev-browser skill
 
 ### US-019: Add simulation results to candidate profile
+
 **Description:** As a candidate, I want my simulation results visible on my profile so employers can see them.
 
 **Acceptance Criteria:**
+
 - [ ] New "Work Simulation" section on profile page
 - [ ] Shows: scenario name, completion date, overall score, recommendation
 - [ ] Expandable to show dimension breakdown
@@ -279,9 +317,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Verify in browser using dev-browser skill
 
 ### US-020: Add simulation results to employer candidate view
+
 **Description:** As an employer, I want to see candidate simulation results so I can make informed hiring decisions.
 
 **Acceptance Criteria:**
+
 - [ ] New "Work Simulation" section on employer's candidate detail page
 - [ ] Shows: overall score, recommendation, dimension scores
 - [ ] Shows key highlights with timestamps
@@ -293,9 +333,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Verify in browser using dev-browser skill
 
 ### US-021: Build recording playback with timestamp navigation
+
 **Description:** As an employer, I want to watch the candidate's screen recording and jump to specific moments.
 
 **Acceptance Criteria:**
+
 - [ ] Video player component with standard controls (play, pause, seek, volume)
 - [ ] Timestamp links from highlights jump to exact moment in video
 - [ ] Playback speed controls (0.5x, 1x, 1.5x, 2x)
@@ -304,9 +346,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Verify in browser using dev-browser skill
 
 ### US-022: Handle screen share interruption gracefully
+
 **Description:** As a candidate, I want to continue my simulation if screen share fails so I don't lose progress.
 
 **Acceptance Criteria:**
+
 - [ ] Detect when screen share stream ends unexpectedly
 - [ ] Pause simulation timer immediately
 - [ ] Show modal: "Screen share stopped. Please re-share to continue."
@@ -318,9 +362,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Verify in browser using dev-browser skill
 
 ### US-023: Create simulation tRPC router
+
 **Description:** As a developer, I need API endpoints for all simulation operations.
 
 **Acceptance Criteria:**
+
 - [ ] Create `src/server/api/routers/simulation.ts`
 - [ ] `simulation.getScenarios` - list available scenarios
 - [ ] `simulation.start` - create simulation, return codebase URL and initial data
@@ -338,9 +384,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Typecheck passes
 
 ### US-024: Seed initial payment bug scenario
+
 **Description:** As a developer, I need to seed the initial scenario so candidates can start simulations.
 
 **Acceptance Criteria:**
+
 - [ ] Create seed script: `prisma/seed-simulation.ts`
 - [ ] Seed one SimulationScenario record for "Payment Processing Bug"
 - [ ] Include: name, description, difficulty (MEDIUM), duration (60), codebaseUrl, documentationContent, stakeholders (3 with full prompts), initialMessage (from Sarah), evaluationCriteria
@@ -349,9 +397,11 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 - [ ] Typecheck passes
 
 ### US-025: Handle browser crash recovery
+
 **Description:** As a candidate, I want to resume my simulation if my browser crashes so I don't lose progress.
 
 **Acceptance Criteria:**
+
 - [ ] If candidate navigates to `/simulation/[id]` for an IN_PROGRESS simulation, resume instead of starting new
 - [ ] Timer continues from stored value in database (not reset)
 - [ ] All previous Slack messages and call transcripts are loaded
@@ -366,31 +416,34 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 ## Stakeholder Definitions
 
 ### Sarah Chen - Engineering Manager
-| Attribute | Value |
-|-----------|-------|
-| Role | Engineering Manager, Payments Team |
-| Personality | Supportive but busy, gives high-level direction, expects autonomy |
-| Knowledge | Team context, high-level architecture, timeline expectations, who to talk to |
-| Doesn't Know | Technical implementation details, specific customer complaints, product roadmap |
-| Communication Style | Professional, warm, delegates ("Alex would know more"), trusts judgment |
+
+| Attribute           | Value                                                                           |
+| ------------------- | ------------------------------------------------------------------------------- |
+| Role                | Engineering Manager, Payments Team                                              |
+| Personality         | Supportive but busy, gives high-level direction, expects autonomy               |
+| Knowledge           | Team context, high-level architecture, timeline expectations, who to talk to    |
+| Doesn't Know        | Technical implementation details, specific customer complaints, product roadmap |
+| Communication Style | Professional, warm, delegates ("Alex would know more"), trusts judgment         |
 
 ### Mike Torres - Product Manager
-| Attribute | Value |
-|-----------|-------|
-| Role | Product Manager, Payments |
-| Personality | Verbose, enthusiastic, provides lots of context, sometimes more than needed |
-| Knowledge | Customer names/amounts (Acme Corp $2M/mo, TechGlobal $800K/mo), timeline (started Tuesday 3pm), European enterprise customers, business impact |
-| Doesn't Know | Technical implementation, code structure, how to debug |
-| Communication Style | Talks a lot, goes on tangents, very customer-focused, appreciates directness |
+
+| Attribute           | Value                                                                                                                                          |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Role                | Product Manager, Payments                                                                                                                      |
+| Personality         | Verbose, enthusiastic, provides lots of context, sometimes more than needed                                                                    |
+| Knowledge           | Customer names/amounts (Acme Corp $2M/mo, TechGlobal $800K/mo), timeline (started Tuesday 3pm), European enterprise customers, business impact |
+| Doesn't Know        | Technical implementation, code structure, how to debug                                                                                         |
+| Communication Style | Talks a lot, goes on tangents, very customer-focused, appreciates directness                                                                   |
 
 ### Alex Kim - Senior Software Engineer
-| Attribute | Value |
-|-----------|-------|
-| Role | Senior Software Engineer / Tech Lead, Payments |
-| Personality | Concise, technical, appreciates well-formed questions, skeptical of new people |
-| Knowledge | Deep codebase knowledge, recent webhook optimization (removed async queue), TODO comment about retry logic, historical context |
-| Doesn't Know | Current customer complaints (hasn't checked Slack), business priorities |
-| Communication Style | Short answers, asks clarifying questions, gives hints not answers |
+
+| Attribute           | Value                                                                                                                          |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Role                | Senior Software Engineer / Tech Lead, Payments                                                                                 |
+| Personality         | Concise, technical, appreciates well-formed questions, skeptical of new people                                                 |
+| Knowledge           | Deep codebase knowledge, recent webhook optimization (removed async queue), TODO comment about retry logic, historical context |
+| Doesn't Know        | Current customer complaints (hasn't checked Slack), business priorities                                                        |
+| Communication Style | Short answers, asks clarifying questions, gives hints not answers                                                              |
 
 ---
 
@@ -438,6 +491,7 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 ## Design Considerations
 
 ### Main Simulation Layout
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  Header: "Skillvee Work Simulation"  [● Recording]    [45:32]  │
@@ -454,20 +508,24 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 ```
 
 ### Slack Interface
+
 - Left panel: Channels + Direct Messages with unread indicators
 - Right panel: Message thread with input at bottom
 - Typing indicator when AI responding
 
 ### Call Interface
+
 - Stakeholder cards with Call button when not in call
 - Active call: avatar, speaking indicator, duration, mute/end buttons, live transcript
 
 ### Color System for Timer
+
 - Green: >15 minutes remaining
 - Yellow: 5-15 minutes remaining
 - Red: <5 minutes remaining
 
 ### Existing Components to Reuse
+
 - Sidebar navigation from admin dashboard
 - Toast notifications
 - Modal dialogs
@@ -480,30 +538,35 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 ## Technical Considerations
 
 ### Dependencies
+
 - Gemini Live API (existing implementation in `src/lib/gemini-live/`)
 - MediaRecorder API for screen recording
 - getDisplayMedia API for screen capture
 - Cloud storage for recordings and codebase files (Supabase Storage or S3)
 
 ### Performance Requirements
+
 - AI Slack response latency: 5-30 seconds (intentional to simulate async)
 - AI voice response latency: <500ms
 - Recording chunk upload: every 30 seconds
 - Evaluation processing: <5 minutes
 
 ### Data Storage
+
 - Screen recordings: Supabase Storage, retain forever
 - Codebase files: Supabase Storage, versioned per scenario
 - Conversation transcripts: Database (JSON)
 - Evaluation results: Database (JSON)
 
 ### Browser Crash Recovery
+
 - If browser crashes, candidate can return to `/simulation/[id]` and resume
 - Timer continues from where it left off (stored in database)
 - Recording resumes with new chunk sequence
 - All messages and call history preserved
 
 ### Background Processing
+
 - Evaluation runs as background job after submission
 - Recording finalization (merging chunks) runs async
 
@@ -511,85 +574,92 @@ Build an immersive, first-day-on-the-job simulation that places software enginee
 
 ## Success Metrics
 
-| Metric | Target |
-|--------|--------|
-| Simulation completion rate | >80% |
-| Average completion time | 45-55 minutes |
-| Evaluation accuracy (vs human review) | >85% |
-| Employer satisfaction | >4/5 |
-| Candidate satisfaction | >4/5 |
-| Screen recording success rate | >99% |
-| Voice call quality (no issues) | >95% |
-| Evaluation processing time | <5 minutes |
+| Metric                                | Target        |
+| ------------------------------------- | ------------- |
+| Simulation completion rate            | >80%          |
+| Average completion time               | 45-55 minutes |
+| Evaluation accuracy (vs human review) | >85%          |
+| Employer satisfaction                 | >4/5          |
+| Candidate satisfaction                | >4/5          |
+| Screen recording success rate         | >99%          |
+| Voice call quality (no issues)        | >95%          |
+| Evaluation processing time            | <5 minutes    |
 
 ---
 
 ## Appendix A: Information Distribution Table
 
-| Information | Sarah (EM) | Mike (PM) | Alex (SE) |
-|-------------|------------|-----------|-----------|
-| Customers affected | "enterprise customers" | Names + $ amounts | Unaware |
-| When it started | "a few days ago" | "Tuesday 3pm" | Can check logs |
-| Error symptoms | "payments failing" | "charged but marked failed" | "webhook errors in logs" |
-| Affected regions | Doesn't know | "Mostly Europe" | Can correlate with traffic |
-| Recent changes | "Nothing major" | "New enterprise tier launched" | "I merged webhook optimization last week" |
-| Root cause hints | None | None | "Check webhook timing" if asked well |
+| Information        | Sarah (EM)             | Mike (PM)                      | Alex (SE)                                 |
+| ------------------ | ---------------------- | ------------------------------ | ----------------------------------------- |
+| Customers affected | "enterprise customers" | Names + $ amounts              | Unaware                                   |
+| When it started    | "a few days ago"       | "Tuesday 3pm"                  | Can check logs                            |
+| Error symptoms     | "payments failing"     | "charged but marked failed"    | "webhook errors in logs"                  |
+| Affected regions   | Doesn't know           | "Mostly Europe"                | Can correlate with traffic                |
+| Recent changes     | "Nothing major"        | "New enterprise tier launched" | "I merged webhook optimization last week" |
+| Root cause hints   | None                   | None                           | "Check webhook timing" if asked well      |
 
 ---
 
 ## Appendix B: Evaluation Rubric
 
 ### 1. Information Gathering (25%)
-| Score | Criteria |
-|-------|----------|
-| 5 | Asks precise, targeted questions. Efficiently extracts key information. Knows when to stop asking and start doing. |
-| 4 | Asks good questions, covers main areas. Minor inefficiencies. |
-| 3 | Gathers necessary information but takes longer. Some redundant questions. |
-| 2 | Misses important questions. Over-relies on one source. |
-| 1 | Fails to gather critical information. Jumps to conclusions. |
+
+| Score | Criteria                                                                                                           |
+| ----- | ------------------------------------------------------------------------------------------------------------------ |
+| 5     | Asks precise, targeted questions. Efficiently extracts key information. Knows when to stop asking and start doing. |
+| 4     | Asks good questions, covers main areas. Minor inefficiencies.                                                      |
+| 3     | Gathers necessary information but takes longer. Some redundant questions.                                          |
+| 2     | Misses important questions. Over-relies on one source.                                                             |
+| 1     | Fails to gather critical information. Jumps to conclusions.                                                        |
 
 ### 2. Communication Clarity (20%)
-| Score | Criteria |
-|-------|----------|
-| 5 | Clear, concise, professional. Adapts style to audience. Summarizes effectively. |
-| 4 | Clear communication with minor verbosity. |
-| 3 | Gets point across but could be clearer. |
-| 2 | Confusing or overly verbose. Miscommunications occur. |
-| 1 | Unable to clearly express needs or findings. |
+
+| Score | Criteria                                                                        |
+| ----- | ------------------------------------------------------------------------------- |
+| 5     | Clear, concise, professional. Adapts style to audience. Summarizes effectively. |
+| 4     | Clear communication with minor verbosity.                                       |
+| 3     | Gets point across but could be clearer.                                         |
+| 2     | Confusing or overly verbose. Miscommunications occur.                           |
+| 1     | Unable to clearly express needs or findings.                                    |
 
 ### 3. Technical Judgment (25%)
-| Score | Criteria |
-|-------|----------|
-| 5 | Quickly identifies relevant code areas. Forms correct hypotheses. Efficient debugging approach. |
-| 4 | Good technical instincts with minor detours. |
-| 3 | Eventually finds the issue but inefficient path. |
-| 2 | Struggles to navigate codebase. Poor hypotheses. |
-| 1 | Unable to make meaningful progress technically. |
+
+| Score | Criteria                                                                                        |
+| ----- | ----------------------------------------------------------------------------------------------- |
+| 5     | Quickly identifies relevant code areas. Forms correct hypotheses. Efficient debugging approach. |
+| 4     | Good technical instincts with minor detours.                                                    |
+| 3     | Eventually finds the issue but inefficient path.                                                |
+| 2     | Struggles to navigate codebase. Poor hypotheses.                                                |
+| 1     | Unable to make meaningful progress technically.                                                 |
 
 ### 4. Problem-Solving Approach (20%)
-| Score | Criteria |
-|-------|----------|
-| 5 | Structured approach. Prioritizes effectively. Adapts when needed. |
-| 4 | Good approach with minor inefficiencies. |
-| 3 | Makes progress but unstructured. |
-| 2 | Chaotic approach. Difficulty prioritizing. |
-| 1 | No clear approach. Stuck frequently. |
+
+| Score | Criteria                                                          |
+| ----- | ----------------------------------------------------------------- |
+| 5     | Structured approach. Prioritizes effectively. Adapts when needed. |
+| 4     | Good approach with minor inefficiencies.                          |
+| 3     | Makes progress but unstructured.                                  |
+| 2     | Chaotic approach. Difficulty prioritizing.                        |
+| 1     | No clear approach. Stuck frequently.                              |
 
 ### 5. Solution Quality (10%)
-| Score | Criteria |
-|-------|----------|
-| 5 | Correct fix. Clean code. Considers edge cases. |
-| 4 | Correct fix with minor issues. |
-| 3 | Partial fix or correct fix with code quality issues. |
-| 2 | Incorrect fix but demonstrates understanding. |
-| 1 | No solution or completely wrong approach. |
+
+| Score | Criteria                                             |
+| ----- | ---------------------------------------------------- |
+| 5     | Correct fix. Clean code. Considers edge cases.       |
+| 4     | Correct fix with minor issues.                       |
+| 3     | Partial fix or correct fix with code quality issues. |
+| 2     | Incorrect fix but demonstrates understanding.        |
+| 1     | No solution or completely wrong approach.            |
 
 ---
 
 ## Appendix C: The Bug (What Candidates Must Discover)
 
 ### Root Cause
+
 Race condition in webhook processing. When a payment is initiated:
+
 1. System creates a pending transaction record in database
 2. System sends request to payment provider (Stripe)
 3. Provider processes payment and sends webhook with result
@@ -598,13 +668,17 @@ Race condition in webhook processing. When a payment is initiated:
 **The Bug**: Under high load, the webhook sometimes arrives BEFORE the transaction record is fully committed to the database. The webhook handler queries for the transaction, can't find it, logs an error, and the payment is marked as failed—even though it succeeded at Stripe.
 
 ### Why It's Intermittent
+
 Only happens under specific timing conditions:
+
 - High concurrent request volume
 - Database write latency spikes
 - Fast webhook delivery from Stripe
 
 ### The Fix (What Good Candidates Should Implement)
+
 Add retry logic with exponential backoff in the webhook handler:
+
 ```typescript
 // src/services/webhooks/handler.ts
 async function handleWebhook(webhookData: WebhookPayload) {
@@ -613,7 +687,7 @@ async function handleWebhook(webhookData: WebhookPayload) {
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     const transaction = await db.transaction.findUnique({
-      where: { providerTransactionId: webhookData.transactionId }
+      where: { providerTransactionId: webhookData.transactionId },
     });
 
     if (transaction) {
@@ -625,12 +699,15 @@ async function handleWebhook(webhookData: WebhookPayload) {
   }
 
   // After retries, log error and queue for manual review
-  logger.error(`Transaction not found after ${maxRetries} retries`, { webhookData });
+  logger.error(`Transaction not found after ${maxRetries} retries`, {
+    webhookData,
+  });
   await queueForManualReview(webhookData);
 }
 ```
 
 Alternative valid solutions:
+
 - Use a message queue (e.g., Redis, SQS) to ensure ordering
 - Implement optimistic locking with upsert pattern
 - Add webhook event storage with deferred processing
@@ -748,25 +825,26 @@ payment-service/
 ### Key Files with Clues
 
 **src/services/webhooks/handler.ts** (THE BUG):
+
 ```typescript
-import { db } from '../../db/client';
-import { WebhookPayload } from './types';
-import { processWebhookEvent } from './processor';
-import { logger } from '../../utils/logger';
+import { db } from "../../db/client";
+import { WebhookPayload } from "./types";
+import { processWebhookEvent } from "./processor";
+import { logger } from "../../utils/logger";
 
 // TODO: Add retry logic for timing edge cases
 export async function handleStripeWebhook(payload: WebhookPayload) {
   const transaction = await db.transaction.findUnique({
-    where: { stripePaymentIntentId: payload.data.object.id }
+    where: { stripePaymentIntentId: payload.data.object.id },
   });
 
   if (!transaction) {
     // This happens sometimes under load - not sure why
-    logger.error('Transaction not found for webhook', {
+    logger.error("Transaction not found for webhook", {
       paymentIntentId: payload.data.object.id,
-      eventType: payload.type
+      eventType: payload.type,
     });
-    return { success: false, error: 'Transaction not found' };
+    return { success: false, error: "Transaction not found" };
   }
 
   return processWebhookEvent(transaction, payload);
@@ -774,15 +852,18 @@ export async function handleStripeWebhook(payload: WebhookPayload) {
 ```
 
 **docs/incidents/runbook.md** (CLUE):
+
 ```markdown
 ## Common Issues
 
 ### "Transaction not found for webhook"
+
 This error appears in logs occasionally. Usually resolves itself.
 Check CloudWatch for patterns. If persistent, contact Alex.
 ```
 
 **Git log** (candidates can run `git log --oneline`):
+
 ```
 a]1b2c3d4 (HEAD -> main) Fix typo in README
 e5f6g7h8 Update dependencies
@@ -1003,7 +1084,7 @@ The AI evaluation must output this exact JSON structure:
     },
     "communication_clarity": {
       "score": 5,
-      "weight": 0.20,
+      "weight": 0.2,
       "summary": "Excellent communication throughout. Adapted style appropriately—concise with Alex, patient with Mike's tangents. Summarized understanding before moving to code."
     },
     "technical_judgment": {
@@ -1013,12 +1094,12 @@ The AI evaluation must output this exact JSON structure:
     },
     "problem_solving": {
       "score": 4,
-      "weight": 0.20,
+      "weight": 0.2,
       "summary": "Structured approach: gathered context first, then explored code, then implemented. Good time management—left 15 minutes for implementation and testing."
     },
     "solution_quality": {
       "score": 4,
-      "weight": 0.10,
+      "weight": 0.1,
       "summary": "Implemented retry logic with exponential backoff. Correct fix. Minor issue: hardcoded retry count instead of making it configurable."
     }
   },
@@ -1093,18 +1174,18 @@ The AI evaluation must output this exact JSON structure:
 
 ### Field Definitions
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `overall_score` | number (1.0-5.0) | Weighted average of dimension scores, one decimal |
-| `recommendation` | enum | One of: "Strong Hire", "Hire", "Maybe", "No Hire" |
-| `dimension_scores` | object | Score (1-5), weight, and summary for each of 5 dimensions |
-| `key_highlights` | array | 5-10 timestamped moments showing candidate behavior |
-| `key_highlights[].timestamp` | string | MM:SS format from start of simulation |
-| `key_highlights[].type` | enum | "positive" or "negative" |
-| `key_highlights[].dimension` | string | Which skill dimension this demonstrates |
-| `key_highlights[].description` | string | What happened and why it matters |
-| `key_highlights[].quote` | string or null | What the candidate said, if applicable |
-| `summary` | string | 2-3 sentence overall assessment |
+| Field                          | Type             | Description                                               |
+| ------------------------------ | ---------------- | --------------------------------------------------------- |
+| `overall_score`                | number (1.0-5.0) | Weighted average of dimension scores, one decimal         |
+| `recommendation`               | enum             | One of: "Strong Hire", "Hire", "Maybe", "No Hire"         |
+| `dimension_scores`             | object           | Score (1-5), weight, and summary for each of 5 dimensions |
+| `key_highlights`               | array            | 5-10 timestamped moments showing candidate behavior       |
+| `key_highlights[].timestamp`   | string           | MM:SS format from start of simulation                     |
+| `key_highlights[].type`        | enum             | "positive" or "negative"                                  |
+| `key_highlights[].dimension`   | string           | Which skill dimension this demonstrates                   |
+| `key_highlights[].description` | string           | What happened and why it matters                          |
+| `key_highlights[].quote`       | string or null   | What the candidate said, if applicable                    |
+| `summary`                      | string           | 2-3 sentence overall assessment                           |
 
 ---
 

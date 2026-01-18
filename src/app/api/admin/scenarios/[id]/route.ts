@@ -26,7 +26,10 @@ export async function GET(request: Request, context: RouteContext) {
 
   const user = session.user as SessionUser;
   if (user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Admin access required" },
+      { status: 403 }
+    );
   }
 
   const { id } = await context.params;
@@ -56,7 +59,10 @@ export async function PUT(request: Request, context: RouteContext) {
 
   const user = session.user as SessionUser;
   if (user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Admin access required" },
+      { status: 403 }
+    );
   }
 
   const { id } = await context.params;
@@ -71,19 +77,32 @@ export async function PUT(request: Request, context: RouteContext) {
   }
 
   const body = await request.json();
-  const { name, companyName, companyDescription, taskDescription, repoUrl, techStack, isPublished } = body;
+  const {
+    name,
+    companyName,
+    companyDescription,
+    taskDescription,
+    repoUrl,
+    techStack,
+    isPublished,
+  } = body;
 
   // Validate techStack if provided
   if (techStack !== undefined && !Array.isArray(techStack)) {
-    return NextResponse.json({ error: "techStack must be an array" }, { status: 400 });
+    return NextResponse.json(
+      { error: "techStack must be an array" },
+      { status: 400 }
+    );
   }
 
   // Build update data with only provided fields
   const updateData: Record<string, unknown> = {};
   if (name !== undefined) updateData.name = name;
   if (companyName !== undefined) updateData.companyName = companyName;
-  if (companyDescription !== undefined) updateData.companyDescription = companyDescription;
-  if (taskDescription !== undefined) updateData.taskDescription = taskDescription;
+  if (companyDescription !== undefined)
+    updateData.companyDescription = companyDescription;
+  if (taskDescription !== undefined)
+    updateData.taskDescription = taskDescription;
   if (repoUrl !== undefined) updateData.repoUrl = repoUrl;
   if (techStack !== undefined) updateData.techStack = techStack;
   if (isPublished !== undefined) updateData.isPublished = isPublished;
@@ -109,7 +128,10 @@ export async function DELETE(request: Request, context: RouteContext) {
 
   const user = session.user as SessionUser;
   if (user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Admin access required" },
+      { status: 403 }
+    );
   }
 
   const { id } = await context.params;
