@@ -266,3 +266,53 @@ Learnings from autonomous issue resolution.
 3. **Browser testing limitations**: Headless browser testing cannot grant microphone/screen sharing permissions, so call functionality requires manual testing or mocked audio APIs.
 
 4. **min-h-0 for flex scroll children**: When a flex child should scroll its content, `min-h-0` is required to override the default `min-height: auto` which prevents the element from shrinking below its content size.
+
+## Issue #85: US-024 - Add In-Call Indicator to Chat
+
+### What was implemented
+- Added green "In call" badge to chat header when user is on a call with that person
+- Badge shows phone icon + "In call" text with green background (neo-brutalist style)
+- Badge replaces "online" indicator when call is active
+- Badge disappears automatically when call ends (uses CallContext)
+- Added comprehensive unit tests for the in-call indicator behavior
+
+### Files changed
+- `src/components/chat.tsx` - Added in-call indicator with CallContext integration:
+  - Import `Phone` icon from lucide-react
+  - Import `useCallContext` from slack-layout
+  - Check if `activeCall?.coworkerId === coworker.id` to determine in-call state
+  - Conditionally render green badge vs online indicator in header
+- `src/components/chat.test.tsx` - New test file with 11 tests covering:
+  - Rendering (name, role, initials)
+  - In-call indicator states (online, in call, different coworker)
+  - Message input and done button
+
+### Design decisions
+- **Slack-inspired UI**: Followed Slack's huddle pattern with a distinct badge in the conversation header
+- **Green color for active call**: Used `bg-green-500` with `border-green-600` (2px border) for neo-brutalist consistency
+- **Phone icon**: Used lucide-react's Phone icon (14px) to indicate call status
+- **Font mono**: Used `font-mono text-sm font-bold text-white` for "In call" text
+
+### Learnings for future iterations
+
+1. **CallContext for cross-component call state**: The `useCallContext()` hook from `slack-layout.tsx` provides `activeCall` state that can be consumed by any component within the `SlackLayout`. This makes it easy to show call indicators across multiple UI components.
+
+2. **Screen recording guard blocks E2E testing**: The chat page requires screen sharing permission which headless browsers cannot grant. Browser-based tests for chat functionality will be blocked by `ScreenRecordingGuard` component unless testing infrastructure adds bypass mechanisms.
+
+3. **Neo-brutalist green indicators**: For active/success states in the design system, use:
+   - `bg-green-500` for solid backgrounds
+   - `border-2 border-green-600` for borders
+   - `text-white` for text on green backgrounds
+   - `px-3 py-1` for compact badge padding
+
+4. **Conditional rendering in headers**: When swapping between two indicator states (online vs in-call), use a single conditional with explicit branches rather than stacking multiple conditionals. This makes the code clearer and ensures mutual exclusivity.
+
+5. **Unit testing with mocked context**: For components using React context, mock the context hook at the module level and mutate the mock state in `beforeEach` to test different scenarios:
+   ```typescript
+   const mockActiveCall = { coworkerId: "", callType: "coworker" as const };
+   vi.mock("@/components/slack-layout", () => ({
+     useCallContext: vi.fn(() => ({
+       activeCall: mockActiveCall.coworkerId ? mockActiveCall : null,
+     })),
+   }));
+   ```

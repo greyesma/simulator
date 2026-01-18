@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { Phone } from "lucide-react";
 import { api, ApiClientError } from "@/lib/api-client";
+import { useCallContext } from "@/components/slack-layout";
 
 interface ChatMessage {
   role: "user" | "model";
@@ -35,6 +37,10 @@ export function Chat({
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Check if currently in a call with this coworker
+  const { activeCall } = useCallContext();
+  const isInCall = activeCall?.coworkerId === coworker.id;
 
   // Get coworker initials for avatar
   const initials = coworker.name
@@ -143,12 +149,27 @@ export function Chat({
           <h1 className="text-lg font-bold">{coworker.name}</h1>
           <p className="text-sm text-muted-foreground">{coworker.role}</p>
         </div>
-        {/* Online indicator */}
+        {/* Status indicator */}
         <div className="ml-auto flex items-center gap-2">
-          <div className="h-3 w-3 border border-foreground bg-secondary" />
-          <span className="font-mono text-sm text-muted-foreground">
-            online
-          </span>
+          {isInCall ? (
+            <>
+              {/* In-call indicator - green bar with phone icon */}
+              <div className="flex items-center gap-2 border-2 border-green-600 bg-green-500 px-3 py-1">
+                <Phone size={14} className="text-white" />
+                <span className="font-mono text-sm font-bold text-white">
+                  In call
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Online indicator */}
+              <div className="h-3 w-3 border border-foreground bg-secondary" />
+              <span className="font-mono text-sm text-muted-foreground">
+                online
+              </span>
+            </>
+          )}
         </div>
       </header>
 
