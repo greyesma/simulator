@@ -1,6 +1,6 @@
 import { db } from "@/server/db";
 import Link from "next/link";
-import { getAnalytics } from "@/lib/analytics";
+import { getAnalytics } from "@/lib/core";
 import { AnalyticsDashboard } from "./analytics-dashboard";
 
 export default async function AdminDashboard() {

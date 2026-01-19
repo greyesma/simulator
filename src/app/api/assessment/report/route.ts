@@ -2,13 +2,13 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
 import { AssessmentStatus } from "@prisma/client";
-import type { CodeReviewData } from "@/lib/code-review";
-import type { PrCiStatus } from "@/lib/github";
-import type { ChatMessage } from "@/lib/conversation-memory";
+import type { CodeReviewData } from "@/lib/analysis";
+import type { PrCiStatus } from "@/lib/external";
+import type { ChatMessage } from "@/lib/ai";
 import {
   aggregateSegmentAnalyses,
   type SegmentAnalysisResponse,
-} from "@/lib/recording-analysis";
+} from "@/lib/analysis";
 import {
   generateAssessmentReport,
   reportToPrismaJson,
@@ -17,8 +17,8 @@ import {
   type HRSignals,
   type RecordingSignals,
   type ConversationSignals,
-} from "@/lib/assessment-aggregation";
-import { sendReportEmail, isEmailServiceConfigured } from "@/lib/email";
+} from "@/lib/analysis";
+import { sendReportEmail, isEmailServiceConfigured } from "@/lib/external";
 
 /**
  * Collects all assessment signals from the database

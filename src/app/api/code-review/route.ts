@@ -7,8 +7,8 @@ import {
   buildCodeReviewData,
   codeReviewToPrismaJson,
   type CodeReviewData,
-} from "@/lib/code-review";
-import { fetchGitHubPrContent } from "@/lib/github";
+} from "@/lib/analysis";
+import { fetchGitHubPrContent } from "@/lib/external";
 import { success, error, validationError } from "@/lib/api-response";
 
 // Schema for code review request

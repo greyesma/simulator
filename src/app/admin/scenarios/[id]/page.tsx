@@ -1,4 +1,4 @@
-import { requireAdmin } from "@/lib/admin";
+import { requireAdmin } from "@/lib/core";
 import { db } from "@/server/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";

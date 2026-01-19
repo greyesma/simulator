@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "@/server/db";
-import { requireAdmin } from "@/lib/admin";
+import { requireAdmin } from "@/lib/core";
 import { AssessmentTimelineClient } from "./client";
 
 export default async function AssessmentTimelinePage({

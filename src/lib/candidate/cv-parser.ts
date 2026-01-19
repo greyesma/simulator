@@ -1,6 +1,6 @@
-import { gemini } from "@/lib/gemini";
-import { supabaseAdmin } from "@/lib/supabase";
-import { STORAGE_BUCKETS } from "@/lib/storage";
+import { gemini } from "@/lib/ai";
+import { supabaseAdmin } from "@/lib/external";
+import { STORAGE_BUCKETS } from "@/lib/external";
 import { z } from "zod";
 import type { Prisma } from "@prisma/client";
 

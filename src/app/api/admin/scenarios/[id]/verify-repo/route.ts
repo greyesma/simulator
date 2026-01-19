@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { env } from "@/lib/env";
+import { env } from "@/lib/core";
 
 interface SessionUser {
   id: string;

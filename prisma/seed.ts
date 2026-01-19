@@ -12,7 +12,7 @@ import {
   VideoAssessmentStatus,
 } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { EXAMPLE_COWORKERS } from "../src/lib/coworker-persona";
+import { EXAMPLE_COWORKERS } from "../src/lib/ai/coworker-persona";
 
 const prisma = new PrismaClient();
 

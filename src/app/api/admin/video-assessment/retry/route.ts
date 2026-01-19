@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/admin";
+import { requireAdmin } from "@/lib/core";
 import { db } from "@/server/db";
 import {
   retryVideoAssessment,
   forceRetryVideoAssessment,
-} from "@/lib/video-evaluation";
+} from "@/lib/analysis";
 import { VideoAssessmentStatus } from "@prisma/client";
 
 /**

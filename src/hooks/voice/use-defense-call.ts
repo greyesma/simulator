@@ -3,9 +3,9 @@
 import { useState, useCallback } from "react";
 import { useVoiceBase } from "./use-voice-base";
 import type { VoiceConnectionState, VoiceBaseOptions } from "./types";
-import type { AudioPermissionState } from "@/lib/audio";
-import type { TranscriptMessage } from "@/lib/gemini";
-import type { CategorizedError } from "@/lib/error-recovery";
+import type { AudioPermissionState } from "@/lib/media";
+import type { TranscriptMessage } from "@/lib/ai";
+import type { CategorizedError } from "@/lib/core";
 
 export type { VoiceConnectionState as ConnectionState };
 

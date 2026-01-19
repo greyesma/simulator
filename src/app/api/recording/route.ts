@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { supabaseAdmin } from "@/lib/supabase";
-import { STORAGE_BUCKETS } from "@/lib/storage";
+import { supabaseAdmin } from "@/lib/external";
+import { STORAGE_BUCKETS } from "@/lib/external";
 import { success, error } from "@/lib/api-response";
 
 // Maximum file sizes

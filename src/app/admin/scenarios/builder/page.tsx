@@ -1,4 +1,4 @@
-import { requireAdmin } from "@/lib/admin";
+import { requireAdmin } from "@/lib/core";
 import { ScenarioBuilderClient } from "./client";
 
 export default async function ScenarioBuilderPage() {

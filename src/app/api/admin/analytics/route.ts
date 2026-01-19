@@ -5,7 +5,7 @@ import {
   getAnalytics,
   TimePeriodSchema,
   type TimePeriod,
-} from "@/lib/analytics";
+} from "@/lib/core";
 
 /**
  * GET /api/admin/analytics

@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { supabaseAdmin } from "@/lib/supabase";
-import { STORAGE_BUCKETS } from "@/lib/storage";
+import { supabaseAdmin } from "@/lib/external";
+import { STORAGE_BUCKETS } from "@/lib/external";
 import { db } from "@/server/db";
-import { parseCv, profileToPrismaJson } from "@/lib/cv-parser";
+import { parseCv, profileToPrismaJson } from "@/lib/candidate";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 

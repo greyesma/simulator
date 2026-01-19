@@ -27,7 +27,7 @@ vi.mock("@/server/db", () => ({
 }));
 
 // Import after mocks
-import { generateQueryEmbedding, buildQueryText } from "@/lib/embeddings";
+import { generateQueryEmbedding, buildQueryText } from "@/lib/candidate";
 import { db } from "@/server/db";
 import {
   searchCandidates,

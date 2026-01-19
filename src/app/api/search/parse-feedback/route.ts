@@ -8,7 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { parseFeedback } from "@/lib/feedback-parsing";
+import { parseFeedback } from "@/lib/candidate";
 
 export async function POST(request: NextRequest) {
   try {

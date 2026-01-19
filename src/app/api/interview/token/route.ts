@@ -1,12 +1,12 @@
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { generateEphemeralToken } from "@/lib/gemini";
+import { generateEphemeralToken } from "@/lib/ai";
 import {
   buildHRInterviewPrompt,
   formatCVContextForHR,
   formatBasicCandidateContext,
 } from "@/prompts";
-import { formatProfileForPrompt, profileFromPrismaJson } from "@/lib/cv-parser";
+import { formatProfileForPrompt, profileFromPrismaJson } from "@/lib/candidate";
 import { success, error } from "@/lib/api-response";
 
 export async function POST(request: Request) {

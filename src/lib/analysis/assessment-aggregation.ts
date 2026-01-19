@@ -20,17 +20,17 @@
  * 8. Presentation
  */
 
-import { gemini } from "@/lib/gemini";
+import { gemini } from "@/lib/ai";
 import { z } from "zod";
 import type { Prisma } from "@prisma/client";
-import type { CodeReviewData } from "@/lib/code-review";
-import type { PrCiStatus } from "@/lib/github";
+import type { CodeReviewData } from "@/lib/analysis";
+import type { PrCiStatus } from "@/lib/external";
 import type {
   ActivityEntry,
   ToolUsage,
   StuckMoment,
-} from "@/lib/recording-analysis";
-import type { ChatMessage } from "@/lib/conversation-memory";
+} from "@/lib/analysis";
+import type { ChatMessage } from "@/lib/ai";
 
 // ============================================================================
 // Skill Category Schemas and Types

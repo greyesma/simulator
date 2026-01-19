@@ -1,6 +1,5 @@
 import { db } from "@/server/db";
-import { supabaseAdmin } from "./supabase";
-import { STORAGE_BUCKETS } from "./storage";
+import { supabaseAdmin, STORAGE_BUCKETS } from "@/lib/external";
 
 /**
  * Result of a data deletion operation

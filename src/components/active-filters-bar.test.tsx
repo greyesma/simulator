@@ -13,7 +13,7 @@ import {
   removeFilterFromIntent,
   type ActiveFilter,
 } from "./active-filters-bar";
-import type { ExtractedIntent } from "@/lib/entity-extraction";
+import type { ExtractedIntent } from "@/lib/candidate";
 
 // ============================================================================
 // ActiveFiltersBar Component Tests

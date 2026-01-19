@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { generateEphemeralToken } from "@/lib/gemini";
+import { generateEphemeralToken } from "@/lib/ai";
 import { buildManagerKickoffPrompt } from "@/prompts";
 import { success, error } from "@/lib/api-response";
 import { validateRequest } from "@/lib/api-validation";

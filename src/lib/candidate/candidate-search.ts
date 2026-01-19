@@ -13,18 +13,18 @@ import {
   generateQueryEmbedding,
   buildQueryText,
   type EmbeddingVector,
-} from "@/lib/embeddings";
+} from "@/lib/candidate";
 import {
   calculateFitScore,
   type RoleArchetype,
   type DimensionScoreInput,
   type FitScoreResult,
-} from "@/lib/archetype-weights";
+} from "@/lib/candidate";
 import {
   meetsThreshold,
   type SeniorityLevel,
   type ThresholdCheckResult,
-} from "@/lib/seniority-thresholds";
+} from "@/lib/candidate";
 import { AssessmentDimension, VideoAssessmentStatus } from "@prisma/client";
 
 // ============================================================================

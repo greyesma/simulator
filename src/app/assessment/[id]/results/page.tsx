@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
 import { ResultsClient } from "./client";
-import type { AssessmentReport } from "@/lib/assessment-aggregation";
+import type { AssessmentReport } from "@/lib/analysis";
 
 interface ResultsPageProps {
   params: Promise<{ id: string }>;

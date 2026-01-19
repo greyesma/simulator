@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import type { AnalyticsData, TimePeriod, DailyCount } from "@/lib/analytics";
+import type { AnalyticsData, TimePeriod, DailyCount } from "@/lib/core";
 
 interface AnalyticsDashboardProps {
   initialData: AnalyticsData;

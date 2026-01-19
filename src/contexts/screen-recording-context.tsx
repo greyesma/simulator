@@ -16,8 +16,8 @@ import {
   isStreamActive,
   onStreamEnded,
   type ScreenPermissionState,
-} from "@/lib/screen";
-import { VideoRecorder, checkMediaRecorderSupport } from "@/lib/video-recorder";
+} from "@/lib/media";
+import { VideoRecorder, checkMediaRecorderSupport } from "@/lib/media";
 
 export type ScreenRecordingState =
   | "idle"

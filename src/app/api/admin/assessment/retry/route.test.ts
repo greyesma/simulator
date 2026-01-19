@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { POST } from "./route";
 import { db } from "@/server/db";
-import { requireAdmin } from "@/lib/admin";
-import { triggerVideoAssessment } from "@/lib/video-evaluation";
+import { requireAdmin } from "@/lib/core";
+import { triggerVideoAssessment } from "@/lib/analysis";
 
 // Mock admin check
 vi.mock("@/lib/admin", () => ({

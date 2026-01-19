@@ -1,7 +1,7 @@
 "use client";
 
 import { Headphones } from "lucide-react";
-import { DECORATIVE_TEAM_MEMBERS, getInitials } from "@/lib/coworker-persona";
+import { DECORATIVE_TEAM_MEMBERS, getInitials } from "@/lib/ai";
 import { CoworkerAvatar } from "@/components/coworker-avatar";
 
 interface Coworker {

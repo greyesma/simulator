@@ -1,4 +1,4 @@
-import { env } from "@/lib/env";
+import { env } from "@/lib/core";
 
 /**
  * Parses a GitHub PR URL to extract owner, repo, and pull number

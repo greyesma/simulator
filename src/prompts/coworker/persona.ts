@@ -8,7 +8,7 @@
 import type {
   CoworkerKnowledge,
   CoworkerPersona,
-} from "@/lib/coworker-persona";
+} from "@/lib/ai";
 
 export interface CoworkerContext {
   companyName: string;

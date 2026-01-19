@@ -8,7 +8,7 @@ import {
   isStreamActive,
   onStreamEnded,
   type ScreenPermissionState,
-} from "@/lib/screen";
+} from "@/lib/media";
 
 export type ScreenRecordingState =
   | "idle"

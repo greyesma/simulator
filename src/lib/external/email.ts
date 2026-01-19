@@ -6,11 +6,11 @@
  */
 
 import { Resend } from "resend";
-import { env } from "@/lib/env";
+import { env } from "@/lib/core";
 import type {
   AssessmentReport,
   SkillCategory,
-} from "@/lib/assessment-aggregation";
+} from "@/lib/analysis";
 
 // ============================================================================
 // Resend Client

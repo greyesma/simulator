@@ -12,7 +12,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useDefenseCall, type VoiceConnectionState as ConnectionState } from "@/hooks/voice";
-import type { TranscriptMessage } from "@/lib/gemini";
+import type { TranscriptMessage } from "@/lib/ai";
 
 interface DefenseClientProps {
   assessmentId: string;

@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { db } from "@/server/db";
 import { AssessmentStatus } from "@prisma/client";
-import { isValidPrUrl } from "@/lib/pr-validation";
+import { isValidPrUrl } from "@/lib/external";
 import { success, error } from "@/lib/api-response";
 
 /**

@@ -5,8 +5,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { RoleArchetype } from "@/lib/archetype-weights";
-import type { SeniorityLevel } from "@/lib/seniority-thresholds";
+import type { RoleArchetype } from "@/lib/candidate";
+import type { SeniorityLevel } from "@/lib/candidate";
 
 // Mock Gemini before importing the module
 vi.mock("@/lib/gemini", () => ({
@@ -19,7 +19,7 @@ vi.mock("@/lib/gemini", () => ({
 }));
 
 // Import after mocking
-import { gemini } from "@/lib/gemini";
+import { gemini } from "@/lib/ai";
 import {
   extractEntities,
   mapJobTitleToArchetype,

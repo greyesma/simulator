@@ -1,10 +1,37 @@
 # src/lib - Utilities
 
-56 files organized by domain: AI/Gemini, External Services, Recording, ML/Search.
+Domain-based organization for better discoverability:
+
+```
+src/lib/
+├── core/          # env, admin, error-recovery, analytics, data-deletion
+├── external/      # github, email, supabase, storage, pr-validation
+├── media/         # audio, screen, video-recorder
+├── ai/            # gemini, conversation-memory, coworker-persona
+├── scenarios/     # scenario-builder
+├── candidate/     # cv-parser, embeddings, candidate-search, archetypes, seniority
+├── analysis/      # assessment-aggregation, video-evaluation, code-review, recording-analysis
+├── schemas/       # Zod validation schemas
+└── *.ts           # API utilities (api-client, api-response, api-validation)
+```
+
+## Import Pattern
+
+Use barrel exports for cleaner imports:
+
+```typescript
+// Before
+import { gemini } from "@/lib/gemini";
+import { env } from "@/lib/env";
+
+// After
+import { gemini } from "@/lib/ai";
+import { env } from "@/lib/core";
+```
 
 ## Gemini Gotchas
 
-- Transcription MUST be enabled server-side in ephemeral token config (see `gemini.ts:45`)
+- Transcription MUST be enabled server-side in ephemeral token config (see `ai/gemini.ts:45`)
 - Use `Modality.AUDIO` import, not string "AUDIO"
 - For text chat, `systemInstruction` not supported - use first message pair instead
 - Models: `gemini-3-flash-preview` (text), `gemini-2.5-flash-native-audio-latest` (voice)

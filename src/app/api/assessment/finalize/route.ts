@@ -7,17 +7,17 @@ import {
   fetchPrCiStatus,
   type PrCleanupResult,
   type PrCiStatus,
-} from "@/lib/github";
+} from "@/lib/external";
 import {
   analyzeCodeReview,
   buildCodeReviewData,
   codeReviewToPrismaJson,
   type CodeReviewData,
-} from "@/lib/code-review";
+} from "@/lib/analysis";
 import {
   triggerVideoAssessment,
   type TriggerVideoAssessmentResult,
-} from "@/lib/video-evaluation";
+} from "@/lib/analysis";
 
 /**
  * POST /api/assessment/finalize

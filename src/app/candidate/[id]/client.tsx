@@ -27,7 +27,7 @@ import {
   getWeightLevelForDimension,
   ARCHETYPE_CONFIGS,
   WEIGHT_MULTIPLIERS,
-} from "@/lib/archetype-weights";
+} from "@/lib/candidate";
 
 // Map dimension enums to human-readable labels
 const dimensionLabels: Record<AssessmentDimension, string> = {

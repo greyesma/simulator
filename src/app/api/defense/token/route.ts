@@ -1,20 +1,20 @@
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { generateEphemeralToken } from "@/lib/gemini";
+import { generateEphemeralToken } from "@/lib/ai";
 import {
   buildCoworkerMemory,
   formatMemoryForPrompt,
   type ConversationWithMeta,
   type ChatMessage,
-} from "@/lib/conversation-memory";
-import { fetchPrCiStatus, formatCiStatusForPrompt } from "@/lib/github";
+} from "@/lib/ai";
+import { fetchPrCiStatus, formatCiStatusForPrompt } from "@/lib/external";
 import {
   analyzeCodeReview,
   buildCodeReviewData,
   codeReviewToPrismaJson,
   formatCodeReviewForPrompt,
   type CodeReviewData,
-} from "@/lib/code-review";
+} from "@/lib/analysis";
 import { Prisma } from "@prisma/client";
 import { buildDefensePrompt } from "@/prompts";
 import { success, error } from "@/lib/api-response";

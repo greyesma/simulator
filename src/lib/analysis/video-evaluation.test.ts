@@ -64,7 +64,7 @@ import {
   forceRetryVideoAssessment,
   VIDEO_EVALUATION_MODEL,
 } from "./video-evaluation";
-import { gemini } from "@/lib/gemini";
+import { gemini } from "@/lib/ai";
 import { db } from "@/server/db";
 
 // Cast to mocked types for easier access

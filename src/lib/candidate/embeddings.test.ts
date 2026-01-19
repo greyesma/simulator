@@ -34,7 +34,7 @@ vi.mock("@/lib/error-recovery", () => ({
 }));
 
 // Import after mocks
-import { gemini } from "@/lib/gemini";
+import { gemini } from "@/lib/ai";
 import { db } from "@/server/db";
 import {
   EMBEDDING_MODEL,

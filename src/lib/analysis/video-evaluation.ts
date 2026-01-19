@@ -8,11 +8,11 @@
  * @since 2026-01-16
  */
 
-import { gemini } from "@/lib/gemini";
+import { gemini } from "@/lib/ai";
 import { db } from "@/server/db";
-import { withRetry } from "@/lib/error-recovery";
-import { createVideoAssessmentLogger } from "@/lib/assessment-logging";
-import { generateAndStoreEmbeddings } from "@/lib/embeddings";
+import { withRetry } from "@/lib/core";
+import { createVideoAssessmentLogger } from "@/lib/analysis";
+import { generateAndStoreEmbeddings } from "@/lib/candidate";
 import {
   buildVideoEvaluationPrompt,
   type VideoEvaluationOutput,

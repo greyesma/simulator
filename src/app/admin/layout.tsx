@@ -1,4 +1,4 @@
-import { requireAdmin } from "@/lib/admin";
+import { requireAdmin } from "@/lib/core";
 import Link from "next/link";
 
 export default async function AdminLayout({

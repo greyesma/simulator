@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { AssessmentReport, SkillCategory } from "./assessment-aggregation";
+import type { AssessmentReport, SkillCategory } from "@/lib/analysis";
 import type { SendReportEmailParams } from "./email";
 
 // ============================================================================

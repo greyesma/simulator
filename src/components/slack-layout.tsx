@@ -3,7 +3,7 @@
 import { useState, Suspense, createContext, useContext } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Menu, X, Headphones } from "lucide-react";
-import { DECORATIVE_TEAM_MEMBERS, getInitials } from "@/lib/coworker-persona";
+import { DECORATIVE_TEAM_MEMBERS, getInitials } from "@/lib/ai";
 import { FloatingCallBar } from "@/components/floating-call-bar";
 
 interface Coworker {

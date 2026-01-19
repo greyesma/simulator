@@ -1,4 +1,4 @@
-import { checkIsAdmin } from "@/lib/admin";
+import { checkIsAdmin } from "@/lib/core";
 import Link from "next/link";
 
 /**

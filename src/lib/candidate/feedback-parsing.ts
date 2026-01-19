@@ -9,7 +9,7 @@
  * @see Issue #75: US-012b
  */
 
-import { gemini, TEXT_MODEL } from "@/lib/gemini";
+import { gemini, TEXT_MODEL } from "@/lib/ai";
 import { z } from "zod";
 
 // ============================================================================

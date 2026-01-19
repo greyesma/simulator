@@ -21,7 +21,7 @@ import {
 import type {
   AssessmentReport,
   SkillScore,
-} from "@/lib/assessment-aggregation";
+} from "@/lib/analysis";
 
 interface ResultsClientProps {
   assessmentId: string;

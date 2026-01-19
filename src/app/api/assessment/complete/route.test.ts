@@ -19,7 +19,7 @@ vi.mock("@/server/db", () => ({
 }));
 
 import { POST, GET } from "./route";
-import { isValidPrUrl } from "@/lib/pr-validation";
+import { isValidPrUrl } from "@/lib/external";
 import { AssessmentStatus } from "@prisma/client";
 
 describe("POST /api/assessment/complete", () => {

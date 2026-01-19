@@ -1,5 +1,5 @@
-import { gemini } from "@/lib/gemini";
-import { fetchGitHubPrContent, type PrSnapshot } from "@/lib/github";
+import { gemini } from "@/lib/ai";
+import { fetchGitHubPrContent, type PrSnapshot } from "@/lib/external";
 import { z } from "zod";
 import type { Prisma } from "@prisma/client";
 

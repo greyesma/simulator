@@ -10,8 +10,8 @@ import type {
 } from "@prisma/client";
 import { ProfileCVSection } from "@/components/profile-cv-section";
 import { ParsedProfileDisplay } from "@/components/parsed-profile-display";
-import type { AssessmentReport } from "@/lib/assessment-aggregation";
-import { profileFromPrismaJson } from "@/lib/cv-parser";
+import type { AssessmentReport } from "@/lib/analysis";
+import { profileFromPrismaJson } from "@/lib/candidate";
 import { AdminNav } from "@/components/admin-nav";
 import { DataDeletionSection } from "@/components/data-deletion-section";
 import { AlertTriangle } from "lucide-react";

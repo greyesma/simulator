@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { gemini } from "@/lib/gemini";
+import { gemini } from "@/lib/ai";
 import {
   buildCompleteSystemPrompt,
   parseExtractionFromResponse,
   cleanResponseForDisplay,
   applyExtraction,
   type ScenarioBuilderData,
-} from "@/lib/scenario-builder";
+} from "@/lib/scenarios";
 
 interface SessionUser {
   id: string;

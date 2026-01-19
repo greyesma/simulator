@@ -13,7 +13,7 @@ import {
   extractEntities,
   mapJobTitleToArchetype,
   inferSeniorityFromYears,
-} from "@/lib/entity-extraction";
+} from "@/lib/candidate";
 
 /**
  * POST /api/search/extract

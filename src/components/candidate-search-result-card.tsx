@@ -16,9 +16,9 @@
 import Link from "next/link";
 import { AssessmentDimension } from "@prisma/client";
 import { ArrowRight, User, TrendingUp, X } from "lucide-react";
-import type { RoleArchetype, WeightLevel } from "@/lib/archetype-weights";
-import type { SeniorityLevel } from "@/lib/seniority-thresholds";
-import { SENIORITY_THRESHOLDS } from "@/lib/seniority-thresholds";
+import type { RoleArchetype, WeightLevel } from "@/lib/candidate";
+import type { SeniorityLevel } from "@/lib/candidate";
+import { SENIORITY_THRESHOLDS } from "@/lib/candidate";
 
 // ============================================================================
 // Types

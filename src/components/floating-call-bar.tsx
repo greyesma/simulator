@@ -15,8 +15,8 @@ import {
   playAudioChunk,
   createAudioWorkletBlobUrl,
   type AudioPermissionState,
-} from "@/lib/audio";
-import type { TranscriptMessage } from "@/lib/gemini";
+} from "@/lib/media";
+import type { TranscriptMessage } from "@/lib/ai";
 import { CoworkerAvatar } from "@/components/coworker-avatar";
 
 export type CallState =

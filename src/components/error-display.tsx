@@ -8,7 +8,7 @@ import {
   MessageSquare,
   ArrowRight,
 } from "lucide-react";
-import type { CategorizedError, ErrorCategory } from "@/lib/error-recovery";
+import type { CategorizedError, ErrorCategory } from "@/lib/core";
 
 interface ErrorDisplayProps {
   error: CategorizedError;

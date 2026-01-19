@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { supabaseAdmin } from "@/lib/supabase";
-import { STORAGE_BUCKETS } from "@/lib/storage";
+import { supabaseAdmin } from "@/lib/external";
+import { STORAGE_BUCKETS } from "@/lib/external";
 import { z } from "zod";
 import {
   analyzeSegmentScreenshots,
   buildSegmentAnalysisData,
   aggregateSegmentAnalyses,
   type SegmentAnalysisResponse,
-} from "@/lib/recording-analysis";
+} from "@/lib/analysis";
 import type { Prisma } from "@prisma/client";
 
 // Schema for analyze request

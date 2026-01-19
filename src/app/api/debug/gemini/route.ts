@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { GoogleGenAI, Modality } from "@google/genai";
-import { env } from "@/lib/env";
+import { env } from "@/lib/core";
 
 // Debug endpoint to test Gemini Live connection
 export async function GET() {

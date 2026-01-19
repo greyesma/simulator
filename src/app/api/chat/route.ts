@@ -1,24 +1,24 @@
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { gemini } from "@/lib/gemini";
+import { gemini } from "@/lib/ai";
 import {
   parseCoworkerKnowledge,
   type CoworkerPersona,
-} from "@/lib/coworker-persona";
+} from "@/lib/ai";
 import {
   buildCoworkerMemory,
   formatMemoryForPrompt,
   buildCrossCoworkerContext,
   type ChatMessage,
   type ConversationWithMeta,
-} from "@/lib/conversation-memory";
+} from "@/lib/ai";
 import type { Prisma } from "@prisma/client";
 import { AssessmentStatus } from "@prisma/client";
 import { buildChatPrompt } from "@/prompts";
 import { success, error } from "@/lib/api-response";
 import { validateRequest } from "@/lib/api-validation";
 import { ChatRequestSchema } from "@/lib/schemas";
-import { isValidPrUrl } from "@/lib/pr-validation";
+import { isValidPrUrl } from "@/lib/external";
 
 // Gemini Flash model for text chat
 const CHAT_MODEL = "gemini-3-flash-preview";

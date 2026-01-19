@@ -528,3 +528,51 @@ https://api.dicebear.com/7.x/identicon/svg?seed={name}&backgroundColor=D4AF37&ro
 5. **Browser testing limitations**: As noted in Issue #85, chat page E2E testing is blocked by `ScreenRecordingGuard` requiring screen sharing permissions unavailable in headless browsers. Use unit tests and API tests for validation.
 
 6. **Graceful invalid input handling**: When users try to submit something that looks like a PR but isn't valid, provide helpful feedback asking for the correct format rather than a generic error.
+
+## Issue #100: REF-010 - Reorganize src/lib into Domain-Based Subdirectories
+
+### What was implemented
+- Created 7 domain-based subdirectories in src/lib with barrel exports:
+  - `core/` - env, admin, error-recovery, analytics, data-deletion
+  - `external/` - github, email, supabase, storage, pr-validation
+  - `media/` - audio, screen, video-recorder
+  - `ai/` - gemini, conversation-memory, coworker-persona
+  - `scenarios/` - scenario-builder
+  - `candidate/` - cv-parser, embeddings, candidate-search, archetypes, seniority
+  - `analysis/` - assessment-aggregation, video-evaluation, code-review, recording-analysis
+- Moved 54 files from flat structure into domain directories
+- Created index.ts barrel export in each subdirectory
+- Updated 131 files with new import paths
+- Updated src/lib/CLAUDE.md with new structure documentation
+
+### Files changed
+- New directories and index.ts files for each domain
+- All files in src/lib moved to appropriate subdirectory
+- All consuming files updated to use new `@/lib/{domain}` import paths
+- prisma/seed.ts - Updated import path for coworker-persona
+- src/lib/CLAUDE.md - Documented new structure
+
+### Import pattern change
+```typescript
+// Before
+import { gemini } from "@/lib/gemini";
+import { env } from "@/lib/env";
+
+// After
+import { gemini } from "@/lib/ai";
+import { env } from "@/lib/core";
+```
+
+### Learnings for future iterations
+
+1. **Barrel export conflicts**: When creating barrel exports that re-export from multiple modules, check for duplicate export names. Use explicit exports to avoid conflicts (e.g., `SeniorityLevel` was defined in both cv-parser and seniority-thresholds).
+
+2. **Migration order by dependency**: Follow the dependency order specified in the issue (core → external → media → ai → scenarios → candidate → analysis) to minimize broken imports during migration.
+
+3. **Relative vs absolute imports in tests**: Test files within a directory should use relative imports (`"./module"`) for local imports and absolute imports (`"@/lib/domain"`) for cross-domain imports.
+
+4. **Pre-existing test issues**: Many test failures were due to environment variable validation, not the refactoring. Tests that import from barrel exports trigger env validation which requires proper mocking.
+
+5. **Seed file paths**: The prisma/seed.ts file uses relative imports (`"../src/lib/..."`) rather than `@/` aliases, so these need manual updating.
+
+6. **API utilities at root**: Files like api-client, api-response, api-validation remain at src/lib root as they're general utilities not domain-specific.

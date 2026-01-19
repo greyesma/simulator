@@ -29,15 +29,15 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { api } from "@/lib/api-client";
-import type { ExtractedIntent } from "@/lib/entity-extraction";
-import type { RoleArchetype } from "@/lib/archetype-weights";
-import type { SeniorityLevel } from "@/lib/seniority-thresholds";
+import type { ExtractedIntent } from "@/lib/candidate";
+import type { RoleArchetype } from "@/lib/candidate";
+import type { SeniorityLevel } from "@/lib/candidate";
 import {
   CandidateSearchResultGrid,
   type CandidateSearchResult,
 } from "@/components/candidate-search-result-card";
 import { RejectionFeedbackModal } from "@/components/rejection-feedback-modal";
-import type { ConstraintUpdate } from "@/lib/feedback-parsing";
+import type { ConstraintUpdate } from "@/lib/candidate";
 import { AssessmentDimension } from "@prisma/client";
 import {
   ActiveFiltersBar,

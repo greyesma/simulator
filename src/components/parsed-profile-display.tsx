@@ -1,4 +1,4 @@
-import type { ParsedProfile, Skill } from "@/lib/cv-parser";
+import type { ParsedProfile, Skill } from "@/lib/candidate";
 
 interface ParsedProfileDisplayProps {
   profile: ParsedProfile | null | undefined;

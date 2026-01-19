@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { supabaseAdmin } from "@/lib/supabase";
-import { STORAGE_BUCKETS } from "@/lib/storage";
+import { supabaseAdmin } from "@/lib/external";
+import { STORAGE_BUCKETS } from "@/lib/external";
 import {
   analyzeSegmentScreenshots,
   buildSegmentAnalysisData,
-} from "@/lib/recording-analysis";
+} from "@/lib/analysis";
 
 /**
  * Trigger incremental analysis for a completed segment

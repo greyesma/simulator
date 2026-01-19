@@ -24,8 +24,8 @@ Import from `@/types` instead of individual lib files:
 import { ChatMessage, CodeReviewData, ParsedProfile } from "@/types";
 
 // Still works - backwards compatible re-exports
-import { ChatMessage } from "@/lib/conversation-memory";
-import type { CodeReviewData } from "@/lib/code-review";
+import { ChatMessage } from "@/lib/ai";
+import type { CodeReviewData } from "@/lib/analysis";
 ```
 
 ## Type Categories

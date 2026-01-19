@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import type { ScenarioBuilderData } from "@/lib/scenario-builder";
+import type { ScenarioBuilderData } from "@/lib/scenarios";
 import { Markdown } from "@/components/markdown";
 
 interface ChatMessage {

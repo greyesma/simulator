@@ -15,8 +15,8 @@ import {
   stopAudioPlayback,
   createAudioWorkletBlobUrl,
   type AudioPermissionState,
-} from "@/lib/audio";
-import type { TranscriptMessage } from "@/lib/gemini";
+} from "@/lib/media";
+import type { TranscriptMessage } from "@/lib/ai";
 import {
   categorizeError,
   calculateBackoffDelay,
@@ -24,7 +24,7 @@ import {
   loadProgress,
   clearProgress,
   type CategorizedError,
-} from "@/lib/error-recovery";
+} from "@/lib/core";
 import type {
   VoiceConnectionState,
   VoiceBaseOptions,

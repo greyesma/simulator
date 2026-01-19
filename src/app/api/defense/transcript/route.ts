@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
 import type { Prisma } from "@prisma/client";
-import type { TranscriptMessage } from "@/lib/gemini";
+import type { TranscriptMessage } from "@/lib/ai";
 
 /**
  * Defense Call Transcript Endpoint

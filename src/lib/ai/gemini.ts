@@ -1,5 +1,5 @@
 import { GoogleGenAI, Modality } from "@google/genai";
-import { env } from "@/lib/env";
+import { env } from "@/lib/core";
 
 // Server-side Gemini client (uses API key with v1alpha for token support)
 export const gemini = new GoogleGenAI({

@@ -8,9 +8,9 @@
  * @see Issue #67: US-011
  */
 
-import { gemini } from "@/lib/gemini";
+import { gemini } from "@/lib/ai";
 import { db } from "@/server/db";
-import { withRetry } from "@/lib/error-recovery";
+import { withRetry } from "@/lib/core";
 import { AssessmentDimension, VideoAssessmentStatus } from "@prisma/client";
 
 // ============================================================================

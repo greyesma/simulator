@@ -15,7 +15,7 @@ import {
   useCoworkerVoice,
   type VoiceConnectionState as ConnectionState,
 } from "@/hooks/voice";
-import type { TranscriptMessage } from "@/lib/gemini";
+import type { TranscriptMessage } from "@/lib/ai";
 import { ErrorDisplay } from "@/components/error-display";
 import { CoworkerAvatar } from "@/components/coworker-avatar";
 

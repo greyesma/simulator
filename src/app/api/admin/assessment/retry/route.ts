@@ -9,13 +9,13 @@
  */
 
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/admin";
+import { requireAdmin } from "@/lib/core";
 import { db } from "@/server/db";
 import { AssessmentStatus, Prisma } from "@prisma/client";
 import {
   triggerVideoAssessment,
   type TriggerVideoAssessmentResult,
-} from "@/lib/video-evaluation";
+} from "@/lib/analysis";
 
 // Allowed statuses for reassessment
 const RETRIABLE_STATUSES: AssessmentStatus[] = [

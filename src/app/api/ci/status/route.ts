@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { fetchPrCiStatus, type PrCiStatus } from "@/lib/github";
+import { fetchPrCiStatus, type PrCiStatus } from "@/lib/external";
 import { Prisma } from "@prisma/client";
 
 /**

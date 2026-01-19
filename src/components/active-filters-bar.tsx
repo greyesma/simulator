@@ -21,7 +21,7 @@ import {
   Building2,
   Sparkles,
 } from "lucide-react";
-import type { ExtractedIntent } from "@/lib/entity-extraction";
+import type { ExtractedIntent } from "@/lib/candidate";
 
 // ============================================================================
 // Types

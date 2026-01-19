@@ -23,7 +23,7 @@ vi.mock("@/lib/gemini", () => ({
 }));
 
 // Import after mocking
-import { gemini } from "@/lib/gemini";
+import { gemini } from "@/lib/ai";
 import { parseFeedback } from "./feedback-parsing";
 
 // Cast the mock for type safety

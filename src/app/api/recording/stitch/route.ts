@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { supabaseAdmin } from "@/lib/supabase";
-import { STORAGE_BUCKETS } from "@/lib/storage";
+import { supabaseAdmin } from "@/lib/external";
+import { STORAGE_BUCKETS } from "@/lib/external";
 
 // GET /api/recording/stitch - Get all recording segments with signed URLs for stitching
 export async function GET(request: NextRequest) {

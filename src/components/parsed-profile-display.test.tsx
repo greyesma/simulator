@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ParsedProfileDisplay } from "./parsed-profile-display";
-import type { ParsedProfile } from "@/lib/cv-parser";
+import type { ParsedProfile } from "@/lib/candidate";
 
 // Factory function to create test profiles
 function createTestProfile(

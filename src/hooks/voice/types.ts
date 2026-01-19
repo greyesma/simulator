@@ -1,6 +1,6 @@
-import type { AudioPermissionState } from "@/lib/audio";
-import type { TranscriptMessage } from "@/lib/gemini";
-import type { CategorizedError } from "@/lib/error-recovery";
+import type { AudioPermissionState } from "@/lib/media";
+import type { TranscriptMessage } from "@/lib/ai";
+import type { CategorizedError } from "@/lib/core";
 
 /**
  * Unified connection state for all voice hooks.
@@ -60,6 +60,6 @@ export interface VoiceConfig {
 }
 
 // Re-export for convenience
-export type { TranscriptMessage } from "@/lib/gemini";
-export type { AudioPermissionState } from "@/lib/audio";
-export type { CategorizedError } from "@/lib/error-recovery";
+export type { TranscriptMessage } from "@/lib/ai";
+export type { AudioPermissionState } from "@/lib/media";
+export type { CategorizedError } from "@/lib/core";

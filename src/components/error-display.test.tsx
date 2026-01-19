@@ -15,7 +15,7 @@ import {
   InlineError,
   SessionRecoveryPrompt,
 } from "./error-display";
-import type { CategorizedError, ErrorCategory } from "@/lib/error-recovery";
+import type { CategorizedError, ErrorCategory } from "@/lib/core";
 
 // ============================================================================
 // Test Factory
