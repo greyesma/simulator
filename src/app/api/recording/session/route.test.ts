@@ -56,6 +56,24 @@ vi.mock("@/lib/supabase", () => ({
   },
 }));
 
+// Mock external module to prevent Supabase initialization
+vi.mock("@/lib/external", () => ({
+  supabaseAdmin: {
+    storage: {
+      from: () => ({
+        createSignedUrl: () =>
+          Promise.resolve({
+            data: { signedUrl: "https://test.com/screenshot.png" },
+          }),
+      }),
+    },
+  },
+  STORAGE_BUCKETS: {
+    SCREENSHOTS: "screenshots",
+    RECORDINGS: "recordings",
+  },
+}));
+
 // Mock recording-analysis module
 vi.mock("@/lib/recording-analysis", () => ({
   analyzeSegmentScreenshots: vi.fn().mockResolvedValue({
@@ -82,6 +100,26 @@ vi.mock("@/lib/recording-analysis", () => ({
     screenshotsAnalyzed: 1,
     aiAnalysis: {},
   }),
+}));
+
+// Mock isE2ETestMode and env
+const mockIsE2ETestMode = vi.fn();
+vi.mock("@/lib/core", () => ({
+  isE2ETestMode: () => mockIsE2ETestMode(),
+  isE2ETestModeClient: () => mockIsE2ETestMode(),
+  env: {
+    DATABASE_URL: "postgresql://localhost:5432/test",
+    DIRECT_URL: "postgresql://localhost:5432/test",
+    AUTH_SECRET: "test-secret",
+    GOOGLE_CLIENT_ID: "test-google-id",
+    GOOGLE_CLIENT_SECRET: "test-google-secret",
+    GEMINI_API_KEY: "test-gemini-key",
+    SUPABASE_SERVICE_ROLE_KEY: "test-supabase-key",
+    NEXT_PUBLIC_SUPABASE_URL: "https://test.supabase.co",
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: "test-anon-key",
+    E2E_TEST_MODE: false,
+    NEXT_PUBLIC_E2E_TEST_MODE: false,
+  },
 }));
 
 import { POST, GET } from "./route";
@@ -323,6 +361,71 @@ describe("POST /api/recording/session", () => {
     expect(response.status).toBe(400);
     const data = await response.json();
     expect(data.error).toContain("Unknown action");
+  });
+
+  it("should reject testMode requests when not in development", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1" },
+      expires: new Date(Date.now() + 86400000).toISOString(),
+    });
+    mockIsE2ETestMode.mockReturnValue(false);
+
+    const request = new NextRequest("http://localhost/api/recording/session", {
+      method: "POST",
+      body: JSON.stringify({
+        assessmentId: "assessment-1",
+        action: "start",
+        testMode: true,
+      }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(403);
+    const data = await response.json();
+    expect(data.error).toContain("only available in development");
+  });
+
+  it("should create completed segment in testMode when in development", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1" },
+      expires: new Date(Date.now() + 86400000).toISOString(),
+    });
+    mockIsE2ETestMode.mockReturnValue(true);
+    mockAssessmentFindFirst.mockResolvedValue({
+      id: "assessment-1",
+      userId: "user-1",
+    });
+    mockRecordingUpsert.mockResolvedValue({ id: "assessment-1-screen" });
+    mockSegmentUpdateMany.mockResolvedValue({ count: 0 });
+    mockSegmentFindFirst.mockResolvedValue(null);
+    mockSegmentCreate.mockResolvedValue({
+      id: "test-segment-1",
+      segmentIndex: 0,
+    });
+
+    const request = new NextRequest("http://localhost/api/recording/session", {
+      method: "POST",
+      body: JSON.stringify({
+        assessmentId: "assessment-1",
+        action: "start",
+        testMode: true,
+      }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data.segmentId).toBe("test-segment-1");
+    expect(data.testMode).toBe(true);
+
+    // Verify segment was created with completed status and empty paths
+    expect(mockSegmentCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        status: "completed",
+        chunkPaths: [],
+        screenshotPaths: [],
+      }),
+    });
   });
 });
 

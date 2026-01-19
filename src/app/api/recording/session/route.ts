@@ -7,6 +7,7 @@ import {
   analyzeSegmentScreenshots,
   buildSegmentAnalysisData,
 } from "@/lib/analysis";
+import { isE2ETestMode } from "@/lib/core";
 
 /**
  * Trigger incremental analysis for a completed segment
@@ -89,12 +90,20 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { assessmentId, action, segmentId, chunkPath, screenshotPath } = body;
+    const { assessmentId, action, segmentId, chunkPath, screenshotPath, testMode } = body;
 
     if (!assessmentId || !action) {
       return NextResponse.json(
         { error: "Missing required fields: assessmentId, action" },
         { status: 400 }
+      );
+    }
+
+    // Reject testMode requests if not in development mode (double-gate safety)
+    if (testMode && !isE2ETestMode()) {
+      return NextResponse.json(
+        { error: "Test mode is only available in development environment" },
+        { status: 403 }
       );
     }
 
@@ -148,6 +157,29 @@ export async function POST(request: NextRequest) {
           orderBy: { segmentIndex: "desc" },
         });
         const nextIndex = (lastSegment?.segmentIndex ?? -1) + 1;
+
+        // In test mode, create a completed segment with empty paths
+        // This allows downstream code that expects segments to work
+        if (testMode) {
+          const testSegment = await db.recordingSegment.create({
+            data: {
+              recordingId,
+              segmentIndex: nextIndex,
+              startTime: new Date(),
+              endTime: new Date(),
+              status: "completed",
+              chunkPaths: [],
+              screenshotPaths: [],
+            },
+          });
+
+          return NextResponse.json({
+            success: true,
+            segmentId: testSegment.id,
+            segmentIndex: testSegment.segmentIndex,
+            testMode: true,
+          });
+        }
 
         // Create a new segment
         const newSegment = await db.recordingSegment.create({

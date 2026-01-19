@@ -12,10 +12,18 @@ export const env = createEnv({
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
     GITHUB_TOKEN: z.string().optional(),
     RESEND_API_KEY: z.string().optional(),
+    E2E_TEST_MODE: z
+      .enum(["true", "false"])
+      .optional()
+      .transform((val) => val === "true"),
   },
   client: {
     NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
+    NEXT_PUBLIC_E2E_TEST_MODE: z
+      .enum(["true", "false"])
+      .optional()
+      .transform((val) => val === "true"),
   },
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
@@ -29,7 +37,34 @@ export const env = createEnv({
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    E2E_TEST_MODE: process.env.E2E_TEST_MODE,
+    NEXT_PUBLIC_E2E_TEST_MODE: process.env.NEXT_PUBLIC_E2E_TEST_MODE,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,
 });
+
+/**
+ * Check if E2E test mode is enabled with double-gate safety.
+ * Returns true only when:
+ * 1. NODE_ENV is "development"
+ * 2. E2E_TEST_MODE env var is "true"
+ *
+ * This ensures E2E test mode can NEVER be accidentally enabled in production.
+ */
+export function isE2ETestMode(): boolean {
+  return process.env.NODE_ENV === "development" && env.E2E_TEST_MODE === true;
+}
+
+/**
+ * Client-side check for E2E test mode with double-gate safety.
+ * Returns true only when:
+ * 1. NODE_ENV is "development"
+ * 2. NEXT_PUBLIC_E2E_TEST_MODE env var is "true"
+ */
+export function isE2ETestModeClient(): boolean {
+  return (
+    process.env.NODE_ENV === "development" &&
+    env.NEXT_PUBLIC_E2E_TEST_MODE === true
+  );
+}

@@ -637,3 +637,54 @@ import { CoworkerAvatar } from "./coworker-avatar";
    ```
 
 6. **CLAUDE.md updates**: Always update directory documentation when reorganizing to help future development.
+
+## Issue #102: FEAT-001 - Add E2E Test Mode to Bypass Screen Recording
+
+### What was implemented
+- Added `E2E_TEST_MODE` server env var and `NEXT_PUBLIC_E2E_TEST_MODE` client env var to `src/lib/core/env.ts`
+- Created `isE2ETestMode()` and `isE2ETestModeClient()` helper functions with double-gate safety (requires `NODE_ENV=development` AND env var set to `"true"`)
+- Updated `ScreenRecordingGuard` to return children directly when in test mode (no modal)
+- Updated `ScreenRecordingContext` to auto-start a fake recording session in test mode
+- Updated `/api/recording/session` to accept `testMode: true` flag and create completed segment with empty paths
+- API rejects `testMode` requests when `NODE_ENV !== development` (returns 403)
+- Documented env vars in `.env.example`
+- Added unit tests for testMode API behavior
+
+### Files changed
+- `src/lib/core/env.ts` - Added env vars and helper functions
+- `src/components/assessment/screen-recording-guard.tsx` - Early return in test mode
+- `src/contexts/screen-recording-context.tsx` - Auto-start fake session
+- `src/app/api/recording/session/route.ts` - Handle testMode flag with security gate
+- `src/app/api/recording/session/route.test.ts` - Added tests for testMode behavior
+- `.env.example` - Documented new vars
+
+### Usage
+```bash
+E2E_TEST_MODE=true NEXT_PUBLIC_E2E_TEST_MODE=true npm run dev
+```
+Then run E2E tests against that server instance.
+
+### Learnings for future iterations
+
+1. **Double-gate safety pattern**: For features that should NEVER work in production, use a two-part check:
+   - `process.env.NODE_ENV === "development"` (cannot be faked in production builds)
+   - Explicit env var flag (user intent confirmation)
+   This ensures accidental deployment won't enable the bypass.
+
+2. **Inner component pattern for early returns**: When a component using hooks needs to conditionally render, extract the hook-using logic to an inner component. The outer component can have the early return (which happens before any hooks are called), avoiding the "hooks in conditionals" rule violation:
+   ```typescript
+   export function Guard({ children }) {
+     if (isE2ETestModeClient()) return <>{children}</>;
+     return <GuardInner>{children}</GuardInner>;
+   }
+   function GuardInner({ children }) {
+     const { state } = useContext(); // hooks here
+     // ... rest of component
+   }
+   ```
+
+3. **Fake session for downstream compatibility**: When bypassing a feature that creates database records, still create the records (with placeholder/empty values) so downstream code that expects them to exist works correctly.
+
+4. **Mock exports in tests**: When mocking a module barrel export (like `@/lib/core`), ensure all exports used by the imported code are included in the mock. Missing exports cause runtime errors like "No 'env' export is defined on the mock".
+
+5. **Pre-existing test failures**: Many test suites in this codebase fail due to env validation when importing modules that trigger Supabase/env initialization. These are pre-existing issues documented in progress.md and not caused by new changes.

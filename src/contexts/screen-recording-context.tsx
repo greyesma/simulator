@@ -18,6 +18,7 @@ import {
   type ScreenPermissionState,
 } from "@/lib/media";
 import { VideoRecorder, checkMediaRecorderSupport } from "@/lib/media";
+import { isE2ETestModeClient } from "@/lib/core";
 
 export type ScreenRecordingState =
   | "idle"
@@ -157,6 +158,24 @@ async function getSessionStatus(
     );
     if (!response.ok) return null;
     return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+// Helper to start a fake recording session for E2E tests
+async function startFakeRecordingSession(
+  assessmentId: string
+): Promise<{ segmentId: string; segmentIndex: number } | null> {
+  try {
+    const response = await fetch("/api/recording/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ assessmentId, action: "start", testMode: true }),
+    });
+    if (!response.ok) return null;
+    const data = await response.json();
+    return { segmentId: data.segmentId, segmentIndex: data.segmentIndex };
   } catch {
     return null;
   }
@@ -385,6 +404,20 @@ export function ScreenRecordingProvider({
   // Load session status on mount (for persistence across page reloads/laptop close)
   useEffect(() => {
     async function loadSession() {
+      // In E2E test mode, auto-start a fake recording session
+      if (isE2ETestModeClient()) {
+        const sessionResult = await startFakeRecordingSession(assessmentId);
+        if (sessionResult) {
+          segmentIdRef.current = sessionResult.segmentId;
+        }
+        // Set state to recording so downstream code works as expected
+        setState("recording");
+        setPermissionState("granted");
+        sessionStorage.setItem(`screen-recording-${assessmentId}`, "active");
+        setSessionLoaded(true);
+        return;
+      }
+
       const status = await getSessionStatus(assessmentId);
       if (status?.hasRecording) {
         // Update counts from database

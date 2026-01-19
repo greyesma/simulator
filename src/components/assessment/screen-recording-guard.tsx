@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Monitor, Mic, AlertTriangle, ArrowRight } from "lucide-react";
 import { useScreenRecordingContext } from "@/contexts/screen-recording-context";
+import { isE2ETestModeClient } from "@/lib/core";
 
 interface ScreenRecordingGuardProps {
   children: React.ReactNode;
@@ -11,6 +12,26 @@ interface ScreenRecordingGuardProps {
 }
 
 export function ScreenRecordingGuard({
+  children,
+  assessmentId,
+  companyName = "the company",
+}: ScreenRecordingGuardProps) {
+  // In E2E test mode, bypass the guard entirely and render children directly
+  if (isE2ETestModeClient()) {
+    return <>{children}</>;
+  }
+
+  return (
+    <ScreenRecordingGuardInner
+      assessmentId={assessmentId}
+      companyName={companyName}
+    >
+      {children}
+    </ScreenRecordingGuardInner>
+  );
+}
+
+function ScreenRecordingGuardInner({
   children,
   assessmentId,
   companyName = "the company",
