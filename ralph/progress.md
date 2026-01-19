@@ -576,3 +576,64 @@ import { env } from "@/lib/core";
 5. **Seed file paths**: The prisma/seed.ts file uses relative imports (`"../src/lib/..."`) rather than `@/` aliases, so these need manual updating.
 
 6. **API utilities at root**: Files like api-client, api-response, api-validation remain at src/lib root as they're general utilities not domain-specific.
+
+## Issue #101: REF-011 - Reorganize src/components into Domain-Based Subdirectories
+
+### What was implemented
+- Created 6 domain-based subdirectories in src/components with barrel exports:
+  - `shared/` - cv-upload, markdown, providers
+  - `admin/` - admin-nav, data-deletion-section
+  - `feedback/` - error-display, rejection-feedback-modal
+  - `candidate/` - active-filters-bar, candidate-search-result-card, parsed-profile-display, profile-cv-section
+  - `chat/` - chat, coworker-sidebar, coworker-voice-call, floating-call-bar, slack-layout, coworker-avatar
+  - `assessment/` - assessment-screen-wrapper, screen-recording-guard, voice-conversation
+- Created index.ts barrel export in each subdirectory
+- Updated all consumer imports across the codebase (15+ files)
+- Updated src/components/CLAUDE.md with new structure documentation
+
+### Files changed
+- New directories and index.ts files for each domain
+- All 26 component files moved to appropriate subdirectories
+- All test files moved alongside their components
+- All consuming files in src/app updated to use new `@/components/{domain}` import paths
+- src/components/CLAUDE.md - Documented new structure and import patterns
+
+### Import pattern change
+```typescript
+// Before
+import { Chat } from "@/components/chat";
+import { ErrorDisplay } from "@/components/error-display";
+
+// After
+import { Chat, SlackLayout } from "@/components/chat";
+import { ErrorDisplay } from "@/components/feedback";
+```
+
+### Internal imports pattern
+Within a domain directory, components use relative imports:
+```typescript
+// Inside src/components/chat/chat.tsx
+import { useCallContext } from "./slack-layout";
+import { CoworkerAvatar } from "./coworker-avatar";
+```
+
+### Learnings for future iterations
+
+1. **Cross-domain dependencies**: Some components depend on other domains (e.g., profile-cv-section in candidate/ imports CVUpload from shared/). Use absolute imports (`@/components/shared`) for cross-domain dependencies.
+
+2. **Migration order matters**: Follow dependency order (shared → admin → feedback → candidate → chat → assessment) to minimize broken imports during migration.
+
+3. **Test mock paths**: When components switch to relative imports, test mocks must also use relative paths. Example: `vi.mock("@/components/slack-layout")` becomes `vi.mock("./slack-layout")`.
+
+4. **Barrel export pattern for components**: Export component names directly, not default exports:
+   ```typescript
+   export { Chat } from "./chat";
+   export { CoworkerSidebar } from "./coworker-sidebar";
+   ```
+
+5. **Type exports in barrels**: For interfaces that consumers need, export types explicitly:
+   ```typescript
+   export type { CandidateSearchResult } from "./candidate-search-result-card";
+   ```
+
+6. **CLAUDE.md updates**: Always update directory documentation when reorganizing to help future development.
