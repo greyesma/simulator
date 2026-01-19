@@ -2,6 +2,7 @@
 
 import { Headphones } from "lucide-react";
 import { DECORATIVE_TEAM_MEMBERS, getInitials } from "@/lib/coworker-persona";
+import { CoworkerAvatar } from "@/components/coworker-avatar";
 
 interface Coworker {
   id: string;
@@ -78,14 +79,6 @@ function CoworkerItem({
   onChat,
   onCall,
 }: CoworkerItemProps) {
-  // Get initials for avatar
-  const initials = coworker.name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-
   return (
     <div
       onClick={onChat}
@@ -96,11 +89,7 @@ function CoworkerItem({
       <div className="flex items-start gap-3">
         {/* Avatar with online indicator */}
         <div className="relative flex-shrink-0">
-          <div className="flex h-10 w-10 items-center justify-center border-2 border-foreground bg-secondary">
-            <span className="font-mono text-sm font-bold text-secondary-foreground">
-              {initials}
-            </span>
-          </div>
+          <CoworkerAvatar name={coworker.name} size="md" />
           {/* Online status indicator - green dot */}
           <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 border border-foreground bg-green-500" />
         </div>

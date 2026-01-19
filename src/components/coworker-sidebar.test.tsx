@@ -104,29 +104,39 @@ describe("CoworkerSidebar", () => {
     });
   });
 
-  describe("avatar initials", () => {
-    it("shows initials from full name", () => {
+  describe("avatar identicons", () => {
+    it("shows DiceBear identicon for coworker", () => {
       const coworker = createMockCoworker({ name: "Alex Chen" });
       render(<CoworkerSidebar {...defaultProps} coworkers={[coworker]} />);
 
-      expect(screen.getByText("AC")).toBeInTheDocument();
+      const avatar = screen.getByAltText("Alex Chen's avatar");
+      expect(avatar).toBeInTheDocument();
+      expect(avatar).toHaveAttribute(
+        "src",
+        expect.stringContaining("api.dicebear.com")
+      );
     });
 
-    it("handles single name correctly", () => {
-      const coworker = createMockCoworker({ name: "Alex" });
+    it("uses coworker name as seed for deterministic avatar", () => {
+      const coworker = createMockCoworker({ name: "Jamie Rodriguez" });
       render(<CoworkerSidebar {...defaultProps} coworkers={[coworker]} />);
 
-      expect(screen.getByText("A")).toBeInTheDocument();
+      const avatar = screen.getByAltText("Jamie Rodriguez's avatar");
+      expect(avatar).toHaveAttribute(
+        "src",
+        expect.stringContaining("seed=Jamie%20Rodriguez")
+      );
     });
 
-    it("limits initials to two characters", () => {
-      const coworker = createMockCoworker({
-        name: "Mary Jane Watson",
-      });
+    it("uses yellow background color for neo-brutalist theme", () => {
+      const coworker = createMockCoworker({ name: "Test User" });
       render(<CoworkerSidebar {...defaultProps} coworkers={[coworker]} />);
 
-      // Should show "MJ" not "MJW"
-      expect(screen.getByText("MJ")).toBeInTheDocument();
+      const avatar = screen.getByAltText("Test User's avatar");
+      expect(avatar).toHaveAttribute(
+        "src",
+        expect.stringContaining("backgroundColor=D4AF37")
+      );
     });
   });
 

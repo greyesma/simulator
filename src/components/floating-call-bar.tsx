@@ -17,7 +17,7 @@ import {
   type AudioPermissionState,
 } from "@/lib/audio";
 import type { TranscriptMessage } from "@/lib/gemini";
-import { getInitials } from "@/lib/coworker-persona";
+import { CoworkerAvatar } from "@/components/coworker-avatar";
 
 export type CallState =
   | "idle"
@@ -429,8 +429,6 @@ export function FloatingCallBar({
     }
   }, [callState, isAudioSupported, connect]);
 
-  const initials = getInitials(coworker.name);
-
   // Error state (matches chat footer height)
   if (callState === "error") {
     return (
@@ -489,14 +487,8 @@ export function FloatingCallBar({
           <div className="flex items-center gap-3">
             {/* Avatar with speaking indicator */}
             <div className="relative">
-              <div
-                className={`flex h-10 w-10 items-center justify-center border-2 border-foreground bg-secondary ${
-                  isSpeaking ? "ring-2 ring-secondary ring-offset-1" : ""
-                }`}
-              >
-                <span className="font-mono text-sm font-bold text-secondary-foreground">
-                  {initials}
-                </span>
+              <div className={isSpeaking ? "ring-2 ring-secondary ring-offset-1" : ""}>
+                <CoworkerAvatar name={coworker.name} size="md" />
               </div>
               {/* Speaking indicator - sound wave icon */}
               {isSpeaking && (

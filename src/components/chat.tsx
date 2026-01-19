@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Phone } from "lucide-react";
 import { api, ApiClientError } from "@/lib/api-client";
 import { useCallContext } from "@/components/slack-layout";
+import { CoworkerAvatar } from "@/components/coworker-avatar";
 
 interface ChatMessage {
   role: "user" | "model";
@@ -41,14 +42,6 @@ export function Chat({
   // Check if currently in a call with this coworker
   const { activeCall } = useCallContext();
   const isInCall = activeCall?.coworkerId === coworker.id;
-
-  // Get coworker initials for avatar
-  const initials = coworker.name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
 
   // Load chat history on mount
   useEffect(() => {
@@ -140,11 +133,7 @@ export function Chat({
       {/* Header */}
       <header className="flex items-center gap-3 border-b-2 border-foreground bg-background px-4 py-3">
         {/* Coworker avatar */}
-        <div className="flex h-10 w-10 items-center justify-center border-2 border-foreground bg-secondary">
-          <span className="font-mono text-sm font-bold text-secondary-foreground">
-            {initials}
-          </span>
-        </div>
+        <CoworkerAvatar name={coworker.name} size="md" />
         <div>
           <h1 className="text-lg font-bold">{coworker.name}</h1>
           <p className="text-sm text-muted-foreground">{coworker.role}</p>
@@ -181,10 +170,8 @@ export function Chat({
           </div>
         ) : messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center border-2 border-foreground bg-secondary">
-              <span className="font-mono text-2xl font-bold text-secondary-foreground">
-                {initials}
-              </span>
+            <div className="mb-4">
+              <CoworkerAvatar name={coworker.name} size="lg" />
             </div>
             <h2 className="mb-2 text-lg font-bold">
               Start a conversation with {coworker.name}
@@ -208,21 +195,17 @@ export function Chat({
             {messages.map((message, index) => (
               <div key={index} className="flex gap-3">
                 {/* Avatar */}
-                <div
-                  className={`flex h-10 w-10 flex-shrink-0 items-center justify-center border-2 border-foreground ${
-                    message.role === "user" ? "bg-foreground" : "bg-secondary"
-                  }`}
-                >
-                  <span
-                    className={`font-mono text-sm font-bold ${
-                      message.role === "user"
-                        ? "text-background"
-                        : "text-secondary-foreground"
-                    }`}
-                  >
-                    {message.role === "user" ? "You" : initials}
-                  </span>
-                </div>
+                {message.role === "user" ? (
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center border-2 border-foreground bg-foreground">
+                    <span className="font-mono text-sm font-bold text-background">
+                      You
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex-shrink-0">
+                    <CoworkerAvatar name={coworker.name} size="md" />
+                  </div>
+                )}
 
                 {/* Message content */}
                 <div className="min-w-0 flex-1">
@@ -244,10 +227,8 @@ export function Chat({
             {/* Typing indicator when sending */}
             {isSending && (
               <div className="flex gap-3">
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center border-2 border-foreground bg-secondary">
-                  <span className="font-mono text-sm font-bold text-secondary-foreground">
-                    {initials}
-                  </span>
+                <div className="flex-shrink-0">
+                  <CoworkerAvatar name={coworker.name} size="md" />
                 </div>
                 <div className="flex-1">
                   <div className="mb-1 flex items-baseline gap-2">

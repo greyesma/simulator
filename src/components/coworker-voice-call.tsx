@@ -17,6 +17,7 @@ import {
 } from "@/hooks/voice";
 import type { TranscriptMessage } from "@/lib/gemini";
 import { ErrorDisplay } from "@/components/error-display";
+import { CoworkerAvatar } from "@/components/coworker-avatar";
 
 interface Coworker {
   id: string;
@@ -102,15 +103,6 @@ function TranscriptView({
       ))}
     </div>
   );
-}
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
 }
 
 export function CoworkerVoiceCall({
@@ -256,10 +248,8 @@ export function CoworkerVoiceCall({
         <div className="flex w-80 flex-col">
           <div className="flex flex-1 flex-col items-center justify-center p-8">
             {/* Avatar */}
-            <div className="mb-6 flex h-32 w-32 items-center justify-center border-2 border-foreground bg-secondary">
-              <span className="text-5xl font-bold text-secondary-foreground">
-                {getInitials(coworker.name)}
-              </span>
+            <div className="mb-6">
+              <CoworkerAvatar name={coworker.name} size="xl" />
             </div>
             <h3 className="mb-1 text-xl font-bold">{coworker.name}</h3>
             <p className="mb-6 font-mono text-sm text-muted-foreground">

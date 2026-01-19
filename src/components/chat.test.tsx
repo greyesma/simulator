@@ -76,11 +76,16 @@ describe("Chat", () => {
       expect(screen.getByText("Engineering Manager")).toBeInTheDocument();
     });
 
-    it("renders coworker initials in avatar", () => {
+    it("renders coworker avatar with DiceBear identicon", () => {
       render(<Chat {...defaultProps} />);
 
-      // Should show initials in the header avatar
-      expect(screen.getAllByText("AC")[0]).toBeInTheDocument();
+      // Should show DiceBear identicon image
+      const avatar = screen.getByAltText("Alex Chen's avatar");
+      expect(avatar).toBeInTheDocument();
+      expect(avatar).toHaveAttribute(
+        "src",
+        expect.stringContaining("api.dicebear.com")
+      );
     });
   });
 

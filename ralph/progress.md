@@ -439,3 +439,46 @@ The following voice assignments were implemented in seed data:
 4. **UI for voice selection**: Grouping voices by gender in an optgroup makes the dropdown more intuitive. Each voice includes its "personality" descriptor for informed selection.
 
 5. **Schema changes with db push**: For simple additive schema changes like adding an optional field, `prisma db push` is faster than full migrations, especially when there's drift between migration history and actual database schema.
+
+## Issue #89: US-025 - Add DiceBear Identicon Avatars for Coworkers
+
+### What was implemented
+- Created reusable `CoworkerAvatar` component that generates DiceBear identicon avatars
+- Replaced text-based initials avatars with deterministic geometric patterns
+- Applied yellow (#D4AF37) background and black (#000000) pattern to match neo-brutalist theme
+- Avatars are square (0 border-radius) following design system
+- Updated all four coworker avatar locations: chat header, message list, sidebar, voice call UI
+
+### Files changed
+- `src/components/coworker-avatar.tsx` - New reusable avatar component with size variants (sm, md, lg, xl)
+- `src/components/chat.tsx` - Updated header, empty state, message avatars, and typing indicator
+- `src/components/coworker-sidebar.tsx` - Updated CoworkerItem avatar
+- `src/components/coworker-voice-call.tsx` - Updated control panel avatar
+- `src/components/floating-call-bar.tsx` - Updated call bar avatar
+- `src/components/chat.test.tsx` - Updated tests to check for DiceBear images
+- `src/components/coworker-sidebar.test.tsx` - Updated avatar tests for identicons
+
+### DiceBear Configuration
+The avatar URL format:
+```
+https://api.dicebear.com/7.x/identicon/svg?seed={name}&backgroundColor=D4AF37&rowColor=000000
+```
+- `identicon` style generates geometric patterns
+- `seed` uses coworker name for deterministic avatars (same name = same avatar)
+- `backgroundColor` is gold/yellow to match design system
+- `rowColor` is black for the pattern
+
+### Learnings for future iterations
+
+1. **Reusable avatar component pattern**: Creating a dedicated component (`CoworkerAvatar`) with size variants makes it easy to maintain consistent styling across all locations. The size prop maps to Tailwind classes.
+
+2. **DiceBear API for deterministic avatars**: Using the name as seed ensures the same coworker always gets the same avatar pattern. The identicon style provides unique geometric patterns that are visually distinctive.
+
+3. **Image alt text for accessibility**: Each avatar image includes alt text with the coworker's name (`{name}'s avatar`) for screen reader accessibility.
+
+4. **Test updates for image-based components**: When replacing text with images, update tests to look for `img` elements by `alt` text and check `src` attributes contain expected URL patterns rather than checking for text content.
+
+5. **Neo-brutalist image styling**: For image elements in the design system:
+   - Use `border-2 border-foreground` for consistent borders
+   - Ensure square aspect ratio with equal width/height classes
+   - No border-radius (0px) to match other elements
