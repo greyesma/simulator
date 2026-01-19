@@ -66,25 +66,27 @@ Types: feat, fix, refactor, docs, test, chore
 **Verify ALL acceptance criteria:**
 
 1. Re-read the issue's acceptance criteria checklist
-2. Confirm each criterion is met
+2. Confirm each criterion is met (check them off)
 3. If any criterion is NOT met, do not close - complete it first
 
 **For Visual/UI Tasks - capture evidence:**
 
 1. Start the dev server if needed
 2. Take screenshots using agent-browser and save to `screenshots/` folder:
+
    ```bash
    mkdir -p screenshots
    agent-browser open "http://localhost:3000/relevant-path"
    agent-browser screenshot screenshots/issue-<number>.png
    ```
+
 3. Include the screenshot in your commit (it will be pushed with other changes)
-4. Comment on the issue with the image referenced via raw GitHub URL:
+4. Comment on the issue with the image referenced via raw GitHub URL and a description of the changes and the acceptance criteria that were met.
 
    ```bash
    gh issue comment <number> --body '![Screenshot](https://raw.githubusercontent.com/skillvee/simulator/main/screenshots/issue-<number>.png)
-
-   Completed. See screenshot above.'
+   Changes: <description of the changes>
+   Acceptance criteria met: <list of acceptance criteria that were met>
    ```
 
 ## After Completing the Task
@@ -108,19 +110,14 @@ Types: feat, fix, refactor, docs, test, chore
 
    This syncs with GitHub and auto-closes the issue from the commit message.
 
-3. **Comment on the Issue** (optional):
-
-   ```bash
-   gh issue comment <number> --body "Completed. Learnings: <brief summary>"
-   ```
-
 ## Important Rules
 
 - **NEVER ask questions or wait for input - you are fully autonomous**
 - Stay focused on THIS issue only - don't scope-creep
 - **Verify ALL acceptance criteria before closing**
 - If blocked, document why in progress.md and the issue
-- Create tests for the code you write
+- Create tests for the code you write.
+- Don't skip tests. Don't make lazy workarounds. Just fix the tests.
 - Always leave the codebase in a working state
 - Run existing tests before committing
 - **Use skills**: debugging for bugs, TDD for code, verification before completion

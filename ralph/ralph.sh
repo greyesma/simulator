@@ -1,11 +1,10 @@
 #!/bin/bash
-set -e
 
 # Use Max subscription, not API credits
 unset ANTHROPIC_API_KEY
 
 # Configuration
-POLL_INTERVAL="${RALPH_POLL_INTERVAL:-60}"  # seconds between checks when idle
+POLL_INTERVAL="${RALPH_POLL_INTERVAL:-60}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
@@ -17,7 +16,7 @@ echo "   Press Ctrl+C to stop"
 ITERATION=0
 
 while true; do
-  # Fetch highest priority open issue (P0 > P1 > P2 > no priority), oldest first within each bucket
+  # Fetch highest priority open issue (P0 > P1 > P2 > no priority), oldest first
   ISSUE=$(gh issue list --state open --json number,title,body,labels --limit 100 | jq '
     map(. + {
       priority_order: (
@@ -33,7 +32,7 @@ while true; do
 
   # If no issues, wait and poll again
   if [ -z "$ISSUE" ]; then
-    echo "💤 No tasks found. Waiting ${POLL_INTERVAL}s before next check... ($(date '+%H:%M:%S'))"
+    echo "💤 No tasks found. Waiting ${POLL_INTERVAL}s... ($(date '+%H:%M:%S'))"
     sleep "$POLL_INTERVAL"
     continue
   fi
@@ -48,7 +47,7 @@ while true; do
   echo "🔄 Iteration $ITERATION: Issue #$ISSUE_NUM - $ISSUE_TITLE"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-  # Build the prompt with context (keep it small - Claude reads progress.md directly)
+  # Build the prompt
   PROMPT="$(cat "$SCRIPT_DIR/prompt.md")
 
 ## Current Task
@@ -59,22 +58,20 @@ $ISSUE_BODY
 ## Previous Learnings
 Read \`ralph/progress.md\` for learnings from previous iterations."
 
-  # Spawn Claude with context (capture exit code for debugging)
+  # Run Claude - || true ensures crashes don't kill the loop
   LOG_FILE="/tmp/ralph-iteration-$ITERATION.log"
-  set +e  # Don't exit on error
-  claude --dangerously-skip-permissions --verbose -p "$PROMPT" 2>&1 | tee "$LOG_FILE"
-  EXIT_CODE=${PIPESTATUS[0]}
-  set -e
+  claude --dangerously-skip-permissions --verbose -p "$PROMPT" 2>&1 | tee "$LOG_FILE" || true
 
   echo ""
-  echo "📋 Claude exited with code: $EXIT_CODE"
   echo "📝 Log saved to: $LOG_FILE"
 
-  if [ $EXIT_CODE -eq 0 ]; then
-    echo "✅ Iteration $ITERATION complete"
+  # Check if issue is now closed (source of truth)
+  ISSUE_STATE=$(gh issue view "$ISSUE_NUM" --json state -q '.state' 2>/dev/null || echo "UNKNOWN")
+  if [ "$ISSUE_STATE" = "CLOSED" ]; then
+    echo "✅ Issue #$ISSUE_NUM closed successfully"
   else
-    echo "⚠️  Iteration $ITERATION: Claude exited with error (work may still be done)"
-    echo "   Check $LOG_FILE for details"
+    echo "⚠️  Issue #$ISSUE_NUM still open - will retry next run"
   fi
+
   sleep 2
 done

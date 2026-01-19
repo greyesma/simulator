@@ -152,6 +152,20 @@ agent-browser wait 3000
 agent-browser screenshot ./tests/login-success.png
 ```
 
+## E2E Test Mode for Assessment Pages
+
+Assessment pages (`/assessment/[id]/welcome`, `/chat`, `/defense`) require screen recording, which doesn't work in headless browsers.
+
+To bypass screen recording for E2E tests, start the dev server with:
+
+```bash
+E2E_TEST_MODE=true NEXT_PUBLIC_E2E_TEST_MODE=true npm run dev
+```
+
+Then run your tests against that server. The screen recording modal will be skipped and fake recording segments will be created in the database.
+
+**Note:** This only works in development mode (`NODE_ENV=development`). The bypass is disabled in production.
+
 ## Tips
 
 - Use `snapshot` to get accessibility tree with element references (@ref) - more reliable than CSS selectors
