@@ -890,3 +890,28 @@ try {
 4. **Generic async wrapper pattern**: The `wrapAICall<T>()` pattern works for any async operation. The generic type parameter ensures the return type is preserved, maintaining type safety through the wrapper.
 
 5. **Prompt version convention**: Use semantic versions (e.g., "1.0") or date-based versions (e.g., "2024-01") for promptVersion. This enables tracking which prompt versions cause errors over time.
+
+## Issue #107: REF-016 - Add ESLint Types-First Import Pattern
+
+### What was implemented
+- Added `no-restricted-imports` ESLint rule to discourage importing types from implementation files
+- Rule configured with "warn" severity to allow gradual adoption
+- Two patterns added:
+  - `@/components/*/*` - warns when importing from component implementation files
+  - `@/lib/*/!(index)` - warns when importing from lib implementation files (except barrel exports)
+- Updated documentation in CLAUDE.md and src/types/CLAUDE.md
+
+### Files changed
+- `eslint.config.mjs` - Added no-restricted-imports rule with patterns
+- `CLAUDE.md` - Added "Type Imports" section with preferred/avoid examples
+- `src/types/CLAUDE.md` - Added "ESLint Enforcement" section with detailed explanation
+
+### Learnings for future iterations
+
+1. **ESLint flat config patterns**: In ESLint's flat config format (eslint.config.mjs), `no-restricted-imports` uses a `patterns` array with objects containing `group` and `message`. The `group` accepts glob patterns including negation syntax like `!(index)`.
+
+2. **Warn vs error for gradual adoption**: Using "warn" instead of "error" allows the team to adopt the new pattern gradually without blocking CI. Fix warnings as you encounter them rather than requiring a mass refactor.
+
+3. **Barrel export exception**: The pattern `@/lib/*/!(index)` excludes barrel exports (index.ts files) since these are designed for external consumption and may re-export types for backwards compatibility.
+
+4. **Documentation-first for conventions**: When adding linting rules for code style/conventions, update documentation files (CLAUDE.md) first so developers understand the "why" behind the lint warnings.

@@ -36,6 +36,28 @@ Each has its own CLAUDE.md with specific patterns and gotchas.
 
 `vercel` and `supabase` CLIs are installed and linked.
 
+## Type Imports
+
+Import types from `@/types`, not from component or lib implementation files.
+
+**Preferred:**
+
+```typescript
+import { ChatMessage, CodeReviewData, ParsedProfile } from "@/types";
+```
+
+**Avoid:**
+
+```typescript
+// Don't import types from component files
+import { ChatMessage } from "@/components/chat/chat";
+
+// Don't import types from lib implementation files
+import { ParsedProfile } from "@/lib/candidate/cv-parser";
+```
+
+ESLint will warn when importing from implementation files. See `src/types/CLAUDE.md` for full documentation.
+
 ## Skills
 
 - `frontend-design` - Neo-brutalist UI (auto-activates)

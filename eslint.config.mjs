@@ -20,6 +20,23 @@ const eslintConfig = [
           varsIgnorePattern: "^_",
         },
       ],
+      "no-restricted-imports": [
+        "warn",
+        {
+          patterns: [
+            {
+              group: ["@/components/*/*"],
+              message:
+                "Import types from @/types instead of component implementation files",
+            },
+            {
+              group: ["@/lib/*/!(index)"],
+              message:
+                "Import types from @/types instead of lib implementation files",
+            },
+          ],
+        },
+      ],
     },
   },
 ];

@@ -17,16 +17,39 @@ src/types/
 
 ## Usage
 
-Import from `@/types` instead of individual lib files:
+Import from `@/types` instead of individual lib or component files:
 
 ```typescript
 // Preferred - import from centralized types
 import { ChatMessage, CodeReviewData, ParsedProfile } from "@/types";
+```
 
-// Still works - backwards compatible re-exports
+### ESLint Enforcement
+
+An ESLint rule (`no-restricted-imports`) warns when importing from:
+
+- `@/components/*/*` - Component implementation files
+- `@/lib/*/!(index)` - Lib implementation files (except barrel exports)
+
+**Why this matters:**
+
+1. Prevents type duplication across the codebase
+2. Makes types easier to find and maintain
+3. Keeps implementation files focused on logic, not type definitions
+
+**The rule warns (not errors)** to allow gradual adoption. Fix warnings when you encounter them.
+
+### Backwards Compatible Re-exports
+
+Some lib barrel exports still re-export types for backwards compatibility:
+
+```typescript
+// Still works - barrel exports re-export types
 import { ChatMessage } from "@/lib/ai";
 import type { CodeReviewData } from "@/lib/analysis";
 ```
+
+Prefer `@/types` for new code.
 
 ## Type Categories
 
