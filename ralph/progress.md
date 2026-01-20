@@ -688,3 +688,38 @@ Then run E2E tests against that server instance.
 4. **Mock exports in tests**: When mocking a module barrel export (like `@/lib/core`), ensure all exports used by the imported code are included in the mock. Missing exports cause runtime errors like "No 'env' export is defined on the mock".
 
 5. **Pre-existing test failures**: Many test suites in this codebase fail due to env validation when importing modules that trigger Supabase/env initialization. These are pre-existing issues documented in progress.md and not caused by new changes.
+
+## Issue #103: REF-012 - Consolidate Duplicate Type Definitions
+
+### What was implemented
+- Unified `SeniorityLevel` type in `src/types/cv.ts` to use uppercase values (JUNIOR, MID, SENIOR, LEAD, PRINCIPAL, UNKNOWN)
+- Added `FilterSeniorityLevel` type as a subset (JUNIOR, MID, SENIOR) for candidate filtering
+- Updated `seniority-thresholds.ts` to import from `@/types` and create local type alias
+- Removed duplicate `ChatMessage` interface from `chat.tsx` and `scenario builder client.tsx`
+- Updated CV parsing prompt and schema to use uppercase seniority values
+- Updated tests and display components to use new uppercase convention
+
+### Files changed
+- `src/types/cv.ts` - Unified SeniorityLevel to uppercase, added FilterSeniorityLevel
+- `src/types/index.ts` - Added FilterSeniorityLevel export
+- `src/lib/candidate/seniority-thresholds.ts` - Imports from @/types, creates local alias
+- `src/lib/candidate/index.ts` - Updated comments
+- `src/components/chat/chat.tsx` - Imports ChatMessage from @/types
+- `src/app/admin/scenarios/builder/client.tsx` - Imports ChatMessage from @/types
+- `src/lib/candidate/cv-parser.ts` - Updated schema and comparison to uppercase
+- `src/prompts/analysis/cv-parser.ts` - Updated prompt to use uppercase
+- `src/components/candidate/parsed-profile-display.tsx` - Updated SENIORITY_LABELS keys
+- `src/components/candidate/parsed-profile-display.test.tsx` - Updated test values
+- `src/lib/candidate/cv-parser.test.ts` - Updated test values
+
+### Learnings for future iterations
+
+1. **Type re-export vs type alias**: When you want to use a type from another module locally AND re-export it, use a type alias (`export type SeniorityLevel = FilterSeniorityLevel`) rather than a re-export (`export type { FilterSeniorityLevel as SeniorityLevel }`). The re-export doesn't create a local binding.
+
+2. **AI prompt synchronization**: When changing type values (like lowercase to uppercase), remember to update any AI prompts that instruct models to output specific values. The prompt and schema must stay in sync.
+
+3. **Type subset for different contexts**: When a type has different levels of granularity for different use cases (e.g., CV parsing needs all levels, filtering only needs 3), create a subset type like `FilterSeniorityLevel` rather than maintaining duplicate type definitions.
+
+4. **Display label maps**: When changing type keys, check for any display label mappings (like `SENIORITY_LABELS`) that use the type values as keys. These need to be updated to match.
+
+5. **Test data follows types**: When changing enum-like type values, all test files that use those values as literals need to be updated. Use TypeScript's type checking to find all locations.
