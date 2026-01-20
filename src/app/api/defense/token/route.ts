@@ -17,8 +17,7 @@ import {
 } from "@/lib/analysis";
 import { Prisma } from "@prisma/client";
 import { buildDefensePrompt } from "@/prompts";
-import { success, error } from "@/lib/api-response";
-import { validateRequest } from "@/lib/api-validation";
+import { success, error, validateRequest } from "@/lib/api";
 import { DefenseTokenRequestSchema } from "@/lib/schemas";
 
 /**

@@ -12,7 +12,7 @@ src/lib/
 ├── candidate/     # cv-parser, embeddings, candidate-search, archetypes, seniority
 ├── analysis/      # assessment-aggregation, video-evaluation, code-review, recording-analysis
 ├── schemas/       # Zod validation schemas
-└── *.ts           # API utilities (api-client, api-response, api-validation)
+└── api/           # API utilities (client, response, validation)
 ```
 
 ## Import Pattern

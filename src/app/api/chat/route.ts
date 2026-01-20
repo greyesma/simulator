@@ -15,8 +15,7 @@ import {
 import type { Prisma } from "@prisma/client";
 import { AssessmentStatus } from "@prisma/client";
 import { buildChatPrompt } from "@/prompts";
-import { success, error } from "@/lib/api-response";
-import { validateRequest } from "@/lib/api-validation";
+import { success, error, validateRequest } from "@/lib/api";
 import { ChatRequestSchema } from "@/lib/schemas";
 import { isValidPrUrl } from "@/lib/external";
 

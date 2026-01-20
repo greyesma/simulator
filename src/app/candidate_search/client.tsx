@@ -28,7 +28,7 @@ import {
   CheckCircle,
   ArrowLeft,
 } from "lucide-react";
-import { api } from "@/lib/api-client";
+import { api } from "@/lib/api";
 import type { ExtractedIntent } from "@/lib/candidate";
 import type { RoleArchetype } from "@/lib/candidate";
 import type { SeniorityLevel } from "@/lib/candidate";

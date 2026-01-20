@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { success, error } from "@/lib/api-response";
+import { success, error } from "@/lib/api";
 
 interface SessionUser {
   id: string;

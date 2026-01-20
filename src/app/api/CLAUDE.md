@@ -11,10 +11,10 @@
 
 ## Standardized API Response Format
 
-All routes should use helpers from `@/lib/api-response` for consistent response shapes:
+All routes should use helpers from `@/lib/api` for consistent response shapes:
 
 ```typescript
-import { success, error, validationError } from "@/lib/api-response";
+import { success, error, validationError } from "@/lib/api";
 
 // Success response - wraps data in { success: true, data: T }
 return success({ assessment });
@@ -33,10 +33,10 @@ if (!result.success) {
 
 ## Request Validation
 
-Use `validateRequest` from `@/lib/api-validation` for JSON body validation:
+Use `validateRequest` from `@/lib/api` for JSON body validation:
 
 ```typescript
-import { validateRequest } from "@/lib/api-validation";
+import { validateRequest } from "@/lib/api";
 import { ChatRequestSchema } from "@/lib/schemas";
 
 export async function POST(request: Request) {
@@ -83,7 +83,7 @@ return NextResponse.json({ data });
 
 **After:**
 ```typescript
-import { success, error } from "@/lib/api-response";
+import { success, error } from "@/lib/api";
 
 // Error
 return error("Not found", 404, "NOT_FOUND");

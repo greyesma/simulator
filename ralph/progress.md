@@ -723,3 +723,58 @@ Then run E2E tests against that server instance.
 4. **Display label maps**: When changing type keys, check for any display label mappings (like `SENIORITY_LABELS`) that use the type values as keys. These need to be updated to match.
 
 5. **Test data follows types**: When changing enum-like type values, all test files that use those values as literals need to be updated. Use TypeScript's type checking to find all locations.
+
+## Issue #104: REF-013 - Move API Utilities to Domain Directory
+
+### What was implemented
+- Created `src/lib/api/` directory to organize API utilities following the domain-based structure
+- Moved and renamed files:
+  - `api-client.ts` → `api/client.ts`
+  - `api-response.ts` → `api/response.ts`
+  - `api-validation.ts` → `api/validation.ts`
+  - Corresponding test files alongside implementations
+- Created `api/index.ts` barrel export for clean imports
+- Updated all 18 consumer files to use new `@/lib/api` import path
+- Updated documentation in `src/lib/CLAUDE.md` and `src/app/api/CLAUDE.md`
+
+### Files changed
+- Created `src/lib/api/` directory with index.ts, client.ts, response.ts, validation.ts
+- Moved and renamed 3 source files and 3 test files
+- Updated imports in:
+  - `src/components/chat/chat.tsx`
+  - `src/components/admin/data-deletion-section.tsx`
+  - `src/app/candidate_search/client.tsx`
+  - `src/app/api/defense/token/route.ts`
+  - `src/app/api/code-review/route.ts`
+  - `src/app/api/kickoff/token/route.ts`
+  - `src/app/api/interview/token/route.ts`
+  - `src/app/api/recording/route.ts`
+  - `src/app/api/call/token/route.ts`
+  - `src/app/api/admin/scenarios/route.ts`
+  - `src/app/api/chat/route.ts`
+  - `src/app/api/assessment/complete/route.ts`
+  - `src/app/api/CLAUDE.md`
+  - `src/lib/CLAUDE.md`
+
+### Import pattern change
+```typescript
+// Before
+import { success, error } from "@/lib/api-response";
+import { validateRequest } from "@/lib/api-validation";
+import { api, ApiClientError } from "@/lib/api-client";
+
+// After
+import { success, error, validateRequest, api, ApiClientError } from "@/lib/api";
+```
+
+### Learnings for future iterations
+
+1. **Consistent domain organization**: This completes the REF-010 reorganization of src/lib. All utilities are now in domain-based subdirectories (core/, external/, media/, ai/, scenarios/, candidate/, analysis/, schemas/, api/).
+
+2. **Internal relative imports**: When files within a domain directory reference each other, use relative imports (e.g., `import { validationError } from "./response"`). This keeps the dependency explicit within the domain.
+
+3. **Test file locations**: Test files should be moved alongside their source files when reorganizing. Update their relative imports to match the new structure (e.g., `"./api-client"` → `"./client"`).
+
+4. **Combined imports in barrel exports**: When multiple related utilities exist, combine them in a single barrel export to allow consumers to import everything from one place (`@/lib/api`).
+
+5. **Documentation updates**: When reorganizing code, always update relevant CLAUDE.md files to reflect the new structure. This includes both the directory documentation and any example code in other docs.

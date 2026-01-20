@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { api, ApiClientError } from "@/lib/api-client";
+import { api, ApiClientError } from "@/lib/api";
 
 interface DataDeletionSectionProps {
   deletionRequestedAt: Date | null;

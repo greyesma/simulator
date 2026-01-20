@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { success, error, validationError } from "./api-response";
+import { success, error, validationError } from "./response";
 
 describe("API Response Helpers", () => {
   describe("success", () => {

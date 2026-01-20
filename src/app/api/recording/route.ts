@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { db } from "@/server/db";
 import { supabaseAdmin } from "@/lib/external";
 import { STORAGE_BUCKETS } from "@/lib/external";
-import { success, error } from "@/lib/api-response";
+import { success, error } from "@/lib/api";
 
 // Maximum file sizes
 const MAX_VIDEO_CHUNK_SIZE = 50 * 1024 * 1024; // 50MB per chunk

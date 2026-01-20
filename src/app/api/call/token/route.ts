@@ -13,8 +13,7 @@ import {
   type ConversationWithMeta,
 } from "@/lib/ai";
 import { buildVoicePrompt } from "@/prompts";
-import { success, error } from "@/lib/api-response";
-import { validateRequest } from "@/lib/api-validation";
+import { success, error, validateRequest } from "@/lib/api";
 import { CallTokenRequestSchema } from "@/lib/schemas";
 
 export async function POST(request: Request) {

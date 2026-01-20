@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { z } from "zod";
-import { validateRequest } from "./api-validation";
+import { validateRequest } from "./validation";
 
 describe("validateRequest", () => {
   const TestSchema = z.object({

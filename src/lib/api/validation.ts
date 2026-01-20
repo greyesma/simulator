@@ -7,7 +7,7 @@
 
 import { NextResponse } from "next/server";
 import { ZodSchema } from "zod";
-import { validationError } from "./api-response";
+import { validationError } from "./response";
 import type { ApiError } from "@/types";
 
 /**

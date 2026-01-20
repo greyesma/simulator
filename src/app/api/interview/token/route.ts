@@ -7,7 +7,7 @@ import {
   formatBasicCandidateContext,
 } from "@/prompts";
 import { formatProfileForPrompt, profileFromPrismaJson } from "@/lib/candidate";
-import { success, error } from "@/lib/api-response";
+import { success, error } from "@/lib/api";
 
 export async function POST(request: Request) {
   const session = await auth();

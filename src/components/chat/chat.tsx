@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Phone } from "lucide-react";
-import { api, ApiClientError } from "@/lib/api-client";
+import { api, ApiClientError } from "@/lib/api";
 import { useCallContext } from "./slack-layout";
 import { CoworkerAvatar } from "./coworker-avatar";
 import type { ChatMessage } from "@/types";

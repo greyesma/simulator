@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { api, ApiClientError } from "./api-client";
+import { api, ApiClientError } from "./client";
 
 describe("api-client", () => {
   const originalFetch = global.fetch;

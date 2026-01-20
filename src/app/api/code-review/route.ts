@@ -9,7 +9,7 @@ import {
   type CodeReviewData,
 } from "@/lib/analysis";
 import { fetchGitHubPrContent } from "@/lib/external";
-import { success, error, validationError } from "@/lib/api-response";
+import { success, error, validationError } from "@/lib/api";
 
 // Schema for code review request
 const codeReviewRequestSchema = z.object({
