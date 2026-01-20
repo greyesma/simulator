@@ -22,6 +22,11 @@ export {
   type KickoffContext,
 } from "./manager/kickoff";
 export { buildDefensePrompt, type DefenseContext } from "./manager/defense";
+export {
+  PR_ACKNOWLEDGMENT_PROMPT,
+  buildPRAcknowledgmentContext,
+  INVALID_PR_PROMPT,
+} from "./manager/pr-submission";
 
 // Coworker Personas
 export {
@@ -57,3 +62,15 @@ export {
   type VideoEvaluationOutput,
   type AssessmentDimensionType,
 } from "./analysis/video-evaluation";
+export {
+  HR_ASSESSMENT_PROMPT,
+  buildHRAssessmentContext,
+} from "./analysis/hr-assessment";
+export {
+  FEEDBACK_PARSING_PROMPT,
+  buildFeedbackParsingContext,
+} from "./analysis/feedback-parsing";
+export {
+  ENTITY_EXTRACTION_PROMPT,
+  buildEntityExtractionContext,
+} from "./analysis/entity-extraction";

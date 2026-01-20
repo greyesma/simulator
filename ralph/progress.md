@@ -778,3 +778,67 @@ import { success, error, validateRequest, api, ApiClientError } from "@/lib/api"
 4. **Combined imports in barrel exports**: When multiple related utilities exist, combine them in a single barrel export to allow consumers to import everything from one place (`@/lib/api`).
 
 5. **Documentation updates**: When reorganizing code, always update relevant CLAUDE.md files to reflect the new structure. This includes both the directory documentation and any example code in other docs.
+
+## Issue #105: REF-014 - Centralize Scattered Prompts
+
+### What was implemented
+- Created 4 new prompt files following the existing pattern (constant + builder function):
+  - `src/prompts/analysis/hr-assessment.ts` - HR interview transcript analysis prompt
+  - `src/prompts/analysis/feedback-parsing.ts` - Rejection feedback parsing prompt
+  - `src/prompts/analysis/entity-extraction.ts` - Search query entity extraction prompt
+  - `src/prompts/manager/pr-submission.ts` - PR acknowledgment and invalid PR prompts
+- Updated source files to import from centralized `@/prompts`:
+  - `src/app/api/interview/assessment/route.ts` - Uses `buildHRAssessmentContext`
+  - `src/app/api/chat/route.ts` - Uses `buildPRAcknowledgmentContext` and `INVALID_PR_PROMPT`
+  - `src/lib/candidate/feedback-parsing.ts` - Uses `buildFeedbackParsingContext`
+  - `src/lib/candidate/entity-extraction.ts` - Uses `buildEntityExtractionContext`
+- Updated `src/prompts/index.ts` with new exports
+
+### Files changed
+- Created: `src/prompts/analysis/hr-assessment.ts`
+- Created: `src/prompts/analysis/feedback-parsing.ts`
+- Created: `src/prompts/analysis/entity-extraction.ts`
+- Created: `src/prompts/manager/pr-submission.ts`
+- Modified: `src/prompts/index.ts`
+- Modified: `src/app/api/interview/assessment/route.ts`
+- Modified: `src/app/api/chat/route.ts`
+- Modified: `src/lib/candidate/feedback-parsing.ts`
+- Modified: `src/lib/candidate/entity-extraction.ts`
+
+### Prompt organization pattern
+The centralized prompts follow this structure:
+```
+src/prompts/
+├── hr/           # HR interview prompts
+├── manager/      # Manager kickoff, defense, PR submission prompts
+├── coworker/     # Coworker persona and chat prompts
+├── analysis/     # All analysis prompts (code review, CV, HR assessment, etc.)
+└── index.ts      # Barrel exports for all prompts
+```
+
+Each prompt file follows the pattern:
+```typescript
+export const PROMPT_NAME = `...prompt text...`;
+
+export function buildPromptContext(param: Type): string {
+  return `${PROMPT_NAME}${param}`;
+}
+```
+
+### Learnings for future iterations
+
+1. **Prompt file naming convention**: Use lowercase with hyphens (e.g., `hr-assessment.ts`, `pr-submission.ts`) matching the existing prompt files in the directory.
+
+2. **Builder function pattern**: Always pair prompts with a builder function that appends context. This makes it clear how to use the prompt and what context it expects:
+   ```typescript
+   export const PROMPT = `...`;
+   export function buildPromptContext(input: string): string {
+     return `${PROMPT}${input}`;
+   }
+   ```
+
+3. **Domain organization**: Prompts should be organized by domain (hr/, manager/, analysis/) not by file type. Analysis prompts include HR assessment, code review, CV parsing, feedback parsing, and entity extraction.
+
+4. **Multiple exports from single file**: When prompts are related (like PR acknowledgment and invalid PR prompts), group them in a single file with multiple exports.
+
+5. **Import from barrel export**: Always import prompts from `@/prompts` not from individual files. This ensures consistent imports and makes refactoring easier.

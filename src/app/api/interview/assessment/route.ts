@@ -4,6 +4,7 @@ import { db } from "@/server/db";
 import { gemini } from "@/lib/ai";
 import { z } from "zod";
 import type { Prisma } from "@prisma/client";
+import { buildHRAssessmentContext } from "@/prompts";
 
 // Schema for creating/updating HR assessment
 const hrAssessmentSchema = z.object({
@@ -30,32 +31,6 @@ const aiAnalysisSchema = z.object({
   cultureFitNotes: z.string(),
   summary: z.string(),
 });
-
-const ANALYSIS_PROMPT = `You are an expert HR interview analyst. Analyze the following interview transcript between an HR interviewer and a job candidate.
-
-Provide a detailed assessment in JSON format with the following structure:
-{
-  "communicationScore": <1-5, where 5 is excellent communication clarity>,
-  "communicationNotes": "<detailed notes on communication skills: clarity, articulation, listening, response quality>",
-  "cvVerificationNotes": "<notes on how well the candidate's claims in the interview aligned with expected CV/resume content>",
-  "cvConsistencyScore": <1-5, where 5 means all claims seemed consistent and verifiable>,
-  "verifiedClaims": [
-    {
-      "claim": "<specific claim made by candidate>",
-      "status": "<verified|unverified|inconsistent|flagged>",
-      "notes": "<optional explanation>"
-    }
-  ],
-  "professionalismScore": <1-5, where 5 is highly professional demeanor>,
-  "technicalDepthScore": <1-5, where 5 shows deep technical knowledge>,
-  "cultureFitNotes": "<observations about culture fit, work style, values>",
-  "summary": "<2-3 sentence overall assessment summary>"
-}
-
-IMPORTANT: Return ONLY valid JSON, no additional text or markdown formatting.
-
-Interview Transcript:
-`;
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -136,7 +111,7 @@ export async function POST(request: Request) {
       contents: [
         {
           role: "user",
-          parts: [{ text: ANALYSIS_PROMPT + formattedTranscript }],
+          parts: [{ text: buildHRAssessmentContext(formattedTranscript) }],
         },
       ],
     });

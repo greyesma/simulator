@@ -14,7 +14,11 @@ import {
 } from "@/lib/ai";
 import type { Prisma } from "@prisma/client";
 import { AssessmentStatus } from "@prisma/client";
-import { buildChatPrompt } from "@/prompts";
+import {
+  buildChatPrompt,
+  buildPRAcknowledgmentContext,
+  INVALID_PR_PROMPT,
+} from "@/prompts";
 import { success, error, validateRequest } from "@/lib/api";
 import { ChatRequestSchema } from "@/lib/schemas";
 import { isValidPrUrl } from "@/lib/external";
@@ -199,9 +203,7 @@ export async function POST(request: Request) {
       prSubmitted = true;
 
       // Generate an acknowledgment response from the manager
-      const prAckPrompt = `The candidate just submitted their PR link: ${extractedPrUrl}
-
-As their manager, acknowledge receipt of the PR and let them know you'll take a quick look and then call them to discuss it. Be warm, encouraging, and conversational. Keep it brief (1-2 sentences). Something like acknowledging their work, mentioning you'll review it, and that you'll call them shortly.`;
+      const prAckPrompt = buildPRAcknowledgmentContext(extractedPrUrl);
 
       const response = await gemini.models.generateContent({
         model: CHAT_MODEL,
@@ -274,8 +276,6 @@ As their manager, acknowledge receipt of the PR and let them know you'll take a 
     }
   } else if (isCoworkerManager && message.toLowerCase().includes("pr") && message.toLowerCase().includes("http")) {
     // User tried to submit a PR but it wasn't a valid PR URL
-    const invalidPrPrompt = `The candidate just sent a message that seems like they're trying to submit a PR, but the link doesn't appear to be a valid GitHub/GitLab/Bitbucket PR link. Ask them to share the actual pull request or merge request URL. Be helpful and friendly.`;
-
     const response = await gemini.models.generateContent({
       model: CHAT_MODEL,
       contents: [
@@ -304,7 +304,7 @@ As their manager, acknowledge receipt of the PR and let them know you'll take a 
         },
         {
           role: "user",
-          parts: [{ text: invalidPrPrompt }],
+          parts: [{ text: INVALID_PR_PROMPT }],
         },
       ],
     });

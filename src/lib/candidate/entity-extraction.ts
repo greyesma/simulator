@@ -13,6 +13,7 @@ import { gemini, TEXT_MODEL } from "@/lib/ai";
 import { z } from "zod";
 import { type RoleArchetype } from "@/lib/candidate";
 import { type SeniorityLevel } from "@/lib/candidate";
+import { buildEntityExtractionContext } from "@/prompts";
 
 // ============================================================================
 // Types and Schemas
@@ -194,31 +195,6 @@ export function inferSeniorityFromYears(
 }
 
 // ============================================================================
-// Entity Extraction Prompt
-// ============================================================================
-
-/**
- * Optimized prompt for entity extraction.
- * Designed for fast, accurate parsing of search queries.
- */
-const ENTITY_EXTRACTION_PROMPT = `You are a search query parser. Extract structured entities from the user's natural language search query.
-
-IMPORTANT: Respond ONLY with valid JSON. No markdown, no explanations, just JSON.
-
-Extract these entities:
-- job_title: The role/position mentioned (e.g., "Software Engineer", "ML Engineer", "Tech Lead"). Use null if not mentioned.
-- location: City, state, country, or "remote" if mentioned. Use null if not mentioned.
-- years_experience: Extract as a number. Parse expressions like "5+", "3+ years", "senior" (6), "junior" (1). Use null if not mentioned.
-- skills: Array of technical skills/keywords (e.g., ["Python", "React", "LLMs"]). Empty array if none.
-- industry: Array of industry sectors (e.g., ["fintech", "healthcare", "retail"]). Empty array if none.
-- company_type: Array of company attributes (e.g., ["startup", "VC backed", "enterprise", "FAANG"]). Empty array if none.
-
-Example input: "senior python developer in SF with startup experience"
-Example output: {"job_title":"Python Developer","location":"San Francisco","years_experience":6,"skills":["Python"],"industry":[],"company_type":["startup"]}
-
-Query to parse: `;
-
-// ============================================================================
 // Main Extraction Function
 // ============================================================================
 
@@ -254,7 +230,7 @@ export async function extractEntities(
       contents: [
         {
           role: "user",
-          parts: [{ text: ENTITY_EXTRACTION_PROMPT + query }],
+          parts: [{ text: buildEntityExtractionContext(query) }],
         },
       ],
       config: {
