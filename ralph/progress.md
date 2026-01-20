@@ -915,3 +915,61 @@ try {
 3. **Barrel export exception**: The pattern `@/lib/*/!(index)` excludes barrel exports (index.ts files) since these are designed for external consumption and may re-export types for backwards compatibility.
 
 4. **Documentation-first for conventions**: When adding linting rules for code style/conventions, update documentation files (CLAUDE.md) first so developers understand the "why" behind the lint warnings.
+
+## Issue #108: REF-017 - Assessment Audit Trail Enhancement
+
+### What was implemented
+- Added 4 optional fields to `AssessmentApiCall` model in Prisma schema for AI context tracking:
+  - `promptType String?` - e.g., "HR_INTERVIEW", "CODE_REVIEW"
+  - `promptVersion String?` - e.g., "1.0.0"
+  - `modelUsed String?` - e.g., "gemini-3-flash-preview"
+  - `tokenCount Int?` - Approximate tokens used
+- Created `logAICall()` helper function in `src/lib/analysis/ai-call-logging.ts`
+- Added companion `logCompletedAICall()` for one-shot logging
+- Added comprehensive test suite with 7 tests
+- Updated barrel export in `src/lib/analysis/index.ts`
+- Documented the logging pattern in `src/lib/CLAUDE.md`
+
+### Files changed
+- `prisma/schema.prisma` - Added 4 optional fields to AssessmentApiCall model
+- `src/lib/analysis/ai-call-logging.ts` - New helper functions
+- `src/lib/analysis/ai-call-logging.test.ts` - Tests for the helpers
+- `src/lib/analysis/index.ts` - Added export for ai-call-logging
+- `src/lib/CLAUDE.md` - Documented AI call logging pattern
+
+### Usage pattern
+```typescript
+import { logAICall } from "@/lib/analysis";
+
+const tracker = await logAICall({
+  assessmentId: assessment.id,
+  endpoint: "/api/chat",
+  promptText: fullPrompt,
+  modelVersion: "gemini-2.0-flash-exp",
+  promptType: "CHAT",
+  promptVersion: "1.0",
+  modelUsed: "gemini-3-flash-preview",
+});
+
+try {
+  const response = await callAI(fullPrompt);
+  await tracker.complete({
+    responseText: response.text,
+    statusCode: 200,
+  });
+} catch (error) {
+  await tracker.fail(error);
+}
+```
+
+### Learnings for future iterations
+
+1. **Tracker pattern for async operations**: The `logAICall()` function returns a tracker object with `complete()` and `fail()` methods. This pattern allows capturing start time accurately, then updating with response details after the async operation completes.
+
+2. **Optional fields for incremental adoption**: Adding new fields as optional (`String?`, `Int?`) allows existing code to continue working without changes. Routes can be updated incrementally to pass the new context.
+
+3. **One-shot vs tracked logging**: Provide both patterns - `logAICall()` for when you need to measure duration accurately, and `logCompletedAICall()` for simpler cases where you just want to record a completed call in one operation.
+
+4. **Consistent naming with existing patterns**: The new `ai-call-logging.ts` follows the same patterns as `assessment-logging.ts` (which handles VideoAssessmentApiCall), making the codebase more consistent and predictable.
+
+5. **Schema changes note**: This schema-only change enables future observability improvements. Actual logging implementation in API routes can be done incrementally in future issues.

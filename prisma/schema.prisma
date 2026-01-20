@@ -435,6 +435,12 @@ model AssessmentApiCall {
   errorMessage      String?   @db.Text
   stackTrace        String?   @db.Text
 
+  // AI Context (REF-017)
+  promptType        String?   // e.g., "HR_INTERVIEW", "CODE_REVIEW"
+  promptVersion     String?   // e.g., "1.0.0"
+  modelUsed         String?   // e.g., "gemini-3-flash-preview"
+  tokenCount        Int?      // Approximate tokens used
+
   // Relations
   assessment        Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
 

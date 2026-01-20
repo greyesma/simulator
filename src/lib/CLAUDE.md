@@ -10,7 +10,7 @@ src/lib/
 ├── ai/            # gemini, conversation-memory, coworker-persona
 ├── scenarios/     # scenario-builder
 ├── candidate/     # cv-parser, embeddings, candidate-search, archetypes, seniority
-├── analysis/      # assessment-aggregation, video-evaluation, code-review, recording-analysis
+├── analysis/      # ai-call-logging, assessment-aggregation, video-evaluation, code-review, recording-analysis
 ├── schemas/       # Zod validation schemas
 └── api/           # API utilities (client, response, validation)
 ```
@@ -43,6 +43,36 @@ Always double-cast: `data as unknown as Type` (read) and `as unknown as Prisma.I
 ## pgvector
 
 Must use raw SQL (`$executeRaw`, `$queryRaw`) - Prisma ORM doesn't support vector ops.
+
+## AI Call Logging
+
+Use `logAICall()` to track AI API calls with context for debugging:
+
+```typescript
+import { logAICall } from "@/lib/analysis";
+
+const tracker = await logAICall({
+  assessmentId: assessment.id,
+  endpoint: "/api/chat",
+  promptText: fullPrompt,
+  modelVersion: "gemini-2.0-flash-exp",
+  promptType: "CHAT",        // e.g., "HR_INTERVIEW", "CODE_REVIEW"
+  promptVersion: "1.0",      // Prompt template version
+  modelUsed: "gemini-3-flash-preview",
+});
+
+try {
+  const response = await callAI(fullPrompt);
+  await tracker.complete({
+    responseText: response.text,
+    statusCode: 200,
+    promptTokens: response.usageMetadata?.promptTokenCount,
+    responseTokens: response.usageMetadata?.candidatesTokenCount,
+  });
+} catch (error) {
+  await tracker.fail(error);
+}
+```
 
 ## Testing
 
