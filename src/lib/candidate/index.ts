@@ -6,8 +6,9 @@ export * from "./archetype-weights";
 // candidate-search exports
 export * from "./candidate-search";
 
-// cv-parser exports - note: SeniorityLevel is also available from @/types
-// We exclude the re-exports from @/types to avoid conflicts with seniority-thresholds
+// cv-parser exports
+// Note: SeniorityLevel re-exported here is FilterSeniorityLevel from @/types
+// For the full SeniorityLevel with all levels, import directly from @/types
 export {
   workExperienceSchema,
   educationSchema,
@@ -37,9 +38,9 @@ export * from "./entity-extraction";
 // feedback-parsing exports
 export * from "./feedback-parsing";
 
-// seniority-thresholds exports (SeniorityLevel defined here - uppercase variant for filtering)
-// Note: This SeniorityLevel ("JUNIOR" | "MID" | "SENIOR") is different from @/types SeniorityLevel
-// which uses lowercase and has more levels. Consumers should be aware of which variant they need.
+// seniority-thresholds exports
+// SeniorityLevel here is FilterSeniorityLevel ("JUNIOR" | "MID" | "SENIOR") from @/types
+// Used for candidate filtering thresholds
 // We exclude DimensionScoreInput since archetype-weights already exports it
 export {
   type SeniorityLevel,

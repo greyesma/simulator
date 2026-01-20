@@ -56,6 +56,7 @@ export type {
   LanguageProficiency,
   Language,
   SeniorityLevel,
+  FilterSeniorityLevel,
   ParseQuality,
   ParsedProfile,
 } from "./cv";

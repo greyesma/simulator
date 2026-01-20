@@ -160,7 +160,7 @@ export const parsedProfileSchema = z.object({
   // Additional Information
   totalYearsOfExperience: nullableNumber,
   seniorityLevel: z
-    .enum(["junior", "mid", "senior", "lead", "principal", "unknown"])
+    .enum(["JUNIOR", "MID", "SENIOR", "LEAD", "PRINCIPAL", "UNKNOWN"])
     .nullable()
     .transform((v) => v ?? undefined)
     .optional(),
@@ -497,7 +497,7 @@ export function formatProfileForPrompt(profile: ParsedProfile): string {
       profile.totalYearsOfExperience &&
         `Total Experience: ${profile.totalYearsOfExperience} years`,
       profile.seniorityLevel &&
-        profile.seniorityLevel !== "unknown" &&
+        profile.seniorityLevel !== "UNKNOWN" &&
         `Seniority Level: ${profile.seniorityLevel}`,
     ]
       .filter(Boolean)

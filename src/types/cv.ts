@@ -89,15 +89,24 @@ export interface Language {
 }
 
 /**
- * Seniority levels
+ * Seniority levels (uppercase for enum-like consistency)
+ *
+ * Used in two contexts:
+ * 1. CV parsing - all levels available
+ * 2. Candidate filtering - subset (JUNIOR, MID, SENIOR) via FilterSeniorityLevel
  */
 export type SeniorityLevel =
-  | "junior"
-  | "mid"
-  | "senior"
-  | "lead"
-  | "principal"
-  | "unknown";
+  | "JUNIOR"
+  | "MID"
+  | "SENIOR"
+  | "LEAD"
+  | "PRINCIPAL"
+  | "UNKNOWN";
+
+/**
+ * Subset of SeniorityLevel used for candidate filtering thresholds
+ */
+export type FilterSeniorityLevel = "JUNIOR" | "MID" | "SENIOR";
 
 /**
  * Parse quality indicator

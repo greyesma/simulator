@@ -106,37 +106,37 @@ describe("ParsedProfileDisplay component", () => {
 
   describe("seniority badge", () => {
     it("displays junior seniority badge", () => {
-      const profile = createTestProfile({ seniorityLevel: "junior" });
+      const profile = createTestProfile({ seniorityLevel: "JUNIOR" });
       render(<ParsedProfileDisplay profile={profile} />);
       expect(screen.getByText("JUNIOR")).toBeInTheDocument();
     });
 
     it("displays mid seniority badge", () => {
-      const profile = createTestProfile({ seniorityLevel: "mid" });
+      const profile = createTestProfile({ seniorityLevel: "MID" });
       render(<ParsedProfileDisplay profile={profile} />);
       expect(screen.getByText("MID-LEVEL")).toBeInTheDocument();
     });
 
     it("displays senior seniority badge", () => {
-      const profile = createTestProfile({ seniorityLevel: "senior" });
+      const profile = createTestProfile({ seniorityLevel: "SENIOR" });
       render(<ParsedProfileDisplay profile={profile} />);
       expect(screen.getByText("SENIOR")).toBeInTheDocument();
     });
 
     it("displays lead seniority badge", () => {
-      const profile = createTestProfile({ seniorityLevel: "lead" });
+      const profile = createTestProfile({ seniorityLevel: "LEAD" });
       render(<ParsedProfileDisplay profile={profile} />);
       expect(screen.getByText("LEAD")).toBeInTheDocument();
     });
 
     it("displays principal seniority badge", () => {
-      const profile = createTestProfile({ seniorityLevel: "principal" });
+      const profile = createTestProfile({ seniorityLevel: "PRINCIPAL" });
       render(<ParsedProfileDisplay profile={profile} />);
       expect(screen.getByText("PRINCIPAL")).toBeInTheDocument();
     });
 
     it("does not display badge for unknown seniority", () => {
-      const profile = createTestProfile({ seniorityLevel: "unknown" });
+      const profile = createTestProfile({ seniorityLevel: "UNKNOWN" });
       render(<ParsedProfileDisplay profile={profile} />);
       expect(screen.queryByText("UNKNOWN")).not.toBeInTheDocument();
     });
@@ -614,7 +614,7 @@ describe("ParsedProfileDisplay component", () => {
     });
 
     it("uses gold (bg-secondary) for emphasis", () => {
-      const profile = createTestProfile({ seniorityLevel: "senior" });
+      const profile = createTestProfile({ seniorityLevel: "SENIOR" });
       const { container } = render(<ParsedProfileDisplay profile={profile} />);
       const goldElements = container.querySelectorAll(".bg-secondary");
       expect(goldElements.length).toBeGreaterThan(0);

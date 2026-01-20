@@ -5,12 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { ScenarioBuilderData } from "@/lib/scenarios";
 import { Markdown } from "@/components/shared";
-
-interface ChatMessage {
-  role: "user" | "model";
-  text: string;
-  timestamp: string;
-}
+import type { ChatMessage } from "@/types";
 
 export function ScenarioBuilderClient() {
   const router = useRouter();

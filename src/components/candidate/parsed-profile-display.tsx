@@ -16,11 +16,11 @@ const SKILL_CATEGORY_LABELS: Record<string, string> = {
 };
 
 const SENIORITY_LABELS: Record<string, string> = {
-  junior: "JUNIOR",
-  mid: "MID-LEVEL",
-  senior: "SENIOR",
-  lead: "LEAD",
-  principal: "PRINCIPAL",
+  JUNIOR: "JUNIOR",
+  MID: "MID-LEVEL",
+  SENIOR: "SENIOR",
+  LEAD: "LEAD",
+  PRINCIPAL: "PRINCIPAL",
 };
 
 function SeniorityBadge({ level }: { level: string }) {
@@ -139,7 +139,7 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
     <section className="mb-12">
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-2xl font-bold">Parsed Profile</h2>
-        {profile.seniorityLevel && profile.seniorityLevel !== "unknown" && (
+        {profile.seniorityLevel && profile.seniorityLevel !== "UNKNOWN" && (
           <SeniorityBadge level={profile.seniorityLevel} />
         )}
       </div>

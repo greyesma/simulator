@@ -5,12 +5,7 @@ import { Phone } from "lucide-react";
 import { api, ApiClientError } from "@/lib/api-client";
 import { useCallContext } from "./slack-layout";
 import { CoworkerAvatar } from "./coworker-avatar";
-
-interface ChatMessage {
-  role: "user" | "model";
-  text: string;
-  timestamp: string;
-}
+import type { ChatMessage } from "@/types";
 
 interface Coworker {
   id: string;

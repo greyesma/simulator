@@ -274,7 +274,7 @@ describe("CV Parser Schemas", () => {
         },
       ],
       totalYearsOfExperience: 8,
-      seniorityLevel: "senior",
+      seniorityLevel: "SENIOR",
       parsedAt: "2024-01-15T10:00:00Z",
       parseQuality: "high",
     };
@@ -434,7 +434,7 @@ describe("CV Parser Utilities", () => {
       { language: "Mandarin", proficiency: "conversational" },
     ],
     totalYearsOfExperience: 6,
-    seniorityLevel: "lead",
+    seniorityLevel: "LEAD",
     parsedAt: "2024-01-15T10:00:00Z",
     parseQuality: "high",
   };

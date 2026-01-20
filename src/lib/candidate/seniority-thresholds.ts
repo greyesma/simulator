@@ -17,15 +17,10 @@
 
 import { AssessmentDimension } from "@prisma/client";
 import { type RoleArchetype, ARCHETYPE_CONFIGS } from "./archetype-weights";
+import { type FilterSeniorityLevel } from "@/types";
 
-// ============================================================================
-// Types
-// ============================================================================
-
-/**
- * Seniority levels for candidate filtering
- */
-export type SeniorityLevel = "JUNIOR" | "MID" | "SENIOR";
+// Create local type alias and re-export for backward compatibility
+export type SeniorityLevel = FilterSeniorityLevel;
 
 /**
  * Key dimensions for each archetype (dimensions with VERY_HIGH weight)

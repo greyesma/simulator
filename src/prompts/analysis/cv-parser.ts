@@ -86,7 +86,7 @@ Return a JSON object with the following structure:
   ],
 
   "totalYearsOfExperience": <estimated total years in the industry>,
-  "seniorityLevel": "<junior|mid|senior|lead|principal|unknown>",
+  "seniorityLevel": "<JUNIOR|MID|SENIOR|LEAD|PRINCIPAL|UNKNOWN>",
 
   "parsedAt": "<ISO timestamp>",
   "parseQuality": "<high|medium|low>",
@@ -94,11 +94,11 @@ Return a JSON object with the following structure:
 }
 
 ## Seniority Guidelines
-- Junior: 0-2 years, entry-level roles
-- Mid: 2-5 years, independent contributor
-- Senior: 5-8 years, experienced individual contributor
-- Lead: 8+ years with leadership experience
-- Principal: Staff/Principal level roles
+- JUNIOR: 0-2 years, entry-level roles
+- MID: 2-5 years, independent contributor
+- SENIOR: 5-8 years, experienced individual contributor
+- LEAD: 8+ years with leadership experience
+- PRINCIPAL: Staff/Principal level roles
 
 ## Parse Quality Guidelines
 - High: Clear, well-formatted CV with all sections
