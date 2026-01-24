@@ -4,8 +4,8 @@ import type {
   AssessmentDimension,
 } from "@prisma/client";
 
-// Mock gemini module (now in @/lib/ai)
-vi.mock("@/lib/ai", () => ({
+// Mock gemini module
+vi.mock("@/lib/ai/gemini", () => ({
   gemini: {
     models: {
       generateContent: vi.fn(),
@@ -64,7 +64,7 @@ import {
   forceRetryVideoAssessment,
   VIDEO_EVALUATION_MODEL,
 } from "./video-evaluation";
-import { gemini } from "@/lib/ai";
+import { gemini } from "@/lib/ai/gemini";
 import { db } from "@/server/db";
 
 // Cast to mocked types for easier access

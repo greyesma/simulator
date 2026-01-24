@@ -30,14 +30,18 @@ vi.mock("@/server/db", () => ({
   },
 }));
 
-// Mock @/lib/ai (gemini + conversation-memory)
+// Mock @/lib/ai/gemini
 const mockGenerateContent = vi.fn();
-vi.mock("@/lib/ai", () => ({
+vi.mock("@/lib/ai/gemini", () => ({
   gemini: {
     models: {
       generateContent: (...args: unknown[]) => mockGenerateContent(...args),
     },
   },
+}));
+
+// Mock @/lib/ai/conversation-memory
+vi.mock("@/lib/ai/conversation-memory", () => ({
   buildCoworkerMemory: vi.fn().mockResolvedValue({
     hasPriorConversations: false,
     summary: null,
@@ -46,6 +50,10 @@ vi.mock("@/lib/ai", () => ({
   }),
   formatMemoryForPrompt: vi.fn().mockReturnValue(""),
   buildCrossCoworkerContext: vi.fn().mockReturnValue(""),
+}));
+
+// Mock @/lib/ai
+vi.mock("@/lib/ai", () => ({
   parseCoworkerKnowledge: vi.fn().mockReturnValue([]),
 }));
 

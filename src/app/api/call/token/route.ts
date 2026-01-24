@@ -1,17 +1,13 @@
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { generateEphemeralToken } from "@/lib/ai";
-import {
-  parseCoworkerKnowledge,
-  type CoworkerPersona,
-} from "@/lib/ai";
+import { generateEphemeralToken } from "@/lib/ai/gemini";
 import {
   buildCoworkerMemory,
   formatMemoryForPrompt,
   buildCrossCoworkerContext,
-  type ChatMessage,
-  type ConversationWithMeta,
-} from "@/lib/ai";
+} from "@/lib/ai/conversation-memory";
+import { parseCoworkerKnowledge } from "@/lib/ai";
+import type { CoworkerPersona, ChatMessage, ConversationWithMeta } from "@/types";
 import { buildVoicePrompt } from "@/prompts";
 import { success, error, validateRequest } from "@/lib/api";
 import { CallTokenRequestSchema } from "@/lib/schemas";

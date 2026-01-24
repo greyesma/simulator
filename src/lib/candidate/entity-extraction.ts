@@ -9,7 +9,7 @@
  * @see Issue #68: US-008
  */
 
-import { gemini, TEXT_MODEL } from "@/lib/ai";
+import { gemini, TEXT_MODEL } from "@/lib/ai/gemini";
 import { z } from "zod";
 import { type RoleArchetype } from "@/lib/candidate";
 import { type SeniorityLevel } from "@/lib/candidate";

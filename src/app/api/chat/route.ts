@@ -1,17 +1,13 @@
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { gemini } from "@/lib/ai";
-import {
-  parseCoworkerKnowledge,
-  type CoworkerPersona,
-} from "@/lib/ai";
+import { gemini } from "@/lib/ai/gemini";
 import {
   buildCoworkerMemory,
   formatMemoryForPrompt,
   buildCrossCoworkerContext,
-  type ChatMessage,
-  type ConversationWithMeta,
-} from "@/lib/ai";
+} from "@/lib/ai/conversation-memory";
+import { parseCoworkerKnowledge } from "@/lib/ai";
+import type { CoworkerPersona, ChatMessage, ConversationWithMeta } from "@/types";
 import type { Prisma } from "@prisma/client";
 import { AssessmentStatus } from "@prisma/client";
 import {

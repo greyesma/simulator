@@ -8,7 +8,7 @@
  * @since 2026-01-16
  */
 
-import { gemini } from "@/lib/ai";
+import { gemini } from "@/lib/ai/gemini";
 import { db } from "@/server/db";
 import { withRetry } from "@/lib/core";
 import { createVideoAssessmentLogger } from "@/lib/analysis";

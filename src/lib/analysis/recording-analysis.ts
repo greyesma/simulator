@@ -1,4 +1,4 @@
-import { gemini } from "@/lib/ai";
+import { gemini } from "@/lib/ai/gemini";
 import { z } from "zod";
 import type { Prisma } from "@prisma/client";
 

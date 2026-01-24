@@ -9,7 +9,7 @@
  * @see Issue #75: US-012b
  */
 
-import { gemini, TEXT_MODEL } from "@/lib/ai";
+import { gemini, TEXT_MODEL } from "@/lib/ai/gemini";
 import { z } from "zod";
 import { buildFeedbackParsingContext } from "@/prompts";
 

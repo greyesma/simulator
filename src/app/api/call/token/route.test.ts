@@ -24,12 +24,16 @@ vi.mock("@/server/db", () => ({
   },
 }));
 
-// Mock @/lib/ai (gemini + conversation-memory)
+// Mock @/lib/ai/gemini
 const mockGenerateEphemeralToken = vi.fn();
-const mockFormatMemoryForPrompt = vi.fn();
-vi.mock("@/lib/ai", () => ({
+vi.mock("@/lib/ai/gemini", () => ({
   generateEphemeralToken: (...args: unknown[]) =>
     mockGenerateEphemeralToken(...args),
+}));
+
+// Mock @/lib/ai/conversation-memory
+const mockFormatMemoryForPrompt = vi.fn();
+vi.mock("@/lib/ai/conversation-memory", () => ({
   buildCoworkerMemory: vi.fn().mockResolvedValue({
     hasPriorConversations: false,
     summary: null,
@@ -39,6 +43,10 @@ vi.mock("@/lib/ai", () => ({
   formatMemoryForPrompt: (...args: unknown[]) =>
     mockFormatMemoryForPrompt(...args),
   buildCrossCoworkerContext: vi.fn().mockReturnValue(""),
+}));
+
+// Mock @/lib/ai
+vi.mock("@/lib/ai", () => ({
   parseCoworkerKnowledge: vi.fn().mockReturnValue([]),
 }));
 

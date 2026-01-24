@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { generateEphemeralToken } from "@/lib/ai";
+import { generateEphemeralToken } from "@/lib/ai/gemini";
 import {
   buildHRInterviewPrompt,
   formatCVContextForHR,

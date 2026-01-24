@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { gemini } from "@/lib/ai";
+import { gemini } from "@/lib/ai/gemini";
 import {
   buildCompleteSystemPrompt,
   parseExtractionFromResponse,

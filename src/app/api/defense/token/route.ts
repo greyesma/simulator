@@ -1,12 +1,11 @@
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { generateEphemeralToken } from "@/lib/ai";
+import { generateEphemeralToken } from "@/lib/ai/gemini";
 import {
   buildCoworkerMemory,
   formatMemoryForPrompt,
-  type ConversationWithMeta,
-  type ChatMessage,
-} from "@/lib/ai";
+} from "@/lib/ai/conversation-memory";
+import type { ConversationWithMeta, ChatMessage } from "@/types";
 import { fetchPrCiStatus, formatCiStatusForPrompt } from "@/lib/external";
 import {
   analyzeCodeReview,

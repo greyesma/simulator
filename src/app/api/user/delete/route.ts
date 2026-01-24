@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { processImmediateDeletion } from "@/lib/core";
+import { processImmediateDeletion } from "@/lib/core/data-deletion";
 
 /**
  * POST /api/user/delete

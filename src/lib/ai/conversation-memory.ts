@@ -5,7 +5,7 @@
  * Ensures coworkers remember prior interactions within an assessment session.
  */
 
-import { gemini } from "@/lib/ai";
+import { gemini } from "./gemini";
 import type {
   ChatMessage,
   ConversationWithMeta,

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { gemini } from "@/lib/ai";
+import { gemini } from "@/lib/ai/gemini";
 import { z } from "zod";
 import type { Prisma } from "@prisma/client";
 import { buildHRAssessmentContext } from "@/prompts";

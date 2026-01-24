@@ -18,13 +18,17 @@ vi.mock("@/server/db", () => ({
   },
 }));
 
-// Mock @/lib/ai (gemini + conversation-memory)
+// Mock @/lib/ai/gemini
 const mockGenerateEphemeralToken = vi.fn();
-const mockBuildCoworkerMemory = vi.fn();
-const mockFormatMemoryForPrompt = vi.fn();
-vi.mock("@/lib/ai", () => ({
+vi.mock("@/lib/ai/gemini", () => ({
   generateEphemeralToken: (...args: unknown[]) =>
     mockGenerateEphemeralToken(...args),
+}));
+
+// Mock @/lib/ai/conversation-memory
+const mockBuildCoworkerMemory = vi.fn();
+const mockFormatMemoryForPrompt = vi.fn();
+vi.mock("@/lib/ai/conversation-memory", () => ({
   buildCoworkerMemory: (...args: unknown[]) => mockBuildCoworkerMemory(...args),
   formatMemoryForPrompt: (...args: unknown[]) =>
     mockFormatMemoryForPrompt(...args),
