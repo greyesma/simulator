@@ -1,4 +1,5 @@
 import type { ParsedProfile, Skill } from "@/lib/candidate";
+import { Card, CardContent, Badge } from "@/components/ui";
 
 interface ParsedProfileDisplayProps {
   profile: ParsedProfile | null | undefined;
@@ -28,12 +29,9 @@ function SeniorityBadge({ level }: { level: string }) {
   if (!label) return null;
 
   return (
-    <span
-      data-testid="seniority-badge"
-      className="border-2 border-foreground bg-secondary px-3 py-1 font-mono text-xs text-secondary-foreground"
-    >
+    <Badge data-testid="seniority-badge" className="font-mono text-xs">
       {label}
-    </span>
+    </Badge>
   );
 }
 
@@ -49,16 +47,20 @@ function ParseQualityWarning({
       ? "Medium quality parse - some information may be incomplete"
       : "Low quality parse - significant information may be missing";
 
+  const isLow = quality === "low";
+
   return (
-    <div className="bg-muted/30 mb-4 border-2 border-foreground p-3 font-mono text-sm">
-      {message}
-    </div>
+    <Card className={`mb-4 ${isLow ? "border-amber-200 bg-amber-50" : "bg-muted/30"}`}>
+      <CardContent className="p-3">
+        <p className="text-sm text-muted-foreground">{message}</p>
+      </CardContent>
+    </Card>
   );
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="mb-4 border-b-2 border-foreground pb-2 text-lg font-bold">
+    <h3 className="mb-4 border-b border-border pb-2 text-lg font-semibold">
       {children}
     </h3>
   );
@@ -70,14 +72,14 @@ function SkillTag({
   skill: { name: string; proficiencyLevel?: string };
 }) {
   return (
-    <span className="mb-2 mr-2 inline-block border-2 border-foreground px-2 py-1 font-mono text-sm">
+    <Badge variant="secondary" className="mb-2 mr-2">
       {skill.name}
       {skill.proficiencyLevel && (
         <span className="ml-1 text-muted-foreground">
           ({skill.proficiencyLevel})
         </span>
       )}
-    </span>
+    </Badge>
   );
 }
 
@@ -138,7 +140,7 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
   return (
     <section className="mb-12">
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Parsed Profile</h2>
+        <h2 className="text-2xl font-semibold">Parsed Profile</h2>
         {profile.seniorityLevel && profile.seniorityLevel !== "UNKNOWN" && (
           <SeniorityBadge level={profile.seniorityLevel} />
         )}
@@ -146,13 +148,14 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
 
       <ParseQualityWarning quality={profile.parseQuality} />
 
-      <div className="space-y-8 border-2 border-foreground p-6">
+      <Card className="shadow-sm">
+        <CardContent className="space-y-8 p-6">
         {/* Header with basic info */}
-        <div className="border-b-2 border-border pb-6">
+        <div className="border-b border-border pb-6">
           {profile.name && (
-            <h3 className="mb-2 text-xl font-bold">{profile.name}</h3>
+            <h3 className="mb-2 text-xl font-semibold">{profile.name}</h3>
           )}
-          <div className="space-y-1 font-mono text-sm">
+          <div className="space-y-1 text-sm">
             {profile.email && (
               <p className="text-muted-foreground">{profile.email}</p>
             )}
@@ -171,7 +174,7 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
                   href={profile.linkedIn}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="border-b-2 border-secondary font-mono text-sm hover:text-secondary"
+                  className="text-sm text-primary hover:text-primary/80 transition-colors"
                 >
                   LinkedIn
                 </a>
@@ -181,7 +184,7 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
                   href={profile.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="border-b-2 border-secondary font-mono text-sm hover:text-secondary"
+                  className="text-sm text-primary hover:text-primary/80 transition-colors"
                 >
                   GitHub
                 </a>
@@ -191,7 +194,7 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
                   href={profile.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="border-b-2 border-secondary font-mono text-sm hover:text-secondary"
+                  className="text-sm text-primary hover:text-primary/80 transition-colors"
                 >
                   Website
                 </a>
@@ -200,9 +203,9 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
           )}
 
           {profile.totalYearsOfExperience !== undefined && (
-            <p className="mt-4 font-mono text-sm">
+            <p className="mt-4 text-sm">
               <span className="text-muted-foreground">Total Experience:</span>{" "}
-              <span className="font-bold">
+              <span className="font-semibold">
                 {profile.totalYearsOfExperience} years
               </span>
             </p>
@@ -225,22 +228,22 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
               {profile.workExperience.map((exp, index) => (
                 <div
                   key={`${exp.company}-${index}`}
-                  className="border-l-4 border-secondary pl-4"
+                  className="border-l-4 border-primary rounded-r-lg pl-4"
                 >
-                  <h4 className="font-bold">{exp.title}</h4>
-                  <p className="font-bold text-muted-foreground">
+                  <h4 className="font-semibold">{exp.title}</h4>
+                  <p className="font-medium text-muted-foreground">
                     {exp.company}
                   </p>
-                  <p className="mt-1 font-mono text-sm text-muted-foreground">
-                    {exp.startDate} - {exp.endDate || "Present"}
+                  <div className="mt-1 flex items-center text-sm text-muted-foreground">
+                    <span>{exp.startDate} - {exp.endDate || "Present"}</span>
                     {exp.duration && (
-                      <span className="ml-2 border border-border bg-muted px-2 py-0.5">
+                      <Badge variant="secondary" className="ml-2">
                         {exp.duration}
-                      </span>
+                      </Badge>
                     )}
-                  </p>
+                  </div>
                   {exp.location && (
-                    <p className="mt-1 font-mono text-xs text-muted-foreground">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       {exp.location}
                     </p>
                   )}
@@ -250,12 +253,9 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
                     </p>
                   )}
                   {exp.highlights && exp.highlights.length > 0 && (
-                    <ul className="mt-2 space-y-1">
+                    <ul className="mt-2 list-disc space-y-1 pl-4 marker:text-primary">
                       {exp.highlights.map((highlight, i) => (
-                        <li
-                          key={i}
-                          className="text-sm before:mr-2 before:text-secondary before:content-['■']"
-                        >
+                        <li key={i} className="text-sm">
                           {highlight}
                         </li>
                       ))}
@@ -264,12 +264,9 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
                   {exp.technologies && exp.technologies.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-1">
                       {exp.technologies.map((tech, i) => (
-                        <span
-                          key={i}
-                          className="border border-border bg-muted px-2 py-0.5 font-mono text-xs"
-                        >
+                        <Badge key={i} variant="outline" className="text-xs">
                           {tech}
-                        </span>
+                        </Badge>
                       ))}
                     </div>
                   )}
@@ -287,31 +284,28 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
               {profile.education.map((edu, index) => (
                 <div
                   key={`${edu.institution}-${index}`}
-                  className="border-l-4 border-secondary pl-4"
+                  className="border-l-4 border-primary rounded-r-lg pl-4"
                 >
-                  <h4 className="font-bold">{edu.institution}</h4>
+                  <h4 className="font-semibold">{edu.institution}</h4>
                   <p className="text-muted-foreground">
                     {edu.degree}
                     {edu.field && ` in ${edu.field}`}
                   </p>
                   {(edu.startDate || edu.endDate) && (
-                    <p className="mt-1 font-mono text-sm text-muted-foreground">
+                    <p className="mt-1 text-sm text-muted-foreground">
                       {edu.startDate && `${edu.startDate} - `}
                       {edu.endDate || "Present"}
                     </p>
                   )}
                   {edu.gpa && (
-                    <p className="mt-1 font-mono text-sm">GPA: {edu.gpa}</p>
+                    <p className="mt-1 text-sm">GPA: {edu.gpa}</p>
                   )}
                   {edu.honors && edu.honors.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-2">
                       {edu.honors.map((honor, i) => (
-                        <span
-                          key={i}
-                          className="bg-secondary/20 border border-border px-2 py-0.5 font-mono text-xs"
-                        >
+                        <Badge key={i} variant="secondary" className="text-xs">
                           {honor}
-                        </span>
+                        </Badge>
                       ))}
                     </div>
                   )}
@@ -337,16 +331,16 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
               {profile.certifications.map((cert, index) => (
                 <div
                   key={`${cert.name}-${index}`}
-                  className="flex items-start justify-between border-l-4 border-secondary pl-4"
+                  className="flex items-start justify-between border-l-4 border-primary rounded-r-lg pl-4"
                 >
                   <div>
-                    <h4 className="font-bold">{cert.name}</h4>
+                    <h4 className="font-semibold">{cert.name}</h4>
                     <p className="text-sm text-muted-foreground">
                       {cert.issuer}
                     </p>
                   </div>
                   {cert.dateObtained && (
-                    <span className="font-mono text-xs text-muted-foreground">
+                    <span className="text-xs text-muted-foreground">
                       {cert.dateObtained}
                     </span>
                   )}
@@ -360,22 +354,24 @@ export function ParsedProfileDisplay({ profile }: ParsedProfileDisplayProps) {
         {profile.languages.length > 0 && (
           <div>
             <SectionTitle>Languages</SectionTitle>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-3">
               {profile.languages.map((lang, index) => (
-                <div
+                <Badge
                   key={`${lang.language}-${index}`}
-                  className="border-2 border-foreground px-4 py-2"
+                  variant="outline"
+                  className="px-4 py-2 text-sm"
                 >
-                  <span className="font-bold">{lang.language}</span>
-                  <span className="ml-2 font-mono text-sm text-muted-foreground">
+                  <span className="font-semibold">{lang.language}</span>
+                  <span className="ml-2 text-muted-foreground">
                     ({lang.proficiency})
                   </span>
-                </div>
+                </Badge>
               ))}
             </div>
           </div>
         )}
-      </div>
+        </CardContent>
+      </Card>
     </section>
   );
 }

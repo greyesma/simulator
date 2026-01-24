@@ -9,6 +9,8 @@
  * - 1-sentence summary excerpt
  * - View Profile button
  *
+ * Modern design with shadcn/ui components, rounded corners, and subtle shadows.
+ *
  * @since 2026-01-17
  * @see Issue #74: US-012
  */
@@ -19,6 +21,7 @@ import { ArrowRight, User, TrendingUp, X } from "lucide-react";
 import type { RoleArchetype, WeightLevel } from "@/lib/candidate";
 import type { SeniorityLevel } from "@/lib/candidate";
 import { SENIORITY_THRESHOLDS } from "@/lib/candidate";
+import { Card, CardContent, Avatar, AvatarFallback, Badge, Button } from "@/components/ui";
 
 // ============================================================================
 // Types
@@ -139,6 +142,7 @@ function getInitials(name: string | null, email: string | null): string {
 
 /**
  * Compact dimension score bar with threshold highlighting
+ * Uses blue fill with rounded ends for modern design
  */
 function DimensionScoreBar({
   dimension,
@@ -157,8 +161,8 @@ function DimensionScoreBar({
     weightLevel
   );
 
-  // Determine bar color based on threshold status
-  let barColorClass = "bg-secondary"; // Default gold
+  // Determine bar color based on threshold status (default is blue)
+  let barColorClass = "bg-primary"; // Default blue
   if (thresholdStatus === "exceeds") {
     barColorClass = "bg-green-500";
   } else if (thresholdStatus === "below") {
@@ -171,24 +175,24 @@ function DimensionScoreBar({
   return (
     <div className="flex items-center gap-2" data-testid="dimension-score-bar">
       <span
-        className={`w-14 font-mono text-xs ${isKeyDimension ? "font-bold" : "text-muted-foreground"}`}
+        className={`w-14 font-mono text-xs ${isKeyDimension ? "font-bold text-foreground" : "text-muted-foreground"}`}
         data-testid="dimension-label"
       >
         {dimensionShortLabels[dimension]}
       </span>
-      <div className="flex flex-1 gap-[2px]" data-testid="score-dots">
+      <div className="flex flex-1 gap-1" data-testid="score-dots">
         {[1, 2, 3, 4, 5].map((level) => (
           <div
             key={level}
-            className={`h-2 flex-1 border border-foreground ${
-              level <= score ? barColorClass : "bg-muted/30"
+            className={`h-2 flex-1 rounded-full transition-colors ${
+              level <= score ? barColorClass : "bg-muted"
             }`}
             data-testid={`score-dot-${level}`}
           />
         ))}
       </div>
       <span
-        className="w-4 text-right font-mono text-xs"
+        className="w-4 text-right font-mono text-xs text-muted-foreground"
         data-testid="score-value"
       >
         {score}
@@ -198,33 +202,24 @@ function DimensionScoreBar({
 }
 
 /**
- * Fit score badge with visual indicator
+ * Fit score badge with visual indicator using Badge component
  */
 function FitScoreBadge({ score }: { score: number }) {
-  // Determine color based on score range
-  let bgClass = "bg-muted";
-  if (score >= 80) {
-    bgClass = "bg-secondary";
-  } else if (score >= 60) {
-    bgClass = "bg-green-500/20 border-green-500";
-  }
+  // Determine variant based on score range
+  const isHighScore = score >= 80;
+  const isMediumScore = score >= 60;
 
   return (
-    <div
-      className={`flex items-center gap-1 border-2 border-foreground px-3 py-2 ${bgClass}`}
+    <Badge
+      variant={isHighScore ? "default" : isMediumScore ? "secondary" : "outline"}
+      className="flex items-center gap-1.5 px-3 py-1.5 text-base"
       data-testid="fit-score-badge"
     >
-      <TrendingUp
-        size={14}
-        className={score >= 80 ? "text-secondary-foreground" : ""}
-      />
-      <span
-        className={`font-mono text-lg font-bold ${score >= 80 ? "text-secondary-foreground" : ""}`}
-        data-testid="fit-score-value"
-      >
+      <TrendingUp size={14} />
+      <span className="font-mono font-bold" data-testid="fit-score-value">
         {Math.round(score)}
       </span>
-    </div>
+    </Badge>
   );
 }
 
@@ -271,32 +266,29 @@ export function CandidateSearchResultCard({
     : null;
 
   return (
-    <article
-      className={`flex h-full flex-col border-2 border-foreground bg-background ${className}`}
+    <Card
+      className={`flex h-full flex-col shadow-sm hover:shadow-md transition-shadow ${className}`}
       data-testid="candidate-card"
     >
       {/* Header: Avatar, Name, Fit Score */}
-      <header className="flex items-start gap-4 border-b-2 border-foreground p-4">
+      <header className="flex items-start gap-4 border-b border-border p-4">
         {/* Avatar */}
-        <div
-          className="flex h-12 w-12 flex-shrink-0 items-center justify-center border-2 border-foreground bg-secondary"
-          data-testid="candidate-avatar"
-        >
-          <span className="text-sm font-bold text-secondary-foreground">
+        <Avatar className="h-12 w-12 flex-shrink-0" data-testid="candidate-avatar">
+          <AvatarFallback className="bg-primary/10 text-primary font-semibold">
             {initials}
-          </span>
-        </div>
+          </AvatarFallback>
+        </Avatar>
 
         {/* Name and Archetype */}
         <div className="min-w-0 flex-1">
           <h3
-            className="truncate text-lg font-bold"
+            className="truncate text-lg font-semibold"
             data-testid="candidate-name"
           >
             {displayName}
           </h3>
           <p
-            className="truncate font-mono text-xs text-muted-foreground"
+            className="truncate text-sm text-muted-foreground"
             data-testid="archetype-match"
           >
             {archetypeDisplayNames[archetype]}
@@ -313,8 +305,8 @@ export function CandidateSearchResultCard({
       </header>
 
       {/* Dimension Scores */}
-      <section className="flex-1 p-4" data-testid="dimensions-section">
-        <h4 className="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+      <CardContent className="flex-1 pt-4" data-testid="dimensions-section">
+        <h4 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Dimension Scores
         </h4>
         <div className="space-y-2">
@@ -333,12 +325,12 @@ export function CandidateSearchResultCard({
             );
           })}
         </div>
-      </section>
+      </CardContent>
 
       {/* Summary Excerpt */}
       {summaryExcerpt && (
         <section
-          className="border-t border-muted px-4 pb-4"
+          className="border-t border-border px-6 pb-4"
           data-testid="summary-section"
         >
           <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">
@@ -348,30 +340,33 @@ export function CandidateSearchResultCard({
       )}
 
       {/* Footer: View Profile Button + Reject Button */}
-      <footer className="mt-auto border-t-2 border-foreground p-4">
+      <footer className="mt-auto border-t border-border p-4">
         <div className="flex gap-2">
-          <Link
-            href={`/candidate/${id}?archetype=${archetype}`}
-            className="flex flex-1 items-center justify-center gap-2 border-2 border-foreground bg-foreground px-4 py-3 font-bold text-background hover:bg-secondary hover:text-secondary-foreground"
-            data-testid="view-profile-button"
-          >
-            View Profile
-            <ArrowRight size={16} />
-          </Link>
+          <Button asChild className="flex-1">
+            <Link
+              href={`/candidate/${id}?archetype=${archetype}`}
+              className="gap-2"
+              data-testid="view-profile-button"
+            >
+              View Profile
+              <ArrowRight size={16} />
+            </Link>
+          </Button>
           {onReject && (
-            <button
+            <Button
+              variant="outline"
               onClick={() => onReject(id)}
-              className="flex items-center justify-center gap-2 border-2 border-foreground bg-background px-4 py-3 font-medium text-foreground hover:border-red-500 hover:bg-red-100 hover:text-red-700"
+              className="hover:border-destructive hover:bg-destructive/10 hover:text-destructive transition-colors"
               data-testid="reject-button"
               aria-label="Not a fit"
             >
-              <X size={16} />
+              <X size={16} className="mr-1" />
               Not a fit
-            </button>
+            </Button>
           )}
         </div>
       </footer>
-    </article>
+    </Card>
   );
 }
 
@@ -398,15 +393,15 @@ export function CandidateSearchResultGrid({
 }: CandidateSearchResultGridProps) {
   if (candidates.length === 0) {
     return (
-      <div
-        className="border-2 border-foreground p-8 text-center"
+      <Card
+        className="p-8 text-center shadow-sm"
         data-testid="no-results"
       >
         <User size={48} className="mx-auto mb-4 text-muted-foreground" />
         <p className="text-muted-foreground">
           No candidates found matching your criteria.
         </p>
-      </div>
+      </Card>
     );
   }
 

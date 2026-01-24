@@ -434,28 +434,28 @@ describe("CandidateSearchResultCard", () => {
   });
 
   describe("fit score badge styling", () => {
-    it("uses gold background for high scores (>=80)", () => {
+    it("uses default (blue) variant for high scores (>=80)", () => {
       const candidate = createMockCandidate({ fitScore: 85 });
+      render(<CandidateSearchResultCard candidate={candidate} />);
+
+      const badge = screen.getByTestId("fit-score-badge");
+      expect(badge).toHaveClass("bg-primary");
+    });
+
+    it("uses secondary variant for medium scores (60-79)", () => {
+      const candidate = createMockCandidate({ fitScore: 75 });
       render(<CandidateSearchResultCard candidate={candidate} />);
 
       const badge = screen.getByTestId("fit-score-badge");
       expect(badge).toHaveClass("bg-secondary");
     });
 
-    it("uses green background for medium scores (60-79)", () => {
-      const candidate = createMockCandidate({ fitScore: 75 });
-      render(<CandidateSearchResultCard candidate={candidate} />);
-
-      const badge = screen.getByTestId("fit-score-badge");
-      expect(badge.className).toMatch(/bg-green/);
-    });
-
-    it("uses muted background for low scores (<60)", () => {
+    it("uses outline variant for low scores (<60)", () => {
       const candidate = createMockCandidate({ fitScore: 50 });
       render(<CandidateSearchResultCard candidate={candidate} />);
 
       const badge = screen.getByTestId("fit-score-badge");
-      expect(badge).toHaveClass("bg-muted");
+      expect(badge).toHaveClass("text-foreground");
     });
   });
 

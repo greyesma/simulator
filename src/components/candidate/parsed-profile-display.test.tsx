@@ -565,39 +565,41 @@ describe("ParsedProfileDisplay component", () => {
     });
   });
 
-  describe("neo-brutalist design compliance", () => {
-    it("uses border-2 for sections", () => {
+  describe("modern design compliance", () => {
+    it("uses Card component with shadow", () => {
       const profile = createTestProfile({
         name: "Test User",
         workExperience: [{ company: "Test", title: "Dev", startDate: "2020" }],
       });
       const { container } = render(<ParsedProfileDisplay profile={profile} />);
-      const sections = container.querySelectorAll(".border-2");
-      expect(sections.length).toBeGreaterThan(0);
+      const shadowElements = container.querySelectorAll(".shadow-sm");
+      expect(shadowElements.length).toBeGreaterThan(0);
     });
 
-    it("has no rounded corners", () => {
+    it("uses rounded corners", () => {
       const profile = createTestProfile({
         name: "Test User",
         skills: [{ name: "JS", category: "programming_language" }],
       });
       const { container } = render(<ParsedProfileDisplay profile={profile} />);
       const allElements = container.querySelectorAll("*");
-      allElements.forEach((el) => {
-        expect(el.className).not.toMatch(/rounded/);
-      });
+      const hasRounded = Array.from(allElements).some((el) =>
+        el.className.includes("rounded")
+      );
+      expect(hasRounded).toBe(true);
     });
 
-    it("has no shadow classes", () => {
-      const profile = createTestProfile({ name: "Test User" });
-      const { container } = render(<ParsedProfileDisplay profile={profile} />);
-      const allElements = container.querySelectorAll("*");
-      allElements.forEach((el) => {
-        expect(el.className).not.toMatch(/shadow/);
+    it("uses Badge component for skills", () => {
+      const profile = createTestProfile({
+        skills: [{ name: "JavaScript", category: "programming_language" }],
       });
+      render(<ParsedProfileDisplay profile={profile} />);
+      const badge = screen.getByText("JavaScript");
+      expect(badge).toBeInTheDocument();
+      expect(badge.className).toMatch(/rounded-full/);
     });
 
-    it("uses font-mono for dates and metadata", () => {
+    it("uses blue primary color for accents", () => {
       const profile = createTestProfile({
         workExperience: [
           {
@@ -609,15 +611,16 @@ describe("ParsedProfileDisplay component", () => {
         ],
       });
       const { container } = render(<ParsedProfileDisplay profile={profile} />);
-      const monoElements = container.querySelectorAll(".font-mono");
-      expect(monoElements.length).toBeGreaterThan(0);
+      const primaryElements = container.querySelectorAll(".border-primary");
+      expect(primaryElements.length).toBeGreaterThan(0);
     });
 
-    it("uses gold (bg-secondary) for emphasis", () => {
+    it("uses Badge component for seniority", () => {
       const profile = createTestProfile({ seniorityLevel: "SENIOR" });
-      const { container } = render(<ParsedProfileDisplay profile={profile} />);
-      const goldElements = container.querySelectorAll(".bg-secondary");
-      expect(goldElements.length).toBeGreaterThan(0);
+      render(<ParsedProfileDisplay profile={profile} />);
+      const badge = screen.getByTestId("seniority-badge");
+      expect(badge).toBeInTheDocument();
+      expect(badge.className).toMatch(/rounded-full/);
     });
   });
 });

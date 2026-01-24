@@ -920,3 +920,67 @@ vi.mock("@/lib/core/admin", () => ({...}));
 ### Gotchas discovered
 - The admin-nav component is a server component (async function), but it can still import and use the Button component since Button doesn't use client-only hooks
 - The data-deletion-section already had `showConfirmation` state, so converting to Dialog was straightforward - just pass it as the `open` prop and use `onOpenChange` to toggle
+
+## Issue #126: DS-016: Migrate candidate/ card components to modern design
+
+### What was implemented
+- Migrated `candidate-search-result-card.tsx` to use Card, Avatar, Badge, and Button components from `@/components/ui`
+- Migrated `parsed-profile-display.tsx` to use Card, CardContent, and Badge components
+- Updated both test files to reflect modern design patterns (rounded corners, shadows, Badge variants)
+
+### candidate-search-result-card.tsx changes
+- Replaced outer `<article>` with `<Card>` component with `shadow-sm hover:shadow-md transition-shadow`
+- Replaced custom avatar div with `<Avatar>` and `<AvatarFallback>` components (`bg-primary/10 text-primary`)
+- Changed dimension score bars from `border border-foreground` squares to `rounded-full` pills with blue fill (`bg-primary`)
+- Updated FitScoreBadge to use `<Badge>` component with variants:
+  - High scores (>=80): `variant="default"` (blue background)
+  - Medium scores (60-79): `variant="secondary"` (gray background)
+  - Low scores (<60): `variant="outline"` (border only)
+- Replaced custom view profile link with `<Button asChild>` wrapping a `<Link>`
+- Replaced reject button with `<Button variant="outline">` with destructive hover state
+- Updated empty state (no results) to use Card component
+- Changed borders from `border-2 border-foreground` to `border border-border`
+- Changed font from `font-bold` to `font-semibold` for headings
+
+### parsed-profile-display.tsx changes
+- Replaced outer `<div className="border-2 border-foreground">` with `<Card className="shadow-sm">`
+- Updated SeniorityBadge from custom styled span to `<Badge>` component
+- Updated ParseQualityWarning to use `<Card>` with `<CardContent>`
+- Changed SectionTitle border from `border-b-2 border-foreground` to `border-b border-border`
+- Updated SkillTag from custom styled span to `<Badge variant="secondary">`
+- Changed work experience/education borders from `border-secondary` to `border-primary` for blue accent
+- Updated list markers from square (`■`) to disc with `marker:text-primary`
+- Changed technology tags and honors to use `<Badge variant="outline">`
+- Updated language badges from custom div to `<Badge variant="outline">`
+- Changed links from `border-b-2 border-secondary` to `text-primary hover:text-primary/80 transition-colors`
+- Added `rounded-r-lg` to left-bordered sections for modern look
+- Fixed HTML nesting issue: changed `<p>` with Badge inside to `<div>` with flex layout
+
+### Test file changes
+- **candidate-search-result-card.test.tsx**: Updated "fit score badge styling" tests to check for Badge variant classes (`bg-primary`, `bg-secondary`, `text-foreground`) instead of old neo-brutalist classes
+- **parsed-profile-display.test.tsx**: Renamed "neo-brutalist design compliance" to "modern design compliance" with updated tests:
+  - Now expects `shadow-sm` class for Card component
+  - Now expects `rounded-*` classes
+  - Now checks Badge component for skills (`rounded-full`)
+  - Now checks for `border-primary` for blue accents
+  - Now checks Badge component for seniority (`rounded-full`)
+
+### Files changed
+- `src/components/candidate/candidate-search-result-card.tsx` (modified)
+- `src/components/candidate/parsed-profile-display.tsx` (modified)
+- `src/components/candidate/candidate-search-result-card.test.tsx` (modified)
+- `src/components/candidate/parsed-profile-display.test.tsx` (modified)
+
+### Learnings for future iterations
+1. **Badge inside paragraph causes hydration error** - HTML doesn't allow `<div>` (which Badge renders) inside `<p>`. Use `<div>` with flex layout instead.
+2. **Button asChild for Links** - Use `<Button asChild>` to wrap Next.js `<Link>` components while preserving button styling and link behavior.
+3. **Tests need updating with design system changes** - Neo-brutalist tests (expecting no rounded corners, no shadows) must be updated to expect modern design patterns.
+4. **Import from barrel exports** - Use `import { Card, Badge, Button } from "@/components/ui"` rather than individual files.
+5. **Semantic color tokens** - Use `primary` for blue accents, `destructive` for error states, `muted-foreground` for secondary text.
+6. **Smooth transitions everywhere** - Add `transition-colors`, `transition-shadow`, or `transition-all` for hover and state changes.
+7. **Consistent rounded corners** - Use `rounded-lg` for cards, `rounded-full` for badges/avatars, `rounded-r-lg` for left-bordered sections.
+
+### Gotchas discovered
+- The FitScoreBadge was using complex conditional classes for backgrounds. Simplified to Badge variants which handle the styling automatically.
+- The Avatar component uses `rounded-full` by default, which is perfect for candidate initials.
+- Work experience duration badges needed to be wrapped in `<div>` instead of staying in `<p>` to avoid hydration errors.
