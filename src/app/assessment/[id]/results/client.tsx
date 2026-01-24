@@ -405,7 +405,7 @@ export function ResultsClient({
   );
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen animate-page-enter bg-background text-foreground">
       {/* Header */}
       <header className="sticky top-0 z-10 border-b bg-background">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">

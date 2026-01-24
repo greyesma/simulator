@@ -93,7 +93,7 @@ const faqItems = [
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="min-h-screen animate-page-enter bg-background text-foreground">
       {/* Hero Section */}
       <section className="relative flex min-h-screen flex-col justify-center px-6 md:px-12 lg:px-24">
         {/* Modern gradient decoration instead of geometric shapes */}

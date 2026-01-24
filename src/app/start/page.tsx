@@ -120,7 +120,7 @@ function getRedirectUrlForStatus(
  */
 function NoScenariosMessage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
+    <main className="flex min-h-screen animate-page-enter items-center justify-center bg-background px-6 text-foreground">
       <Card className="max-w-md shadow-md">
         <CardContent className="p-8 text-center">
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">

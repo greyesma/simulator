@@ -63,7 +63,7 @@ export default async function AdminLayout({
       </header>
 
       {/* Admin Content */}
-      <main>{children}</main>
+      <main className="animate-page-enter">{children}</main>
     </div>
   );
 }

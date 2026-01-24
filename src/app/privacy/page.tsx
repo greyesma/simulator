@@ -20,7 +20,7 @@ export default function PrivacyPolicyPage() {
   const lastUpdated = "January 2025";
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="min-h-screen animate-page-enter bg-background text-foreground">
       {/* Header */}
       <header className="border-b border-border">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">

@@ -73,7 +73,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-6 py-12 text-foreground">
+    <main className="flex min-h-screen animate-page-enter items-center justify-center bg-background px-6 py-12 text-foreground">
       {/* Subtle gradient background decorations */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />

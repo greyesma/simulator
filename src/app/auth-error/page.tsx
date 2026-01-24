@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export default function AuthErrorPage() {
   return (
-    <main className="relative flex min-h-screen items-center justify-center bg-background px-6 py-12 text-foreground">
+    <main className="relative flex min-h-screen animate-page-enter items-center justify-center bg-background px-6 py-12 text-foreground">
       {/* Gradient blur decoration */}
       <div
         className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-destructive/5 blur-3xl"

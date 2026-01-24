@@ -49,7 +49,7 @@ export default async function CVUploadPage({ params }: PageProps) {
   }
 
   return (
-    <main className="flex min-h-screen flex-col bg-background text-foreground">
+    <main className="flex min-h-screen animate-page-enter flex-col bg-background text-foreground">
       {/* Header */}
       <header className="border-b border-border">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">

@@ -632,3 +632,53 @@
   - [x] Build passes: `npm run build`
   - [x] Lint passes: `npm run lint`
   - [x] Visual verification: Screenshots captured (chat page shows text without markdown rendering)
+
+## Issue #144: DS-034: Add page transition animations
+
+- **What was implemented:**
+  - Added `pageEnter` keyframe animation to tailwind.config.ts (150ms duration, 4px translateY)
+  - Added `animate-page-enter` utility class for CSS-based page transitions
+  - Created `PageTransition` wrapper component in `src/components/shared/page-transition.tsx`
+  - Applied `animate-page-enter` class to key pages:
+    - Landing page (`src/app/page.tsx`)
+    - Sign-in page (`src/app/sign-in/page.tsx`)
+    - Sign-up page (`src/app/sign-up/page.tsx`)
+    - Profile page (`src/app/profile/page.tsx`)
+    - Settings page (`src/app/settings/page.tsx`)
+    - Privacy page (`src/app/privacy/page.tsx`)
+    - Auth error page (`src/app/auth-error/page.tsx`)
+    - Start page - NoScenariosMessage (`src/app/start/page.tsx`)
+    - Admin layout main content (`src/app/admin/layout.tsx`)
+    - Assessment CV upload page (`src/app/assessment/[id]/cv-upload/page.tsx`)
+    - Assessment HR interview page (`src/app/assessment/[id]/hr-interview/page.tsx`)
+    - Assessment results client (`src/app/assessment/[id]/results/client.tsx`)
+  - Added corresponding `@keyframes pageEnter` to globals.css
+
+- **Files changed:**
+  - `tailwind.config.ts` - Added pageEnter keyframe and animate-page-enter utility
+  - `src/app/globals.css` - Added @keyframes pageEnter for CSS fallback
+  - `src/components/shared/page-transition.tsx` - New PageTransition wrapper component
+  - `src/components/shared/index.ts` - Exported PageTransition component
+  - Multiple page files - Applied animate-page-enter class to main elements
+
+- **Learnings for future iterations:**
+  - CSS-based animations are preferred over Framer Motion for simple transitions (smaller bundle)
+  - Page transitions should be applied at the page level, not layout level (layouts persist in Next.js app router)
+  - 150ms with 4px translateY creates a subtle, professional transition without being distracting
+  - Using `animate-page-enter` on the outer container ensures no layout shift between child elements
+  - The PageTransition component was created but direct class application is simpler for most cases
+
+- **Gotchas:**
+  - Next.js app router layouts persist across navigation, so animation must be on page content
+  - The animation only fires on initial page render (works for navigation between pages)
+  - Very fast animations (150ms) are best for page transitions - slower feels sluggish
+
+- **Acceptance criteria verified:**
+  - [x] Pages fade in on navigation (150ms duration with subtle slide)
+  - [x] Transitions are subtle and fast (not distracting)
+  - [x] No layout shift during transitions (uses transform, not margin/padding)
+  - [x] Works with Next.js app router (applied to page-level components)
+  - [x] Does not cause performance issues (CSS-only, no JavaScript)
+  - [x] Build passes: `npm run build`
+  - [x] Lint passes: `npm run lint`
+  - [x] Visual verification: Screenshots captured in `screenshots/issue-144-*.png`
