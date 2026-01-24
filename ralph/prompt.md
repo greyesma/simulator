@@ -121,5 +121,6 @@ Types: feat, fix, refactor, docs, test, chore
 - Always leave the codebase in a working state
 - Run existing tests before committing
 - **Use skills**: debugging for bugs, TDD for code, verification before completion
-- **For UI tasks**: capture screenshots to `screenshots/` folder and reference in comments
+- **For UI tasks**: capture screenshots to `screenshots/` folder and reference in the comment on the issue.
+- Always write a comment on the issue with the changes and the acceptance criteria that were met.
 - Make reasonable decisions when ambiguous - document your choices
