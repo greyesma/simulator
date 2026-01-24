@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
@@ -129,13 +130,25 @@ const components: Components = {
   hr: () => <hr className="my-6 border-t border-border" />,
 
   // Images - rounded corners, subtle border
-  img: ({ src, alt }) => (
-    <img
-      src={src}
-      alt={alt || ""}
-      className="my-4 h-auto max-w-full rounded-lg border border-border"
-    />
-  ),
+  // Using unoptimized for markdown images since they can come from any external source
+  img: ({ src, alt }) => {
+    // src can be string or Blob from react-markdown types, but markdown only provides strings
+    const imageSrc = typeof src === "string" ? src : "";
+    if (!imageSrc) return null;
+    return (
+      <span className="my-4 block">
+        <Image
+          src={imageSrc}
+          alt={alt || ""}
+          width={0}
+          height={0}
+          sizes="100vw"
+          className="h-auto w-full rounded-lg border border-border"
+          unoptimized
+        />
+      </span>
+    );
+  },
 
   // Tables - modern style with rounded corners
   table: ({ children }) => (

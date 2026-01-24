@@ -105,3 +105,24 @@
 
 - **Verification:**
   - Build passes without the `react-hooks/exhaustive-deps` warning for cv-upload.tsx
+
+## Issue #167: Replace img with Next.js Image in markdown.tsx
+
+- **What was implemented:**
+  - Replaced `<img>` element with Next.js `<Image />` component in the markdown renderer
+  - Added `unoptimized` prop since markdown images can come from any external source
+  - Used `width={0} height={0} sizes="100vw"` pattern for responsive images with unknown dimensions
+  - Added type guard for `src` since react-markdown types include `Blob` (though markdown only provides strings)
+  - Wrapped Image in a `<span>` block element to maintain proper block-level behavior
+
+- **Files changed:**
+  - `src/components/shared/markdown.tsx` - Imported Image from next/image, replaced img component
+
+- **Learnings for future iterations:**
+  - react-markdown's `Components` type defines `src` as `string | Blob`, requiring a type guard
+  - For markdown/CMS content with unknown image sources, use `unoptimized` to bypass domain restrictions
+  - The `width={0} height={0} sizes="100vw"` pattern allows responsive sizing for images with unknown dimensions
+  - Next.js Image must be wrapped in a block element when used in inline contexts to maintain layout
+
+- **Verification:**
+  - Build passes without the `@next/next/no-img-element` warning for markdown.tsx
