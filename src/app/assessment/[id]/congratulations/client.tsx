@@ -8,6 +8,7 @@ interface CongratulationsClientProps {
   userName: string;
   companyName: string;
   scenarioName: string;
+  managerId: string | null;
 }
 
 export function CongratulationsClient({
@@ -15,6 +16,7 @@ export function CongratulationsClient({
   userName,
   companyName,
   scenarioName,
+  managerId,
 }: CongratulationsClientProps) {
   const router = useRouter();
   const [showContent, setShowContent] = useState(false);
@@ -45,7 +47,10 @@ export function CongratulationsClient({
     const interval = setInterval(() => {
       setAutoAdvanceTimer((prev) => {
         if (prev <= 1) {
-          router.push(`/assessment/${assessmentId}/welcome`);
+          const chatUrl = managerId
+            ? `/chat?coworkerId=${managerId}`
+            : `/assessment/${assessmentId}/welcome`;
+          router.push(chatUrl);
           return 0;
         }
         return prev - 1;
@@ -53,10 +58,13 @@ export function CongratulationsClient({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [showButton, assessmentId, router]);
+  }, [showButton, assessmentId, managerId, router]);
 
   const handleContinue = () => {
-    router.push(`/assessment/${assessmentId}/welcome`);
+    const chatUrl = managerId
+      ? `/chat?coworkerId=${managerId}`
+      : `/assessment/${assessmentId}/welcome`;
+    router.push(chatUrl);
   };
 
   return (

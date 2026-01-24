@@ -18,11 +18,18 @@ export default async function KickoffPage({ params }: KickoffPageProps) {
     redirect("/sign-in");
   }
 
-  // Verify the assessment exists
+  // Verify the assessment exists and get coworkers
   const assessment = await db.assessment.findFirst({
     where: {
       id,
       userId: session.user.id,
+    },
+    include: {
+      scenario: {
+        include: {
+          coworkers: true,
+        },
+      },
     },
   });
 
@@ -30,6 +37,15 @@ export default async function KickoffPage({ params }: KickoffPageProps) {
     redirect("/");
   }
 
-  // Redirect to welcome page - user can start kickoff call from there
-  redirect(`/assessment/${id}/welcome`);
+  // Find manager for redirect
+  const manager = assessment.scenario.coworkers.find((c) =>
+    c.role.toLowerCase().includes("manager")
+  );
+
+  // Redirect to chat with manager, or fallback to welcome page
+  if (manager) {
+    redirect(`/chat?coworkerId=${manager.id}`);
+  } else {
+    redirect(`/assessment/${id}/welcome`);
+  }
 }

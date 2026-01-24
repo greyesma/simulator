@@ -20,7 +20,11 @@ export default async function CongratulationsPage({
   const assessment = await db.assessment.findUnique({
     where: { id },
     include: {
-      scenario: true,
+      scenario: {
+        include: {
+          coworkers: true,
+        },
+      },
       conversations: {
         where: {
           coworkerId: null, // HR interview
@@ -49,12 +53,19 @@ export default async function CongratulationsPage({
 
   const userName = session.user.name?.split(" ")[0] || "there";
 
+  // Find manager coworker
+  const manager = assessment.scenario.coworkers.find((c) =>
+    c.role.toLowerCase().includes("manager")
+  );
+  const managerId = manager?.id || null;
+
   return (
     <CongratulationsClient
       assessmentId={id}
       userName={userName}
       companyName={assessment.scenario.companyName}
       scenarioName={assessment.scenario.name}
+      managerId={managerId}
     />
   );
 }

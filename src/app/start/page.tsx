@@ -32,15 +32,24 @@ export default async function StartPage() {
       createdAt: "desc",
     },
     include: {
-      scenario: true,
+      scenario: {
+        include: {
+          coworkers: true,
+        },
+      },
     },
   });
 
   // If user has an in-progress assessment, redirect to appropriate page
   if (existingAssessment) {
+    // Find manager for WORKING status redirect
+    const manager = existingAssessment.scenario.coworkers.find((c) =>
+      c.role.toLowerCase().includes("manager")
+    );
     const redirectUrl = getRedirectUrlForStatus(
       existingAssessment.id,
-      existingAssessment.status
+      existingAssessment.status,
+      manager?.id
     );
     redirect(redirectUrl);
   }
@@ -78,7 +87,8 @@ export default async function StartPage() {
  */
 function getRedirectUrlForStatus(
   assessmentId: string,
-  status: AssessmentStatus
+  status: AssessmentStatus,
+  managerId?: string
 ): string {
   switch (status) {
     case AssessmentStatus.HR_INTERVIEW:
@@ -87,7 +97,10 @@ function getRedirectUrlForStatus(
     case AssessmentStatus.ONBOARDING:
       return `/assessment/${assessmentId}/congratulations`;
     case AssessmentStatus.WORKING:
-      return `/assessment/${assessmentId}/welcome`;
+      // Redirect to chat with manager if managerId available, otherwise fallback to welcome
+      return managerId
+        ? `/chat?coworkerId=${managerId}`
+        : `/assessment/${assessmentId}/welcome`;
     case AssessmentStatus.FINAL_DEFENSE:
       return `/assessment/${assessmentId}/defense`;
     case AssessmentStatus.PROCESSING:

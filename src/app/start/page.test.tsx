@@ -65,7 +65,7 @@ describe("/start page", () => {
       mockAssessmentFindFirst.mockResolvedValueOnce({
         id: "assessment-123",
         status: AssessmentStatus.HR_INTERVIEW,
-        scenario: { id: "scenario-1" },
+        scenario: { id: "scenario-1", coworkers: [] },
       });
 
       await expect(StartPage()).rejects.toThrow(
@@ -81,7 +81,7 @@ describe("/start page", () => {
       mockAssessmentFindFirst.mockResolvedValueOnce({
         id: "assessment-123",
         status: AssessmentStatus.ONBOARDING,
-        scenario: { id: "scenario-1" },
+        scenario: { id: "scenario-1", coworkers: [] },
       });
 
       await expect(StartPage()).rejects.toThrow(
@@ -92,12 +92,32 @@ describe("/start page", () => {
       );
     });
 
-    it("redirects to welcome for WORKING status", async () => {
+    it("redirects to chat with manager for WORKING status", async () => {
       mockAuth.mockResolvedValueOnce({ user: { id: "user-123" } });
       mockAssessmentFindFirst.mockResolvedValueOnce({
         id: "assessment-123",
         status: AssessmentStatus.WORKING,
-        scenario: { id: "scenario-1" },
+        scenario: {
+          id: "scenario-1",
+          coworkers: [{ id: "manager-1", role: "Engineering Manager" }],
+        },
+      });
+
+      await expect(StartPage()).rejects.toThrow(
+        "REDIRECT:/chat?coworkerId=manager-1"
+      );
+      expect(mockRedirect).toHaveBeenCalledWith("/chat?coworkerId=manager-1");
+    });
+
+    it("redirects to welcome for WORKING status when no manager", async () => {
+      mockAuth.mockResolvedValueOnce({ user: { id: "user-123" } });
+      mockAssessmentFindFirst.mockResolvedValueOnce({
+        id: "assessment-123",
+        status: AssessmentStatus.WORKING,
+        scenario: {
+          id: "scenario-1",
+          coworkers: [{ id: "dev-1", role: "Senior Developer" }],
+        },
       });
 
       await expect(StartPage()).rejects.toThrow(
@@ -113,7 +133,7 @@ describe("/start page", () => {
       mockAssessmentFindFirst.mockResolvedValueOnce({
         id: "assessment-123",
         status: AssessmentStatus.FINAL_DEFENSE,
-        scenario: { id: "scenario-1" },
+        scenario: { id: "scenario-1", coworkers: [] },
       });
 
       await expect(StartPage()).rejects.toThrow(
@@ -129,7 +149,7 @@ describe("/start page", () => {
       mockAssessmentFindFirst.mockResolvedValueOnce({
         id: "assessment-123",
         status: AssessmentStatus.PROCESSING,
-        scenario: { id: "scenario-1" },
+        scenario: { id: "scenario-1", coworkers: [] },
       });
 
       await expect(StartPage()).rejects.toThrow(
@@ -167,11 +187,14 @@ describe("/start page", () => {
       mockAssessmentFindFirst.mockResolvedValueOnce({
         id: "most-recent-assessment",
         status: AssessmentStatus.WORKING,
-        scenario: { id: "scenario-1" },
+        scenario: {
+          id: "scenario-1",
+          coworkers: [{ id: "manager-1", role: "Engineering Manager" }],
+        },
       });
 
       await expect(StartPage()).rejects.toThrow(
-        "REDIRECT:/assessment/most-recent-assessment/welcome"
+        "REDIRECT:/chat?coworkerId=manager-1"
       );
 
       // Verify orderBy is desc
