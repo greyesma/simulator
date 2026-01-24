@@ -4,26 +4,9 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-function GeometricDecoration() {
-  return (
-    <div
-      className="pointer-events-none absolute inset-0 overflow-hidden"
-      aria-hidden="true"
-    >
-      {/* Triangle - top right */}
-      <div
-        className="absolute -right-16 -top-16 h-64 w-64 bg-secondary"
-        style={{ clipPath: "polygon(100% 0, 100% 100%, 0 0)" }}
-      />
-      {/* Small triangle - bottom left */}
-      <div
-        className="absolute -bottom-8 -left-8 h-32 w-32 bg-foreground"
-        style={{ clipPath: "polygon(0 0, 100% 100%, 0 100%)" }}
-      />
-    </div>
-  );
-}
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -91,32 +74,38 @@ export default function SignUpPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-6 py-12 text-foreground">
-      <div className="relative w-full max-w-md">
-        <GeometricDecoration />
+      {/* Subtle gradient background decorations */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
+      </div>
 
-        <div className="relative z-10 border-2 border-border bg-background p-8">
-          {/* Header */}
-          <div className="mb-8">
-            <Link href="/" className="mb-6 block text-2xl font-bold">
-              Skillvee
-            </Link>
-            <h1 className="text-3xl font-bold">Create account</h1>
-            <p className="mt-2 text-muted-foreground">
-              Start practicing real developer scenarios
-            </p>
-          </div>
-
+      <Card className="relative z-10 w-full max-w-md shadow-md">
+        <CardHeader className="pb-4">
+          <Link
+            href="/"
+            className="mb-4 block text-2xl font-semibold text-primary"
+          >
+            Skillvee
+          </Link>
+          <h1 className="text-3xl font-semibold">Create account</h1>
+          <p className="mt-2 text-muted-foreground">
+            Start practicing real developer scenarios
+          </p>
+        </CardHeader>
+        <CardContent>
           {/* Error message */}
           {error && (
-            <div className="bg-destructive/10 mb-6 border-2 border-destructive p-4 font-mono text-sm text-destructive">
+            <div className="mb-6 rounded-lg bg-destructive/10 p-4 text-sm text-destructive">
               {error}
             </div>
           )}
 
           {/* Google OAuth */}
-          <button
+          <Button
             onClick={handleGoogleSignUp}
-            className="mb-6 flex w-full items-center justify-center gap-3 border-2 border-foreground bg-background px-4 py-4 font-semibold text-foreground hover:border-secondary hover:bg-secondary"
+            variant="outline"
+            className="mb-6 w-full gap-3 py-6"
             type="button"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -138,7 +127,7 @@ export default function SignUpPage() {
               />
             </svg>
             Continue with Google
-          </button>
+          </Button>
 
           {/* Divider */}
           <div className="relative mb-6">
@@ -146,7 +135,7 @@ export default function SignUpPage() {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-background px-4 font-mono text-sm text-muted-foreground">
+              <span className="bg-card px-4 text-sm text-muted-foreground">
                 OR
               </span>
             </div>
@@ -157,18 +146,17 @@ export default function SignUpPage() {
             <div className="mb-4">
               <label
                 htmlFor="name"
-                className="mb-2 block font-mono text-sm text-muted-foreground"
+                className="mb-2 block text-sm text-muted-foreground"
               >
-                NAME{" "}
+                Name{" "}
                 <span className="text-muted-foreground/50">(optional)</span>
               </label>
-              <input
+              <Input
                 id="name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 autoComplete="name"
-                className="w-full border-2 border-border bg-background px-4 py-3 font-mono focus:border-secondary focus:outline-none"
                 placeholder="Your name"
               />
             </div>
@@ -176,18 +164,17 @@ export default function SignUpPage() {
             <div className="mb-4">
               <label
                 htmlFor="email"
-                className="mb-2 block font-mono text-sm text-muted-foreground"
+                className="mb-2 block text-sm text-muted-foreground"
               >
-                EMAIL
+                Email
               </label>
-              <input
+              <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="w-full border-2 border-border bg-background px-4 py-3 font-mono focus:border-secondary focus:outline-none"
                 placeholder="you@example.com"
               />
             </div>
@@ -195,18 +182,17 @@ export default function SignUpPage() {
             <div className="mb-4">
               <label
                 htmlFor="password"
-                className="mb-2 block font-mono text-sm text-muted-foreground"
+                className="mb-2 block text-sm text-muted-foreground"
               >
-                PASSWORD
+                Password
               </label>
-              <input
+              <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="new-password"
-                className="w-full border-2 border-border bg-background px-4 py-3 font-mono focus:border-secondary focus:outline-none"
                 placeholder="At least 8 characters"
               />
             </div>
@@ -214,29 +200,24 @@ export default function SignUpPage() {
             <div className="mb-6">
               <label
                 htmlFor="confirmPassword"
-                className="mb-2 block font-mono text-sm text-muted-foreground"
+                className="mb-2 block text-sm text-muted-foreground"
               >
-                CONFIRM PASSWORD
+                Confirm Password
               </label>
-              <input
+              <Input
                 id="confirmPassword"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 autoComplete="new-password"
-                className="w-full border-2 border-border bg-background px-4 py-3 font-mono focus:border-secondary focus:outline-none"
                 placeholder="Re-enter password"
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full border-2 border-foreground bg-foreground px-4 py-4 font-semibold text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
-            >
+            <Button type="submit" disabled={isLoading} className="w-full py-6">
               {isLoading ? "Creating account..." : "Create Account"}
-            </button>
+            </Button>
           </form>
 
           {/* Sign in link */}
@@ -244,13 +225,13 @@ export default function SignUpPage() {
             Already have an account?{" "}
             <Link
               href="/sign-in"
-              className="border-b-2 border-secondary font-semibold text-foreground hover:text-secondary"
+              className="font-semibold text-primary transition-colors hover:text-primary/80"
             >
               Sign in
             </Link>
           </p>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </main>
   );
 }

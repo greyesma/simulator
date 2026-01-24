@@ -237,3 +237,36 @@
 
 - **Visual verification:**
   - Screenshots captured: `screenshots/issue-132-landing-hero.png`, `screenshots/issue-132-landing-features.png`, `screenshots/issue-132-landing-fullpage.png`
+
+## Issue #133: DS-023: Migrate auth pages to modern design
+
+- **What was implemented:**
+  - Migrated `sign-in/page.tsx` and `sign-up/page.tsx` to modern shadcn/ui design system
+  - Removed GeometricDecoration components (sharp neo-brutalist triangles with bg-secondary)
+  - Replaced with subtle gradient blur circles using bg-primary/5 and bg-primary/10
+  - Container now uses Card component with shadow-md instead of border-2
+  - All inputs migrated to Input component with proper focus-visible ring states
+  - Submit buttons use Button component with primary variant (blue)
+  - OAuth buttons use Button outline variant
+  - Error messages styled with rounded-lg bg-destructive/10 text-destructive
+  - Page links use text-primary with transition-colors hover effect
+  - Labels changed from font-mono uppercase to normal text-sm styling
+  - Headers use font-semibold instead of font-bold
+
+- **Files changed:**
+  - `src/app/sign-in/page.tsx` - Complete modern design overhaul
+  - `src/app/sign-up/page.tsx` - Complete modern design overhaul
+
+- **Learnings for future iterations:**
+  - Auth pages follow same Card pattern as landing page feature cards
+  - For divider "OR" text, use bg-card to match Card background (not bg-background)
+  - Button outline variant works well for OAuth buttons (border but no fill)
+  - Links use text-primary with hover:text-primary/80 for subtle interaction
+  - Error messages use rounded-lg (not rounded-xl) for inline alerts
+
+- **Gotchas:**
+  - Sign-in page uses Suspense for useSearchParams, sign-up page doesn't (different auth flows)
+  - Gradient blur decorations positioned oppositely on each page for visual variety
+
+- **Visual verification:**
+  - Screenshots captured: `screenshots/issue-133-sign-in.png`, `screenshots/issue-133-sign-up.png`
