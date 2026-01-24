@@ -25,9 +25,9 @@ const eslintConfig = [
         {
           patterns: [
             {
-              group: ["@/components/*/*"],
+              group: ["@/components/*/*", "!@/components/ui/*"],
               message:
-                "Import types from @/types instead of component implementation files",
+                "Import types from @/types instead of component implementation files. (Note: @/components/ui/* imports are allowed for shadcn components)",
             },
             {
               group: ["@/lib/*/!(index)"],

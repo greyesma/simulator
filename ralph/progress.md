@@ -66,3 +66,22 @@
 
 - **Verification:**
   - Build passes without the `@react-email/render` module not found warning
+
+## Issue #165: Fix ESLint import restriction warnings in chat components
+
+- **What was implemented:**
+  - Updated ESLint config to allow `@/components/ui/*` imports (shadcn components)
+  - The `no-restricted-imports` rule pattern was too broad, catching legitimate component imports
+  - Added negative pattern `!@/components/ui/*` to exclude shadcn UI components from the restriction
+
+- **Files changed:**
+  - `eslint.config.mjs` - Updated pattern from `["@/components/*/*"]` to `["@/components/*/*", "!@/components/ui/*"]`
+
+- **Learnings for future iterations:**
+  - The `no-restricted-imports` rule pattern `@/components/*/*` was meant to catch TYPE imports from implementation files
+  - But shadcn/ui components legitimately export components from `@/components/ui/*` paths
+  - Use negative patterns (`!@/components/ui/*`) to create exceptions in ESLint restricted import rules
+  - The original warning message was misleading since these weren't type imports at all
+
+- **Verification:**
+  - Build passes without the 6 warnings about imports from `@/components/ui/input`, `@/components/ui/button`, `@/components/ui/avatar`, and `@/components/ui/badge`
