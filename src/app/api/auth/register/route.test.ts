@@ -1,13 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { Prisma } from "@prisma/client";
 
-// Mock the database
-const mockFindUnique = vi.fn();
+// Mock the database - note: findUnique removed in DI-003 (race condition fix)
 const mockCreate = vi.fn();
 
 vi.mock("@/server/db", () => ({
   db: {
     user: {
-      findUnique: (...args: unknown[]) => mockFindUnique(...args),
       create: (...args: unknown[]) => mockCreate(...args),
     },
   },
@@ -29,7 +28,6 @@ describe("POST /api/auth/register", () => {
   });
 
   it("registers a new user with valid email and password", async () => {
-    mockFindUnique.mockResolvedValue(null); // User doesn't exist
     mockCreate.mockResolvedValue({
       id: "user-123",
       email: "test@example.com",
@@ -122,11 +120,22 @@ describe("POST /api/auth/register", () => {
     expect(data.error).toBe("Invalid email format");
   });
 
-  it("rejects registration when email already exists", async () => {
-    mockFindUnique.mockResolvedValue({
-      id: "existing-user",
-      email: "test@example.com",
-    });
+  // ============================================================================
+  // Race Condition Prevention Tests (DI-003)
+  // Uses P2002 error handling instead of check-then-create pattern
+  // ============================================================================
+
+  it("returns 409 when P2002 unique constraint error occurs (duplicate email)", async () => {
+    // Simulate Prisma P2002 error for unique constraint violation
+    const prismaError = new Prisma.PrismaClientKnownRequestError(
+      "Unique constraint failed on the fields: (`email`)",
+      {
+        code: "P2002",
+        clientVersion: "5.0.0",
+        meta: { target: ["email"] },
+      }
+    );
+    mockCreate.mockRejectedValue(prismaError);
 
     const request = new Request("http://localhost/api/auth/register", {
       method: "POST",
@@ -144,8 +153,134 @@ describe("POST /api/auth/register", () => {
     expect(data.error).toBe("Email already registered");
   });
 
+  it("handles race condition where concurrent registrations both attempt creation", async () => {
+    // First call succeeds
+    mockCreate
+      .mockResolvedValueOnce({
+        id: "user-123",
+        email: "race@example.com",
+        name: null,
+        role: "USER",
+      })
+      // Second call fails with P2002 (unique constraint)
+      .mockRejectedValueOnce(
+        new Prisma.PrismaClientKnownRequestError(
+          "Unique constraint failed on the fields: (`email`)",
+          {
+            code: "P2002",
+            clientVersion: "5.0.0",
+            meta: { target: ["email"] },
+          }
+        )
+      );
+
+    const request1 = new Request("http://localhost/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: "race@example.com",
+        password: "password123",
+      }),
+    });
+
+    const request2 = new Request("http://localhost/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: "race@example.com",
+        password: "password123",
+      }),
+    });
+
+    // Simulate concurrent requests
+    const [response1, response2] = await Promise.all([
+      POST(request1),
+      POST(request2),
+    ]);
+
+    // One should succeed (201), one should get proper duplicate error (409)
+    const statuses = [response1.status, response2.status].sort();
+    expect(statuses).toEqual([201, 409]);
+  });
+
+  it("does not expose internal Prisma error details to user", async () => {
+    const prismaError = new Prisma.PrismaClientKnownRequestError(
+      "Unique constraint failed on the constraint: `User_email_key`",
+      {
+        code: "P2002",
+        clientVersion: "5.0.0",
+        meta: { target: ["email"] },
+      }
+    );
+    mockCreate.mockRejectedValue(prismaError);
+
+    const request = new Request("http://localhost/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: "existing@example.com",
+        password: "password123",
+      }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(409);
+    // User-friendly message, not internal Prisma details
+    expect(data.error).toBe("Email already registered");
+    expect(data.error).not.toContain("User_email_key");
+    expect(data.error).not.toContain("constraint");
+    expect(data.error).not.toContain("Prisma");
+  });
+
+  it("returns 500 for non-P2002 Prisma errors", async () => {
+    // Different Prisma error (e.g., connection error P1001)
+    const prismaError = new Prisma.PrismaClientKnownRequestError(
+      "Can't reach database server",
+      {
+        code: "P1001",
+        clientVersion: "5.0.0",
+      }
+    );
+    mockCreate.mockRejectedValue(prismaError);
+
+    const request = new Request("http://localhost/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: "test@example.com",
+        password: "password123",
+      }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(data.error).toBe("Internal server error");
+  });
+
+  it("returns 500 for non-Prisma database errors", async () => {
+    mockCreate.mockRejectedValue(new Error("Unknown database error"));
+
+    const request = new Request("http://localhost/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: "test@example.com",
+        password: "password123",
+      }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(data.error).toBe("Internal server error");
+  });
+
   it("creates user with USER role by default", async () => {
-    mockFindUnique.mockResolvedValue(null);
     mockCreate.mockResolvedValue({
       id: "user-123",
       email: "test@example.com",
@@ -174,7 +309,6 @@ describe("POST /api/auth/register", () => {
 
   it("hashes the password before storing", async () => {
     const bcrypt = await import("bcryptjs");
-    mockFindUnique.mockResolvedValue(null);
     mockCreate.mockResolvedValue({
       id: "user-123",
       email: "test@example.com",
@@ -203,7 +337,6 @@ describe("POST /api/auth/register", () => {
   });
 
   it("does not return password in response", async () => {
-    mockFindUnique.mockResolvedValue(null);
     mockCreate.mockResolvedValue({
       id: "user-123",
       email: "test@example.com",
@@ -227,7 +360,6 @@ describe("POST /api/auth/register", () => {
   });
 
   it("sets emailVerified to current date for credentials registration", async () => {
-    mockFindUnique.mockResolvedValue(null);
     mockCreate.mockResolvedValue({
       id: "user-123",
       email: "test@example.com",

@@ -139,10 +139,14 @@ export async function POST(request: NextRequest) {
 
     switch (action) {
       case "start": {
-        // Wrap all segment operations in a transaction for atomicity
+        // Wrap all segment operations in a transaction with FOR UPDATE lock
         // This ensures segment indices are always sequential with no gaps
         // and prevents race conditions between concurrent requests
         const segmentResult = await db.$transaction(async (tx) => {
+          // Lock the recording row to prevent concurrent reads/writes
+          // This ensures only one request can determine the next segment index at a time
+          await tx.$queryRaw`SELECT id FROM "Recording" WHERE id = ${recordingId} FOR UPDATE`;
+
           // Mark any existing "recording" segments as interrupted
           await tx.recordingSegment.updateMany({
             where: {
@@ -155,7 +159,7 @@ export async function POST(request: NextRequest) {
             },
           });
 
-          // Get the next segment index
+          // Get the next segment index (safe now due to FOR UPDATE lock)
           const lastSegment = await tx.recordingSegment.findFirst({
             where: { recordingId },
             orderBy: { segmentIndex: "desc" },

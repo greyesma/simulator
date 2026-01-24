@@ -173,9 +173,10 @@ describe("POST /api/recording/session", () => {
     });
     mockRecordingUpsert.mockResolvedValue({ id: "assessment-1-screen" });
 
-    // Transaction mock for start action
+    // Transaction mock for start action (includes FOR UPDATE lock)
     mockTransaction.mockImplementation(async (fn) => {
       const tx = {
+        $queryRaw: vi.fn().mockResolvedValue([]), // FOR UPDATE lock
         recordingSegment: {
           updateMany: mockSegmentUpdateMany.mockResolvedValue({ count: 0 }),
           findFirst: mockSegmentFindFirst.mockResolvedValue(null),
@@ -211,9 +212,10 @@ describe("POST /api/recording/session", () => {
     });
     mockRecordingUpsert.mockResolvedValue({ id: "assessment-1-screen" });
 
-    // Transaction mock for start action with existing segment
+    // Transaction mock for start action with existing segment (includes FOR UPDATE lock)
     mockTransaction.mockImplementation(async (fn) => {
       const tx = {
+        $queryRaw: vi.fn().mockResolvedValue([]), // FOR UPDATE lock
         recordingSegment: {
           updateMany: mockSegmentUpdateMany.mockResolvedValue({ count: 1 }),
           findFirst: mockSegmentFindFirst.mockResolvedValue({
@@ -403,9 +405,10 @@ describe("POST /api/recording/session", () => {
     });
     mockRecordingUpsert.mockResolvedValue({ id: "assessment-1-screen" });
 
-    // Transaction mock for test mode
+    // Transaction mock for test mode (includes FOR UPDATE lock)
     mockTransaction.mockImplementation(async (fn) => {
       const tx = {
+        $queryRaw: vi.fn().mockResolvedValue([]), // FOR UPDATE lock
         recordingSegment: {
           updateMany: mockSegmentUpdateMany.mockResolvedValue({ count: 0 }),
           findFirst: mockSegmentFindFirst.mockResolvedValue(null),
@@ -458,9 +461,10 @@ describe("POST /api/recording/session", () => {
     });
     mockRecordingUpsert.mockResolvedValue({ id: "assessment-1-screen" });
 
-    // Transaction mock
+    // Transaction mock (includes FOR UPDATE lock)
     mockTransaction.mockImplementation(async (fn) => {
       const tx = {
+        $queryRaw: vi.fn().mockResolvedValue([]), // FOR UPDATE lock
         recordingSegment: {
           updateMany: mockSegmentUpdateMany.mockResolvedValue({ count: 0 }),
           findFirst: mockSegmentFindFirst.mockResolvedValue(null),
@@ -496,9 +500,10 @@ describe("POST /api/recording/session", () => {
     });
     mockRecordingUpsert.mockResolvedValue({ id: "assessment-1-screen" });
 
-    // Transaction mock that fails on create
+    // Transaction mock that fails on create (includes FOR UPDATE lock)
     mockTransaction.mockImplementation(async (fn) => {
       const tx = {
+        $queryRaw: vi.fn().mockResolvedValue([]), // FOR UPDATE lock
         recordingSegment: {
           updateMany: mockSegmentUpdateMany.mockResolvedValue({ count: 1 }),
           findFirst: mockSegmentFindFirst.mockResolvedValue({ segmentIndex: 0 }),
@@ -535,6 +540,10 @@ describe("POST /api/recording/session", () => {
 
     mockTransaction.mockImplementation(async (fn) => {
       const tx = {
+        $queryRaw: vi.fn().mockImplementation(() => {
+          operations.push("forUpdateLock");
+          return Promise.resolve([]);
+        }),
         recordingSegment: {
           updateMany: vi.fn().mockImplementation(() => {
             operations.push("updateMany");
@@ -568,8 +577,107 @@ describe("POST /api/recording/session", () => {
     const data = await response.json();
     expect(data.segmentIndex).toBe(5);
 
-    // Verify operations happened in correct order
-    expect(operations).toEqual(["updateMany", "findFirst", "create"]);
+    // Verify operations happened in correct order (FOR UPDATE lock first for race condition prevention)
+    expect(operations).toEqual(["forUpdateLock", "updateMany", "findFirst", "create"]);
+  });
+
+  // ============================================================================
+  // Race Condition Prevention Tests (DI-003)
+  // ============================================================================
+
+  it("should use FOR UPDATE lock to prevent race conditions on segment index", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1" },
+      expires: new Date(Date.now() + 86400000).toISOString(),
+    });
+    mockAssessmentFindFirst.mockResolvedValue({
+      id: "assessment-1",
+      userId: "user-1",
+    });
+    mockRecordingUpsert.mockResolvedValue({ id: "assessment-1-screen" });
+
+    // Track if FOR UPDATE lock was called
+    let forUpdateCalled = false;
+
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        $queryRaw: vi.fn().mockImplementation(() => {
+          forUpdateCalled = true;
+          return Promise.resolve([]);
+        }),
+        recordingSegment: {
+          updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+          findFirst: vi.fn().mockResolvedValue(null),
+          create: vi.fn().mockResolvedValue({
+            id: "segment-1",
+            segmentIndex: 0,
+          }),
+        },
+      };
+      return fn(tx);
+    });
+
+    const request = new NextRequest("http://localhost/api/recording/session", {
+      method: "POST",
+      body: JSON.stringify({ assessmentId: "assessment-1", action: "start" }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+
+    // Verify FOR UPDATE lock was acquired before determining segment index
+    expect(forUpdateCalled).toBe(true);
+  });
+
+  it("should acquire lock before reading segment index to prevent concurrent read races", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1" },
+      expires: new Date(Date.now() + 86400000).toISOString(),
+    });
+    mockAssessmentFindFirst.mockResolvedValue({
+      id: "assessment-1",
+      userId: "user-1",
+    });
+    mockRecordingUpsert.mockResolvedValue({ id: "assessment-1-screen" });
+
+    const operationOrder: string[] = [];
+
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        $queryRaw: vi.fn().mockImplementation(() => {
+          operationOrder.push("lock");
+          return Promise.resolve([]);
+        }),
+        recordingSegment: {
+          updateMany: vi.fn().mockImplementation(() => {
+            operationOrder.push("updateMany");
+            return Promise.resolve({ count: 0 });
+          }),
+          findFirst: vi.fn().mockImplementation(() => {
+            operationOrder.push("findFirst");
+            return Promise.resolve({ segmentIndex: 2 });
+          }),
+          create: vi.fn().mockImplementation(() => {
+            operationOrder.push("create");
+            return Promise.resolve({ id: "segment-3", segmentIndex: 3 });
+          }),
+        },
+      };
+      return fn(tx);
+    });
+
+    const request = new NextRequest("http://localhost/api/recording/session", {
+      method: "POST",
+      body: JSON.stringify({ assessmentId: "assessment-1", action: "start" }),
+    });
+
+    await POST(request);
+
+    // Lock must happen before findFirst (which reads segment index)
+    const lockIndex = operationOrder.indexOf("lock");
+    const findFirstIndex = operationOrder.indexOf("findFirst");
+    expect(lockIndex).toBeLessThan(findFirstIndex);
+    expect(lockIndex).toBe(0); // Lock should be first operation
   });
 });
 

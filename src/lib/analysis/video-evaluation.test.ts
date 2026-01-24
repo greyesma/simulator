@@ -21,6 +21,7 @@ vi.mock("@/server/db", () => ({
       update: vi.fn(),
       findUnique: vi.fn(),
       create: vi.fn(),
+      upsert: vi.fn(),
     },
     dimensionScore: {
       upsert: vi.fn(),
@@ -81,6 +82,7 @@ const mockVideoAssessmentFindUnique = db.videoAssessment
 const mockVideoAssessmentCreate = db.videoAssessment.create as ReturnType<
   typeof vi.fn
 >;
+const mockVideoAssessmentUpsert = (db.videoAssessment as unknown as { upsert: ReturnType<typeof vi.fn> }).upsert;
 const mockDimensionScoreUpsert = db.dimensionScore.upsert as ReturnType<
   typeof vi.fn
 >;
@@ -1168,6 +1170,7 @@ describe("triggerVideoAssessment", () => {
     vi.clearAllMocks();
     mockVideoAssessmentUpdate.mockResolvedValue({ id: "video-assessment-123" });
     mockVideoAssessmentCreate.mockResolvedValue({ id: "video-assessment-123" });
+    mockVideoAssessmentUpsert.mockResolvedValue({ id: "video-assessment-123", status: "PENDING" });
     mockDimensionScoreUpsert.mockResolvedValue({ id: "test-score-id" });
     mockVideoAssessmentSummaryUpsert.mockResolvedValue({
       id: "test-summary-id",
@@ -1184,8 +1187,8 @@ describe("triggerVideoAssessment", () => {
     });
   });
 
-  it("should create new VideoAssessment and trigger evaluation", async () => {
-    mockVideoAssessmentFindUnique.mockResolvedValue(null);
+  it("should use upsert to atomically create or get VideoAssessment", async () => {
+    mockVideoAssessmentUpsert.mockResolvedValue({ id: "video-assessment-123", status: "PENDING" });
 
     const result = await triggerVideoAssessment({
       assessmentId: "simulation-123",
@@ -1198,19 +1201,22 @@ describe("triggerVideoAssessment", () => {
     expect(result.videoAssessmentId).toBe("video-assessment-123");
     expect(result.error).toBeUndefined();
 
-    // Should create new video assessment
-    expect(mockVideoAssessmentCreate).toHaveBeenCalledWith({
-      data: {
+    // Should use upsert for race-condition-safe creation
+    expect(mockVideoAssessmentUpsert).toHaveBeenCalledWith({
+      where: { assessmentId: "simulation-123" },
+      create: {
         candidateId: "user-456",
         assessmentId: "simulation-123",
         videoUrl: "https://storage.example.com/recording.webm",
         status: "PENDING",
       },
+      update: {},
+      select: { id: true, status: true },
     });
   });
 
-  it("should return existing VideoAssessment if already exists and not failed", async () => {
-    mockVideoAssessmentFindUnique.mockResolvedValue({
+  it("should return existing VideoAssessment if already exists and processing", async () => {
+    mockVideoAssessmentUpsert.mockResolvedValue({
       id: "existing-video-assessment",
       status: "PROCESSING",
     });
@@ -1224,12 +1230,32 @@ describe("triggerVideoAssessment", () => {
     expect(result.success).toBe(true);
     expect(result.videoAssessmentId).toBe("existing-video-assessment");
 
-    // Should not create new video assessment
-    expect(mockVideoAssessmentCreate).not.toHaveBeenCalled();
+    // Should not trigger evaluation for in-progress assessment
+    // Only upsert is called, no update to reset status
+    expect(mockVideoAssessmentUpdate).not.toHaveBeenCalled();
+  });
+
+  it("should return existing VideoAssessment if already completed", async () => {
+    mockVideoAssessmentUpsert.mockResolvedValue({
+      id: "completed-video-assessment",
+      status: "COMPLETED",
+    });
+
+    const result = await triggerVideoAssessment({
+      assessmentId: "simulation-123",
+      candidateId: "user-456",
+      videoUrl: "https://storage.example.com/recording.webm",
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.videoAssessmentId).toBe("completed-video-assessment");
+
+    // Should not re-trigger evaluation for completed assessment
+    expect(mockVideoAssessmentUpdate).not.toHaveBeenCalled();
   });
 
   it("should re-trigger evaluation for failed VideoAssessment", async () => {
-    mockVideoAssessmentFindUnique.mockResolvedValue({
+    mockVideoAssessmentUpsert.mockResolvedValue({
       id: "failed-video-assessment",
       status: "FAILED",
     });
@@ -1251,7 +1277,7 @@ describe("triggerVideoAssessment", () => {
   });
 
   it("should handle database errors gracefully", async () => {
-    mockVideoAssessmentFindUnique.mockRejectedValue(new Error("DB error"));
+    mockVideoAssessmentUpsert.mockRejectedValue(new Error("DB error"));
 
     const result = await triggerVideoAssessment({
       assessmentId: "simulation-123",
@@ -1262,6 +1288,42 @@ describe("triggerVideoAssessment", () => {
     expect(result.success).toBe(false);
     expect(result.videoAssessmentId).toBeNull();
     expect(result.error).toBe("DB error");
+  });
+
+  // ============================================================================
+  // Race Condition Prevention Tests (DI-003)
+  // ============================================================================
+
+  it("should use upsert to prevent race conditions on concurrent triggers", async () => {
+    // When two requests come in concurrently, upsert ensures only one creates
+    // and the other gets the existing record
+    mockVideoAssessmentUpsert.mockResolvedValue({
+      id: "video-assessment-123",
+      status: "PENDING",
+    });
+
+    // Simulate concurrent calls
+    const [result1, result2] = await Promise.all([
+      triggerVideoAssessment({
+        assessmentId: "simulation-123",
+        candidateId: "user-456",
+        videoUrl: "https://storage.example.com/recording.webm",
+      }),
+      triggerVideoAssessment({
+        assessmentId: "simulation-123",
+        candidateId: "user-456",
+        videoUrl: "https://storage.example.com/recording.webm",
+      }),
+    ]);
+
+    // Both should succeed and return the same video assessment ID
+    expect(result1.success).toBe(true);
+    expect(result2.success).toBe(true);
+    expect(result1.videoAssessmentId).toBe(result2.videoAssessmentId);
+
+    // Upsert was called twice (once per request), not create
+    expect(mockVideoAssessmentUpsert).toHaveBeenCalledTimes(2);
+    expect(mockVideoAssessmentCreate).not.toHaveBeenCalled();
   });
 });
 

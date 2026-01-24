@@ -542,6 +542,9 @@ export interface TriggerVideoAssessmentResult {
  * The evaluation runs in the background - the function returns immediately after creating
  * the VideoAssessment record with PENDING status.
  *
+ * Uses upsert to prevent race conditions where concurrent requests could both try to
+ * create a VideoAssessment for the same simulation.
+ *
  * @param options - Options including assessment IDs and video URL
  * @returns Result with the created VideoAssessment ID
  */
@@ -551,57 +554,61 @@ export async function triggerVideoAssessment(
   const { assessmentId, candidateId, videoUrl, taskDescription } = options;
 
   try {
-    // Check if a video assessment already exists for this simulation
-    const existing = await db.videoAssessment.findUnique({
+    // Use upsert to atomically create or get existing VideoAssessment
+    // This prevents race conditions where concurrent requests both pass findUnique
+    // and both try to create, causing unique constraint violations
+    const videoAssessment = await db.videoAssessment.upsert({
       where: { assessmentId },
-      select: { id: true, status: true },
-    });
-
-    if (existing) {
-      // If it exists and failed, allow re-triggering
-      if (existing.status === VideoAssessmentStatus.FAILED) {
-        // Reset to PENDING for retry
-        await db.videoAssessment.update({
-          where: { id: existing.id },
-          data: { status: VideoAssessmentStatus.PENDING },
-        });
-
-        // Start evaluation asynchronously (fire and forget)
-        evaluateVideo({
-          assessmentId: existing.id,
-          videoUrl,
-          taskDescription,
-        }).catch((error) => {
-          console.error(
-            `[VideoEvaluation] Background evaluation failed for ${existing.id}:`,
-            error
-          );
-        });
-
-        return {
-          success: true,
-          videoAssessmentId: existing.id,
-        };
-      }
-
-      // Already in progress or completed
-      return {
-        success: true,
-        videoAssessmentId: existing.id,
-      };
-    }
-
-    // Create new VideoAssessment record
-    const videoAssessment = await db.videoAssessment.create({
-      data: {
+      create: {
         candidateId,
         assessmentId,
         videoUrl,
         status: VideoAssessmentStatus.PENDING,
       },
+      update: {
+        // No-op update if exists (preserves existing state)
+        // We'll handle FAILED status re-triggering separately below
+      },
+      select: { id: true, status: true },
     });
 
-    // Start evaluation asynchronously (fire and forget)
+    // If it exists and failed, allow re-triggering by resetting status
+    if (videoAssessment.status === VideoAssessmentStatus.FAILED) {
+      await db.videoAssessment.update({
+        where: { id: videoAssessment.id },
+        data: { status: VideoAssessmentStatus.PENDING },
+      });
+
+      // Start evaluation asynchronously (fire and forget)
+      evaluateVideo({
+        assessmentId: videoAssessment.id,
+        videoUrl,
+        taskDescription,
+      }).catch((error) => {
+        console.error(
+          `[VideoEvaluation] Background evaluation failed for ${videoAssessment.id}:`,
+          error
+        );
+      });
+
+      return {
+        success: true,
+        videoAssessmentId: videoAssessment.id,
+      };
+    }
+
+    // If already in progress or completed, don't restart evaluation
+    if (
+      videoAssessment.status === VideoAssessmentStatus.PROCESSING ||
+      videoAssessment.status === VideoAssessmentStatus.COMPLETED
+    ) {
+      return {
+        success: true,
+        videoAssessmentId: videoAssessment.id,
+      };
+    }
+
+    // Status is PENDING - start evaluation asynchronously (fire and forget)
     // This ensures the finalize endpoint returns quickly
     evaluateVideo({
       assessmentId: videoAssessment.id,

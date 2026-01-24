@@ -1,3 +1,33 @@
+## Issue #158: DI-003: Fix race conditions in check-then-act patterns
+
+- **What was implemented:**
+  - **User Registration (`src/app/api/auth/register/route.ts`):** Replaced check-then-create pattern with try/catch for Prisma P2002 error. Removed the pre-check `findUnique` call and now directly attempts `create`, catching unique constraint violations to return proper 409 error.
+  - **Recording Session (`src/app/api/recording/session/route.ts`):** Added `FOR UPDATE` lock using raw SQL query within the existing transaction. This locks the Recording row before reading the last segment index, preventing concurrent requests from reading the same index and creating duplicates.
+  - **Video Assessment (`src/lib/analysis/video-evaluation.ts`):** Replaced check-then-create pattern with `upsert`. This atomically creates or retrieves the VideoAssessment record, preventing race conditions where concurrent triggers could both try to create.
+
+- **Files changed:**
+  - `src/app/api/auth/register/route.ts` - P2002 error handling
+  - `src/app/api/recording/session/route.ts` - FOR UPDATE lock in transaction
+  - `src/lib/analysis/video-evaluation.ts` - Upsert pattern for triggerVideoAssessment
+
+- **Test files updated:**
+  - `src/app/api/auth/register/route.test.ts` - Added race condition tests for P2002 handling
+  - `src/app/api/recording/session/route.test.ts` - Added FOR UPDATE lock tests
+  - `src/lib/analysis/video-evaluation.test.ts` - Updated tests for upsert pattern
+
+- **Learnings for future iterations:**
+  - **Pattern 1 (Error-based):** For unique constraints like email, use try/catch with P2002 error code instead of pre-checking. This is both safer (atomic) and more efficient (one DB call instead of two).
+  - **Pattern 2 (FOR UPDATE lock):** When calculating sequential values (like segment indices), use `SELECT ... FOR UPDATE` to lock the parent row before reading. This serializes concurrent operations at the database level.
+  - **Pattern 3 (Upsert):** When you need "create if not exists" semantics, use `upsert` with an empty `update` clause. This is atomic and prevents race conditions.
+  - Prisma's `PrismaClientKnownRequestError` with code `P2002` indicates unique constraint violation.
+  - Raw SQL queries in Prisma transactions work via `tx.$queryRaw`.
+
+- **Gotchas:**
+  - FOR UPDATE locks only work within transactions - the lock is released when the transaction commits.
+  - When using `upsert` with no-op update (`update: {}`), the record is returned as-is if it exists.
+  - P2002 errors contain metadata about which constraint was violated, but shouldn't expose this to users.
+  - The existing component tests (chat.test.tsx, coworker-sidebar.test.tsx) have pre-existing failures unrelated to this change - they need CSS class updates from design system migration.
+
 ## Issue #130: DS-020: Migrate chat/ voice components to modern design
 
 - **What was implemented:**
