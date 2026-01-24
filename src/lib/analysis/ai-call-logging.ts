@@ -101,7 +101,7 @@ export async function logAICall(
 ): Promise<AICallTracker> {
   const {
     assessmentId,
-    endpoint,
+    endpoint: _endpoint,
     promptText,
     modelVersion,
     promptType,
@@ -187,7 +187,7 @@ export async function logCompletedAICall(
 ): Promise<string> {
   const {
     assessmentId,
-    endpoint,
+    endpoint: _endpoint,
     promptText,
     modelVersion,
     promptType,

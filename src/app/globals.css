@@ -4,67 +4,81 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* Neo-brutalist light mode */
-  --background: #ffffff;
-  --foreground: #000000;
-  --primary: #000000;
-  --primary-foreground: #ffffff;
-  --secondary: #f7da50;
-  --secondary-foreground: #000000;
-  --accent: #f7da50;
-  --accent-foreground: #000000;
-  --muted: #f5f5f5;
-  --muted-foreground: #666666;
-  --destructive: #ff0000;
-  --destructive-foreground: #ffffff;
-  --border: #000000;
-  --input: #000000;
-  --ring: #f7da50;
+@layer base {
+  :root {
+    /* Modern shadcn/ui design system */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 214 93% 54%; /* #237CF1 blue */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 214 93% 54%; /* matches primary */
+    --radius: 0.5rem;
 
-  --font-dm-sans: "DM Sans", system-ui, sans-serif;
-  --font-space-mono: "Space Mono", monospace;
+    /* Chart colors */
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+
+    --font-dm-sans: "DM Sans", system-ui, sans-serif;
+    --font-space-mono: "Space Mono", monospace;
+  }
+
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 214 93% 54%; /* #237CF1 blue */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 214 93% 54%; /* matches primary */
+
+    /* Chart colors for dark mode */
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
 }
 
-.dark {
-  /* Neo-brutalist dark mode */
-  --background: #000000;
-  --foreground: #ffffff;
-  --primary: #f7da50;
-  --primary-foreground: #000000;
-  --secondary: #f7da50;
-  --secondary-foreground: #000000;
-  --accent: #ffffff;
-  --accent-foreground: #000000;
-  --muted: #1a1a1a;
-  --muted-foreground: #999999;
-  --destructive: #ff4444;
-  --destructive-foreground: #000000;
-  --border: #ffffff;
-  --input: #ffffff;
-  --ring: #f7da50;
-}
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
 
-* {
-  border-color: var(--border);
-}
-
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-dm-sans);
-}
-
-/* Neo-brutalist: no smooth transitions on colors */
-button,
-a {
-  transition: none;
-}
-
-/* Instant hover state flip */
-button:hover,
-a:hover {
-  transition: none;
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-dm-sans);
+  }
 }
 
 /* Code and technical text */

@@ -7,7 +7,6 @@
 
 import type {
   CoworkerKnowledge,
-  PersonalityStyle,
   CoworkerPersona,
   DecorativeTeamMember,
 } from "@/types";
@@ -15,7 +14,6 @@ import type {
 // Re-export types for backwards compatibility
 export type {
   CoworkerKnowledge,
-  PersonalityStyle,
   CoworkerPersona,
   DecorativeTeamMember,
 } from "@/types";

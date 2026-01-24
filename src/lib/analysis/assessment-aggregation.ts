@@ -30,7 +30,7 @@ import type {
   ToolUsage,
   StuckMoment,
 } from "@/lib/analysis";
-import type { ChatMessage } from "@/lib/ai";
+import type { ChatMessage } from "@/types";
 
 // ============================================================================
 // Skill Category Schemas and Types

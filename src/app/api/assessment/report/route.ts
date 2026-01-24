@@ -4,7 +4,7 @@ import { db } from "@/server/db";
 import { AssessmentStatus } from "@prisma/client";
 import type { CodeReviewData } from "@/lib/analysis";
 import type { PrCiStatus } from "@/lib/external";
-import type { ChatMessage } from "@/lib/ai";
+import type { ChatMessage } from "@/types";
 import {
   aggregateSegmentAnalyses,
   type SegmentAnalysisResponse,

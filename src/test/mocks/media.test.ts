@@ -5,7 +5,7 @@
  * @see Issue #98: REF-008
  */
 
-import { describe, it, expect, vi, afterEach, type Mock } from "vitest";
+import { describe, it, expect, afterEach, type Mock } from "vitest";
 import {
   createMockMediaRecorder,
   createMockAudioContext,
