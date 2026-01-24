@@ -270,3 +270,38 @@
 
 - **Visual verification:**
   - Screenshots captured: `screenshots/issue-133-sign-in.png`, `screenshots/issue-133-sign-up.png`
+
+## Issue #134: DS-024: Migrate start and privacy pages to modern design
+
+- **What was implemented:**
+  - Updated `start/page.tsx` NoScenariosMessage component with Card, CardContent, Button from shadcn/ui
+  - Icon uses rounded-full bg-primary/10 container with FileQuestion icon in text-primary
+  - Button uses asChild prop for proper Link wrapping
+  - Updated `privacy/page.tsx` with comprehensive modern styling:
+    - "LEGAL" badge uses rounded-full bg-primary/10 with text-primary
+    - Introduction wrapped in Card with border-l-4 border-l-primary accent
+    - Section heading accent bars use bg-primary (blue) rounded-full pill
+    - Data deletion callout uses Card with bg-primary/5 and Button component
+    - Contact section uses Card with bg-muted/50 background
+    - Back to home uses Button ghost variant with ArrowLeft icon
+  - All font-bold replaced with font-semibold throughout
+  - All 2px borders replaced with subtle 1px border-border
+
+- **Files changed:**
+  - `src/app/start/page.tsx` - NoScenariosMessage modernization
+  - `src/app/privacy/page.tsx` - Complete typography and component migration
+
+- **Learnings for future iterations:**
+  - Button asChild with Link provides proper anchor behavior with Button styling
+  - For legal/policy pages, Card with border-l-4 border-l-primary works well for callout sections
+  - Use bg-primary/5 for subtle background highlights on Card components
+  - Button variant="ghost" works well for "back" navigation links
+  - Section accent bars should use rounded-full for pill-shaped indicators
+
+- **Gotchas:**
+  - Start page is mostly a redirect handler - only NoScenariosMessage component renders UI
+  - Privacy page has no external dependencies, so it can be rendered statically
+  - Headless browser may have CSS loading issues but HTML structure can be verified via curl
+
+- **Visual verification:**
+  - Screenshot captured: `screenshots/issue-134-privacy-v3.png`
