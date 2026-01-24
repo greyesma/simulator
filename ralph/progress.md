@@ -22,3 +22,29 @@
 
 - **Visual verification:**
   - Screenshots captured in `screenshots/issue-128-chat-modern-design.png` and `screenshots/issue-128-chat-with-input.png`
+
+## Issue #129: DS-019: Migrate chat/ layout components to modern design
+
+- **What was implemented:**
+  - Updated `slack-layout.tsx` with shadow-md, rounded corners (rounded-r-lg), modern border styling
+  - Updated `coworker-sidebar.tsx` with smooth transitions (ease-in-out), rounded hover states
+  - Added active coworker highlighting with primary blue accent (border-l-primary bg-primary/10)
+  - Updated `floating-call-bar.tsx` to use Button and Badge components from shadcn/ui
+  - Added rounded-xl and shadow-lg to call bar for floating effect
+  - Replaced neo-brutalist 2px borders with subtle border-border styling throughout
+
+- **Files changed:**
+  - `src/components/chat/slack-layout.tsx` - Container shadow, rounded corners, modern borders, smooth transitions
+  - `src/components/chat/coworker-sidebar.tsx` - Smooth hover transitions, rounded corners, call button styling
+  - `src/components/chat/floating-call-bar.tsx` - Button/Badge components, rounded-xl shadow-lg, green Badge for in-call
+
+- **Learnings for future iterations:**
+  - Use `transition-all duration-200 ease-in-out` for smooth hover effects (all three timing properties)
+  - Active/selected states work well with `border-l-4 border-l-primary bg-primary/10`
+  - For floating elements, combine `rounded-xl` with `shadow-lg` for depth
+  - Badge component with custom bg-green-500 works well for status indicators
+  - Both slack-layout and coworker-sidebar have CoworkerItem/OfflineTeamMember - keep them consistent
+
+- **Gotchas:**
+  - slack-layout.tsx has its own CoworkerItem component (different from coworker-sidebar.tsx) - must update both
+  - The floating-call-bar already had Button imported but wasn't using it for all buttons
