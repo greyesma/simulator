@@ -422,3 +422,40 @@
 
 - **Visual verification:**
   - Screenshots captured: `screenshots/issue-137-users.png`, `screenshots/issue-137-assessments.png`, `screenshots/issue-137-assessments-expanded.png`, `screenshots/issue-137-assessment-detail.png`
+
+## Issue #138: DS-028: Migrate early assessment flow pages to modern design
+
+- **What was implemented:**
+  - Updated `src/app/assessment/[id]/hr-interview/page.tsx` with Button, Card, CardContent, and Check icon from lucide-react
+  - Progress indicators migrated from bg-secondary to bg-primary with rounded-full styling
+  - Step numbers now use rounded-full instead of square boxes
+  - Header changed from border-b-2 to border-b, font-bold to font-semibold
+  - Completed interview state uses Card with shadow-md instead of border-2
+  - Check icon uses rounded-full bg-primary/10 container with text-primary
+  - Continue button uses Button component with asChild for Link wrapping
+  - Updated `src/app/assessment/[id]/hr-interview/client.tsx` with Card, CardContent, and Check icon
+  - Completed state (redirecting) uses Card with shadow-md and rounded-full check icon
+  - Intro section background changed from bg-muted to bg-muted/50 for subtlety
+  - Info cards (Duration, Format, Focus) migrated from border-2 to Card components with shadow-sm
+  - All font-bold replaced with font-semibold
+  - All font-mono removed from non-code text
+  - Note: welcome/page.tsx and kickoff/page.tsx are redirect-only pages with no visual UI
+
+- **Files changed:**
+  - `src/app/assessment/[id]/hr-interview/page.tsx` - Progress indicators, header, completed state styling
+  - `src/app/assessment/[id]/hr-interview/client.tsx` - Info cards, completed state, intro section styling
+
+- **Learnings for future iterations:**
+  - Welcome and kickoff pages are redirect-only pages that have no visual UI to migrate
+  - The voice-conversation component was already migrated in DS-021 (#131), so HR interview inherits that styling
+  - Progress indicators work well with rounded-full and bg-primary for active step
+  - For multi-step flows, use rounded-full with border for inactive steps, bg-primary for active
+  - Check icon with rounded-full bg-primary/10 container creates consistent completion state
+
+- **Gotchas:**
+  - HR interview page requires a CV to be uploaded (redirects to cv-upload otherwise)
+  - Voice conversation component is already modernized from DS-021, only the page wrapper needed updates
+  - Test assessment needs cvUrl set to access the HR interview page
+
+- **Visual verification:**
+  - Screenshot captured: `screenshots/issue-138-hr-interview.png`

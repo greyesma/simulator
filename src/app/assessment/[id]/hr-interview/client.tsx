@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Check } from "lucide-react";
 import { VoiceConversation } from "@/components/assessment";
+import { Card, CardContent } from "@/components/ui/card";
 import type { TranscriptMessage } from "@/lib/ai";
 
 interface HRInterviewClientProps {
@@ -31,13 +33,15 @@ export function HRInterviewClient({
     // Show brief loading state while redirecting
     return (
       <div className="flex flex-1 items-center justify-center">
-        <div className="max-w-md p-8 text-center">
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center border-2 border-foreground bg-secondary">
-            <span className="text-3xl">&#10003;</span>
-          </div>
-          <h2 className="mb-4 text-2xl font-bold">Interview Completed!</h2>
-          <p className="text-muted-foreground">Redirecting...</p>
-        </div>
+        <Card className="max-w-md shadow-md">
+          <CardContent className="pt-6 text-center">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+              <Check className="h-10 w-10 text-primary" />
+            </div>
+            <h2 className="mb-4 text-2xl font-semibold">Interview Completed!</h2>
+            <p className="text-muted-foreground">Redirecting...</p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -45,9 +49,9 @@ export function HRInterviewClient({
   return (
     <div className="flex flex-1 flex-col">
       {/* Intro section */}
-      <div className="border-b-2 border-border bg-muted p-6">
+      <div className="border-b border-border bg-muted/50 p-6">
         <div className="mx-auto max-w-3xl">
-          <h2 className="mb-2 text-xl font-bold">
+          <h2 className="mb-2 text-xl font-semibold">
             Welcome to your HR Interview
           </h2>
           <p className="mb-4 text-muted-foreground">
@@ -56,19 +60,25 @@ export function HRInterviewClient({
             screening to verify your experience and assess your fit for the{" "}
             {scenarioName} role.
           </p>
-          <div className="grid grid-cols-3 gap-4 font-mono text-sm">
-            <div className="border-2 border-border bg-background p-3">
-              <div className="mb-1 text-muted-foreground">Duration</div>
-              <div className="font-bold">~20 minutes</div>
-            </div>
-            <div className="border-2 border-border bg-background p-3">
-              <div className="mb-1 text-muted-foreground">Format</div>
-              <div className="font-bold">Voice Call</div>
-            </div>
-            <div className="border-2 border-border bg-background p-3">
-              <div className="mb-1 text-muted-foreground">Focus</div>
-              <div className="font-bold">CV Verification</div>
-            </div>
+          <div className="grid grid-cols-3 gap-4 text-sm">
+            <Card className="shadow-sm">
+              <CardContent className="p-3">
+                <div className="mb-1 text-muted-foreground">Duration</div>
+                <div className="font-semibold">~20 minutes</div>
+              </CardContent>
+            </Card>
+            <Card className="shadow-sm">
+              <CardContent className="p-3">
+                <div className="mb-1 text-muted-foreground">Format</div>
+                <div className="font-semibold">Voice Call</div>
+              </CardContent>
+            </Card>
+            <Card className="shadow-sm">
+              <CardContent className="p-3">
+                <div className="mb-1 text-muted-foreground">Focus</div>
+                <div className="font-semibold">CV Verification</div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
