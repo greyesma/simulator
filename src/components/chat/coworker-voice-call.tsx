@@ -18,6 +18,7 @@ import {
 import type { TranscriptMessage } from "@/lib/ai";
 import { ErrorDisplay } from "@/components/feedback";
 import { CoworkerAvatar } from "./coworker-avatar";
+import { Button } from "@/components/ui/button";
 
 interface Coworker {
   id: string;
@@ -38,21 +39,23 @@ function ConnectionStateIndicator({ state }: { state: ConnectionState }) {
     idle: { label: "Ready to call", color: "bg-muted" },
     "requesting-permission": {
       label: "Requesting microphone...",
-      color: "bg-secondary",
+      color: "bg-primary",
     },
-    connecting: { label: "Connecting...", color: "bg-secondary" },
+    connecting: { label: "Connecting...", color: "bg-primary" },
     connected: { label: "Connected", color: "bg-green-500" },
-    error: { label: "Connection error", color: "bg-red-500" },
+    error: { label: "Connection error", color: "bg-destructive" },
     ended: { label: "Call ended", color: "bg-muted" },
-    retrying: { label: "Retrying...", color: "bg-secondary" },
+    retrying: { label: "Retrying...", color: "bg-primary" },
   };
 
   const config = stateConfig[state];
 
   return (
     <div className="flex items-center gap-2">
-      <div className={`h-3 w-3 ${config.color}`} />
-      <span className="font-mono text-sm">{config.label}</span>
+      <div
+        className={`h-3 w-3 rounded-full transition-colors duration-200 ${config.color}`}
+      />
+      <span className="text-sm text-muted-foreground">{config.label}</span>
     </div>
   );
 }
@@ -88,13 +91,13 @@ function TranscriptView({
           className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
         >
           <div
-            className={`max-w-[80%] p-3 ${
+            className={`max-w-[80%] rounded-lg p-3 transition-all duration-200 ${
               message.role === "user"
-                ? "bg-foreground text-background"
-                : "border-2 border-border bg-muted text-foreground"
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-foreground"
             }`}
           >
-            <div className="mb-1 font-mono text-xs opacity-70">
+            <div className="mb-1 text-xs opacity-70">
               {message.role === "user" ? "You" : coworkerName}
             </div>
             <p className="text-sm">{message.text}</p>
@@ -144,11 +147,11 @@ export function CoworkerVoiceCall({
   if (!isAudioSupported) {
     return (
       <div className="flex h-full items-center justify-center p-8">
-        <div className="max-w-md border-2 border-border p-8 text-center">
+        <div className="max-w-md rounded-xl border bg-card p-8 text-center shadow-lg">
           <div className="mb-4 text-4xl">
-            <MicOff className="mx-auto h-12 w-12 text-red-500" />
+            <MicOff className="mx-auto h-12 w-12 text-destructive" />
           </div>
-          <h3 className="mb-2 text-xl font-bold">Browser Not Supported</h3>
+          <h3 className="mb-2 text-xl font-semibold">Browser Not Supported</h3>
           <p className="mb-4 text-muted-foreground">
             Your browser doesn&apos;t support audio capture. Please use a modern
             browser like Chrome, Firefox, or Safari.
@@ -162,11 +165,13 @@ export function CoworkerVoiceCall({
   if (permissionState === "denied" && connectionState === "error") {
     return (
       <div className="flex h-full items-center justify-center p-8">
-        <div className="max-w-md border-2 border-border p-8 text-center">
+        <div className="max-w-md rounded-xl border bg-card p-8 text-center shadow-lg">
           <div className="mb-4 text-4xl">
-            <MicOff className="mx-auto h-12 w-12 text-red-500" />
+            <MicOff className="mx-auto h-12 w-12 text-destructive" />
           </div>
-          <h3 className="mb-2 text-xl font-bold">Microphone Access Required</h3>
+          <h3 className="mb-2 text-xl font-semibold">
+            Microphone Access Required
+          </h3>
           <p className="mb-4 text-muted-foreground">
             Please enable microphone access in your browser settings to start a
             voice call.
@@ -178,20 +183,15 @@ export function CoworkerVoiceCall({
             <li>4. Refresh this page</li>
           </ol>
           <div className="flex flex-col justify-center gap-3 sm:flex-row">
-            <button
-              onClick={() => window.location.reload()}
-              className="border-2 border-foreground bg-foreground px-6 py-3 font-semibold text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground"
-            >
+            <Button onClick={() => window.location.reload()}>
+              <RefreshCw className="h-4 w-4" />
               Refresh Page
-            </button>
+            </Button>
             {onFallbackToText && (
-              <button
-                onClick={onFallbackToText}
-                className="flex items-center justify-center gap-2 border-2 border-secondary bg-secondary px-6 py-3 font-semibold text-secondary-foreground hover:border-foreground hover:bg-foreground hover:text-background"
-              >
+              <Button variant="secondary" onClick={onFallbackToText}>
                 <MessageSquare className="h-4 w-4" />
                 Chat Instead
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -200,39 +200,53 @@ export function CoworkerVoiceCall({
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col overflow-hidden rounded-xl border bg-card shadow-lg">
       {/* Header */}
-      <div className="flex items-center justify-between border-b-2 border-border p-4">
+      <div className="flex items-center justify-between border-b p-4">
         <div>
-          <h2 className="text-xl font-bold">Voice Call with {coworker.name}</h2>
+          <h2 className="text-xl font-semibold">
+            Voice Call with {coworker.name}
+          </h2>
           <ConnectionStateIndicator state={connectionState} />
         </div>
 
         <div className="flex items-center gap-4">
           {/* Audio indicators */}
           <div className="flex items-center gap-2">
-            {isListening ? (
-              <Mic className="h-5 w-5 text-green-500" />
-            ) : (
-              <MicOff className="h-5 w-5 text-muted-foreground" />
-            )}
-            {isSpeaking ? (
-              <Volume2 className="h-5 w-5 text-secondary" />
-            ) : (
-              <VolumeX className="h-5 w-5 text-muted-foreground" />
-            )}
+            <div
+              className={`rounded-full p-1.5 transition-colors duration-200 ${
+                isListening ? "bg-green-500/20" : "bg-muted"
+              }`}
+            >
+              {isListening ? (
+                <Mic className="h-5 w-5 text-green-500" />
+              ) : (
+                <MicOff className="h-5 w-5 text-muted-foreground" />
+              )}
+            </div>
+            <div
+              className={`rounded-full p-1.5 transition-colors duration-200 ${
+                isSpeaking ? "bg-primary/20" : "bg-muted"
+              }`}
+            >
+              {isSpeaking ? (
+                <Volume2 className="h-5 w-5 text-primary" />
+              ) : (
+                <VolumeX className="h-5 w-5 text-muted-foreground" />
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main content */}
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-hidden">
         {/* Transcript panel */}
-        <div className="flex-1 border-r-2 border-border">
+        <div className="flex-1 border-r">
           <div className="flex h-full flex-col">
-            <div className="border-b border-border p-4">
-              <h3 className="font-mono text-sm text-muted-foreground">
-                TRANSCRIPT
+            <div className="border-b p-4">
+              <h3 className="text-sm font-medium text-muted-foreground">
+                Transcript
               </h3>
             </div>
             <div className="flex-1 overflow-hidden">
@@ -260,14 +274,14 @@ export function CoworkerVoiceCall({
             {connectionState === "connected" && (
               <div className="mb-6">
                 {isSpeaking ? (
-                  <div className="flex items-center gap-2 text-secondary">
-                    <Volume2 className="h-5 w-5" />
-                    <span className="font-mono text-sm">Speaking...</span>
+                  <div className="flex items-center gap-2 text-primary">
+                    <Volume2 className="h-5 w-5 animate-pulse" />
+                    <span className="text-sm">Speaking...</span>
                   </div>
                 ) : isListening ? (
                   <div className="flex items-center gap-2 text-green-500">
-                    <Mic className="h-5 w-5" />
-                    <span className="font-mono text-sm">Listening...</span>
+                    <Mic className="h-5 w-5 animate-pulse" />
+                    <span className="text-sm">Listening...</span>
                   </div>
                 ) : null}
               </div>
@@ -275,20 +289,20 @@ export function CoworkerVoiceCall({
 
             {/* Connection controls */}
             {connectionState === "idle" && (
-              <button
+              <Button
                 onClick={connect}
-                className="flex items-center gap-2 border-2 border-green-600 bg-green-600 px-6 py-3 font-semibold text-white hover:border-green-700 hover:bg-green-700"
+                className="bg-green-600 text-white transition-all duration-200 hover:bg-green-700"
               >
                 <Phone className="h-5 w-5" />
                 Start Call
-              </button>
+              </Button>
             )}
 
             {(connectionState === "requesting-permission" ||
               connectionState === "connecting") && (
-              <div className="flex items-center gap-2 text-secondary">
-                <div className="h-5 w-5 animate-spin border-2 border-secondary border-t-transparent" />
-                <span className="font-mono text-sm">
+              <div className="flex items-center gap-2 text-primary">
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <span className="text-sm">
                   {connectionState === "requesting-permission"
                     ? "Requesting microphone..."
                     : "Connecting..."}
@@ -297,13 +311,14 @@ export function CoworkerVoiceCall({
             )}
 
             {connectionState === "connected" && (
-              <button
+              <Button
+                variant="destructive"
                 onClick={handleEndCall}
-                className="flex items-center gap-2 border-2 border-red-600 bg-red-600 px-6 py-3 font-semibold text-white hover:border-red-700 hover:bg-red-700"
+                className="transition-all duration-200"
               >
                 <PhoneOff className="h-5 w-5" />
                 End Call
-              </button>
+              </Button>
             )}
 
             {(connectionState === "error" || connectionState === "retrying") &&
@@ -322,23 +337,17 @@ export function CoworkerVoiceCall({
 
             {connectionState === "error" && !categorizedError && error && (
               <div className="text-center">
-                <p className="mb-4 font-mono text-sm text-red-500">{error}</p>
+                <p className="mb-4 text-sm text-destructive">{error}</p>
                 <div className="flex flex-col justify-center gap-3 sm:flex-row">
-                  <button
-                    onClick={connect}
-                    className="flex items-center gap-2 border-2 border-foreground bg-foreground px-6 py-3 font-semibold text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground"
-                  >
+                  <Button onClick={connect}>
                     <RefreshCw className="h-4 w-4" />
                     Try Again
-                  </button>
+                  </Button>
                   {onFallbackToText && (
-                    <button
-                      onClick={onFallbackToText}
-                      className="flex items-center gap-2 border-2 border-secondary bg-secondary px-6 py-3 font-semibold text-secondary-foreground hover:border-foreground hover:bg-foreground hover:text-background"
-                    >
+                    <Button variant="secondary" onClick={onFallbackToText}>
                       <MessageSquare className="h-4 w-4" />
                       Chat Instead
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
@@ -346,7 +355,7 @@ export function CoworkerVoiceCall({
 
             {connectionState === "ended" && (
               <div className="text-center">
-                <p className="mb-4 font-mono text-sm text-muted-foreground">
+                <p className="mb-4 text-sm text-muted-foreground">
                   Call completed
                 </p>
                 <p className="text-sm text-muted-foreground">
@@ -358,15 +367,15 @@ export function CoworkerVoiceCall({
 
           {/* Tips */}
           {connectionState === "idle" && (
-            <div className="border-t-2 border-border bg-muted p-4">
-              <h4 className="mb-2 font-mono text-xs text-muted-foreground">
-                TIPS
+            <div className="rounded-b-xl border-t bg-muted/50 p-4">
+              <h4 className="mb-2 text-xs font-medium text-muted-foreground">
+                Tips
               </h4>
               <ul className="space-y-1 text-xs text-muted-foreground">
-                <li>Speak clearly into your microphone</li>
-                <li>Find a quiet environment</li>
-                <li>You can interrupt at any time</li>
-                <li>Call transcript is saved automatically</li>
+                <li>• Speak clearly into your microphone</li>
+                <li>• Find a quiet environment</li>
+                <li>• You can interrupt at any time</li>
+                <li>• Call transcript is saved automatically</li>
               </ul>
             </div>
           )}

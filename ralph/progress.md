@@ -126,3 +126,40 @@
 
 - **Verification:**
   - Build passes without the `@next/next/no-img-element` warning for markdown.tsx
+
+## Issue #130: DS-020: Migrate chat/ voice components to modern design
+
+- **What was implemented:**
+  - Updated `coworker-voice-call.tsx` with modern shadcn/ui design system styling
+  - Added Button component import and replaced all custom buttons with Button variants
+  - Container now has rounded-xl corners, shadow-lg, and bg-card styling
+  - Connection state indicator has rounded-full status dot with smooth transitions
+  - Audio indicators (mic/speaker) have rounded backgrounds with state-aware colors
+  - Speaking indicator uses primary blue color instead of gold/secondary
+  - End call button uses Button destructive variant (red)
+  - Start call button uses custom green styling with Button component
+  - Transcript message bubbles use rounded-lg with primary/muted backgrounds
+  - All state transitions use `transition-all duration-200` for smooth animations
+  - Error states use text-destructive instead of text-red-500
+  - Tips section has rounded-b-xl with bg-muted/50 background
+  - Headers use font-semibold instead of font-bold
+
+- **Files changed:**
+  - `src/components/chat/coworker-voice-call.tsx` - Complete modern design overhaul
+
+- **Learnings for future iterations:**
+  - The Button component has size="icon" for icon-only buttons (h-10 w-10)
+  - For custom colored buttons (like green Start Call), use className override on Button
+  - Use bg-{color}/20 for subtle background states (e.g., bg-green-500/20 for active mic)
+  - Animate-pulse works well for active speaking/listening indicators
+  - The destructive variant is perfect for end call buttons
+  - Use rounded-full for small status indicators, rounded-xl for containers
+
+- **Gotchas:**
+  - Voice calls require real audio support, so headless browsers show "Not supported" error
+  - The call UI is rendered inline in the chat page, not as a separate modal
+  - FloatingCallBar shows "In call" status in the chat sidebar
+
+- **Visual verification:**
+  - Screenshots captured in `screenshots/issue-130-chat-page.png` and `screenshots/issue-130-voice-call.png`
+  - Note: Full voice call UI cannot be tested in headless browser due to audio requirements
