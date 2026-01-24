@@ -612,3 +612,37 @@ import { Input } from "@/components/ui/input";
 ### Gotchas discovered
 - The congratulations client needed `managerId` passed as a prop since it's a client component and can't do server-side queries
 - The start page's `getRedirectUrlForStatus` function needed a third parameter for managerId to handle WORKING status redirects properly
+
+## Issue #151: Fix Gemini mock path in API token route tests
+
+### What was implemented
+- Updated mock paths in 4 test files to use `@/lib/ai/gemini` instead of `@/lib/ai`
+- This ensures the mocks match the exact import paths used in the route implementations
+
+### Root cause
+The route implementations import directly from `@/lib/ai/gemini`:
+```typescript
+import { generateEphemeralToken } from "@/lib/ai/gemini";
+import { gemini } from "@/lib/ai/gemini";
+```
+
+But the test files were mocking `@/lib/ai`:
+```typescript
+vi.mock("@/lib/ai", () => ({ ... }));
+```
+
+Vitest mocks must match the exact import path. When the mock path doesn't match, the real module is imported instead, causing "API key not valid" errors when tests try to call the real Gemini API.
+
+### Files changed
+- `src/app/api/interview/token/route.test.ts` - Mock path updated to `@/lib/ai/gemini`
+- `src/app/api/kickoff/token/route.test.ts` - Mock path updated to `@/lib/ai/gemini`
+- `src/app/api/interview/assessment/route.test.ts` - Mock path updated to `@/lib/ai/gemini`
+- `src/app/api/admin/scenarios/builder/route.test.ts` - Mock path updated to `@/lib/ai/gemini`
+
+### Learnings for future iterations
+1. **Mock paths must match import paths exactly** - Vitest mocks work by intercepting specific module paths. If the route imports from `@/lib/ai/gemini`, the test must mock `@/lib/ai/gemini`, not `@/lib/ai`.
+2. **Check the actual source file imports** - When tests fail with "API key not valid" or similar errors, verify that the mock path matches the exact import used in the module under test.
+3. **Barrel exports don't help with mocking** - Even if `@/lib/ai/index.ts` re-exports from `@/lib/ai/gemini`, mocking `@/lib/ai` won't intercept imports that go directly to `@/lib/ai/gemini`.
+
+### Gotchas discovered
+- The `interview/token/route.test.ts` also had an unused mock export `HR_PERSONA_SYSTEM_PROMPT` that was removed since it's not needed.
