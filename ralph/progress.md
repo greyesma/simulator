@@ -585,3 +585,30 @@ import { Input } from "@/components/ui/input";
 
 ### Gotchas discovered
 - The GET endpoint previously didn't fetch the coworker - it was only fetched in POST. Added coworker lookup with proper scenarioId check for consistency with POST handler
+
+## Issue #150: US-003: Update all redirects from /welcome to /chat
+
+### What was implemented
+- Updated all routes that redirected to `/welcome` to instead redirect to `/chat?coworkerId={managerId}`
+- Converted welcome page to a redirect-only page for backwards compatibility
+- Deleted the welcome client component (no longer needed)
+- Updated start page tests to reflect new redirect behavior
+
+### Files changed
+- `src/app/assessment/[id]/congratulations/page.tsx` - Added coworkers to query, passes managerId to client
+- `src/app/assessment/[id]/congratulations/client.tsx` - Updated redirects to `/chat?coworkerId={managerId}`
+- `src/app/start/page.tsx` - Updated WORKING status redirect to include managerId
+- `src/app/assessment/[id]/kickoff/page.tsx` - Redirects to `/chat?coworkerId={managerId}`
+- `src/app/assessment/[id]/welcome/page.tsx` - Converted to redirect-only
+- `src/app/assessment/[id]/welcome/client.tsx` - Deleted
+- `src/app/start/page.test.tsx` - Updated tests for new redirect behavior
+
+### Learnings for future iterations
+1. **Manager detection is consistent** - All files use the same pattern: `coworkers.find(c => c.role.toLowerCase().includes("manager"))` to find the manager
+2. **Fallback to welcome page** - When no manager is found, we fallback to the existing welcome page or profile to avoid breaking the flow
+3. **Backwards compatibility via redirect** - Instead of deleting the welcome page entirely, it was converted to a redirect-only page to handle any existing links
+4. **Tests need to include coworkers** - The start page tests needed `scenario.coworkers` in the mock data after the query was updated
+
+### Gotchas discovered
+- The congratulations client needed `managerId` passed as a prop since it's a client component and can't do server-side queries
+- The start page's `getRedirectUrlForStatus` function needed a third parameter for managerId to handle WORKING status redirects properly
