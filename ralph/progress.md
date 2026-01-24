@@ -224,3 +224,41 @@
 
 ### Gotchas discovered
 - The shadcn Card default border radius (`rounded-lg`) needed to be changed to `rounded-xl` to meet the acceptance criteria. This is a minor customization that maintains the component structure.
+
+## Issue #118: DS-008: Add shadcn Input, Label, and Textarea components
+
+### What was implemented
+- Installed Input, Label, and Textarea components via `npx shadcn@latest add input label textarea --yes`
+- All three components use the blue theme via CSS variables configured in DS-001 and DS-002
+
+### Files changed
+- `src/components/ui/input.tsx` (new) - shadcn Input component
+- `src/components/ui/label.tsx` (new) - shadcn Label component with Radix UI primitive
+- `src/components/ui/textarea.tsx` (new) - shadcn Textarea component
+
+### Styling details
+
+**Input component:**
+- Blue focus ring via `focus-visible:ring-2 focus-visible:ring-ring` (ring uses `--ring` = #237CF1)
+- Rounded corners: `rounded-md`
+- Placeholder text: `placeholder:text-muted-foreground`
+- Disabled states: `disabled:cursor-not-allowed disabled:opacity-50`
+- File input styling for upload buttons
+
+**Label component:**
+- Uses Radix UI `@radix-ui/react-label` for accessibility (handles htmlFor automatically)
+- Peer-disabled states: `peer-disabled:cursor-not-allowed peer-disabled:opacity-70`
+
+**Textarea component:**
+- Matches Input styling pattern exactly
+- Min height: `min-h-[80px]`
+- Same focus, placeholder, and disabled states as Input
+
+### Learnings for future iterations
+1. **Multiple components can be installed at once** - `npx shadcn@latest add input label textarea --yes` installs all three in one command
+2. **No customization needed for these components** - Unlike Card (DS-007) which needed `rounded-xl`, the Input/Label/Textarea components meet acceptance criteria out of the box
+3. **Label uses Radix UI primitive** - This provides accessibility features like proper `htmlFor` handling without additional code
+4. **Consistent pattern across form components** - Input and Textarea share the same class structure for focus, placeholder, and disabled states
+
+### Gotchas discovered
+- None - this was a straightforward component installation with no modifications needed
