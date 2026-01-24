@@ -482,3 +482,44 @@ import { Input } from "@/components/ui/input";
 
 ### Gotchas discovered
 - None - this was a straightforward barrel export file creation
+
+## Issue #123: DS-013: Migrate shared/ components to modern design
+
+### What was implemented
+- Migrated `cv-upload.tsx` to use Card and Button components from `@/components/ui`
+- Migrated `markdown.tsx` to use modern blue theme styling with rounded corners
+
+### cv-upload.tsx changes
+- Container: Changed from plain `<div>` with `border-2 border-dashed` to `<Card>` component with dashed border
+- Dropzone: Added blue accent on drag-over (`border-primary bg-primary/5`) instead of secondary color
+- Progress bar: Changed to rounded ends (`rounded-full`) with blue fill (`bg-primary`)
+- Added "Browse files" `<Button variant="outline" size="sm">` for clearer CTA
+- Error state: Uses `<Card>` with destructive styling instead of plain div
+- Used `cn()` utility for cleaner conditional class composition
+- Removed `font-mono` classes in favor of system fonts
+
+### markdown.tsx changes
+- Updated docstring from "Neo-brutalist" to "Modern styled with blue theme"
+- Code blocks (`<pre>`): Added `rounded-lg` for rounded corners
+- Inline code: Changed from gold (`bg-secondary/30`) to blue tint (`bg-primary/10 text-primary`) with `rounded`
+- Lists: Changed from square bullets (`■`) to native disc/decimal bullets with blue markers (`marker:text-primary`)
+- Links: Changed from gold underline to blue text with primary color decoration
+- Blockquotes: Changed left border from secondary to primary (blue)
+- Tables: Added `rounded-lg` wrapper, changed from inverted header to muted background
+- Images: Added `rounded-lg` and softer border
+- H1: Changed border from `border-b-2 border-foreground` to `border-b border-border`
+- Horizontal rules: Softened from `border-t-2 border-foreground` to `border-t border-border`
+
+### Files changed
+- `src/components/shared/cv-upload.tsx` (modified) - Card, Button, rounded progress bar, blue accents
+- `src/components/shared/markdown.tsx` (modified) - Rounded corners, blue theme, modern styling
+
+### Learnings for future iterations
+1. **Import from barrel exports** - ESLint rule `no-restricted-imports` enforces importing from `@/components/ui` instead of individual component files like `@/components/ui/card`
+2. **Use `cn()` for conditional classes** - The `cn()` utility from `@/lib/utils` provides cleaner conditional class composition than template strings
+3. **Blue theme uses primary color** - The design system uses `primary` (blue #237CF1) instead of `secondary` (which was gold in the old neo-brutalist theme)
+4. **Consistent rounded corners** - Use `rounded-lg` for code blocks, tables, images; `rounded-full` for progress bars and badges
+
+### Gotchas discovered
+- The original cv-upload used `font-mono` extensively which gave a technical feel but doesn't match the modern design - removed in favor of system fonts
+- List markers in markdown needed `marker:text-primary` Tailwind class to color the bullet points blue

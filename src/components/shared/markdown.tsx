@@ -11,10 +11,10 @@ interface MarkdownProps {
 }
 
 /**
- * Neo-brutalist styled Markdown renderer.
+ * Modern styled Markdown renderer with blue theme.
  *
  * Uses DM Sans for prose and Space Mono for code.
- * Sharp corners, no shadows, high contrast.
+ * Rounded corners, subtle shadows, blue accents.
  */
 export function Markdown({ children, className = "" }: MarkdownProps) {
   return (
@@ -33,7 +33,7 @@ export function Markdown({ children, className = "" }: MarkdownProps) {
 const components: Components = {
   // Headings - bold, DM Sans, no margins on first heading
   h1: ({ children }) => (
-    <h1 className="mb-4 mt-6 border-b-2 border-foreground pb-2 text-2xl font-bold first:mt-0">
+    <h1 className="mb-4 mt-6 border-b border-border pb-2 text-2xl font-bold first:mt-0">
       {children}
     </h1>
   ),
@@ -62,32 +62,26 @@ const components: Components = {
     <p className="mb-3 leading-relaxed last:mb-0">{children}</p>
   ),
 
-  // Lists - square bullets for brutalist style
+  // Lists - disc bullets for modern style
   ul: ({ children }) => (
-    <ul className="mb-3 ml-4 list-none space-y-1">{children}</ul>
+    <ul className="mb-3 ml-4 list-disc space-y-1 marker:text-primary">
+      {children}
+    </ul>
   ),
   ol: ({ children }) => (
-    <ol className="counter-reset-list mb-3 ml-4 list-none space-y-1">
+    <ol className="mb-3 ml-4 list-decimal space-y-1 marker:text-primary">
       {children}
     </ol>
   ),
-  li: ({ children, ...props }) => {
-    // Check if this is inside an ordered list by looking at parent
-    const _isOrdered = props.node?.position?.start.column === 1;
-    return (
-      <li className="relative pl-4 before:absolute before:left-0 before:top-1.5 before:text-xs before:text-secondary before:content-['■']">
-        {children}
-      </li>
-    );
-  },
+  li: ({ children }) => <li className="pl-1">{children}</li>,
 
-  // Links - gold underline on hover
+  // Links - blue underline on hover
   a: ({ href, children }) => (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="underline decoration-secondary decoration-2 underline-offset-2 transition-colors hover:bg-secondary hover:text-secondary-foreground"
+      className="text-primary underline decoration-primary/50 decoration-1 underline-offset-2 transition-colors hover:decoration-primary"
     >
       {children}
     </a>
@@ -99,7 +93,7 @@ const components: Components = {
   // Emphasis/Italic
   em: ({ children }) => <em className="italic">{children}</em>,
 
-  // Inline code - Space Mono, gold background
+  // Inline code - blue background tint
   code: ({ className, children, ...props }) => {
     // Check if this is a code block (has language class) or inline code
     const isBlock = className?.includes("language-");
@@ -111,58 +105,56 @@ const components: Components = {
       );
     }
     return (
-      <code className="bg-secondary/30 border-foreground/20 border px-1.5 py-0.5 font-mono text-sm">
+      <code className="rounded bg-primary/10 px-1.5 py-0.5 font-mono text-sm text-primary">
         {children}
       </code>
     );
   },
 
-  // Code blocks - black background, white text, Space Mono
+  // Code blocks - dark background, rounded corners
   pre: ({ children }) => (
-    <pre className="mb-4 overflow-x-auto border-2 border-foreground bg-foreground p-4 font-mono text-sm text-background">
+    <pre className="mb-4 overflow-x-auto rounded-lg border border-border bg-muted p-4 font-mono text-sm">
       {children}
     </pre>
   ),
 
-  // Blockquote - left border with gold
+  // Blockquote - left border with blue
   blockquote: ({ children }) => (
-    <blockquote className="mb-3 border-l-4 border-secondary pl-4 italic text-muted-foreground">
+    <blockquote className="mb-3 border-l-4 border-primary pl-4 italic text-muted-foreground">
       {children}
     </blockquote>
   ),
 
   // Horizontal rule
-  hr: () => <hr className="my-6 border-t-2 border-foreground" />,
+  hr: () => <hr className="my-6 border-t border-border" />,
 
-  // Images - sharp corners, border
+  // Images - rounded corners, subtle border
   img: ({ src, alt }) => (
     <img
       src={src}
       alt={alt || ""}
-      className="my-4 h-auto max-w-full border-2 border-foreground"
+      className="my-4 h-auto max-w-full rounded-lg border border-border"
     />
   ),
 
-  // Tables - brutalist style
+  // Tables - modern style with rounded corners
   table: ({ children }) => (
-    <div className="mb-4 overflow-x-auto">
-      <table className="w-full border-2 border-foreground">{children}</table>
+    <div className="mb-4 overflow-x-auto rounded-lg border border-border">
+      <table className="w-full">{children}</table>
     </div>
   ),
   thead: ({ children }) => (
-    <thead className="bg-foreground text-background">{children}</thead>
+    <thead className="bg-muted text-foreground">{children}</thead>
   ),
   tbody: ({ children }) => <tbody>{children}</tbody>,
   tr: ({ children }) => (
-    <tr className="border-b border-foreground last:border-b-0">{children}</tr>
+    <tr className="border-b border-border last:border-b-0">{children}</tr>
   ),
   th: ({ children }) => (
-    <th className="px-4 py-2 text-left font-mono text-sm font-bold uppercase tracking-wider">
-      {children}
-    </th>
+    <th className="px-4 py-2 text-left text-sm font-semibold">{children}</th>
   ),
   td: ({ children }) => (
-    <td className="border-foreground/20 border-r px-4 py-2 last:border-r-0">
+    <td className="border-r border-border px-4 py-2 last:border-r-0">
       {children}
     </td>
   ),

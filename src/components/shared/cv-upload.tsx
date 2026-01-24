@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import { Card, Button } from "@/components/ui";
+import { cn } from "@/lib/utils";
 
 interface CVUploadProps {
   onUploadComplete?: (data: {
@@ -142,25 +144,31 @@ export function CVUpload({
         disabled={isUploading}
       />
 
-      <div
+      <Card
         onClick={handleClick}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        className={`cursor-pointer border-2 border-dashed p-8 text-center transition-colors ${isDragOver ? "bg-secondary/10 border-secondary" : "border-border hover:border-foreground"} ${isUploading ? "pointer-events-none opacity-70" : ""} `}
+        className={cn(
+          "cursor-pointer border-2 border-dashed p-8 text-center transition-colors",
+          isDragOver
+            ? "border-primary bg-primary/5"
+            : "border-border hover:border-primary/50",
+          isUploading && "pointer-events-none opacity-70"
+        )}
       >
         {isUploading ? (
           <div className="space-y-4">
-            <div className="font-mono text-sm">
+            <div className="text-sm font-medium">
               {progress < 90 ? "Uploading..." : "Analyzing CV..."}
             </div>
-            <div className="h-2 w-full border border-border bg-muted">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
               <div
-                className="h-full bg-secondary transition-all duration-200"
+                className="h-full rounded-full bg-primary transition-all duration-200"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <div className="font-mono text-xs text-muted-foreground">
+            <div className="text-xs text-muted-foreground">
               {progress < 90
                 ? `${progress}%`
                 : "Extracting your experience and skills"}
@@ -168,29 +176,29 @@ export function CVUpload({
           </div>
         ) : fileName ? (
           <div className="space-y-2">
-            <div className="font-mono text-sm text-secondary">{fileName}</div>
-            <div className="font-mono text-xs text-muted-foreground">
+            <div className="text-sm font-medium text-primary">{fileName}</div>
+            <div className="text-xs text-muted-foreground">
               Click or drag to replace
             </div>
           </div>
         ) : (
-          <div className="space-y-2">
-            <div className="text-4xl">+</div>
+          <div className="space-y-3">
+            <div className="text-4xl text-muted-foreground">+</div>
             <div className="font-semibold">Upload your CV</div>
-            <div className="font-mono text-xs text-muted-foreground">
+            <div className="text-xs text-muted-foreground">
               PDF, DOC, DOCX, TXT, RTF (max 10MB)
             </div>
-            <div className="font-mono text-xs text-muted-foreground">
-              Click or drag and drop
-            </div>
+            <Button type="button" variant="outline" size="sm">
+              Browse files
+            </Button>
           </div>
         )}
-      </div>
+      </Card>
 
       {error && (
-        <div className="mt-2 border-2 border-red-500 p-2 font-mono text-sm text-red-500">
-          {error}
-        </div>
+        <Card className="mt-2 border-destructive bg-destructive/10 p-3">
+          <p className="text-sm text-destructive">{error}</p>
+        </Card>
       )}
     </div>
   );
