@@ -1,5 +1,6 @@
 import { checkIsAdmin } from "@/lib/core";
 import Link from "next/link";
+import { Button } from "@/components/ui";
 
 /**
  * Admin navigation link that only renders for admin users
@@ -13,11 +14,10 @@ export async function AdminNav() {
   }
 
   return (
-    <Link
-      href="/admin"
-      className="bg-foreground px-3 py-1 font-mono text-sm text-background hover:bg-secondary hover:text-secondary-foreground"
-    >
-      Admin
-    </Link>
+    <Button variant="ghost" size="sm" asChild>
+      <Link href="/admin" className="text-primary font-medium">
+        Admin
+      </Link>
+    </Button>
   );
 }

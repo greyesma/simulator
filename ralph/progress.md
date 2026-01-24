@@ -877,3 +877,46 @@ vi.mock("@/lib/core/admin", () => ({...}));
 - The Dialog component's close button doesn't have a testid by default - use `screen.getByRole("button", { name: /close/i })` to find it via the sr-only "Close" text
 - When using Dialog, don't add a second close button with your own testid - use the built-in one or customize DialogContent
 - The Dialog's `onOpenChange` callback handles both opening and closing - check if `open` is false to call `onClose`
+
+## Issue #125: DS-015: Migrate admin/ components to modern design
+
+### What was implemented
+- Migrated `admin-nav.tsx` to use Button component with ghost variant
+- Migrated `data-deletion-section.tsx` to use Card, Button, and Dialog components
+
+### admin-nav.tsx changes
+- Replaced plain `<Link>` with neo-brutalist styling with `<Button variant="ghost" size="sm" asChild>` wrapping the Link
+- Added `text-primary font-medium` for blue accent on the nav link
+- Rounded corners via Button component (built-in rounded-md)
+
+### data-deletion-section.tsx changes
+- Replaced outer `<div className="border-2 border-border p-6">` with `<Card>` and `<CardContent>`
+- Changed icon container from `bg-secondary` square to `rounded-lg bg-primary/10` with `text-primary` icon
+- Changed SVG stroke styles from `strokeLinecap="square" strokeLinejoin="miter"` to `strokeLinecap="round" strokeLinejoin="round"`
+- Replaced Privacy Policy link styling with `text-primary hover:text-primary/80 transition-colors`
+- Changed error/success message boxes from `border-2` neo-brutalist to `rounded-lg` modern
+- Changed pending deletion alert from `border-2 border-yellow-500` to `rounded-lg border border-yellow-200`
+- Changed pending deletion icon container from square `bg-yellow-500` to `rounded-full`
+- Replaced all `<button>` elements with `<Button>` components:
+  - Cancel deletion request: `<Button variant="outline" size="sm">`
+  - Request deletion: `<Button variant="destructive">`
+- Replaced inline confirmation dialog with `<Dialog>` component:
+  - Uses `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter`
+  - Cancel button: `<Button variant="outline">`
+  - Confirm button: `<Button variant="destructive">`
+- Changed `font-bold` to `font-semibold` for headings (modern preference)
+
+### Files changed
+- `src/components/admin/admin-nav.tsx` (modified)
+- `src/components/admin/data-deletion-section.tsx` (modified)
+
+### Learnings for future iterations
+1. **Button asChild pattern** - Use `<Button asChild>` when wrapping Next.js `<Link>` components to preserve button styling while maintaining link behavior
+2. **Dialog replaces inline confirmation** - Instead of inline confirmation boxes, use the Dialog component for a modal experience with built-in animations and accessibility
+3. **Semantic color tokens** - Use `primary`, `destructive`, `muted-foreground` consistently instead of specific colors like `yellow-700`
+4. **Rounded icon containers** - Change square icon containers (`bg-secondary`) to rounded ones (`rounded-lg bg-primary/10`) with `text-primary` for icons
+5. **SVG stroke styles** - Modern design uses `strokeLinecap="round" strokeLinejoin="round"` instead of `"square"` and `"miter"`
+
+### Gotchas discovered
+- The admin-nav component is a server component (async function), but it can still import and use the Button component since Button doesn't use client-only hooks
+- The data-deletion-section already had `showConfirmation` state, so converting to Dialog was straightforward - just pass it as the `open` prop and use `onOpenChange` to toggle
