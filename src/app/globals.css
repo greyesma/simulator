@@ -6,26 +6,26 @@
 
 @layer base {
   :root {
-    /* Modern shadcn/ui design system */
+    /* Modern shadcn/ui design system - Blue theme */
     --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 214 93% 54%; /* #237CF1 blue */
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 217 91% 54%; /* #237CF1 blue */
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+    --secondary: 210 40% 96.1%; /* #f1f5f9 */
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%; /* slate tones */
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 199 89% 94%; /* sky-100 */
+    --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 214 93% 54%; /* matches primary */
+    --destructive-foreground: 0 0% 100%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 217 91% 54%; /* matches primary */
     --radius: 0.5rem;
 
     /* Chart colors */
@@ -40,25 +40,25 @@
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 214 93% 54%; /* #237CF1 blue */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 54%; /* #237CF1 blue */
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 214 93% 54%; /* matches primary */
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 217 91% 54%; /* matches primary */
 
     /* Chart colors for dark mode */
     --chart-1: 220 70% 50%;
@@ -89,7 +89,7 @@ pre,
 }
 
 /* ==========================================================================
-   Syntax Highlighting (Neo-Brutalist Theme)
+   Syntax Highlighting (Blue Theme)
    Based on highlight.js with custom colors for our design system
    ========================================================================== */
 
@@ -104,7 +104,7 @@ pre,
   padding: 0;
 }
 
-/* Neo-brutalist syntax colors - high contrast, minimal palette */
+/* Blue theme syntax colors - high contrast, minimal palette */
 .hljs {
   color: #ffffff;
   background: #000000;
@@ -117,11 +117,11 @@ pre,
   font-style: italic;
 }
 
-/* Keywords, tags - gold accent */
+/* Keywords, tags - blue accent */
 .hljs-keyword,
 .hljs-selector-tag,
 .hljs-tag {
-  color: #f7da50;
+  color: #60a5fa;
   font-weight: bold;
 }
 
@@ -134,13 +134,13 @@ pre,
   color: #ffffff;
 }
 
-/* Numbers, literals - gold */
+/* Numbers, literals - blue */
 .hljs-number,
 .hljs-literal,
 .hljs-type,
 .hljs-params,
 .hljs-link {
-  color: #f7da50;
+  color: #60a5fa;
 }
 
 /* Functions, methods - bold white */
@@ -151,9 +151,9 @@ pre,
   font-weight: bold;
 }
 
-/* Attributes - gold */
+/* Attributes - blue */
 .hljs-attribute {
-  color: #f7da50;
+  color: #60a5fa;
 }
 
 /* Built-ins, symbols */
@@ -164,10 +164,10 @@ pre,
   color: #cccccc;
 }
 
-/* Additions - gold background */
+/* Additions - blue background */
 .hljs-addition {
   color: #000000;
-  background-color: #f7da50;
+  background-color: #60a5fa;
 }
 
 /* Deletions - muted with strikethrough feel */
@@ -180,7 +180,7 @@ pre,
 /* Selection */
 .hljs::selection,
 .hljs ::selection {
-  background-color: #f7da50;
+  background-color: #60a5fa;
   color: #000000;
 }
 
@@ -202,7 +202,7 @@ pre,
 
 /* Regexp */
 .hljs-regexp {
-  color: #f7da50;
+  color: #60a5fa;
 }
 
 /* Subst */
@@ -237,7 +237,7 @@ pre,
 .dark .hljs-link,
 .dark .hljs-attribute,
 .dark .hljs-regexp {
-  color: #8c6d00;
+  color: #2563eb;
 }
 
 .dark .hljs-string,

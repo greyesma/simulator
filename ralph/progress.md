@@ -35,3 +35,46 @@
 ### Gotchas discovered
 - Next.js build runs lint as part of the process, so pre-existing lint errors block the build
 - The `@react-email/render` module warning is a known issue with resend package but doesn't block compilation
+
+## Issue #112: DS-002: Configure blue theme CSS variables
+
+### What was implemented
+- Updated `:root` CSS variables with the new blue theme color palette
+- Updated `.dark` CSS variables for dark mode with blue-slate tones
+- Replaced gold accent (#f7da50) with blue (#60a5fa) in syntax highlighting
+- Updated all gold-related comments to reference blue instead
+
+### CSS Variable Changes
+
+**Light mode (:root):**
+- `--primary`: `217 91% 54%` (#237CF1 blue)
+- `--secondary`: `210 40% 96.1%` (#f1f5f9)
+- `--accent`: `199 89% 94%` (sky-100)
+- `--muted`: `210 40% 96.1%` (slate tones)
+- `--muted-foreground`: `215.4 16.3% 46.9%`
+- `--foreground`: `222.2 84% 4.9%`
+- `--border/input`: `214.3 31.8% 91.4%`
+- `--ring`: `217 91% 54%` (matches primary)
+
+**Dark mode (.dark):**
+- `--background`: `222.2 84% 4.9%`
+- `--foreground`: `210 40% 98%`
+- `--secondary/muted/accent/border/input`: `217.2 32.6% 17.5%`
+- `--muted-foreground`: `215 20.2% 65.1%`
+
+**Syntax highlighting:**
+- Light mode: #60a5fa (blue-400) replaces #f7da50 (gold)
+- Dark mode: #2563eb (blue-600) replaces #8c6d00 (dark gold)
+
+### Files changed
+- `src/app/globals.css` (modified) - All CSS variable updates
+
+### Learnings for future iterations
+1. The issue specified exact HSL values to use - follow them precisely
+2. Gold color (#f7da50) still exists in other files (email.ts, styles/theme.css, remotion, docs) - these are intentionally NOT migrated yet as components will adopt the new theme gradually
+3. Syntax highlighting colors should complement the main theme (blue-400/blue-600 work well)
+4. Dark mode uses slate-blue tones (hue ~217) instead of pure grays for cohesion with the blue theme
+
+### Gotchas discovered
+- Comments in the CSS still referenced "gold" and "neo-brutalist" - updated them to reflect the new theme
+- The design system migration is incremental: globals.css provides new tokens, but components can still use old class patterns until individually migrated
