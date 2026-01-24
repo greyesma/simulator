@@ -163,3 +163,42 @@
 - **Visual verification:**
   - Screenshots captured in `screenshots/issue-130-chat-page.png` and `screenshots/issue-130-voice-call.png`
   - Note: Full voice call UI cannot be tested in headless browser due to audio requirements
+
+## Issue #131: DS-021: Migrate assessment/ components to modern design
+
+- **What was implemented:**
+  - Updated `screen-recording-guard.tsx` to use Dialog and Button components from shadcn/ui
+  - Initial consent modal now uses Dialog with rounded-xl icons in bg-primary/10 backgrounds
+  - Recording stopped modal uses destructive color scheme for warning icon
+  - Permission request modals prevent closing via onPointerDownOutside and onEscapeKeyDown
+  - All buttons replaced with Button component (size="lg" for full-width actions)
+  - Updated `voice-conversation.tsx` to match coworker-voice-call.tsx styling
+  - Main container uses rounded-xl border bg-card shadow-lg
+  - Status indicators use rounded-full with transition-colors duration-200
+  - Audio indicators have rounded-full backgrounds with state-aware colors (green/primary)
+  - Speaking indicator uses primary blue with animate-pulse
+  - Avatar uses rounded-full with bg-primary/10 and text-primary
+  - Message bubbles use rounded-lg with primary/muted backgrounds
+  - Tips section uses rounded-b-xl with bg-muted/50
+  - Headers use font-semibold instead of font-bold
+
+- **Files changed:**
+  - `src/components/assessment/screen-recording-guard.tsx` - Dialog and Button migration
+  - `src/components/assessment/voice-conversation.tsx` - Complete modern design overhaul
+  - Note: `assessment-screen-wrapper.tsx` is a thin context provider wrapper with no visual styling
+
+- **Learnings for future iterations:**
+  - Voice conversation component styling should match coworker-voice-call.tsx for consistency
+  - Dialog component from shadcn/ui handles modal overlay, animations, and accessibility
+  - Use onPointerDownOutside and onEscapeKeyDown to prevent modal dismissal for required flows
+  - DialogFooter with flex-col for full-width buttons in modals
+  - Assessment pages use E2E_TEST_MODE to bypass screen recording in headless tests
+
+- **Gotchas:**
+  - Screen recording guard modals can't be tested in E2E mode (bypassed by design)
+  - Voice conversation requires real audio support, headless browsers show "Not supported"
+  - Assessment flow redirects based on current stage, so direct page access may redirect
+
+- **Visual verification:**
+  - Screenshot captured in `screenshots/issue-131-chat-page.png`
+  - Note: Recording guard modals bypassed in E2E mode, voice UI requires audio support
