@@ -189,3 +189,5 @@ Created issues for PRD: [feature-name]
 
 Run Ralph to process: ./ralph/ralph.sh
 ```
+
+If this command has been invoked after creating a plan, then write the plan route in the issue so that we don't loos that valuable context.
