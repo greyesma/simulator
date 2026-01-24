@@ -199,3 +199,28 @@
 
 ### Gotchas discovered
 - None - this was a straightforward component installation
+
+## Issue #117: DS-007: Add shadcn Card component
+
+### What was implemented
+- Installed the shadcn Card component via `npx shadcn@latest add card --yes`
+- Updated Card to use `rounded-xl` instead of the default `rounded-lg` to match the acceptance criteria
+
+### Files changed
+- `src/components/ui/card.tsx` (new) - shadcn Card component with all sub-components
+
+### Components available
+- **Card** - Main container with `rounded-xl border bg-card text-card-foreground shadow-sm`
+- **CardHeader** - Header section with padding and vertical spacing
+- **CardTitle** - Title text with semibold weight and tight tracking
+- **CardDescription** - Muted description text
+- **CardContent** - Main content area with padding
+- **CardFooter** - Footer section with flex alignment
+
+### Learnings for future iterations
+1. **Default rounded value may not match requirements** - shadcn Card uses `rounded-lg` by default, but the design system spec required `rounded-xl`. Always verify component styling against acceptance criteria.
+2. **Card uses semantic colors** - Uses `bg-card` and `text-card-foreground` CSS variables, which can be customized separately from `--background` in globals.css if needed.
+3. **Consistent pattern with Button** - Like Button (DS-006), the Card component automatically inherits the blue theme via CSS variables configured in DS-001/DS-002.
+
+### Gotchas discovered
+- The shadcn Card default border radius (`rounded-lg`) needed to be changed to `rounded-xl` to meet the acceptance criteria. This is a minor customization that maintains the component structure.
