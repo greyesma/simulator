@@ -1,16 +1,19 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
 
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="mb-4 mt-12 flex items-center gap-3 text-2xl font-bold">
-      <div className="h-6 w-2 bg-secondary" />
+    <h2 className="mb-4 mt-12 flex items-center gap-3 text-2xl font-semibold">
+      <div className="h-6 w-1 rounded-full bg-primary" />
       {children}
     </h2>
   );
 }
 
 function SubHeading({ children }: { children: React.ReactNode }) {
-  return <h3 className="mb-2 mt-6 text-lg font-bold">{children}</h3>;
+  return <h3 className="mb-2 mt-6 text-lg font-semibold">{children}</h3>;
 }
 
 export default function PrivacyPolicyPage() {
@@ -19,15 +22,18 @@ export default function PrivacyPolicyPage() {
   return (
     <main className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="border-b-2 border-border">
+      <header className="border-b border-border">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
-          <Link href="/" className="text-xl font-bold">
+          <Link
+            href="/"
+            className="text-xl font-semibold transition-colors hover:text-primary"
+          >
             Skillvee
           </Link>
           <nav className="flex items-center gap-4">
             <Link
               href="/"
-              className="font-mono text-sm text-muted-foreground hover:text-foreground"
+              className="text-sm text-muted-foreground transition-colors hover:text-primary"
             >
               Home
             </Link>
@@ -39,21 +45,23 @@ export default function PrivacyPolicyPage() {
       <article className="mx-auto max-w-4xl px-6 py-12">
         {/* Title section */}
         <div className="mb-12">
-          <div className="mb-6 inline-block border-2 border-border px-4 py-2">
-            <span className="font-mono text-sm">LEGAL</span>
+          <div className="mb-6 inline-block rounded-full bg-primary/10 px-4 py-2">
+            <span className="text-sm font-medium text-primary">Legal</span>
           </div>
-          <h1 className="mb-4 text-5xl font-bold">Privacy Policy</h1>
+          <h1 className="mb-4 text-5xl font-semibold">Privacy Policy</h1>
           <p className="text-muted-foreground">Last updated: {lastUpdated}</p>
         </div>
 
         {/* Introduction */}
-        <div className="mb-8 border-l-4 border-secondary pl-6">
-          <p className="text-lg">
-            At Skillvee, we take your privacy seriously. This Privacy Policy
-            explains how we collect, use, disclose, and safeguard your
-            information when you use our developer assessment platform.
-          </p>
-        </div>
+        <Card className="mb-8 border-l-4 border-l-primary">
+          <CardContent className="py-6">
+            <p className="text-lg">
+              At Skillvee, we take your privacy seriously. This Privacy Policy
+              explains how we collect, use, disclose, and safeguard your
+              information when you use our developer assessment platform.
+            </p>
+          </CardContent>
+        </Card>
 
         <SectionHeading>1. Information We Collect</SectionHeading>
 
@@ -207,20 +215,19 @@ export default function PrivacyPolicyPage() {
           </li>
         </ul>
 
-        <div className="bg-accent/10 my-8 border-2 border-border p-6">
-          <h3 className="mb-2 font-bold">Requesting Data Deletion</h3>
-          <p className="mb-4 text-muted-foreground">
-            You can request deletion of your data at any time from your profile
-            settings. We will process your request within 30 days and confirm
-            deletion via email.
-          </p>
-          <Link
-            href="/profile"
-            className="inline-block border-2 border-foreground bg-foreground px-4 py-2 font-semibold text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground"
-          >
-            Go to Profile Settings
-          </Link>
-        </div>
+        <Card className="my-8 bg-primary/5">
+          <CardContent className="py-6">
+            <h3 className="mb-2 font-semibold">Requesting Data Deletion</h3>
+            <p className="mb-4 text-muted-foreground">
+              You can request deletion of your data at any time from your
+              profile settings. We will process your request within 30 days and
+              confirm deletion via email.
+            </p>
+            <Button asChild>
+              <Link href="/profile">Go to Profile Settings</Link>
+            </Button>
+          </CardContent>
+        </Card>
 
         <SectionHeading>7. Third-Party Services</SectionHeading>
 
@@ -278,24 +285,26 @@ export default function PrivacyPolicyPage() {
           If you have questions about this Privacy Policy or your data, please
           contact us at:
         </p>
-        <div className="bg-accent/10 border-2 border-border p-6">
-          <p className="font-mono">Email: privacy@skillvee.com</p>
-        </div>
+        <Card className="bg-muted/50">
+          <CardContent className="py-6">
+            <p className="font-mono text-sm">Email: privacy@skillvee.com</p>
+          </CardContent>
+        </Card>
 
         {/* Back to home */}
-        <div className="mt-12 border-t-2 border-border pt-8">
-          <Link
-            href="/"
-            className="flex items-center gap-2 font-mono text-sm text-muted-foreground hover:text-foreground"
-          >
-            <span>←</span> Back to Home
-          </Link>
+        <div className="mt-12 border-t border-border pt-8">
+          <Button asChild variant="ghost" className="gap-2">
+            <Link href="/">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Home
+            </Link>
+          </Button>
         </div>
       </article>
 
       {/* Footer */}
-      <footer className="border-t-2 border-border">
-        <div className="mx-auto max-w-4xl px-6 py-8 text-center font-mono text-sm text-muted-foreground">
+      <footer className="border-t border-border">
+        <div className="mx-auto max-w-4xl px-6 py-8 text-center text-sm text-muted-foreground">
           © 2025 Skillvee. All rights reserved.
         </div>
       </footer>

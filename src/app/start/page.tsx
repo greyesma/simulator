@@ -1,7 +1,11 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
 import { AssessmentStatus } from "@prisma/client";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { FileQuestion } from "lucide-react";
 
 /**
  * Smart redirect page that handles assessment start flow:
@@ -117,30 +121,23 @@ function getRedirectUrlForStatus(
 function NoScenariosMessage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
-      <div className="max-w-md text-center">
-        <div className="border-2 border-border p-8">
-          <div className="mb-6">
-            <div
-              className="mx-auto h-16 w-16 bg-secondary"
-              style={{
-                clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
-              }}
-            />
+      <Card className="max-w-md shadow-md">
+        <CardContent className="p-8 text-center">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+            <FileQuestion className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="mb-4 text-2xl font-bold">No Assessments Available</h1>
+          <h1 className="mb-4 text-2xl font-semibold">
+            No Assessments Available
+          </h1>
           <p className="mb-6 text-muted-foreground">
             We&apos;re working on preparing new assessment scenarios. Please
             check back soon.
           </p>
-          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-          <a
-            href="/"
-            className="inline-block border-2 border-foreground bg-foreground px-6 py-3 font-semibold text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground"
-          >
-            Back to Home
-          </a>
-        </div>
-      </div>
+          <Button asChild size="lg" className="w-full">
+            <Link href="/">Back to Home</Link>
+          </Button>
+        </CardContent>
+      </Card>
     </main>
   );
 }
