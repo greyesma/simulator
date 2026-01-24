@@ -199,6 +199,64 @@ it("handles button click", async () => {
 });
 ```
 
+## E2E Testing with agent-browser
+
+For visual testing and E2E tests of assessment pages, use the seeded test data.
+
+### Setup
+
+```bash
+# 1. Seed the database (creates test users + fixed assessment IDs)
+export $(grep -v '^#' .env.local | xargs) && npx tsx prisma/seed.ts
+
+# 2. Start dev server with E2E mode (bypasses screen recording)
+E2E_TEST_MODE=true NEXT_PUBLIC_E2E_TEST_MODE=true npm run dev
+```
+
+### Test Users
+
+| Role  | Email            | Password        |
+| ----- | ---------------- | --------------- |
+| Admin | admin@test.com   | testpassword123 |
+| User  | user@test.com    | testpassword123 |
+
+### Fixed Test Assessment IDs
+
+These IDs are created by the seed script and can be used for predictable E2E testing:
+
+| ID                     | Status  | Owner          | URL                                        |
+| ---------------------- | ------- | -------------- | ------------------------------------------ |
+| `test-assessment-chat` | WORKING | user@test.com  | `/assessment/test-assessment-chat/chat`    |
+
+### Visual Testing Workflow
+
+```bash
+# Login and take screenshot of chat page
+agent-browser open "http://localhost:3000/sign-in" --session "e2e"
+agent-browser fill "#email" "user@test.com" --session "e2e"
+agent-browser fill "#password" "testpassword123" --session "e2e"
+agent-browser click "button[type='submit']" --session "e2e"
+agent-browser wait 3000 --session "e2e"
+
+# Navigate to chat page (fixed assessment ID)
+agent-browser open "http://localhost:3000/assessment/test-assessment-chat/chat" --session "e2e"
+agent-browser wait 2000 --session "e2e"
+agent-browser screenshot ./screenshots/chat-page.png --session "e2e"
+```
+
+### Adding New Test Assessments
+
+To add more fixed test assessments for different pages/statuses, update `prisma/seed.ts`:
+
+```typescript
+const TEST_ASSESSMENT_IDS = {
+  chat: "test-assessment-chat",        // Status: WORKING
+  defense: "test-assessment-defense",  // Status: FINAL_DEFENSE (add this)
+};
+```
+
+Then create the assessment with `prisma.assessment.upsert()` using the fixed ID.
+
 ## Gotchas
 
 1. **JSX in test files**: Use `.tsx` extension, not `.ts`
@@ -206,3 +264,5 @@ it("handles button click", async () => {
 3. **Async mocks**: Always `await` async operations
 4. **Mock cleanup**: Reset mocks in `afterEach` if they hold state
 5. **Provider wrapping**: Use `renderWithProviders`, not bare `render`
+6. **E2E env vars**: Must export env vars before running seed script
+7. **E2E test mode**: Assessment pages require `E2E_TEST_MODE=true` to bypass screen recording
