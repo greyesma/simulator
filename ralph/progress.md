@@ -375,3 +375,41 @@ The existing `CoworkerAvatar` component uses DiceBear identicon URLs. The shadcn
 
 ### Gotchas discovered
 - The issue specified "TabsTrigger uses blue underline/highlight when active" but the default shadcn implementation uses `data-[state=active]:text-foreground` (black text) and `data-[state=active]:bg-background` (white background). Changed to `text-primary` and added `border-b-2 border-primary` for the blue underline effect.
+
+## Issue #146: BUG: Fix voice call API key error - token extraction from wrong response level
+
+### What was implemented
+- Fixed token extraction in `src/components/chat/floating-call-bar.tsx` line 260
+- Fixed token extraction in `src/hooks/voice/use-voice-base.ts` lines 311-312
+
+### Root cause
+Token endpoints (kickoff, call, defense) return responses wrapped in the standard API format using the `success()` helper from `@/lib/api/response.ts`:
+```json
+{ "success": true, "data": { "token": "...", "assessmentId": "..." } }
+```
+
+But client code was extracting `token` from the **top level** instead of `response.data`:
+```typescript
+// Before (broken):
+const { token } = await tokenResponse.json();  // token is undefined!
+
+// After (fixed):
+const response = await tokenResponse.json();
+const { token } = response.data;
+```
+
+This resulted in `undefined` being passed to `new GoogleGenAI({ apiKey: undefined })`, causing the "API Key must be set when running in a browser" error.
+
+### Files changed
+- `src/components/chat/floating-call-bar.tsx` (modified) - Extract token from `response.data` instead of top level
+- `src/hooks/voice/use-voice-base.ts` (modified) - Extract tokenData from `response.data` instead of top level
+
+### Learnings for future iterations
+1. **Consistency matters** - The API uses a standard `{ success: true, data: {...} }` wrapper (via `@/lib/api/response.ts`), but client code wasn't consistently unwrapping it
+2. **Error messages can be misleading** - "API Key must be set when running in a browser" suggests a configuration issue, but the actual cause was `undefined` being passed from incorrect response parsing
+3. **Check the actual API response format** - When debugging API integration issues, always verify the actual response structure by reading the API route handler code
+4. **Follow the data flow** - The issue description accurately traced the problem: API returns wrapped response → client extracts from wrong level → `undefined` token → SDK error
+
+### Gotchas discovered
+- The `use-voice-base.ts` hook passes `tokenData` to an `onTokenResponse` callback, so it needed to be the unwrapped data object, not just the token string
+- The existing error handling (`if (!tokenResponse.ok)`) was correctly extracting error data, but the success path was incorrectly extracting from the top level

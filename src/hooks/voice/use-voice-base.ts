@@ -308,7 +308,8 @@ export function useVoiceBase({
         throw new Error(data.error || "Failed to get token");
       }
 
-      const tokenData = await tokenResponse.json();
+      const response = await tokenResponse.json();
+      const tokenData = response.data;
 
       // Let caller extract additional data from token response
       onTokenResponse?.(tokenData);

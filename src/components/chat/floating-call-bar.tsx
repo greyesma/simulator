@@ -257,7 +257,8 @@ export function FloatingCallBar({
         throw new Error(data.error || "Failed to get call token");
       }
 
-      const { token } = await tokenResponse.json();
+      const response = await tokenResponse.json();
+      const { token } = response.data;
 
       // Connect to Gemini Live
       const ai = new GoogleGenAI({
