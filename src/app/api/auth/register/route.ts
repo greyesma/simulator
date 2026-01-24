@@ -2,43 +2,16 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { db } from "@/server/db";
 import { Prisma } from "@prisma/client";
-
-interface RegisterRequest {
-  email: string;
-  password: string;
-  name?: string;
-}
+import { validateRequest } from "@/lib/api";
+import { RegisterRequestSchema } from "@/lib/schemas";
 
 export async function POST(request: Request) {
+  // Validate request body using Zod schema
+  const validated = await validateRequest(request, RegisterRequestSchema);
+  if ("error" in validated) return validated.error;
+  const { email, password, name } = validated.data;
+
   try {
-    const body = (await request.json()) as RegisterRequest;
-    const { email, password, name } = body;
-
-    // Validate required fields
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: "Email and password are required" },
-        { status: 400 }
-      );
-    }
-
-    // Validate password length
-    if (password.length < 8) {
-      return NextResponse.json(
-        { error: "Password must be at least 8 characters" },
-        { status: 400 }
-      );
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: "Invalid email format" },
-        { status: 400 }
-      );
-    }
-
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 

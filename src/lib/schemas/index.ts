@@ -14,4 +14,10 @@ export {
   type KickoffTokenRequest,
   DefenseTokenRequestSchema,
   type DefenseTokenRequest,
+  RegisterRequestSchema,
+  type RegisterRequest,
+  ScenarioCreateSchema,
+  type ScenarioCreate,
+  ScenarioUpdateSchema,
+  type ScenarioUpdate,
 } from "./api";

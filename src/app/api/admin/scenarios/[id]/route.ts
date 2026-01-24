@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
+import { validateRequest } from "@/lib/api";
+import { ScenarioUpdateSchema } from "@/lib/schemas";
 
 interface SessionUser {
   id: string;
@@ -76,33 +78,17 @@ export async function PUT(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Scenario not found" }, { status: 404 });
   }
 
-  const body = await request.json();
-  const {
-    name,
-    companyName,
-    companyDescription,
-    taskDescription,
-    repoUrl,
-    techStack,
-    isPublished,
-  } = body;
-
-  // Validate techStack if provided
-  if (techStack !== undefined && !Array.isArray(techStack)) {
-    return NextResponse.json(
-      { error: "techStack must be an array" },
-      { status: 400 }
-    );
-  }
+  // Validate request body using Zod schema
+  const validated = await validateRequest(request, ScenarioUpdateSchema);
+  if ("error" in validated) return validated.error;
+  const { name, companyName, companyDescription, taskDescription, repoUrl, techStack, isPublished } = validated.data;
 
   // Build update data with only provided fields
   const updateData: Record<string, unknown> = {};
   if (name !== undefined) updateData.name = name;
   if (companyName !== undefined) updateData.companyName = companyName;
-  if (companyDescription !== undefined)
-    updateData.companyDescription = companyDescription;
-  if (taskDescription !== undefined)
-    updateData.taskDescription = taskDescription;
+  if (companyDescription !== undefined) updateData.companyDescription = companyDescription;
+  if (taskDescription !== undefined) updateData.taskDescription = taskDescription;
   if (repoUrl !== undefined) updateData.repoUrl = repoUrl;
   if (techStack !== undefined) updateData.techStack = techStack;
   if (isPublished !== undefined) updateData.isPublished = isPublished;

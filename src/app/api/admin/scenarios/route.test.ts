@@ -203,7 +203,9 @@ describe("POST /api/admin/scenarios", () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toBe("Missing required fields");
+    expect(data.error).toBe("Validation failed");
+    expect(data.code).toBe("VALIDATION_ERROR");
+    expect(data.details).toBeDefined();
   });
 
   it("creates scenario with isPublished defaulting to false", async () => {
@@ -268,6 +270,10 @@ describe("POST /api/admin/scenarios", () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toBe("techStack must be an array");
+    expect(data.error).toBe("Validation failed");
+    expect(data.code).toBe("VALIDATION_ERROR");
+    expect(data.details).toContainEqual(
+      expect.objectContaining({ path: "techStack" })
+    );
   });
 });

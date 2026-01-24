@@ -67,7 +67,11 @@ describe("POST /api/auth/register", () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toBe("Email and password are required");
+    expect(data.error).toBe("Validation failed");
+    expect(data.code).toBe("VALIDATION_ERROR");
+    expect(data.details).toContainEqual(
+      expect.objectContaining({ path: "email" })
+    );
   });
 
   it("rejects registration with missing password", async () => {
@@ -83,7 +87,11 @@ describe("POST /api/auth/register", () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toBe("Email and password are required");
+    expect(data.error).toBe("Validation failed");
+    expect(data.code).toBe("VALIDATION_ERROR");
+    expect(data.details).toContainEqual(
+      expect.objectContaining({ path: "password" })
+    );
   });
 
   it("rejects registration with password less than 8 characters", async () => {
@@ -100,7 +108,14 @@ describe("POST /api/auth/register", () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toBe("Password must be at least 8 characters");
+    expect(data.error).toBe("Validation failed");
+    expect(data.code).toBe("VALIDATION_ERROR");
+    expect(data.details).toContainEqual(
+      expect.objectContaining({
+        path: "password",
+        message: "Password must be at least 8 characters",
+      })
+    );
   });
 
   it("rejects registration with invalid email format", async () => {
@@ -117,7 +132,11 @@ describe("POST /api/auth/register", () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toBe("Invalid email format");
+    expect(data.error).toBe("Validation failed");
+    expect(data.code).toBe("VALIDATION_ERROR");
+    expect(data.details).toContainEqual(
+      expect.objectContaining({ path: "email", message: "Invalid email format" })
+    );
   });
 
   // ============================================================================

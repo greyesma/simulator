@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { success, error } from "@/lib/api";
+import { success, error, validateRequest } from "@/lib/api";
+import { ScenarioCreateSchema } from "@/lib/schemas";
 
 interface SessionUser {
   id: string;
@@ -53,32 +54,10 @@ export async function POST(request: Request) {
     return error("Admin access required", 403);
   }
 
-  const body = await request.json();
-  const {
-    name,
-    companyName,
-    companyDescription,
-    taskDescription,
-    repoUrl,
-    techStack,
-    isPublished,
-  } = body;
-
-  // Validate required fields
-  if (
-    !name ||
-    !companyName ||
-    !companyDescription ||
-    !taskDescription ||
-    !repoUrl
-  ) {
-    return error("Missing required fields", 400);
-  }
-
-  // Validate techStack is an array
-  if (techStack !== undefined && !Array.isArray(techStack)) {
-    return error("techStack must be an array", 400);
-  }
+  // Validate request body using Zod schema
+  const validated = await validateRequest(request, ScenarioCreateSchema);
+  if ("error" in validated) return validated.error;
+  const { name, companyName, companyDescription, taskDescription, repoUrl, techStack, isPublished } = validated.data;
 
   const scenario = await db.scenario.create({
     data: {
@@ -87,8 +66,8 @@ export async function POST(request: Request) {
       companyDescription,
       taskDescription,
       repoUrl,
-      techStack: techStack || [],
-      isPublished: isPublished ?? false,
+      techStack,
+      isPublished,
     },
   });
 

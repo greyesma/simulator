@@ -275,7 +275,11 @@ describe("PUT /api/admin/scenarios/[id]", () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toBe("techStack must be an array");
+    expect(data.error).toBe("Validation failed");
+    expect(data.code).toBe("VALIDATION_ERROR");
+    expect(data.details).toContainEqual(
+      expect.objectContaining({ path: "techStack" })
+    );
   });
 });
 

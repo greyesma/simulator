@@ -958,3 +958,58 @@
   - [x] Non-admin requests to admin routes return 403
   - [x] Existing API route tests pass
   - [x] Typecheck passes
+
+## Issue #161: SEC-002: Standardize request validation with Zod across all API routes
+
+- **What was implemented:**
+  - Created `RegisterRequestSchema` for `/api/auth/register` route with email, password, and optional name validation
+  - Created `ScenarioCreateSchema` for `/api/admin/scenarios` POST route with required fields: name, companyName, companyDescription, taskDescription, repoUrl; optional: techStack (array), isPublished (boolean)
+  - Created `ScenarioUpdateSchema` for `/api/admin/scenarios/[id]` PUT route with all fields optional (partial of create)
+  - Migrated `/api/auth/register/route.ts` from manual validation to `validateRequest()` with Zod schema
+  - Migrated `/api/admin/scenarios/route.ts` POST from manual validation to `validateRequest()` with Zod schema
+  - Migrated `/api/admin/scenarios/[id]/route.ts` PUT from manual validation to `validateRequest()` with Zod schema
+  - Updated test files to expect new validation response format (`{ error: "Validation failed", code: "VALIDATION_ERROR", details: [...] }`)
+
+- **Files changed:**
+  - `src/lib/schemas/api.ts` - Added RegisterRequestSchema, ScenarioCreateSchema, ScenarioUpdateSchema
+  - `src/lib/schemas/index.ts` - Exported new schemas and types
+  - `src/app/api/auth/register/route.ts` - Replaced manual validation with validateRequest()
+  - `src/app/api/admin/scenarios/route.ts` - Replaced manual validation with validateRequest() for POST
+  - `src/app/api/admin/scenarios/[id]/route.ts` - Replaced manual validation with validateRequest() for PUT
+  - `src/app/api/auth/register/route.test.ts` - Updated to expect Zod validation response format
+  - `src/app/api/admin/scenarios/route.test.ts` - Updated to expect Zod validation response format
+  - `src/app/api/admin/scenarios/[id]/route.test.ts` - Updated to expect Zod validation response format
+
+- **Pattern used:**
+  ```typescript
+  // Import schema and validateRequest
+  import { validateRequest } from "@/lib/api";
+  import { RegisterRequestSchema } from "@/lib/schemas";
+
+  // Use in route handler
+  const validated = await validateRequest(request, RegisterRequestSchema);
+  if ("error" in validated) return validated.error;
+  const { email, password, name } = validated.data;
+  ```
+
+- **Learnings for future iterations:**
+  - The `validateRequest()` helper handles JSON parsing errors and returns proper 400 responses
+  - Zod schemas with `.default()` allow optional fields with defaults (e.g., `techStack: z.array(z.string()).optional().default([])`)
+  - The `validationError()` function returns `{ success: false, error: "Validation failed", code: "VALIDATION_ERROR", details: [...] }` format
+  - Tests need to be updated when migrating to Zod validation - error messages change from custom strings to standardized "Validation failed"
+  - Schema types can be exported via `z.infer<typeof Schema>` pattern
+
+- **Gotchas:**
+  - Zod's default error message for missing required string fields is "Required", not the custom message
+  - When updating tests, check for `data.error === "Validation failed"` and `data.code === "VALIDATION_ERROR"` instead of specific error messages
+  - The `details` array contains objects with `{ path: "fieldName", message: "error message" }` format
+  - Use `z.string().min(1, "message")` to provide custom "required" messages, or use `z.string({ required_error: "message" })` for Zod's required_error
+
+- **Acceptance criteria verified:**
+  - [x] Create schemas file at `src/lib/schemas/api.ts` with RegisterRequestSchema, ScenarioCreateSchema, ScenarioUpdateSchema
+  - [x] Migrate `/api/auth/register/route.ts` to use `validateRequest()` with schema
+  - [x] Migrate `/api/admin/scenarios/route.ts` POST to use `validateRequest()` with schema
+  - [x] Migrate `/api/admin/scenarios/[id]/route.ts` PUT to use `validateRequest()` with schema
+  - [x] Validation errors return 400 with descriptive messages
+  - [x] Tests pass
+  - [x] Typecheck passes
