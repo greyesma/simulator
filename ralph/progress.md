@@ -108,3 +108,23 @@
 ### Gotchas discovered
 - The neo-brutalist 0px radius overrides mentioned in the issue were from an older version of the codebase that was replaced before DS-001 was implemented
 - Issues in a dependency chain may have overlapping scope - worth checking if the work was already done upstream
+
+## Issue #114: DS-004: Add animation utilities and keyframes
+
+### What was implemented
+- Added CSS keyframes in `globals.css`: fadeIn, slideUp, slideDown, scaleIn, accordion-down, accordion-up
+- Added corresponding Tailwind animation utilities in `tailwind.config.ts`: animate-fade-in, animate-slide-up, animate-slide-down, animate-scale-in, animate-accordion-down, animate-accordion-up
+- Replaced `transition-none` with `transition-colors` in `markdown.tsx` link component
+
+### Files changed
+- `src/app/globals.css` (modified) - Added keyframes section at end of file
+- `tailwind.config.ts` (modified) - Added keyframes and animation config in theme.extend
+- `src/components/shared/markdown.tsx` (modified) - Changed `transition-none` to `transition-colors`
+
+### Learnings for future iterations
+1. **Issue said globals.css has transition:none overrides** - it didn't. The actual `transition-none` was in a component file (`markdown.tsx`), not in globals.css. Always grep the codebase to find actual occurrences.
+2. **Keyframes need to be defined in both CSS and Tailwind** - The CSS keyframes provide the animation definition, while Tailwind config maps them to utility classes like `animate-fade-in`.
+3. **Accordion animations use Radix UI CSS variables** - `var(--radix-accordion-content-height)` is set by Radix components at runtime, enabling dynamic height animations.
+
+### Gotchas discovered
+- The issue description mentioned "Remove `transition: none` overrides from buttons/links in globals.css" but the actual override was in markdown.tsx using the Tailwind class `transition-none`, not in globals.css
