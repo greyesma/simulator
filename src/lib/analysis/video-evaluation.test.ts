@@ -13,7 +13,8 @@ vi.mock("@/lib/ai/gemini", () => ({
   },
 }));
 
-// Mock database
+// Mock database with $transaction support
+const mockTransaction = vi.fn();
 vi.mock("@/server/db", () => ({
   db: {
     videoAssessment: {
@@ -34,6 +35,7 @@ vi.mock("@/server/db", () => ({
       create: vi.fn(),
       update: vi.fn(),
     },
+    $transaction: (fn: (tx: unknown) => Promise<unknown>) => mockTransaction(fn),
   },
 }));
 
@@ -199,6 +201,21 @@ describe("evaluateVideo", () => {
     });
     mockVideoAssessmentApiCallUpdate.mockResolvedValue({
       id: "test-api-call-id",
+    });
+    // Mock transaction to execute the callback with transaction-capable db client
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        dimensionScore: {
+          upsert: mockDimensionScoreUpsert,
+        },
+        videoAssessmentSummary: {
+          upsert: mockVideoAssessmentSummaryUpsert,
+        },
+        videoAssessment: {
+          update: mockVideoAssessmentUpdate,
+        },
+      };
+      return fn(tx);
     });
   });
 
@@ -578,6 +595,166 @@ describe("evaluateVideo", () => {
     expect(timestamps).toContain("1:23:45");
     expect(timestamps).not.toContain("invalid");
     expect(timestamps).not.toContain("not-a-time");
+  });
+
+  // ============================================================================
+  // Transaction Tests (DI-002)
+  // ============================================================================
+
+  it("should wrap dimension score upserts in a transaction for atomicity", async () => {
+    mockGenerateContent.mockResolvedValue({
+      text: JSON.stringify(mockEvaluationResponse),
+    });
+
+    await evaluateVideo({
+      assessmentId: "test-assessment-id",
+      videoUrl: "https://storage.example.com/video.mp4",
+    });
+
+    // Verify transaction was called
+    expect(mockTransaction).toHaveBeenCalledTimes(1);
+    expect(mockTransaction).toHaveBeenCalledWith(expect.any(Function));
+  });
+
+  it("should save no scores if transaction fails mid-upsert (rollback)", async () => {
+    mockGenerateContent.mockResolvedValue({
+      text: JSON.stringify(mockEvaluationResponse),
+    });
+
+    // Track which dimensions were attempted
+    const attemptedDimensions: string[] = [];
+    let upsertCallCount = 0;
+
+    // Transaction mock that fails on the 5th dimension score upsert
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        dimensionScore: {
+          upsert: vi.fn().mockImplementation(async (args: { where: { assessmentId_dimension: { dimension: string } } }) => {
+            upsertCallCount++;
+            attemptedDimensions.push(args.where.assessmentId_dimension.dimension);
+            if (upsertCallCount === 5) {
+              throw new Error("Database error on 5th upsert");
+            }
+            return { id: `score-${upsertCallCount}` };
+          }),
+        },
+        videoAssessmentSummary: {
+          upsert: vi.fn().mockResolvedValue({ id: "summary-id" }),
+        },
+        videoAssessment: {
+          update: vi.fn().mockResolvedValue({ id: "test-assessment-id" }),
+        },
+      };
+      return fn(tx);
+    });
+
+    const result = await evaluateVideo({
+      assessmentId: "test-assessment-id",
+      videoUrl: "https://storage.example.com/video.mp4",
+    });
+
+    // Should fail
+    expect(result.success).toBe(false);
+    expect(result.error).toBe("Database error on 5th upsert");
+
+    // Transaction should have been attempted
+    expect(mockTransaction).toHaveBeenCalledTimes(1);
+
+    // Some dimensions were attempted before failure
+    expect(attemptedDimensions.length).toBe(5);
+  });
+
+  it("should update assessment status within the same transaction", async () => {
+    mockGenerateContent.mockResolvedValue({
+      text: JSON.stringify(mockEvaluationResponse),
+    });
+
+    const txOperations: string[] = [];
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        dimensionScore: {
+          upsert: vi.fn().mockImplementation(async () => {
+            txOperations.push("dimensionScore.upsert");
+            return { id: "score-id" };
+          }),
+        },
+        videoAssessmentSummary: {
+          upsert: vi.fn().mockImplementation(async () => {
+            txOperations.push("videoAssessmentSummary.upsert");
+            return { id: "summary-id" };
+          }),
+        },
+        videoAssessment: {
+          update: vi.fn().mockImplementation(async () => {
+            txOperations.push("videoAssessment.update");
+            return { id: "test-assessment-id" };
+          }),
+        },
+      };
+      return fn(tx);
+    });
+
+    await evaluateVideo({
+      assessmentId: "test-assessment-id",
+      videoUrl: "https://storage.example.com/video.mp4",
+    });
+
+    // Verify all operations happened within the transaction
+    expect(txOperations).toContain("dimensionScore.upsert");
+    expect(txOperations).toContain("videoAssessmentSummary.upsert");
+    expect(txOperations).toContain("videoAssessment.update");
+
+    // Status update should be the last operation in the transaction
+    const lastOperation = txOperations[txOperations.length - 1];
+    expect(lastOperation).toBe("videoAssessment.update");
+  });
+
+  it("should allow retry after failed evaluation without duplicate scores", async () => {
+    // First attempt fails mid-transaction
+    mockGenerateContent.mockResolvedValue({
+      text: JSON.stringify(mockEvaluationResponse),
+    });
+
+    let attemptCount = 0;
+    mockTransaction.mockImplementation(async (fn) => {
+      attemptCount++;
+      if (attemptCount === 1) {
+        throw new Error("First attempt failed");
+      }
+      // Second attempt succeeds
+      const tx = {
+        dimensionScore: {
+          upsert: mockDimensionScoreUpsert,
+        },
+        videoAssessmentSummary: {
+          upsert: mockVideoAssessmentSummaryUpsert,
+        },
+        videoAssessment: {
+          update: mockVideoAssessmentUpdate,
+        },
+      };
+      return fn(tx);
+    });
+
+    // First attempt
+    const result1 = await evaluateVideo({
+      assessmentId: "test-assessment-id",
+      videoUrl: "https://storage.example.com/video.mp4",
+    });
+    expect(result1.success).toBe(false);
+
+    // Reset upsert mock to track second attempt
+    mockDimensionScoreUpsert.mockClear();
+
+    // Second attempt
+    const result2 = await evaluateVideo({
+      assessmentId: "test-assessment-id",
+      videoUrl: "https://storage.example.com/video.mp4",
+    });
+    expect(result2.success).toBe(true);
+
+    // Should have called upsert for all 7 dimensions (LEADERSHIP is null)
+    expect(mockDimensionScoreUpsert).toHaveBeenCalledTimes(7);
   });
 
   // ============================================================================

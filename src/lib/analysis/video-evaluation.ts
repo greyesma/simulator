@@ -260,66 +260,80 @@ export async function evaluateVideo(
       parsed_dimension_count: dimensionCount,
     });
 
-    // Store dimension scores
+    // Store dimension scores, summary, and update status atomically
     const dimensionScores = new Map<AssessmentDimension, number | null>();
 
+    // Build dimension scores map first (no DB operations yet)
     for (const [dimensionName, scoreData] of Object.entries(
       evaluation.dimension_scores
     )) {
       const dimension = mapDimensionToEnum(
         dimensionName as AssessmentDimensionType
       );
-      const score = scoreData.score;
-      dimensionScores.set(dimension, score);
-
-      // Only create score record if we have a score (not null)
-      if (score !== null) {
-        await db.dimensionScore.upsert({
-          where: {
-            assessmentId_dimension: {
-              assessmentId,
-              dimension,
-            },
-          },
-          create: {
-            assessmentId,
-            dimension,
-            score,
-            observableBehaviors: scoreData.observable_behaviors,
-            timestamps: formatTimestamps(scoreData.timestamps),
-            trainableGap: scoreData.trainable_gap,
-          },
-          update: {
-            score,
-            observableBehaviors: scoreData.observable_behaviors,
-            timestamps: formatTimestamps(scoreData.timestamps),
-            trainableGap: scoreData.trainable_gap,
-          },
-        });
-      }
+      dimensionScores.set(dimension, scoreData.score);
     }
 
-    // Store assessment summary with raw AI response
-    await db.videoAssessmentSummary.upsert({
-      where: { assessmentId },
-      create: {
-        assessmentId,
-        overallSummary: evaluation.overall_summary,
-        rawAiResponse: evaluation as unknown as Prisma.InputJsonValue,
-      },
-      update: {
-        overallSummary: evaluation.overall_summary,
-        rawAiResponse: evaluation as unknown as Prisma.InputJsonValue,
-      },
-    });
+    // Wrap all database writes in a transaction for atomicity
+    // This ensures either all scores are saved or none are (no partial scores)
+    await db.$transaction(async (tx) => {
+      // Upsert dimension scores
+      for (const [dimensionName, scoreData] of Object.entries(
+        evaluation.dimension_scores
+      )) {
+        const dimension = mapDimensionToEnum(
+          dimensionName as AssessmentDimensionType
+        );
+        const score = scoreData.score;
 
-    // Update assessment status to COMPLETED
-    await db.videoAssessment.update({
-      where: { id: assessmentId },
-      data: {
-        status: VideoAssessmentStatus.COMPLETED,
-        completedAt: new Date(),
-      },
+        // Only create score record if we have a score (not null)
+        if (score !== null) {
+          await tx.dimensionScore.upsert({
+            where: {
+              assessmentId_dimension: {
+                assessmentId,
+                dimension,
+              },
+            },
+            create: {
+              assessmentId,
+              dimension,
+              score,
+              observableBehaviors: scoreData.observable_behaviors,
+              timestamps: formatTimestamps(scoreData.timestamps),
+              trainableGap: scoreData.trainable_gap,
+            },
+            update: {
+              score,
+              observableBehaviors: scoreData.observable_behaviors,
+              timestamps: formatTimestamps(scoreData.timestamps),
+              trainableGap: scoreData.trainable_gap,
+            },
+          });
+        }
+      }
+
+      // Store assessment summary with raw AI response
+      await tx.videoAssessmentSummary.upsert({
+        where: { assessmentId },
+        create: {
+          assessmentId,
+          overallSummary: evaluation.overall_summary,
+          rawAiResponse: evaluation as unknown as Prisma.InputJsonValue,
+        },
+        update: {
+          overallSummary: evaluation.overall_summary,
+          rawAiResponse: evaluation as unknown as Prisma.InputJsonValue,
+        },
+      });
+
+      // Update assessment status to COMPLETED
+      await tx.videoAssessment.update({
+        where: { id: assessmentId },
+        data: {
+          status: VideoAssessmentStatus.COMPLETED,
+          completedAt: new Date(),
+        },
+      });
     });
 
     // Log: Assessment completed successfully (event_type: completed)

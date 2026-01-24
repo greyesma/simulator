@@ -137,6 +137,10 @@ async function collectUserStorageFiles(userId: string): Promise<{
  * - User record is marked with deletedAt timestamp (preserves ID for audit)
  * - All associated data is hard deleted (assessments, recordings, files)
  *
+ * IMPORTANT: Database operations are wrapped in a transaction for atomicity.
+ * Storage files are deleted AFTER the database transaction succeeds to prevent
+ * orphaned files if DB deletion fails.
+ *
  * @param userId - The user ID to delete data for
  * @returns DeletionResult with counts of deleted items
  */
@@ -159,7 +163,70 @@ export async function deleteUserData(userId: string): Promise<DeletionResult> {
     const { resumePaths, recordingPaths, screenshotPaths } =
       await collectUserStorageFiles(userId);
 
-    // Step 2: Delete storage files from Supabase
+    // Step 2: Delete database records using Prisma transaction for atomicity
+    // Due to cascade deletes, deleting assessments will also delete:
+    // - Conversations (onDelete: Cascade)
+    // - Recordings (onDelete: Cascade) -> RecordingSegments (onDelete: Cascade)
+    // - HRInterviewAssessment (onDelete: Cascade)
+    const dbCounts = await db.$transaction(async (tx) => {
+      // Get counts for reporting (inside transaction for consistency)
+      const assessmentCount = await tx.assessment.count({
+        where: { userId },
+      });
+
+      const conversationCount = await tx.conversation.count({
+        where: { assessment: { userId } },
+      });
+
+      const recordingCount = await tx.recording.count({
+        where: { assessment: { userId } },
+      });
+
+      const segmentCount = await tx.recordingSegment.count({
+        where: { recording: { assessment: { userId } } },
+      });
+
+      const hrAssessmentCount = await tx.hRInterviewAssessment.count({
+        where: { assessment: { userId } },
+      });
+
+      // Delete all assessments (cascades to related records)
+      await tx.assessment.deleteMany({
+        where: { userId },
+      });
+
+      // Soft delete the user (set deletedAt, clear personal data)
+      await tx.user.update({
+        where: { id: userId },
+        data: {
+          deletedAt: new Date(),
+          // Clear personal data while keeping the record for audit trail
+          name: null,
+          email: null,
+          image: null,
+          password: null,
+          emailVerified: null,
+        },
+      });
+
+      return {
+        assessmentCount,
+        conversationCount,
+        recordingCount,
+        segmentCount,
+        hrAssessmentCount,
+      };
+    });
+
+    // Update result with counts from transaction
+    result.deletedItems.assessments = dbCounts.assessmentCount;
+    result.deletedItems.conversations = dbCounts.conversationCount;
+    result.deletedItems.recordings = dbCounts.recordingCount;
+    result.deletedItems.recordingSegments = dbCounts.segmentCount;
+    result.deletedItems.hrAssessments = dbCounts.hrAssessmentCount;
+
+    // Step 3: Delete storage files from Supabase AFTER successful DB transaction
+    // This ensures we don't delete files if DB operations fail
     const resumeResult = await deleteStorageFiles(
       STORAGE_BUCKETS.RESUMES,
       resumePaths
@@ -180,58 +247,6 @@ export async function deleteUserData(userId: string): Promise<DeletionResult> {
     );
     result.deletedItems.storageFiles += screenshotResult.deleted;
     result.errors.push(...screenshotResult.errors);
-
-    // Step 3: Delete database records using Prisma transactions
-    // Due to cascade deletes, deleting assessments will also delete:
-    // - Conversations (onDelete: Cascade)
-    // - Recordings (onDelete: Cascade) -> RecordingSegments (onDelete: Cascade)
-    // - HRInterviewAssessment (onDelete: Cascade)
-
-    // First, get counts for reporting
-    const assessmentCount = await db.assessment.count({
-      where: { userId },
-    });
-
-    const conversationCount = await db.conversation.count({
-      where: { assessment: { userId } },
-    });
-
-    const recordingCount = await db.recording.count({
-      where: { assessment: { userId } },
-    });
-
-    const segmentCount = await db.recordingSegment.count({
-      where: { recording: { assessment: { userId } } },
-    });
-
-    const hrAssessmentCount = await db.hRInterviewAssessment.count({
-      where: { assessment: { userId } },
-    });
-
-    // Delete all assessments (cascades to related records)
-    await db.assessment.deleteMany({
-      where: { userId },
-    });
-
-    result.deletedItems.assessments = assessmentCount;
-    result.deletedItems.conversations = conversationCount;
-    result.deletedItems.recordings = recordingCount;
-    result.deletedItems.recordingSegments = segmentCount;
-    result.deletedItems.hrAssessments = hrAssessmentCount;
-
-    // Step 4: Soft delete the user (set deletedAt, clear personal data)
-    await db.user.update({
-      where: { id: userId },
-      data: {
-        deletedAt: new Date(),
-        // Clear personal data while keeping the record for audit trail
-        name: null,
-        email: null,
-        image: null,
-        password: null,
-        emailVerified: null,
-      },
-    });
 
     result.success = true;
   } catch (error) {

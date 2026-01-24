@@ -18,6 +18,7 @@ const mockSegmentCreate = vi.fn();
 const mockSegmentUpdate = vi.fn();
 const mockSegmentUpdateMany = vi.fn();
 const mockSegmentAnalysisUpsert = vi.fn();
+const mockTransaction = vi.fn();
 
 vi.mock("@/server/db", () => ({
   db: {
@@ -39,6 +40,7 @@ vi.mock("@/server/db", () => ({
     segmentAnalysis: {
       upsert: (...args: unknown[]) => mockSegmentAnalysisUpsert(...args),
     },
+    $transaction: (fn: (tx: unknown) => Promise<unknown>) => mockTransaction(fn),
   },
 }));
 
@@ -170,11 +172,20 @@ describe("POST /api/recording/session", () => {
       userId: "user-1",
     });
     mockRecordingUpsert.mockResolvedValue({ id: "assessment-1-screen" });
-    mockSegmentUpdateMany.mockResolvedValue({ count: 0 });
-    mockSegmentFindFirst.mockResolvedValue(null);
-    mockSegmentCreate.mockResolvedValue({
-      id: "segment-1",
-      segmentIndex: 0,
+
+    // Transaction mock for start action
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        recordingSegment: {
+          updateMany: mockSegmentUpdateMany.mockResolvedValue({ count: 0 }),
+          findFirst: mockSegmentFindFirst.mockResolvedValue(null),
+          create: mockSegmentCreate.mockResolvedValue({
+            id: "segment-1",
+            segmentIndex: 0,
+          }),
+        },
+      };
+      return fn(tx);
     });
 
     const request = new NextRequest("http://localhost/api/recording/session", {
@@ -199,13 +210,22 @@ describe("POST /api/recording/session", () => {
       userId: "user-1",
     });
     mockRecordingUpsert.mockResolvedValue({ id: "assessment-1-screen" });
-    mockSegmentUpdateMany.mockResolvedValue({ count: 1 });
-    mockSegmentFindFirst.mockResolvedValue({
-      segmentIndex: 0,
-    });
-    mockSegmentCreate.mockResolvedValue({
-      id: "segment-2",
-      segmentIndex: 1,
+
+    // Transaction mock for start action with existing segment
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        recordingSegment: {
+          updateMany: mockSegmentUpdateMany.mockResolvedValue({ count: 1 }),
+          findFirst: mockSegmentFindFirst.mockResolvedValue({
+            segmentIndex: 0,
+          }),
+          create: mockSegmentCreate.mockResolvedValue({
+            id: "segment-2",
+            segmentIndex: 1,
+          }),
+        },
+      };
+      return fn(tx);
     });
 
     const request = new NextRequest("http://localhost/api/recording/session", {
@@ -382,11 +402,20 @@ describe("POST /api/recording/session", () => {
       userId: "user-1",
     });
     mockRecordingUpsert.mockResolvedValue({ id: "assessment-1-screen" });
-    mockSegmentUpdateMany.mockResolvedValue({ count: 0 });
-    mockSegmentFindFirst.mockResolvedValue(null);
-    mockSegmentCreate.mockResolvedValue({
-      id: "test-segment-1",
-      segmentIndex: 0,
+
+    // Transaction mock for test mode
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        recordingSegment: {
+          updateMany: mockSegmentUpdateMany.mockResolvedValue({ count: 0 }),
+          findFirst: mockSegmentFindFirst.mockResolvedValue(null),
+          create: mockSegmentCreate.mockResolvedValue({
+            id: "test-segment-1",
+            segmentIndex: 0,
+          }),
+        },
+      };
+      return fn(tx);
     });
 
     const request = new NextRequest("http://localhost/api/recording/session", {
@@ -412,6 +441,135 @@ describe("POST /api/recording/session", () => {
         screenshotPaths: [],
       }),
     });
+  });
+
+  // ============================================================================
+  // Transaction Tests (DI-002)
+  // ============================================================================
+
+  it("should wrap segment start operations in a transaction for atomicity", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1" },
+      expires: new Date(Date.now() + 86400000).toISOString(),
+    });
+    mockAssessmentFindFirst.mockResolvedValue({
+      id: "assessment-1",
+      userId: "user-1",
+    });
+    mockRecordingUpsert.mockResolvedValue({ id: "assessment-1-screen" });
+
+    // Transaction mock
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        recordingSegment: {
+          updateMany: mockSegmentUpdateMany.mockResolvedValue({ count: 0 }),
+          findFirst: mockSegmentFindFirst.mockResolvedValue(null),
+          create: mockSegmentCreate.mockResolvedValue({
+            id: "segment-1",
+            segmentIndex: 0,
+          }),
+        },
+      };
+      return fn(tx);
+    });
+
+    const request = new NextRequest("http://localhost/api/recording/session", {
+      method: "POST",
+      body: JSON.stringify({ assessmentId: "assessment-1", action: "start" }),
+    });
+
+    await POST(request);
+
+    // Verify transaction was called
+    expect(mockTransaction).toHaveBeenCalledTimes(1);
+    expect(mockTransaction).toHaveBeenCalledWith(expect.any(Function));
+  });
+
+  it("should rollback updateMany if segment create fails", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1" },
+      expires: new Date(Date.now() + 86400000).toISOString(),
+    });
+    mockAssessmentFindFirst.mockResolvedValue({
+      id: "assessment-1",
+      userId: "user-1",
+    });
+    mockRecordingUpsert.mockResolvedValue({ id: "assessment-1-screen" });
+
+    // Transaction mock that fails on create
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        recordingSegment: {
+          updateMany: mockSegmentUpdateMany.mockResolvedValue({ count: 1 }),
+          findFirst: mockSegmentFindFirst.mockResolvedValue({ segmentIndex: 0 }),
+          create: mockSegmentCreate.mockRejectedValue(new Error("Create failed")),
+        },
+      };
+      // This will throw, simulating transaction rollback
+      return fn(tx);
+    });
+
+    const request = new NextRequest("http://localhost/api/recording/session", {
+      method: "POST",
+      body: JSON.stringify({ assessmentId: "assessment-1", action: "start" }),
+    });
+
+    const response = await POST(request);
+    // Transaction failure results in 500 internal server error
+    expect(response.status).toBe(500);
+  });
+
+  it("should ensure segment indices are sequential with no gaps", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1" },
+      expires: new Date(Date.now() + 86400000).toISOString(),
+    });
+    mockAssessmentFindFirst.mockResolvedValue({
+      id: "assessment-1",
+      userId: "user-1",
+    });
+    mockRecordingUpsert.mockResolvedValue({ id: "assessment-1-screen" });
+
+    // Track operations within transaction
+    const operations: string[] = [];
+
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        recordingSegment: {
+          updateMany: vi.fn().mockImplementation(() => {
+            operations.push("updateMany");
+            return Promise.resolve({ count: 0 });
+          }),
+          findFirst: vi.fn().mockImplementation(() => {
+            operations.push("findFirst");
+            return Promise.resolve({ segmentIndex: 4 }); // Last segment was index 4
+          }),
+          create: vi.fn().mockImplementation((args: { data: { segmentIndex: number } }) => {
+            operations.push("create");
+            // Verify the new segment index is last + 1
+            expect(args.data.segmentIndex).toBe(5);
+            return Promise.resolve({
+              id: "segment-5",
+              segmentIndex: 5,
+            });
+          }),
+        },
+      };
+      return fn(tx);
+    });
+
+    const request = new NextRequest("http://localhost/api/recording/session", {
+      method: "POST",
+      body: JSON.stringify({ assessmentId: "assessment-1", action: "start" }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data.segmentIndex).toBe(5);
+
+    // Verify operations happened in correct order
+    expect(operations).toEqual(["updateMany", "findFirst", "create"]);
   });
 });
 

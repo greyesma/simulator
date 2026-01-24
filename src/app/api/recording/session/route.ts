@@ -139,65 +139,72 @@ export async function POST(request: NextRequest) {
 
     switch (action) {
       case "start": {
-        // Mark any existing "recording" segments as interrupted
-        await db.recordingSegment.updateMany({
-          where: {
-            recordingId,
-            status: "recording",
-          },
-          data: {
-            status: "interrupted",
-            endTime: new Date(),
-          },
-        });
+        // Wrap all segment operations in a transaction for atomicity
+        // This ensures segment indices are always sequential with no gaps
+        // and prevents race conditions between concurrent requests
+        const segmentResult = await db.$transaction(async (tx) => {
+          // Mark any existing "recording" segments as interrupted
+          await tx.recordingSegment.updateMany({
+            where: {
+              recordingId,
+              status: "recording",
+            },
+            data: {
+              status: "interrupted",
+              endTime: new Date(),
+            },
+          });
 
-        // Get the next segment index
-        const lastSegment = await db.recordingSegment.findFirst({
-          where: { recordingId },
-          orderBy: { segmentIndex: "desc" },
-        });
-        const nextIndex = (lastSegment?.segmentIndex ?? -1) + 1;
+          // Get the next segment index
+          const lastSegment = await tx.recordingSegment.findFirst({
+            where: { recordingId },
+            orderBy: { segmentIndex: "desc" },
+          });
+          const nextIndex = (lastSegment?.segmentIndex ?? -1) + 1;
 
-        // In test mode, create a completed segment with empty paths
-        // This allows downstream code that expects segments to work
-        if (testMode) {
-          const testSegment = await db.recordingSegment.create({
+          // In test mode, create a completed segment with empty paths
+          // This allows downstream code that expects segments to work
+          if (testMode) {
+            const testSegment = await tx.recordingSegment.create({
+              data: {
+                recordingId,
+                segmentIndex: nextIndex,
+                startTime: new Date(),
+                endTime: new Date(),
+                status: "completed",
+                chunkPaths: [],
+                screenshotPaths: [],
+              },
+            });
+
+            return {
+              success: true,
+              segmentId: testSegment.id,
+              segmentIndex: testSegment.segmentIndex,
+              testMode: true,
+            };
+          }
+
+          // Create a new segment
+          const newSegment = await tx.recordingSegment.create({
             data: {
               recordingId,
               segmentIndex: nextIndex,
               startTime: new Date(),
-              endTime: new Date(),
-              status: "completed",
+              status: "recording",
               chunkPaths: [],
               screenshotPaths: [],
             },
           });
 
-          return NextResponse.json({
+          return {
             success: true,
-            segmentId: testSegment.id,
-            segmentIndex: testSegment.segmentIndex,
-            testMode: true,
-          });
-        }
-
-        // Create a new segment
-        const newSegment = await db.recordingSegment.create({
-          data: {
-            recordingId,
-            segmentIndex: nextIndex,
-            startTime: new Date(),
-            status: "recording",
-            chunkPaths: [],
-            screenshotPaths: [],
-          },
+            segmentId: newSegment.id,
+            segmentIndex: newSegment.segmentIndex,
+          };
         });
 
-        return NextResponse.json({
-          success: true,
-          segmentId: newSegment.id,
-          segmentIndex: newSegment.segmentIndex,
-        });
+        return NextResponse.json(segmentResult);
       }
 
       case "addChunk": {

@@ -801,3 +801,37 @@
   - Migration drift warning from `prisma migrate dev` is expected when using Supabase (extensions are managed by Supabase)
   - Integration tests run against the actual database - use careful cleanup in afterAll
   - Test timeout should be increased (30s) for database operations
+
+## Issue #157: DI-002: Add transaction wrapping for multi-step database operations
+
+- **What was implemented:**
+  - Wrapped database operations in `db.$transaction()` for three critical files to ensure atomicity
+  - `data-deletion.ts`: All DB operations (counts, deleteMany, user update) now run in a single transaction; storage files are deleted AFTER successful transaction to prevent orphaned files
+  - `video-evaluation.ts`: Dimension score upsert loop, summary upsert, and status update wrapped in transaction to prevent partial scores on failure
+  - `recording/session/route.ts`: Segment creation (updateMany + findFirst + create) wrapped in transaction to ensure atomic segment creation with sequential indices
+
+- **Files changed:**
+  - `src/lib/core/data-deletion.ts` - Added `db.$transaction()` wrapping with storage deletion moved after transaction
+  - `src/lib/analysis/video-evaluation.ts` - Added `db.$transaction()` around dimension score loop and completion
+  - `src/app/api/recording/session/route.ts` - Added `db.$transaction()` around segment start action
+  - `src/lib/core/data-deletion.test.ts` - Updated mocks for `$transaction`, added rollback tests
+  - `src/lib/analysis/video-evaluation.test.ts` - Updated mocks for `$transaction`, added transaction atomicity tests
+  - `src/app/api/recording/session/route.test.ts` - Updated mocks for `$transaction`, added rollback and index integrity tests
+
+- **Testing patterns for transactions:**
+  - Mock `db.$transaction` by implementing it as a function that calls the callback with a mock `tx` object
+  - The mock `tx` object should have the same methods as `db` but allows tracking which operations happen within the transaction
+  - To test rollback: reject the transaction and verify downstream operations (like storage deletion) don't happen
+  - To test atomicity: track operation order within the transaction callback
+
+- **Learnings for future iterations:**
+  - Prisma's `$transaction` with an interactive callback (`async (tx) => {...}`) allows multiple dependent operations
+  - Operations inside the transaction use `tx` (not `db`) to participate in the same transaction
+  - Storage operations (Supabase) should happen AFTER successful DB transactions - if storage fails, it's recoverable (retry); if DB fails after storage delete, data is lost
+  - For test mocks, the transaction mock needs to execute the callback to test the internal behavior
+
+- **Gotchas:**
+  - When mocking `$transaction`, you must call the callback function with a mock `tx` object for the test to work
+  - The `tx` object inside the transaction has the same API as `db` but scoped to that transaction
+  - If the callback throws, Prisma automatically rolls back all operations within that transaction
+  - Tests using transaction mocks are more complex - consider tracking operation order for atomicity verification
