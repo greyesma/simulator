@@ -73,6 +73,9 @@ export function FloatingCallBar({
   const audioQueueRef = useRef<string[]>([]);
   const isPlayingRef = useRef(false);
 
+  // Prevent concurrent connection attempts
+  const isConnectingRef = useRef(false);
+
   // Determine which API endpoint to use based on call type
   const getTokenEndpoint = useCallback(() => {
     switch (callType) {
@@ -220,9 +223,14 @@ export function FloatingCallBar({
 
   // Connect to Gemini Live
   const connect = useCallback(async () => {
+    // Prevent concurrent connection attempts
+    if (isConnectingRef.current) {
+      return;
+    }
     if (callState !== "idle" && callState !== "error") {
       return;
     }
+    isConnectingRef.current = true;
 
     setError(null);
     setCallState("requesting-permission");
@@ -297,10 +305,16 @@ export function FloatingCallBar({
         },
       });
 
+      // Close any existing session before assigning new one
+      if (sessionRef.current) {
+        sessionRef.current.close();
+        sessionRef.current = null;
+      }
       sessionRef.current = session;
 
       // Initialize audio capture
       await initializeAudioCapture(stream, session);
+      isConnectingRef.current = false;
 
       // Start the conversation
       session.sendClientContent({
@@ -310,6 +324,7 @@ export function FloatingCallBar({
         turnComplete: true,
       });
     } catch (err) {
+      isConnectingRef.current = false;
       console.error("Connection error:", err);
       const errorMessage =
         err instanceof Error ? err.message : "Connection failed";

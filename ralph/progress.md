@@ -414,6 +414,40 @@ This resulted in `undefined` being passed to `new GoogleGenAI({ apiKey: undefine
 - The `use-voice-base.ts` hook passes `tokenData` to an `onTokenResponse` callback, so it needed to be the unwrapped data object, not just the token string
 - The existing error handling (`if (!tokenResponse.ok)`) was correctly extracting error data, but the success path was incorrectly extracting from the top level
 
+## Issue #147: Fix duplicate voice calls in FloatingCallBar
+
+### What was implemented
+- Added `isConnectingRef` to prevent concurrent connection attempts in `FloatingCallBar`
+- Added guard at start of `connect()` function to return early if already connecting
+- Added cleanup of existing session before creating a new one
+- Reset the connecting flag on both success and error paths
+
+### Root cause
+The `FloatingCallBar` component had an auto-connect `useEffect` with the `connect` callback as a dependency. The `connect` callback depends on 8 values including `handleServerMessage`, which changes when its dependencies change. When `connect` was recreated, the effect re-ran, and if `callState` was still `"idle"` (due to async state updates), a second call to `connect()` happened, creating two simultaneous Gemini Live sessions.
+
+### Files changed
+- `src/components/chat/floating-call-bar.tsx` (modified) - Added `isConnectingRef` and guards
+
+### Code changes
+1. Added `isConnectingRef = useRef(false)` after other refs (line 77)
+2. Added guard at start of `connect()`: check `isConnectingRef.current` and return early if true
+3. Set `isConnectingRef.current = true` before starting connection
+4. Added cleanup of existing session before `sessionRef.current = session`
+5. Reset `isConnectingRef.current = false` after successful audio capture initialization
+6. Reset `isConnectingRef.current = false` in catch block before error handling
+
+### Learnings for future iterations
+1. **useCallback dependencies can cause re-execution** - When a callback depends on other callbacks or state, changes to those dependencies recreate the callback, which can trigger useEffect hooks that depend on it
+2. **Refs for connection state** - Using a ref (`isConnectingRef`) instead of state for the "is connecting" flag is correct because:
+   - State updates are async and may not be visible immediately
+   - Refs provide synchronous, immediate updates that prevent race conditions
+3. **Clean up before replace** - When assigning a new session, always close the existing one first to prevent orphaned connections
+4. **Guard both entry and exit paths** - Reset the connecting flag in both success and error paths to ensure subsequent connection attempts can proceed
+
+### Gotchas discovered
+- The state-based guard (`callState !== "idle"`) wasn't sufficient because state updates are async - by the time the second `connect()` call checked `callState`, it might still be "idle" even though the first call had started
+- The `connect` callback was in the dependency array of the auto-connect `useEffect`, which is correct for React's rules of hooks but caused the duplicate connection issue
+
 ## Issue #122: DS-012: Create ui/index.ts barrel export
 
 ### What was implemented
