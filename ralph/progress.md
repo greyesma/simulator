@@ -551,3 +551,37 @@ import { Input } from "@/components/ui/input";
 
 ### Gotchas discovered
 - The welcome page used a local `Message` type (from its own component) with `content` field, while `ChatMessage` uses `text` field - the utility correctly uses `ChatMessage` with `text`
+
+## Issue #149: US-002: Update Chat API to generate greetings on first manager load
+
+### What was implemented
+- Updated Chat API GET endpoint to detect first manager load and generate greeting messages
+- Added import for `generateManagerGreetings` from `@/lib/chat/greeting-generator`
+- Added scenario include to assessment query for greeting context
+- Added coworker lookup to check if the coworker is a manager
+- Added greeting generation logic when: no conversation exists, coworker is manager, status is ONBOARDING or WORKING
+- Added automatic status update from ONBOARDING to WORKING when greetings are generated
+
+### Files changed
+- `src/app/api/chat/route.ts` (modified) - GET endpoint with greeting generation logic
+
+### Code changes
+1. Added import for `generateManagerGreetings` at line 21
+2. Added `include: { scenario: true }` to assessment query for greeting context
+3. Added coworker lookup to verify coworker exists and check if it's a manager
+4. Added greeting generation block after conversation lookup:
+   - Checks `!conversation && isManager(coworker.role)`
+   - Checks `assessment.status === ONBOARDING || WORKING`
+   - Generates greetings using scenario context
+   - Saves conversation to DB
+   - Updates status to WORKING if ONBOARDING
+   - Returns greeting messages
+
+### Learnings for future iterations
+1. **Reuse existing helper functions** - The `isManager()` helper was already defined in the file (line 26-28), so it was reused for the manager check
+2. **Include scenario in query** - The assessment query needed `include: { scenario: true }` to access `repoUrl`, `taskDescription`, and `companyName` for greeting generation
+3. **Status transition is one-way** - ONBOARDING → WORKING transition happens when greetings are generated; subsequent loads don't re-generate (conversation exists)
+4. **Existing chat functionality unchanged** - If conversation exists, the flow returns the existing messages as before
+
+### Gotchas discovered
+- The GET endpoint previously didn't fetch the coworker - it was only fetched in POST. Added coworker lookup with proper scenarioId check for consistency with POST handler

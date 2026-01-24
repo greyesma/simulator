@@ -18,6 +18,7 @@ import {
 import { success, error, validateRequest } from "@/lib/api";
 import { ChatRequestSchema } from "@/lib/schemas";
 import { isValidPrUrl } from "@/lib/external";
+import { generateManagerGreetings } from "@/lib/chat/greeting-generator";
 
 // Gemini Flash model for text chat
 const CHAT_MODEL = "gemini-3-flash-preview";
@@ -398,11 +399,14 @@ export async function GET(request: Request) {
     );
   }
 
-  // Verify assessment belongs to user
+  // Verify assessment belongs to user and get scenario context
   const assessment = await db.assessment.findFirst({
     where: {
       id: assessmentId,
       userId: session.user.id,
+    },
+    include: {
+      scenario: true,
     },
   });
 
@@ -410,7 +414,19 @@ export async function GET(request: Request) {
     return error("Assessment not found", 404, "NOT_FOUND");
   }
 
-  // Get conversation
+  // Get coworker to check if it's a manager
+  const coworker = await db.coworker.findFirst({
+    where: {
+      id: coworkerId,
+      scenarioId: assessment.scenarioId,
+    },
+  });
+
+  if (!coworker) {
+    return error("Coworker not found", 404, "NOT_FOUND");
+  }
+
+  // Get existing conversation
   const conversation = await db.conversation.findFirst({
     where: {
       assessmentId,
@@ -418,6 +434,45 @@ export async function GET(request: Request) {
       type: "text",
     },
   });
+
+  // If no conversation exists and this is a manager in ONBOARDING/WORKING status,
+  // generate greeting messages and save them as a new conversation
+  if (!conversation && isManager(coworker.role)) {
+    if (
+      assessment.status === AssessmentStatus.ONBOARDING ||
+      assessment.status === AssessmentStatus.WORKING
+    ) {
+      // Generate greeting messages
+      const greetingMessages = generateManagerGreetings({
+        userName: session.user.name || "there",
+        managerName: coworker.name,
+        managerRole: coworker.role,
+        companyName: assessment.scenario.companyName,
+        repoUrl: assessment.scenario.repoUrl,
+        taskDescription: assessment.scenario.taskDescription,
+      });
+
+      // Save greeting messages as a new conversation
+      await db.conversation.create({
+        data: {
+          assessmentId,
+          coworkerId,
+          type: "text",
+          transcript: greetingMessages as unknown as Prisma.InputJsonValue,
+        },
+      });
+
+      // Update assessment status to WORKING if currently ONBOARDING
+      if (assessment.status === AssessmentStatus.ONBOARDING) {
+        await db.assessment.update({
+          where: { id: assessmentId },
+          data: { status: AssessmentStatus.WORKING },
+        });
+      }
+
+      return success({ messages: greetingMessages });
+    }
+  }
 
   const messages = conversation
     ? (conversation.transcript as unknown as ChatMessage[])
