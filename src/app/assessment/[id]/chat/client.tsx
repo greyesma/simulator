@@ -49,7 +49,7 @@ export function ChatPageClient({
       ) : (
         <div className="flex flex-1 items-center justify-center">
           <div className="text-center">
-            <h2 className="mb-2 text-xl font-bold">No Coworkers Available</h2>
+            <h2 className="mb-2 text-xl font-semibold">No Coworkers Available</h2>
             <p className="text-muted-foreground">
               There are no coworkers configured for this scenario.
             </p>

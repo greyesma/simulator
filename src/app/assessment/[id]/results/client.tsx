@@ -22,6 +22,8 @@ import type {
   AssessmentReport,
   SkillScore,
 } from "@/lib/analysis";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface ResultsClientProps {
   assessmentId: string;
@@ -46,9 +48,9 @@ function SkillScoreBar({
       {segments.map((segment) => (
         <div
           key={segment}
-          className={`h-3 flex-1 ${
-            segment <= score ? "bg-secondary" : "bg-muted"
-          } border border-foreground`}
+          className={`h-3 flex-1 rounded-sm ${
+            segment <= score ? "bg-primary" : "bg-muted"
+          }`}
         />
       ))}
     </div>
@@ -76,29 +78,29 @@ function SkillCard({
   };
 
   const levelColors: Record<string, string> = {
-    exceptional: "bg-secondary text-secondary-foreground",
-    strong: "bg-green-100 text-green-800 border-green-800",
-    adequate: "bg-blue-100 text-blue-800 border-blue-800",
-    developing: "bg-yellow-100 text-yellow-800 border-yellow-800",
-    needs_improvement: "bg-red-100 text-red-800 border-red-800",
+    exceptional: "bg-primary text-primary-foreground",
+    strong: "bg-green-100 text-green-800",
+    adequate: "bg-blue-100 text-blue-800",
+    developing: "bg-yellow-100 text-yellow-800",
+    needs_improvement: "bg-red-100 text-red-800",
   };
 
   return (
-    <div className="border-2 border-foreground">
+    <Card className="overflow-hidden">
       <button
         onClick={onToggle}
-        className="flex w-full items-center justify-between p-4 hover:bg-muted"
+        className="flex w-full items-center justify-between p-4 transition-colors hover:bg-muted/50"
       >
         <div className="flex flex-1 items-center gap-4">
-          <div className="min-w-[200px] text-left font-bold">
+          <div className="min-w-[200px] text-left font-semibold">
             {categoryLabels[skill.category] || skill.category}
           </div>
           <div className="max-w-xs flex-1">
             <SkillScoreBar score={skill.score} />
           </div>
-          <div className="font-mono text-lg font-bold">{skill.score}/5</div>
+          <div className="text-lg font-semibold text-primary">{skill.score}/5</div>
           <span
-            className={`border px-2 py-1 font-mono text-xs ${levelColors[skill.level] || "bg-muted"}`}
+            className={`rounded-md px-2 py-1 text-xs font-medium ${levelColors[skill.level] || "bg-muted"}`}
           >
             {skill.level.replace("_", " ").toUpperCase()}
           </span>
@@ -111,17 +113,17 @@ function SkillCard({
       </button>
 
       {isExpanded && (
-        <div className="border-t border-border bg-muted px-4 pb-4 pt-2">
+        <div className="border-t bg-muted/50 px-4 pb-4 pt-2">
           <p className="mb-3 text-sm text-muted-foreground">{skill.notes}</p>
           {skill.evidence.length > 0 && (
             <div>
-              <h5 className="mb-2 font-mono text-xs text-muted-foreground">
-                EVIDENCE
+              <h5 className="mb-2 text-xs font-medium text-muted-foreground">
+                Evidence
               </h5>
               <ul className="space-y-1">
                 {skill.evidence.map((item, index) => (
                   <li key={index} className="flex items-start gap-2 text-sm">
-                    <span className="text-secondary">•</span>
+                    <span className="text-primary">•</span>
                     {item}
                   </li>
                 ))}
@@ -130,7 +132,7 @@ function SkillCard({
           )}
         </div>
       )}
-    </div>
+    </Card>
   );
 }
 
@@ -142,7 +144,7 @@ function OverallScoreDisplay({
   level: string;
 }) {
   const levelLabels: Record<string, { label: string; color: string }> = {
-    exceptional: { label: "Exceptional", color: "text-secondary" },
+    exceptional: { label: "Exceptional", color: "text-primary" },
     strong: { label: "Strong", color: "text-green-600" },
     adequate: { label: "Adequate", color: "text-blue-600" },
     developing: { label: "Developing", color: "text-yellow-600" },
@@ -156,13 +158,13 @@ function OverallScoreDisplay({
 
   return (
     <div className="py-8 text-center">
-      <div className="inline-flex h-32 w-32 items-center justify-center border-4 border-foreground bg-background">
+      <div className="inline-flex h-32 w-32 items-center justify-center rounded-full border-4 border-primary bg-primary/10">
         <div>
-          <div className="text-5xl font-bold">{score}</div>
-          <div className="font-mono text-sm text-muted-foreground">/5</div>
+          <div className="text-5xl font-semibold text-primary">{score}</div>
+          <div className="text-sm text-muted-foreground">/5</div>
         </div>
       </div>
-      <div className={`mt-4 text-2xl font-bold ${config.color}`}>
+      <div className={`mt-4 text-2xl font-semibold ${config.color}`}>
         {config.label}
       </div>
     </div>
@@ -180,65 +182,77 @@ function MetricsGrid({ metrics }: { metrics: AssessmentReport["metrics"] }) {
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
       {metrics.totalDurationMinutes !== null && (
-        <div className="border-2 border-border p-4">
-          <div className="mb-2 flex items-center gap-2 text-muted-foreground">
-            <Clock className="h-4 w-4" />
-            <span className="font-mono text-xs">TOTAL TIME</span>
-          </div>
-          <div className="text-xl font-bold">
-            {metrics.totalDurationMinutes} min
-          </div>
-        </div>
+        <Card>
+          <CardContent className="p-4">
+            <div className="mb-2 flex items-center gap-2 text-muted-foreground">
+              <Clock className="h-4 w-4" />
+              <span className="text-xs font-medium">Total Time</span>
+            </div>
+            <div className="text-xl font-semibold">
+              {metrics.totalDurationMinutes} min
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {metrics.workingPhaseMinutes !== null && (
-        <div className="border-2 border-border p-4">
-          <div className="mb-2 flex items-center gap-2 text-muted-foreground">
-            <Target className="h-4 w-4" />
-            <span className="font-mono text-xs">WORKING PHASE</span>
-          </div>
-          <div className="text-xl font-bold">
-            {metrics.workingPhaseMinutes} min
-          </div>
-        </div>
+        <Card>
+          <CardContent className="p-4">
+            <div className="mb-2 flex items-center gap-2 text-muted-foreground">
+              <Target className="h-4 w-4" />
+              <span className="text-xs font-medium">Working Phase</span>
+            </div>
+            <div className="text-xl font-semibold">
+              {metrics.workingPhaseMinutes} min
+            </div>
+          </CardContent>
+        </Card>
       )}
 
-      <div className="border-2 border-border p-4">
-        <div className="mb-2 flex items-center gap-2 text-muted-foreground">
-          <Users className="h-4 w-4" />
-          <span className="font-mono text-xs">COWORKERS</span>
-        </div>
-        <div className="text-xl font-bold">{metrics.coworkersContacted}</div>
-      </div>
+      <Card>
+        <CardContent className="p-4">
+          <div className="mb-2 flex items-center gap-2 text-muted-foreground">
+            <Users className="h-4 w-4" />
+            <span className="text-xs font-medium">Coworkers</span>
+          </div>
+          <div className="text-xl font-semibold">{metrics.coworkersContacted}</div>
+        </CardContent>
+      </Card>
 
-      <div className="border-2 border-border p-4">
-        <div className="mb-2 flex items-center gap-2 text-muted-foreground">
-          <Bot className="h-4 w-4" />
-          <span className="font-mono text-xs">AI TOOLS</span>
-        </div>
-        <div className="text-xl font-bold">
-          {metrics.aiToolsUsed ? "Yes" : "No"}
-        </div>
-      </div>
+      <Card>
+        <CardContent className="p-4">
+          <div className="mb-2 flex items-center gap-2 text-muted-foreground">
+            <Bot className="h-4 w-4" />
+            <span className="text-xs font-medium">AI Tools</span>
+          </div>
+          <div className="text-xl font-semibold">
+            {metrics.aiToolsUsed ? "Yes" : "No"}
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className="border-2 border-border p-4">
-        <div className="mb-2 flex items-center gap-2 text-muted-foreground">
-          {testStatusIcons[metrics.testsStatus]}
-          <span className="font-mono text-xs">CI TESTS</span>
-        </div>
-        <div className="text-xl font-bold capitalize">
-          {metrics.testsStatus}
-        </div>
-      </div>
+      <Card>
+        <CardContent className="p-4">
+          <div className="mb-2 flex items-center gap-2 text-muted-foreground">
+            {testStatusIcons[metrics.testsStatus]}
+            <span className="text-xs font-medium">CI Tests</span>
+          </div>
+          <div className="text-xl font-semibold capitalize">
+            {metrics.testsStatus}
+          </div>
+        </CardContent>
+      </Card>
 
       {metrics.codeReviewScore !== null && (
-        <div className="border-2 border-border p-4">
-          <div className="mb-2 flex items-center gap-2 text-muted-foreground">
-            <Award className="h-4 w-4" />
-            <span className="font-mono text-xs">CODE REVIEW</span>
-          </div>
-          <div className="text-xl font-bold">{metrics.codeReviewScore}/5</div>
-        </div>
+        <Card>
+          <CardContent className="p-4">
+            <div className="mb-2 flex items-center gap-2 text-muted-foreground">
+              <Award className="h-4 w-4" />
+              <span className="text-xs font-medium">Code Review</span>
+            </div>
+            <div className="text-xl font-semibold">{metrics.codeReviewScore}/5</div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
@@ -247,21 +261,21 @@ function MetricsGrid({ metrics }: { metrics: AssessmentReport["metrics"] }) {
 function ProcessingState({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-8">
-      <div className="max-w-md border-2 border-foreground p-12 text-center">
-        <div className="mx-auto mb-6 h-16 w-16 animate-spin border-4 border-secondary border-t-transparent" />
-        <h2 className="mb-4 text-2xl font-bold">Processing Your Assessment</h2>
+      <Card className="max-w-md p-12 text-center shadow-lg">
+        <div className="mx-auto mb-6 h-16 w-16 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <h2 className="mb-4 text-2xl font-semibold">Processing Your Assessment</h2>
         <p className="mb-6 text-muted-foreground">
           We&apos;re analyzing your performance and generating your personalized
           report. This usually takes less than a minute.
         </p>
         <button
           onClick={onRetry}
-          className="mx-auto flex items-center gap-2 font-mono text-sm text-muted-foreground hover:text-foreground"
+          className="mx-auto flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <RefreshCw className="h-4 w-4" />
           Refresh
         </button>
-      </div>
+      </Card>
     </div>
   );
 }
@@ -269,20 +283,19 @@ function ProcessingState({ onRetry }: { onRetry: () => void }) {
 function NoReportState({ onGenerate }: { onGenerate: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-8">
-      <div className="max-w-md border-2 border-foreground p-12 text-center">
-        <AlertCircle className="mx-auto mb-6 h-16 w-16 text-secondary" />
-        <h2 className="mb-4 text-2xl font-bold">Report Not Ready</h2>
+      <Card className="max-w-md p-12 text-center shadow-lg">
+        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+          <AlertCircle className="h-8 w-8 text-primary" />
+        </div>
+        <h2 className="mb-4 text-2xl font-semibold">Report Not Ready</h2>
         <p className="mb-6 text-muted-foreground">
           Your assessment report is still being generated. Click below to check
           again.
         </p>
-        <button
-          onClick={onGenerate}
-          className="border-2 border-foreground bg-foreground px-6 py-3 font-bold text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground"
-        >
+        <Button onClick={onGenerate}>
           Generate Report
-        </button>
-      </div>
+        </Button>
+      </Card>
     </div>
   );
 }
@@ -394,20 +407,20 @@ export function ResultsClient({
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b-2 border-foreground bg-background">
+      <header className="sticky top-0 z-10 border-b bg-background">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
             <Link
               href="/profile"
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+              className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span className="font-mono text-sm">Back to Profile</span>
+              <span className="text-sm">Back to Profile</span>
             </Link>
           </div>
           <div className="text-right">
-            <h1 className="font-bold">Assessment Results</h1>
-            <p className="font-mono text-xs text-muted-foreground">
+            <h1 className="font-semibold">Assessment Results</h1>
+            <p className="text-xs text-muted-foreground">
               {formattedDate}
             </p>
           </div>
@@ -416,13 +429,13 @@ export function ResultsClient({
 
       <main className="mx-auto max-w-5xl px-6 py-8">
         {/* Hero Section */}
-        <section className="mb-8 border-2 border-foreground p-8">
+        <Card className="mb-8 p-8 shadow-md">
           <div className="flex flex-col items-center gap-8 md:flex-row">
             <div className="flex-1">
-              <div className="mb-4 inline-block bg-secondary px-3 py-1 font-mono text-xs text-secondary-foreground">
+              <div className="mb-4 inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
                 {companyName}
               </div>
-              <h2 className="mb-2 text-3xl font-bold">{scenarioName}</h2>
+              <h2 className="mb-2 text-3xl font-semibold">{scenarioName}</h2>
               <p className="text-muted-foreground">
                 Great work, {userName}! Here&apos;s your detailed assessment
                 breakdown.
@@ -433,12 +446,12 @@ export function ResultsClient({
               level={report.overallLevel}
             />
           </div>
-        </section>
+        </Card>
 
         {/* Metrics */}
         <section className="mb-8">
-          <h3 className="mb-4 flex items-center gap-2 text-xl font-bold">
-            <Target className="h-5 w-5 text-secondary" />
+          <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold">
+            <Target className="h-5 w-5 text-primary" />
             Session Metrics
           </h3>
           <MetricsGrid metrics={report.metrics} />
@@ -447,21 +460,21 @@ export function ResultsClient({
         {/* Skill Breakdown */}
         <section className="mb-8">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="flex items-center gap-2 text-xl font-bold">
-              <TrendingUp className="h-5 w-5 text-secondary" />
+            <h3 className="flex items-center gap-2 text-xl font-semibold">
+              <TrendingUp className="h-5 w-5 text-primary" />
               Skill Breakdown
             </h3>
             <div className="flex gap-2">
               <button
                 onClick={expandAll}
-                className="font-mono text-xs text-muted-foreground hover:text-foreground"
+                className="text-xs text-muted-foreground transition-colors hover:text-foreground"
               >
                 Expand All
               </button>
               <span className="text-muted-foreground">|</span>
               <button
                 onClick={collapseAll}
-                className="font-mono text-xs text-muted-foreground hover:text-foreground"
+                className="text-xs text-muted-foreground transition-colors hover:text-foreground"
               >
                 Collapse All
               </button>
@@ -481,16 +494,16 @@ export function ResultsClient({
 
         {/* Narrative Feedback */}
         <section className="mb-8">
-          <h3 className="mb-4 flex items-center gap-2 text-xl font-bold">
-            <Award className="h-5 w-5 text-secondary" />
+          <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold">
+            <Award className="h-5 w-5 text-primary" />
             Narrative Feedback
           </h3>
 
-          <div className="border-2 border-foreground">
+          <Card className="overflow-hidden">
             {/* Summary */}
-            <div className="border-b border-border p-6">
-              <h4 className="mb-3 font-mono text-xs text-muted-foreground">
-                OVERALL SUMMARY
+            <div className="border-b p-6">
+              <h4 className="mb-3 text-xs font-medium text-muted-foreground">
+                Overall Summary
               </h4>
               <div className="prose prose-sm max-w-none">
                 {report.narrative.overallSummary
@@ -504,10 +517,10 @@ export function ResultsClient({
             </div>
 
             {/* Strengths */}
-            <div className="border-b border-border bg-green-50 p-6">
-              <h4 className="mb-3 flex items-center gap-2 font-mono text-xs text-green-800">
+            <div className="border-b bg-green-50 p-6">
+              <h4 className="mb-3 flex items-center gap-2 text-xs font-medium text-green-800">
                 <CheckCircle2 className="h-4 w-4" />
-                STRENGTHS
+                Strengths
               </h4>
               <ul className="space-y-2">
                 {report.narrative.strengths.map((strength, index) => (
@@ -520,10 +533,10 @@ export function ResultsClient({
             </div>
 
             {/* Areas for Improvement */}
-            <div className="border-b border-border bg-yellow-50 p-6">
-              <h4 className="mb-3 flex items-center gap-2 font-mono text-xs text-yellow-800">
+            <div className="border-b bg-yellow-50 p-6">
+              <h4 className="mb-3 flex items-center gap-2 text-xs font-medium text-yellow-800">
                 <TrendingUp className="h-4 w-4" />
-                AREAS FOR IMPROVEMENT
+                Areas for Improvement
               </h4>
               <ul className="space-y-2">
                 {report.narrative.areasForImprovement.map((area, index) => (
@@ -538,9 +551,9 @@ export function ResultsClient({
             {/* Notable Observations */}
             {report.narrative.notableObservations.length > 0 && (
               <div className="bg-blue-50 p-6">
-                <h4 className="mb-3 flex items-center gap-2 font-mono text-xs text-blue-800">
+                <h4 className="mb-3 flex items-center gap-2 text-xs font-medium text-blue-800">
                   <AlertCircle className="h-4 w-4" />
-                  NOTABLE OBSERVATIONS
+                  Notable Observations
                 </h4>
                 <ul className="space-y-2">
                   {report.narrative.notableObservations.map(
@@ -554,30 +567,30 @@ export function ResultsClient({
                 </ul>
               </div>
             )}
-          </div>
+          </Card>
         </section>
 
         {/* Recommendations */}
         <section className="mb-8">
-          <h3 className="mb-4 flex items-center gap-2 text-xl font-bold">
-            <Target className="h-5 w-5 text-secondary" />
+          <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold">
+            <Target className="h-5 w-5 text-primary" />
             Recommendations
           </h3>
 
           <div className="space-y-4">
             {report.recommendations.map((rec, index) => {
               const priorityColors: Record<string, string> = {
-                high: "bg-red-100 text-red-800 border-red-800",
-                medium: "bg-yellow-100 text-yellow-800 border-yellow-800",
-                low: "bg-green-100 text-green-800 border-green-800",
+                high: "bg-red-100 text-red-800",
+                medium: "bg-yellow-100 text-yellow-800",
+                low: "bg-green-100 text-green-800",
               };
 
               return (
-                <div key={index} className="border-2 border-foreground p-6">
+                <Card key={index} className="p-6">
                   <div className="mb-3 flex items-start justify-between gap-4">
-                    <h4 className="text-lg font-bold">{rec.title}</h4>
+                    <h4 className="text-lg font-semibold">{rec.title}</h4>
                     <span
-                      className={`border px-2 py-1 font-mono text-xs ${priorityColors[rec.priority]}`}
+                      className={`rounded-md px-2 py-1 text-xs font-medium ${priorityColors[rec.priority]}`}
                     >
                       {rec.priority.toUpperCase()}
                     </span>
@@ -586,13 +599,13 @@ export function ResultsClient({
                     {rec.description}
                   </p>
                   <div>
-                    <h5 className="mb-2 font-mono text-xs text-muted-foreground">
-                      ACTION STEPS
+                    <h5 className="mb-2 text-xs font-medium text-muted-foreground">
+                      Action Steps
                     </h5>
                     <ol className="space-y-2">
                       {rec.actionableSteps.map((step, stepIndex) => (
                         <li key={stepIndex} className="flex items-start gap-3">
-                          <span className="font-mono text-sm font-bold text-secondary">
+                          <span className="text-sm font-semibold text-primary">
                             {stepIndex + 1}.
                           </span>
                           <span>{step}</span>
@@ -600,31 +613,29 @@ export function ResultsClient({
                       ))}
                     </ol>
                   </div>
-                </div>
+                </Card>
               );
             })}
           </div>
         </section>
 
         {/* Footer Actions */}
-        <section className="mt-8 border-t-2 border-foreground pt-8">
+        <section className="mt-8 border-t pt-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <p className="text-sm text-muted-foreground">
               Assessment ID: <span className="font-mono">{assessmentId}</span>
             </p>
             <div className="flex gap-4">
-              <Link
-                href="/profile"
-                className="border-2 border-foreground bg-muted px-6 py-3 font-semibold text-foreground hover:bg-foreground hover:text-background"
-              >
-                Back to Profile
-              </Link>
-              <Link
-                href="/"
-                className="border-2 border-foreground bg-secondary px-6 py-3 font-bold text-secondary-foreground hover:bg-foreground hover:text-background"
-              >
-                Start New Assessment
-              </Link>
+              <Button variant="outline" asChild>
+                <Link href="/profile">
+                  Back to Profile
+                </Link>
+              </Button>
+              <Button asChild>
+                <Link href="/">
+                  Start New Assessment
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
