@@ -305,3 +305,44 @@
 
 - **Visual verification:**
   - Screenshot captured: `screenshots/issue-134-privacy-v3.png`
+
+## Issue #135: DS-025: Migrate admin dashboard page to modern design
+
+- **What was implemented:**
+  - Updated `src/app/admin/page.tsx` with Button, Card, and Badge components from shadcn/ui
+  - Quick action links migrated to Button components (primary for create, outline for manage)
+  - Recent assessments table wrapped in Card with CardContent
+  - Status indicators migrated from span with bg-secondary to Badge component
+  - "View All" link uses Button variant="link" with primary color
+  - Table rows have hover effect with transition-colors hover:bg-muted/50
+  - Headers changed from font-bold to font-semibold
+  - Updated `src/app/admin/analytics-dashboard.tsx` with Card, CardContent, CardHeader, CardTitle components
+  - Period selector buttons migrated from custom styled buttons to Button components
+  - StatCard component now uses Card with shadow-sm
+  - TrendChart component wrapped in Card with rounded bar charts (rounded-t-sm)
+  - Phase Durations and Completion Funnel sections use Card with CardHeader/CardContent
+  - Status Distribution section uses Card with rounded-md bars
+  - FunnelStep bars have rounded-md styling
+  - All bg-secondary (gold) references replaced with bg-primary (blue)
+  - All font-mono removed from non-code text, replaced with font-medium
+
+- **Files changed:**
+  - `src/app/admin/page.tsx` - Button, Card, Badge imports and component migration
+  - `src/app/admin/analytics-dashboard.tsx` - Card components and modern styling throughout
+
+- **Learnings for future iterations:**
+  - Button asChild works well for Link wrapping in admin dashboards
+  - For tables in admin views, wrap in Card with CardContent p-0 to remove padding
+  - Badge component with custom colors (bg-green-500/10 text-green-600) for status indicators
+  - Use hover:bg-muted/50 for subtle table row hover effects
+  - Card components already include rounded-xl and border-border by default
+  - For chart bars, use rounded-t-sm or rounded-md for subtle rounding
+  - When replacing bg-secondary with bg-primary, also add text-primary-foreground for contrast
+
+- **Gotchas:**
+  - TrendChart receives color as prop (bg-foreground or bg-secondary) - need to map to new colors
+  - StatCard, TrendChart, and FunnelStep are local components within analytics-dashboard.tsx
+  - Card and CardContent imports are separate from CardHeader and CardTitle
+
+- **Visual verification:**
+  - Screenshots captured: `screenshots/issue-135-admin-dashboard.png`, `screenshots/issue-135-admin-dashboard-bottom.png`

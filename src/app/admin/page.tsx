@@ -2,6 +2,9 @@ import { db } from "@/server/db";
 import Link from "next/link";
 import { getAnalytics } from "@/lib/core";
 import { AnalyticsDashboard } from "./analytics-dashboard";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default async function AdminDashboard() {
   // Fetch analytics data with 30-day default
@@ -20,7 +23,7 @@ export default async function AdminDashboard() {
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
-      <h1 className="mb-8 text-3xl font-bold">Admin Dashboard</h1>
+      <h1 className="mb-8 text-3xl font-semibold">Admin Dashboard</h1>
 
       {/* Analytics Dashboard */}
       <section className="mb-12">
@@ -29,102 +32,100 @@ export default async function AdminDashboard() {
 
       {/* Quick Actions */}
       <section className="mb-12">
-        <h2 className="mb-4 text-xl font-bold">Quick Actions</h2>
+        <h2 className="mb-4 text-xl font-semibold">Quick Actions</h2>
         <div className="flex flex-wrap gap-4">
-          <Link
-            href="/admin/scenarios/new"
-            className="border-2 border-foreground bg-foreground px-6 py-3 font-semibold text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground"
-          >
-            Create Scenario
-          </Link>
-          <Link
-            href="/admin/scenarios"
-            className="border-2 border-foreground bg-background px-6 py-3 font-semibold text-foreground hover:bg-muted"
-          >
-            Manage Scenarios ({scenarioCount})
-          </Link>
-          <Link
-            href="/admin/users"
-            className="border-2 border-foreground bg-background px-6 py-3 font-semibold text-foreground hover:bg-muted"
-          >
-            Manage Users
-          </Link>
+          <Button asChild className="shadow-sm hover:shadow-md transition-shadow">
+            <Link href="/admin/scenarios/new">Create Scenario</Link>
+          </Button>
+          <Button asChild variant="outline" className="shadow-sm hover:shadow-md transition-shadow">
+            <Link href="/admin/scenarios">Manage Scenarios ({scenarioCount})</Link>
+          </Button>
+          <Button asChild variant="outline" className="shadow-sm hover:shadow-md transition-shadow">
+            <Link href="/admin/users">Manage Users</Link>
+          </Button>
         </div>
       </section>
 
       {/* Recent Assessments */}
       <section>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold">Recent Assessments</h2>
-          <Link
-            href="/admin/assessments"
-            className="border-b-2 border-secondary font-mono text-sm text-foreground hover:text-secondary"
-          >
-            View All
-          </Link>
+          <h2 className="text-xl font-semibold">Recent Assessments</h2>
+          <Button asChild variant="link" className="text-primary hover:text-primary/80 transition-colors">
+            <Link href="/admin/assessments">View All</Link>
+          </Button>
         </div>
-        <div className="border-2 border-border">
-          {recentAssessments.length === 0 ? (
-            <div className="p-6 text-center text-muted-foreground">
-              No assessments yet
-            </div>
-          ) : (
-            <table className="w-full">
-              <thead>
-                <tr className="border-b-2 border-border">
-                  <th className="p-4 text-left font-mono text-xs text-muted-foreground">
-                    USER
-                  </th>
-                  <th className="p-4 text-left font-mono text-xs text-muted-foreground">
-                    SCENARIO
-                  </th>
-                  <th className="p-4 text-left font-mono text-xs text-muted-foreground">
-                    STATUS
-                  </th>
-                  <th className="p-4 text-left font-mono text-xs text-muted-foreground">
-                    DATE
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentAssessments.map((assessment) => (
-                  <tr key={assessment.id} className="border-b border-border">
-                    <td className="p-4">
-                      <p className="font-semibold">
-                        {assessment.user.name || "Anonymous"}
-                      </p>
-                      <p className="font-mono text-xs text-muted-foreground">
-                        {assessment.user.email}
-                      </p>
-                    </td>
-                    <td className="p-4 font-mono text-sm">
-                      {assessment.scenario.name}
-                    </td>
-                    <td className="p-4">
-                      <span
-                        className={`px-2 py-1 font-mono text-xs ${
-                          assessment.status === "COMPLETED"
-                            ? "bg-secondary text-secondary-foreground"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {assessment.status}
-                      </span>
-                    </td>
-                    <td className="p-4 font-mono text-sm text-muted-foreground">
-                      {new Intl.DateTimeFormat("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      }).format(assessment.createdAt)}
-                    </td>
+        <Card className="shadow-sm">
+          <CardContent className="p-0">
+            {recentAssessments.length === 0 ? (
+              <div className="p-6 text-center text-muted-foreground">
+                No assessments yet
+              </div>
+            ) : (
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="p-4 text-left text-xs font-medium text-muted-foreground">
+                      USER
+                    </th>
+                    <th className="p-4 text-left text-xs font-medium text-muted-foreground">
+                      SCENARIO
+                    </th>
+                    <th className="p-4 text-left text-xs font-medium text-muted-foreground">
+                      STATUS
+                    </th>
+                    <th className="p-4 text-left text-xs font-medium text-muted-foreground">
+                      DATE
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+                </thead>
+                <tbody>
+                  {recentAssessments.map((assessment) => (
+                    <tr
+                      key={assessment.id}
+                      className="border-b border-border last:border-b-0 transition-colors hover:bg-muted/50"
+                    >
+                      <td className="p-4">
+                        <p className="font-semibold">
+                          {assessment.user.name || "Anonymous"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {assessment.user.email}
+                        </p>
+                      </td>
+                      <td className="p-4 text-sm">
+                        {assessment.scenario.name}
+                      </td>
+                      <td className="p-4">
+                        <Badge
+                          variant={
+                            assessment.status === "COMPLETED"
+                              ? "default"
+                              : "secondary"
+                          }
+                          className={
+                            assessment.status === "COMPLETED"
+                              ? "bg-green-500/10 text-green-600 hover:bg-green-500/20"
+                              : ""
+                          }
+                        >
+                          {assessment.status}
+                        </Badge>
+                      </td>
+                      <td className="p-4 text-sm text-muted-foreground">
+                        {new Intl.DateTimeFormat("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }).format(assessment.createdAt)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </CardContent>
+        </Card>
       </section>
     </div>
   );

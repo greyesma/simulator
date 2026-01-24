@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import type { AnalyticsData, TimePeriod, DailyCount } from "@/lib/core";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface AnalyticsDashboardProps {
   initialData: AnalyticsData;
@@ -37,7 +39,7 @@ export function AnalyticsDashboard({ initialData }: AnalyticsDashboardProps) {
     <div className={isLoading ? "pointer-events-none opacity-60" : ""}>
       {/* Period Selector */}
       <div className="mb-8 flex items-center justify-between">
-        <h2 className="text-xl font-bold">Analytics</h2>
+        <h2 className="text-xl font-semibold">Analytics</h2>
         <div className="flex gap-2">
           {(
             [
@@ -48,17 +50,15 @@ export function AnalyticsDashboard({ initialData }: AnalyticsDashboardProps) {
               { value: "all", label: "All Time" },
             ] as const
           ).map((option) => (
-            <button
+            <Button
               key={option.value}
               onClick={() => setPeriod(option.value)}
-              className={`border-2 px-3 py-1 font-mono text-xs ${
-                period === option.value
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border bg-background text-foreground hover:border-foreground"
-              }`}
+              variant={period === option.value ? "default" : "outline"}
+              size="sm"
+              className="text-xs transition-all"
             >
               {option.label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -118,101 +118,115 @@ export function AnalyticsDashboard({ initialData }: AnalyticsDashboardProps) {
       {/* Phase Durations and Funnel */}
       <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* Phase Durations */}
-        <div className="border-2 border-border p-6">
-          <h3 className="mb-4 font-mono text-xs text-muted-foreground">
-            TIME PER PHASE
-          </h3>
-          {data.phaseDurations.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No data yet</p>
-          ) : (
-            <div className="space-y-4">
-              {data.phaseDurations.map((phase) => (
-                <div key={phase.phase}>
-                  <div className="mb-1 flex justify-between">
-                    <span className="text-sm font-semibold">{phase.phase}</span>
-                    <span className="font-mono text-sm">
-                      {phase.avgDurationMinutes}m avg
-                    </span>
+        <Card className="shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-medium text-muted-foreground">
+              TIME PER PHASE
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {data.phaseDurations.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No data yet</p>
+            ) : (
+              <div className="space-y-4">
+                {data.phaseDurations.map((phase) => (
+                  <div key={phase.phase}>
+                    <div className="mb-1 flex justify-between">
+                      <span className="text-sm font-semibold">{phase.phase}</span>
+                      <span className="text-sm">
+                        {phase.avgDurationMinutes}m avg
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span>Min: {phase.minDurationMinutes}m</span>
+                      <span>|</span>
+                      <span>Max: {phase.maxDurationMinutes}m</span>
+                      <span>|</span>
+                      <span>n={phase.sampleSize}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>Min: {phase.minDurationMinutes}m</span>
-                    <span>|</span>
-                    <span>Max: {phase.maxDurationMinutes}m</span>
-                    <span>|</span>
-                    <span>n={phase.sampleSize}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Completion Funnel */}
-        <div className="border-2 border-border p-6">
-          <h3 className="mb-4 font-mono text-xs text-muted-foreground">
-            COMPLETION FUNNEL
-          </h3>
-          {data.completionFunnel.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No data yet</p>
-          ) : (
-            <div className="space-y-3">
-              {data.completionFunnel.map((step, index) => (
-                <FunnelStep
-                  key={step.step}
-                  step={step.step}
-                  count={step.count}
-                  percentage={step.percentage}
-                  dropoffRate={step.dropoffRate}
-                  isFirst={index === 0}
-                  isLast={index === data.completionFunnel.length - 1}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        <Card className="shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-medium text-muted-foreground">
+              COMPLETION FUNNEL
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {data.completionFunnel.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No data yet</p>
+            ) : (
+              <div className="space-y-3">
+                {data.completionFunnel.map((step, index) => (
+                  <FunnelStep
+                    key={step.step}
+                    step={step.step}
+                    count={step.count}
+                    percentage={step.percentage}
+                    dropoffRate={step.dropoffRate}
+                    isFirst={index === 0}
+                    isLast={index === data.completionFunnel.length - 1}
+                  />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Status Distribution */}
-      <div className="border-2 border-border p-6">
-        <h3 className="mb-4 font-mono text-xs text-muted-foreground">
-          STATUS DISTRIBUTION
-        </h3>
-        <div className="flex h-8 gap-2">
-          {data.statusDistribution.map((status) => (
-            <div
-              key={status.status}
-              className={`relative h-full ${
-                status.status === "COMPLETED" ? "bg-secondary" : "bg-muted"
-              }`}
-              style={{
-                width: `${Math.max(status.percentage, 2)}%`,
-                minWidth: status.count > 0 ? "40px" : "0px",
-              }}
-              title={`${status.status}: ${status.count} (${status.percentage}%)`}
-            >
-              {status.percentage >= 10 && (
-                <span className="absolute inset-0 flex items-center justify-center font-mono text-xs">
-                  {status.count}
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 flex flex-wrap gap-4">
-          {data.statusDistribution.map((status) => (
-            <div key={status.status} className="flex items-center gap-2">
+      <Card className="shadow-sm">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-xs font-medium text-muted-foreground">
+            STATUS DISTRIBUTION
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex h-8 gap-2">
+            {data.statusDistribution.map((status) => (
               <div
-                className={`h-3 w-3 ${
-                  status.status === "COMPLETED" ? "bg-secondary" : "bg-muted"
+                key={status.status}
+                className={`relative h-full rounded-md transition-all ${
+                  status.status === "COMPLETED" ? "bg-primary" : "bg-muted"
                 }`}
-              />
-              <span className="font-mono text-xs">
-                {status.status.replace(/_/g, " ")}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
+                style={{
+                  width: `${Math.max(status.percentage, 2)}%`,
+                  minWidth: status.count > 0 ? "40px" : "0px",
+                }}
+                title={`${status.status}: ${status.count} (${status.percentage}%)`}
+              >
+                {status.percentage >= 10 && (
+                  <span className={`absolute inset-0 flex items-center justify-center text-xs ${
+                    status.status === "COMPLETED" ? "text-primary-foreground" : ""
+                  }`}>
+                    {status.count}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 flex flex-wrap gap-4">
+            {data.statusDistribution.map((status) => (
+              <div key={status.status} className="flex items-center gap-2">
+                <div
+                  className={`h-3 w-3 rounded-sm ${
+                    status.status === "COMPLETED" ? "bg-primary" : "bg-muted"
+                  }`}
+                />
+                <span className="text-xs">
+                  {status.status.replace(/_/g, " ")}
+                </span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -227,12 +241,14 @@ function StatCard({
   highlight: boolean;
 }) {
   return (
-    <div className="border-2 border-border p-4">
-      <p className="mb-2 font-mono text-xs text-muted-foreground">{label}</p>
-      <p className={`text-2xl font-bold ${highlight ? "text-secondary" : ""}`}>
-        {value}
-      </p>
-    </div>
+    <Card className="shadow-sm">
+      <CardContent className="p-4">
+        <p className="mb-2 text-xs font-medium text-muted-foreground">{label}</p>
+        <p className={`text-2xl font-semibold ${highlight ? "text-primary" : ""}`}>
+          {value}
+        </p>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -250,38 +266,43 @@ function TrendChart({
   const maxCount = Math.max(...recentData.map((d) => d.count), 1);
   const total = recentData.reduce((sum, d) => sum + d.count, 0);
 
+  // Map old colors to new modern colors
+  const barColor = color === "bg-secondary" ? "bg-primary" : "bg-primary/70";
+
   return (
-    <div className="border-2 border-border p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h4 className="font-mono text-xs text-muted-foreground">{title}</h4>
-        <span className="text-lg font-bold">{total}</span>
-      </div>
-      <div className="flex h-16 items-end gap-1">
-        {recentData.map((day) => (
-          <div
-            key={day.date}
-            className="flex flex-1 flex-col items-center gap-1"
-          >
+    <Card className="shadow-sm">
+      <CardContent className="p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h4 className="text-xs font-medium text-muted-foreground">{title}</h4>
+          <span className="text-lg font-semibold">{total}</span>
+        </div>
+        <div className="flex h-16 items-end gap-1">
+          {recentData.map((day) => (
             <div
-              className={`w-full ${color}`}
-              style={{
-                height: `${Math.max((day.count / maxCount) * 100, 4)}%`,
-                minHeight: day.count > 0 ? "4px" : "2px",
-                opacity: day.count > 0 ? 1 : 0.2,
-              }}
-            />
-          </div>
-        ))}
-      </div>
-      <div className="mt-1 flex justify-between">
-        <span className="font-mono text-xs text-muted-foreground">
-          {recentData[0]?.date.slice(5) || ""}
-        </span>
-        <span className="font-mono text-xs text-muted-foreground">
-          {recentData[recentData.length - 1]?.date.slice(5) || ""}
-        </span>
-      </div>
-    </div>
+              key={day.date}
+              className="flex flex-1 flex-col items-center gap-1"
+            >
+              <div
+                className={`w-full rounded-t-sm ${barColor}`}
+                style={{
+                  height: `${Math.max((day.count / maxCount) * 100, 4)}%`,
+                  minHeight: day.count > 0 ? "4px" : "2px",
+                  opacity: day.count > 0 ? 1 : 0.2,
+                }}
+              />
+            </div>
+          ))}
+        </div>
+        <div className="mt-1 flex justify-between">
+          <span className="text-xs text-muted-foreground">
+            {recentData[0]?.date.slice(5) || ""}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {recentData[recentData.length - 1]?.date.slice(5) || ""}
+          </span>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -303,15 +324,15 @@ function FunnelStep({
   return (
     <div className="flex items-center gap-3">
       <div
-        className={`h-6 ${isLast ? "bg-secondary" : "bg-muted"}`}
+        className={`h-6 rounded-md transition-all ${isLast ? "bg-primary" : "bg-muted"}`}
         style={{ width: `${Math.max(percentage, 10)}%` }}
       />
       <div className="flex flex-1 items-center justify-between">
         <span className="text-sm font-semibold">{step}</span>
         <div className="flex items-center gap-2">
-          <span className="font-mono text-sm">{count}</span>
+          <span className="text-sm">{count}</span>
           {!isFirst && dropoffRate > 0 && (
-            <span className="font-mono text-xs text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               (-{dropoffRate}%)
             </span>
           )}
