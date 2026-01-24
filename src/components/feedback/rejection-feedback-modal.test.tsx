@@ -77,9 +77,9 @@ describe("RejectionFeedbackModal", () => {
       expect(screen.getByTestId("submit-feedback-button")).toBeInTheDocument();
     });
 
-    it("renders close/cancel button", () => {
+    it("renders cancel button", () => {
       renderModal();
-      expect(screen.getByTestId("close-modal-button")).toBeInTheDocument();
+      expect(screen.getByTestId("cancel-button")).toBeInTheDocument();
     });
   });
 
@@ -174,19 +174,21 @@ describe("RejectionFeedbackModal", () => {
   });
 
   describe("closing", () => {
-    it("calls onClose when close button is clicked", async () => {
+    it("calls onClose when cancel button is clicked", async () => {
       const user = userEvent.setup();
       renderModal();
 
-      await user.click(screen.getByTestId("close-modal-button"));
+      await user.click(screen.getByTestId("cancel-button"));
       expect(mockOnClose).toHaveBeenCalled();
     });
 
-    it("calls onClose when overlay is clicked", async () => {
+    it("calls onClose when dialog close button (X) is clicked", async () => {
       const user = userEvent.setup();
       renderModal();
 
-      await user.click(screen.getByTestId("modal-overlay"));
+      // The Dialog component has a close button with sr-only "Close" text
+      const closeButton = screen.getByRole("button", { name: /close/i });
+      await user.click(closeButton);
       expect(mockOnClose).toHaveBeenCalled();
     });
 
@@ -201,25 +203,26 @@ describe("RejectionFeedbackModal", () => {
       const user = userEvent.setup();
       renderModal();
 
-      await user.click(screen.getByTestId("modal-content"));
+      // Click on the feedback input (inside the modal)
+      await user.click(screen.getByTestId("feedback-input"));
       expect(mockOnClose).not.toHaveBeenCalled();
     });
   });
 
-  describe("neo-brutalist styling", () => {
-    it("has no rounded corners (0px radius)", () => {
+  describe("modern design styling", () => {
+    it("has rounded corners (modern design)", () => {
       renderModal();
-      const modal = screen.getByTestId("modal-content");
+      const modal = screen.getByTestId("rejection-feedback-modal");
 
-      // Should not have rounded classes
-      expect(modal.className).not.toMatch(/rounded/);
+      // Should have rounded classes (modern shadcn design)
+      expect(modal.className).toMatch(/rounded/);
     });
 
-    it("has sharp borders", () => {
+    it("has smooth shadow for elevation", () => {
       renderModal();
-      const modal = screen.getByTestId("modal-content");
+      const modal = screen.getByTestId("rejection-feedback-modal");
 
-      expect(modal.className).toMatch(/border-2|border-\[/);
+      expect(modal.className).toMatch(/shadow/);
     });
   });
 });

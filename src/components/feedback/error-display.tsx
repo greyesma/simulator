@@ -9,6 +9,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 import type { CategorizedError, ErrorCategory } from "@/lib/core";
+import { Card, CardContent, Button } from "@/components/ui";
+import { cn } from "@/lib/utils";
 
 interface ErrorDisplayProps {
   error: CategorizedError;
@@ -67,108 +69,109 @@ export function ErrorDisplay({
     retryCount !== undefined && maxRetries !== undefined;
 
   return (
-    <div className={`border-2 border-red-500 bg-background p-6 ${className}`}>
-      <div className="flex flex-col items-center text-center">
-        {/* Icon */}
-        <div className="mb-4 text-red-500">{getErrorIcon(error.category)}</div>
-
-        {/* Title */}
-        <h3 className="mb-2 text-xl font-bold">
-          {getErrorTitle(error.category)}
-        </h3>
-
-        {/* User-friendly message */}
-        <p className="mb-4 max-w-md text-muted-foreground">
-          {error.userMessage}
-        </p>
-
-        {/* Retry progress indicator */}
-        {showRetryProgress && isRetrying && (
-          <div className="mb-4">
-            <div className="flex items-center gap-2 text-secondary">
-              <RefreshCw className="h-4 w-4 animate-spin" />
-              <span className="font-mono text-sm">
-                Retrying... ({retryCount}/{maxRetries})
-              </span>
-            </div>
+    <Card
+      className={cn(
+        "border-destructive bg-destructive/5 shadow-sm",
+        className
+      )}
+    >
+      <CardContent className="p-6">
+        <div className="flex flex-col items-center text-center">
+          {/* Icon */}
+          <div className="mb-4 text-destructive">
+            {getErrorIcon(error.category)}
           </div>
-        )}
 
-        {/* Actions */}
-        <div className="flex flex-col gap-3 sm:flex-row">
-          {/* Retry button */}
-          {error.isRetryable && onRetry && (
-            <button
-              onClick={onRetry}
-              disabled={isRetrying}
-              className="flex items-center justify-center gap-2 border-2 border-foreground bg-foreground px-6 py-3 font-semibold text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isRetrying ? (
-                <>
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                  Retrying...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="h-4 w-4" />
-                  {error.recoveryAction || "Try Again"}
-                </>
-              )}
-            </button>
+          {/* Title */}
+          <h3 className="mb-2 text-xl font-bold">
+            {getErrorTitle(error.category)}
+          </h3>
+
+          {/* User-friendly message */}
+          <p className="mb-4 max-w-md text-muted-foreground">
+            {error.userMessage}
+          </p>
+
+          {/* Retry progress indicator */}
+          {showRetryProgress && isRetrying && (
+            <div className="mb-4">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <RefreshCw className="h-4 w-4 animate-spin" />
+                <span className="text-sm">
+                  Retrying... ({retryCount}/{maxRetries})
+                </span>
+              </div>
+            </div>
           )}
 
-          {/* Fallback option (e.g., switch to text mode) */}
-          {showFallbackOption && onFallback && (
-            <button
-              onClick={onFallback}
-              className="flex items-center justify-center gap-2 border-2 border-secondary bg-secondary px-6 py-3 font-semibold text-secondary-foreground hover:border-foreground hover:bg-foreground hover:text-background"
-            >
-              <MessageSquare className="h-4 w-4" />
-              {fallbackLabel}
-            </button>
-          )}
+          {/* Actions */}
+          <div className="flex flex-col gap-3 sm:flex-row">
+            {/* Retry button */}
+            {error.isRetryable && onRetry && (
+              <Button onClick={onRetry} disabled={isRetrying}>
+                {isRetrying ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    Retrying...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4" />
+                    {error.recoveryAction || "Try Again"}
+                  </>
+                )}
+              </Button>
+            )}
 
-          {/* Non-retryable - show recovery action */}
-          {!error.isRetryable && error.recoveryAction && !onFallback && (
-            <button
-              onClick={() => {
-                if (error.category === "session") {
-                  window.location.href = "/sign-in";
-                } else if (error.category === "browser") {
-                  // Just show the message, user needs to use different browser
-                } else {
-                  window.location.reload();
-                }
-              }}
-              className="flex items-center justify-center gap-2 border-2 border-foreground bg-foreground px-6 py-3 font-semibold text-background hover:border-secondary hover:bg-secondary hover:text-secondary-foreground"
-            >
-              <ArrowRight className="h-4 w-4" />
-              {error.recoveryAction}
-            </button>
+            {/* Fallback option (e.g., switch to text mode) */}
+            {showFallbackOption && onFallback && (
+              <Button variant="outline" onClick={onFallback}>
+                <MessageSquare className="h-4 w-4" />
+                {fallbackLabel}
+              </Button>
+            )}
+
+            {/* Non-retryable - show recovery action */}
+            {!error.isRetryable && error.recoveryAction && !onFallback && (
+              <Button
+                onClick={() => {
+                  if (error.category === "session") {
+                    window.location.href = "/sign-in";
+                  } else if (error.category === "browser") {
+                    // Just show the message, user needs to use different browser
+                  } else {
+                    window.location.reload();
+                  }
+                }}
+              >
+                <ArrowRight className="h-4 w-4" />
+                {error.recoveryAction}
+              </Button>
+            )}
+          </div>
+
+          {/* Technical details (collapsed by default in production) */}
+          {process.env.NODE_ENV === "development" && (
+            <details className="mt-4 w-full text-left">
+              <summary className="cursor-pointer text-xs text-muted-foreground">
+                Technical Details
+              </summary>
+              <pre className="mt-2 max-h-32 overflow-auto rounded-lg bg-muted p-2 text-xs">
+                {JSON.stringify(
+                  {
+                    category: error.category,
+                    message: error.message,
+                    isRetryable: error.isRetryable,
+                  },
+                  null,
+                  2
+                )}
+              </pre>
+            </details>
           )}
         </div>
-
-        {/* Technical details (collapsed by default in production) */}
-        {process.env.NODE_ENV === "development" && (
-          <details className="mt-4 w-full text-left">
-            <summary className="cursor-pointer font-mono text-xs text-muted-foreground">
-              Technical Details
-            </summary>
-            <pre className="mt-2 max-h-32 overflow-auto bg-muted p-2 font-mono text-xs">
-              {JSON.stringify(
-                {
-                  category: error.category,
-                  message: error.message,
-                  isRetryable: error.isRetryable,
-                },
-                null,
-                2
-              )}
-            </pre>
-          </details>
-        )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -189,26 +192,33 @@ export function InlineError({
   className = "",
 }: InlineErrorProps) {
   return (
-    <div
-      className={`flex items-center justify-between gap-4 border-2 border-red-500 bg-red-50 p-3 dark:bg-red-950 ${className}`}
-    >
-      <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
-        <AlertTriangle className="h-4 w-4 flex-shrink-0" />
-        <span className="text-sm font-medium">{message}</span>
-      </div>
-      {onRetry && (
-        <button
-          onClick={onRetry}
-          disabled={isRetrying}
-          className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-secondary disabled:opacity-50"
-        >
-          <RefreshCw
-            className={`h-3 w-3 ${isRetrying ? "animate-spin" : ""}`}
-          />
-          {isRetrying ? "Retrying" : "Retry"}
-        </button>
+    <Card
+      className={cn(
+        "border-destructive bg-destructive/10",
+        className
       )}
-    </div>
+    >
+      <CardContent className="flex items-center justify-between gap-4 p-3">
+        <div className="flex items-center gap-2 text-destructive">
+          <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+          <span className="text-sm font-medium">{message}</span>
+        </div>
+        {onRetry && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onRetry}
+            disabled={isRetrying}
+            className="h-auto px-2 py-1"
+          >
+            <RefreshCw
+              className={cn("h-3 w-3", isRetrying && "animate-spin")}
+            />
+            {isRetrying ? "Retrying" : "Retry"}
+          </Button>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -231,41 +241,37 @@ export function SessionRecoveryPrompt({
   const formattedTime = new Date(lastSaved).toLocaleString();
 
   return (
-    <div className="border-2 border-secondary bg-background p-6">
-      <div className="flex flex-col items-center text-center">
-        <div className="mb-4 flex h-12 w-12 items-center justify-center bg-secondary">
-          <RefreshCw className="h-6 w-6 text-secondary-foreground" />
-        </div>
+    <Card className="shadow-sm">
+      <CardContent className="p-6">
+        <div className="flex flex-col items-center text-center">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+            <RefreshCw className="h-6 w-6 text-primary" />
+          </div>
 
-        <h3 className="mb-2 text-xl font-bold">Resume Your Session?</h3>
+          <h3 className="mb-2 text-xl font-bold">Resume Your Session?</h3>
 
-        <p className="mb-2 text-muted-foreground">
-          We found a saved session from {formattedTime}.
-        </p>
-
-        {progressSummary && (
-          <p className="mb-4 font-mono text-sm text-muted-foreground">
-            {progressSummary}
+          <p className="mb-2 text-muted-foreground">
+            We found a saved session from {formattedTime}.
           </p>
-        )}
 
-        <div className="mt-2 flex flex-col gap-3 sm:flex-row">
-          <button
-            onClick={onRecover}
-            className="flex items-center justify-center gap-2 border-2 border-secondary bg-secondary px-6 py-3 font-semibold text-secondary-foreground hover:border-foreground hover:bg-foreground hover:text-background"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Resume Session
-          </button>
+          {progressSummary && (
+            <p className="mb-4 text-sm text-muted-foreground">
+              {progressSummary}
+            </p>
+          )}
 
-          <button
-            onClick={onStartFresh}
-            className="flex items-center justify-center gap-2 border-2 border-foreground bg-background px-6 py-3 font-semibold text-foreground hover:bg-muted"
-          >
-            Start Fresh
-          </button>
+          <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+            <Button onClick={onRecover}>
+              <RefreshCw className="h-4 w-4" />
+              Resume Session
+            </Button>
+
+            <Button variant="outline" onClick={onStartFresh}>
+              Start Fresh
+            </Button>
+          </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
