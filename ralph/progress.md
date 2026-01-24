@@ -202,3 +202,38 @@
 - **Visual verification:**
   - Screenshot captured in `screenshots/issue-131-chat-page.png`
   - Note: Recording guard modals bypassed in E2E mode, voice UI requires audio support
+
+## Issue #132: DS-022: Migrate landing page to modern design
+
+- **What was implemented:**
+  - Removed GeometricDecoration component (sharp neo-brutalist triangles/parallelograms)
+  - Replaced with subtle gradient blur circles using bg-primary/5 and bg-primary/10
+  - Migrated all CTA buttons to Button component with asChild for Link wrapping
+  - Updated FeatureCard to use Card, CardHeader, CardTitle, CardContent components
+  - Updated FAQItem to use Card components with rounded-xl and shadow-sm
+  - Migrated comparison section to use Card components (bg-muted/30 vs bg-primary/5)
+  - Changed all secondary color (#f7da50) references to primary blue (#237CF1)
+  - Updated hero badge from border to rounded-full bg-primary/10
+  - Final CTA section now uses bg-primary instead of bg-foreground
+  - Added smooth transitions throughout (transition-all duration-200, hover:shadow-md)
+  - Footer links now use decoration-primary instead of decoration-secondary
+
+- **Files changed:**
+  - `src/app/page.tsx` - Complete landing page modernization
+
+- **Learnings for future iterations:**
+  - Button component has `asChild` prop for wrapping Link components
+  - For hero gradient backgrounds, use low opacity blur circles (bg-primary/5, blur-3xl)
+  - Card component already includes rounded-xl and shadow-sm by default
+  - Use CardHeader with pb-2 to reduce spacing between title and content
+  - The comparison section works well with bg-muted/30 (negative) vs bg-primary/5 (positive)
+  - Skillvee column uses border-primary/50 for subtle emphasis
+  - For full-width colored sections, use bg-primary with text-primary-foreground
+
+- **Gotchas:**
+  - The scroll indicator uses a gradient line (from-border to-transparent) instead of solid
+  - Badge text uses text-primary on bg-primary/10 for subtle appearance
+  - Company logos section keeps grayscale filter for professional look
+
+- **Visual verification:**
+  - Screenshots captured: `screenshots/issue-132-landing-hero.png`, `screenshots/issue-132-landing-features.png`, `screenshots/issue-132-landing-fullpage.png`
