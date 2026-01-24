@@ -32,13 +32,18 @@ vi.mock("@/server/db", () => ({
   },
 }));
 
-vi.mock("./supabase", () => ({
+vi.mock("@/lib/external", () => ({
   supabaseAdmin: {
     storage: {
       from: () => ({
         remove: (paths: string[]) => mockStorageRemove(paths),
       }),
     },
+  },
+  STORAGE_BUCKETS: {
+    RESUMES: "resumes",
+    RECORDINGS: "recordings",
+    SCREENSHOTS: "screenshots",
   },
 }));
 

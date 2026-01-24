@@ -681,3 +681,53 @@ const mockGenerateQueryEmbedding = generateQueryEmbedding as Mock;
 
 ### Gotchas discovered
 - The error message `mockResolvedValue is not a function` indicated a type casting issue, but the actual root cause was the mock not being applied at all (due to wrong path). Once the mock was applied, the `Mock` type cast then became necessary.
+
+## Issue #153: Fix data-deletion test storage mock path (2 failing tests)
+
+### What was implemented
+- Fixed mock path from `./supabase` to `@/lib/external` in `data-deletion.test.ts`
+- Added `STORAGE_BUCKETS` to the mock (required by the implementation)
+
+### Root cause
+The test was mocking `./supabase` (a relative path that doesn't match any import):
+```typescript
+vi.mock("./supabase", () => ({...}));
+```
+
+But the implementation imports from `@/lib/external`:
+```typescript
+import { supabaseAdmin, STORAGE_BUCKETS } from "@/lib/external";
+```
+
+Vitest mocks must match the exact import path. Since the mock wasn't applied, `mockStorageRemove` was never called, causing:
+- "deletes storage files from all buckets" - expected 3 calls, got 0
+- "continues deletion even if storage fails" - expected errors array to have length > 0
+
+### Files changed
+- `src/lib/core/data-deletion.test.ts` - Fixed mock path and added STORAGE_BUCKETS
+
+### Code changes
+```typescript
+// Before (broken):
+vi.mock("./supabase", () => ({
+  supabaseAdmin: {...}
+}));
+
+// After (fixed):
+vi.mock("@/lib/external", () => ({
+  supabaseAdmin: {...},
+  STORAGE_BUCKETS: {
+    RESUMES: "resumes",
+    RECORDINGS: "recordings",
+    SCREENSHOTS: "screenshots",
+  },
+}));
+```
+
+### Learnings for future iterations
+1. **This is the same lesson as Issues #151 and #152** - Mock paths must match the exact import paths used by the module under test
+2. **Include all imports from the mocked module** - The implementation imports both `supabaseAdmin` and `STORAGE_BUCKETS` from `@/lib/external`, so both must be included in the mock
+3. **Barrel exports matter** - Even though `supabaseAdmin` originates from `./supabase`, the implementation imports it via `@/lib/external` barrel, so that's what must be mocked
+
+### Gotchas discovered
+- The original mock path `./supabase` was likely a copy-paste error from another test file or an assumption about relative imports - always verify the actual import in the source file
