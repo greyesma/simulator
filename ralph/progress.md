@@ -1048,3 +1048,54 @@
   - [x] Typecheck passes (`npm run typecheck`)
   - [x] Build passes (`npm run build`)
   - [x] Lint passes (`npm run lint`)
+
+## Issue #163: PAT-002: Split large admin assessment detail component (1,224 LOC)
+
+- **What was implemented:**
+  - Split `src/app/admin/assessments/[id]/client.tsx` from 1,224 LOC into 10 focused files
+  - Created `components/` directory with 7 extracted components:
+    - `types.ts` (86 LOC) - SerializedAssessment, TimelineEvent, Toast types
+    - `utils.ts` (75 LOC) - formatDuration, formatDate, formatTime, getEventIcon utilities
+    - `copy-button.tsx` (55 LOC) - Reusable clipboard copy button with feedback
+    - `collapsible-code-section.tsx` (76 LOC) - Expandable JSON/text viewer
+    - `api-call-details.tsx` (147 LOC) - API call metadata, timestamps, prompt/response display
+    - `confirmation-dialog.tsx` (86 LOC) - Retry assessment confirmation modal
+    - `toast-notification.tsx` (53 LOC) - Success/error/info toast component
+    - `candidate-info-card.tsx` (58 LOC) - Candidate name, email, completion date card
+    - `timeline-event.tsx` (223 LOC) - Single timeline event with expandable details
+    - `index.ts` (29 LOC) - Barrel export for all components and types
+  - Main client.tsx reduced from 1,224 LOC to 481 LOC (61% reduction)
+  - Fixed 3 pre-existing test failures from design system migration (test assertions checking old CSS classes)
+
+- **Files changed:**
+  - `src/app/admin/assessments/[id]/client.tsx` - Reduced from 1,224 to 481 LOC
+  - `src/app/admin/assessments/[id]/components/` - New directory with 10 files
+  - `src/app/admin/assessments/[id]/page.test.tsx` - Updated 3 tests to use modern CSS classes
+
+- **File size verification:**
+  - client.tsx: 481 LOC (< 500 requirement ✓)
+  - All extracted components: < 300 LOC each (largest is timeline-event.tsx at 223 LOC ✓)
+  - Total lines across all files: 1,369 LOC (vs original 1,224 - overhead from module boundaries)
+
+- **Learnings for future iterations:**
+  - When extracting components, avoid naming conflicts between types and components (e.g., TimelineEvent type vs TimelineEvent component - renamed component export to TimelineEventItem)
+  - Barrel exports (`index.ts`) make imports cleaner: `import { X, Y, Z } from "./components"` instead of individual file imports
+  - Keep state management in the parent orchestrator component, pass data as props and callbacks for mutations
+  - Re-export utilities needed by tests for backwards compatibility: `export { formatDuration } from "./components"`
+  - Consider prop drilling depth - max 2-3 levels is reasonable (TimelineEvent receives callbacks from parent)
+
+- **Gotchas:**
+  - TypeScript will error if you try to export both a type and a value with the same name - use `as` to rename one
+  - Tests checking for CSS class names may need updates after design system migrations - the 3 failing tests were checking for old neo-brutalist classes (`border-red-500`, `bg-red-50`) instead of modern shadcn classes (`border-destructive`, `bg-destructive/5`)
+  - The vitest test runner can hang indefinitely on macOS - use `npx vitest run` instead of `npm test` for more reliable execution
+
+- **Acceptance criteria verified:**
+  - [x] Analyzed the component to identify logical sub-components (types, utils, 7 UI components)
+  - [x] Extracted 7 sub-components to separate files (exceeds 3-5 requirement)
+  - [x] Each extracted component is < 300 LOC (largest: 223 LOC)
+  - [x] Main client.tsx reduced to < 500 LOC (481 LOC)
+  - [x] All functionality remains identical (no behavior changes)
+  - [x] All existing tests pass (63/63 in page.test.tsx)
+  - [x] Typecheck passes (`npm run typecheck`)
+  - [x] Build passes (`npm run build`)
+  - [x] No new ESLint warnings introduced (`npm run lint` clean)

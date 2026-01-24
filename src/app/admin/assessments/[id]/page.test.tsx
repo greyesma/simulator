@@ -377,7 +377,8 @@ describe("AssessmentTimelineClient", () => {
         <AssessmentTimelineClient assessment={serializedErrorAssessment} />
       );
       const card = screen.getByTestId("total-duration-card");
-      expect(card).toHaveClass("border-red-500");
+      // Modern design uses Tailwind's destructive color class
+      expect(card).toHaveClass("border-destructive");
     });
   });
 
@@ -491,9 +492,10 @@ describe("AssessmentTimelineClient", () => {
       render(
         <AssessmentTimelineClient assessment={serializedErrorAssessment} />
       );
-      // Check the error event container has red styling
+      // Check the error event container has destructive (red) styling
       const errorEvent = screen.getByTestId("timeline-event-log-2");
-      const redDiv = errorEvent.querySelector('[class*="bg-red-50"]');
+      // Modern design uses bg-destructive/5 for subtle red backgrounds
+      const redDiv = errorEvent.querySelector('[class*="bg-destructive"]');
       expect(redDiv).toBeInTheDocument();
     });
 
@@ -598,9 +600,9 @@ describe("AssessmentTimelineClient", () => {
       render(<AssessmentTimelineClient assessment={longDurationAssessment} />);
 
       const durationMarker = screen.getByTestId("duration-marker-log-2");
-      expect(durationMarker.querySelector("span")).toHaveClass(
-        "border-amber-500"
-      );
+      // Use querySelector to find element with amber border class
+      const amberBadge = durationMarker.querySelector('[class*="border-amber"]');
+      expect(amberBadge).toBeInTheDocument();
     });
   });
 });

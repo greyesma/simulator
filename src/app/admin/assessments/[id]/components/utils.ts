@@ -1,0 +1,75 @@
+import type { AssessmentLogEventType } from "@prisma/client";
+import {
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  Play,
+  ExternalLink,
+} from "lucide-react";
+import type { TimelineEvent } from "./types";
+
+// Format duration in human-readable format
+export function formatDuration(ms: number): string {
+  if (ms < 1000) return `${ms}ms`;
+  if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
+  const minutes = Math.floor(ms / 60000);
+  const seconds = Math.round((ms % 60000) / 1000);
+  return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
+}
+
+// Format date for display
+export function formatDate(dateString: string): string {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(dateString));
+}
+
+// Format time for timeline display
+export function formatTime(dateString: string): string {
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).format(new Date(dateString));
+}
+
+// Calculate duration between events
+export function calculateDurationBetweenEvents(
+  current: string,
+  previous: string
+): number {
+  return new Date(current).getTime() - new Date(previous).getTime();
+}
+
+// Event type display labels
+export const EVENT_TYPE_LABELS: Record<AssessmentLogEventType, string> = {
+  STARTED: "Assessment Started",
+  PROMPT_SENT: "Prompt Sent",
+  RESPONSE_RECEIVED: "Response Received",
+  PARSING_STARTED: "Parsing Started",
+  PARSING_COMPLETED: "Parsing Completed",
+  ERROR: "Error",
+  COMPLETED: "Assessment Completed",
+};
+
+// Get icon for event type
+export function getEventIcon(event: TimelineEvent) {
+  if (event.isError) {
+    return AlertCircle;
+  }
+  if (event.eventType === "COMPLETED") {
+    return CheckCircle2;
+  }
+  if (event.eventType === "STARTED") {
+    return Play;
+  }
+  if (event.type === "apiCall") {
+    return ExternalLink;
+  }
+  return Clock;
+}
