@@ -2,27 +2,10 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
 import { ProcessingClient } from "./client";
-import type { VideoAssessmentStatus } from "@prisma/client";
+import type { ProcessingStats } from "./types";
 
 interface ProcessingPageProps {
   params: Promise<{ id: string }>;
-}
-
-export interface VideoAssessmentInfo {
-  id: string;
-  status: VideoAssessmentStatus;
-}
-
-export interface ProcessingStats {
-  totalDurationMinutes: number | null;
-  coworkersContacted: number;
-  totalMessages: number;
-  scenarioName: string;
-  companyName: string;
-  userName: string;
-  hasHRInterview: boolean;
-  hasDefenseCall: boolean;
-  videoAssessment: VideoAssessmentInfo | null;
 }
 
 export default async function ProcessingPage({ params }: ProcessingPageProps) {

@@ -14,7 +14,7 @@ import {
   Check,
 } from "lucide-react";
 import { Card, CardContent, Badge } from "@/components/ui";
-import type { ProcessingStats } from "./page";
+import type { ProcessingStats } from "./types";
 import type { LucideIcon } from "lucide-react";
 
 interface ProcessingClientProps {

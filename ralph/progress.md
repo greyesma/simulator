@@ -1013,3 +1013,38 @@
   - [x] Validation errors return 400 with descriptive messages
   - [x] Tests pass
   - [x] Typecheck passes
+
+## Issue #162: PAT-001: Fix circular dependency between processing client and page
+
+- **What was implemented:**
+  - Identified the circular dependency: `client.tsx` imported `ProcessingStats` type from `page.tsx`, while `page.tsx` imported `ProcessingClient` from `client.tsx`
+  - Created `src/app/assessment/[id]/processing/types.ts` to hold shared types (`ProcessingStats` and `VideoAssessmentInfo`)
+  - Updated `page.tsx` to import types from `types.ts` instead of defining them locally
+  - Updated `client.tsx` to import types from `types.ts` instead of `page.tsx`
+  - Fixed an unrelated lint error in `src/middleware.ts` (unused `NextRequest` import)
+
+- **Files changed:**
+  - `src/app/assessment/[id]/processing/types.ts` - New file with shared type definitions
+  - `src/app/assessment/[id]/processing/page.tsx` - Removed type exports, now imports from types.ts
+  - `src/app/assessment/[id]/processing/client.tsx` - Changed import from page.tsx to types.ts
+  - `src/middleware.ts` - Removed unused NextRequest import (pre-existing lint issue)
+
+- **Learnings for future iterations:**
+  - Circular dependencies in Next.js often occur when client components import types from server components (page.tsx)
+  - The fix is simple: extract shared types to a separate file that both can import from
+  - Use `type` imports to avoid runtime issues - types are erased at compile time
+  - madge with `--circular --extensions ts,tsx` is the standard tool for detecting circular dependencies
+
+- **Gotchas:**
+  - The type-only import (`import type { ... }`) doesn't cause runtime issues but still creates a static analysis cycle that madge detects
+  - Always verify with madge after fixing - sometimes extracting types can inadvertently create new cycles
+  - The processing page is a server component that prepares stats for the client component
+
+- **Acceptance criteria verified:**
+  - [x] Identified the specific imports causing the cycle between client.tsx and page.tsx
+  - [x] Restructured imports to eliminate the circular dependency
+  - [x] `npx madge --circular --extensions ts,tsx src/` reports 0 circular dependencies
+  - [x] All existing tests pass (3 pre-existing failures unrelated to this change)
+  - [x] Typecheck passes (`npm run typecheck`)
+  - [x] Build passes (`npm run build`)
+  - [x] Lint passes (`npm run lint`)
