@@ -5,11 +5,11 @@
  * @see Issue #67: US-011
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
 import { AssessmentDimension, VideoAssessmentStatus } from "@prisma/client";
 
 // Mock the embeddings module
-vi.mock("@/lib/embeddings", () => ({
+vi.mock("@/lib/candidate/embeddings", () => ({
   generateQueryEmbedding: vi.fn(),
   buildQueryText: vi.fn(),
 }));
@@ -42,10 +42,8 @@ import {
 } from "./candidate-search";
 
 // Cast mocks for type-safe access
-const mockGenerateQueryEmbedding = generateQueryEmbedding as ReturnType<
-  typeof vi.fn
->;
-const mockBuildQueryText = buildQueryText as ReturnType<typeof vi.fn>;
+const mockGenerateQueryEmbedding = generateQueryEmbedding as Mock;
+const mockBuildQueryText = buildQueryText as Mock;
 const mockQueryRaw = db.$queryRaw as unknown as ReturnType<typeof vi.fn>;
 const mockExecuteRaw = db.$executeRaw as unknown as ReturnType<typeof vi.fn>;
 const mockDbVideoAssessment = db.videoAssessment as unknown as {
