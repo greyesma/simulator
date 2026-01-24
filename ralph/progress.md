@@ -262,3 +262,45 @@
 
 ### Gotchas discovered
 - None - this was a straightforward component installation with no modifications needed
+
+## Issue #119: DS-009: Add shadcn Dialog component
+
+### What was implemented
+- Installed the shadcn Dialog component via `npx shadcn@latest add dialog --yes`
+- Updated DialogContent to use `animate-scale-in` (our custom animation from DS-004) instead of the default `zoom-in-95`
+- Updated DialogContent to use `rounded-lg` for rounded corners (consistent with design system)
+
+### Files changed
+- `src/components/ui/dialog.tsx` (new) - shadcn Dialog component with customized animations
+
+### Components available
+- **Dialog** - Root component that manages open/closed state
+- **DialogTrigger** - Button/element that opens the dialog
+- **DialogContent** - Main content container with scale-in animation and rounded corners
+- **DialogHeader** - Header section for title and description
+- **DialogTitle** - Title text with semibold weight
+- **DialogDescription** - Muted description text
+- **DialogFooter** - Footer section for action buttons
+- **DialogClose** - Close button with X icon
+- **DialogOverlay** - Background overlay with fade-in animation
+- **DialogPortal** - Portal for rendering dialog outside DOM hierarchy
+
+### Accessibility features (built-in via Radix UI)
+- Focus trap: Dialog traps focus within content when open
+- Escape key: Closes dialog on Escape keypress
+- ARIA: Proper aria-* attributes from DialogPrimitive
+- Screen reader: Close button has `sr-only` label
+
+### Animation customization
+The default shadcn Dialog uses `zoom-in-95` from tailwindcss-animate. This was changed to:
+- `data-[state=open]:animate-scale-in` - Uses our custom scaleIn keyframe from DS-004 for enter animation
+- `data-[state=closed]:zoom-out-95` - Keeps the default exit animation
+
+### Learnings for future iterations
+1. **shadcn animations vs custom animations** - shadcn components use tailwindcss-animate utilities by default (zoom-in-95, fade-in-0, etc.). When the acceptance criteria specifies using our custom animations (animate-scale-in from DS-004), the component needs to be modified.
+2. **Radix UI provides accessibility** - The Dialog uses `@radix-ui/react-dialog` which handles focus trap, escape key, and ARIA attributes automatically. No additional accessibility work needed.
+3. **Build can be flaky** - The Next.js build sometimes fails with transient `PageNotFoundError` errors. Clearing `.next` cache and rebuilding usually resolves this.
+4. **Rounded corners applied without sm: prefix** - Changed `sm:rounded-lg` to `rounded-lg` so corners are rounded on all screen sizes
+
+### Gotchas discovered
+- The issue specified "Content has scale-in animation (uses animate-scale-in)" but the default shadcn Dialog uses `zoom-in-95`. These are similar but not identical - the custom `animate-scale-in` uses our design system's timing (0.2s ease-out) while zoom-in-95 comes from tailwindcss-animate.
