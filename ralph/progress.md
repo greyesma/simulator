@@ -538,3 +538,58 @@
   - Profile page shows Card-based sections with Avatar, Badge, and Button components
   - Settings page shows Card layout with Danger Zone using destructive styling
   - No gold (#f7da50) color visible in any migrated pages
+
+## Issue #142: DS-032: Remove neo-brutalist code and dead code
+
+- **What was implemented:**
+  - Deleted unused `styles/theme.css` file (old neo-brutalist theme, never imported)
+  - Updated `src/app/auth-error/page.tsx` to use Button, Card, and AlertTriangle icon
+  - Updated `src/lib/external/email.ts` score-box to use blue (#237CF1) instead of gold
+  - Updated `remotion/src/lib/design-system.ts` accent color to blue and added rounded corners
+  - Updated `src/components/CLAUDE.md` to reference modern shadcn/ui design
+  - Replaced `bg-secondary` (gold) with `bg-primary` (blue) in floating-call-bar.tsx
+  - Replaced `bg-secondary` with `bg-primary/10` in slack-layout.tsx avatar
+  - Updated analytics-dashboard.tsx to pass `bg-primary` directly instead of mapping
+  - Updated admin/layout.tsx to use Badge component and hover:text-primary
+  - Updated multiple test files to check for modern design patterns:
+    - page.test.tsx: bg-primary instead of bg-foreground for buttons
+    - coworker-sidebar.test.tsx: backgroundColor=237CF1 instead of D4AF37
+    - markdown.test.tsx: Completely rewrote to test rounded-lg, border-border, bg-primary/10
+    - active-filters-bar.test.tsx: text-foreground for outline Badge variant
+    - page.test.tsx (candidate): bg-primary instead of bg-secondary for speed buttons
+
+- **Files changed:**
+  - `styles/theme.css` - Deleted (was unused dead code)
+  - `src/app/auth-error/page.tsx` - Complete modern redesign with Card and Button
+  - `src/lib/external/email.ts` - Blue score-box with white text
+  - `remotion/src/lib/design-system.ts` - Blue accent, rounded corners
+  - `src/components/CLAUDE.md` - Updated design quick reference
+  - `src/components/chat/floating-call-bar.tsx` - bg-primary for call indicators
+  - `src/components/chat/slack-layout.tsx` - bg-primary/10 for coworker avatars
+  - `src/app/admin/analytics-dashboard.tsx` - Removed color mapping, direct bg-primary
+  - `src/app/admin/layout.tsx` - Badge for ADMIN, hover:text-primary for nav
+  - Test files: Updated 5 test files to reflect modern design patterns
+
+- **Learnings for future iterations:**
+  - styles/theme.css was completely unused - grep for imports before deleting
+  - Button component uses bg-primary, not bg-foreground for variant="default"
+  - Badge variant="outline" only has text-foreground, no background
+  - Badge variant="secondary" uses bg-secondary which is now light grey, not gold
+  - Badge variant="destructive" uses bg-destructive for error states
+  - DiceBear avatar background colors are specified in the URL query string
+  - Email templates use inline CSS, not Tailwind - update hex codes directly
+
+- **Gotchas:**
+  - Tests for button styling need to check for bg-primary, not bg-foreground
+  - Tests checking for neo-brutalist patterns (border-2, bg-secondary as gold) need updates
+  - The markdown component was already updated to modern design, but tests were stale
+  - remotion design-system affects video generation but doesn't block build/tests
+
+- **Acceptance criteria verified:**
+  - [x] No `border-2 border-foreground` patterns remain (removed from auth-error)
+  - [x] No hardcoded gold (#f7da50) color references in source code
+  - [x] No "neo-brutalist" or "brutalist" comments in component code
+  - [x] CSS is minimal and clean (deleted entire unused theme.css)
+  - [x] No unused styles or dead code (styles/theme.css deleted)
+  - [x] Build passes: `npm run build`
+  - [x] Lint passes: `npm run lint`
