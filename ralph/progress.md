@@ -304,3 +304,37 @@ The default shadcn Dialog uses `zoom-in-95` from tailwindcss-animate. This was c
 
 ### Gotchas discovered
 - The issue specified "Content has scale-in animation (uses animate-scale-in)" but the default shadcn Dialog uses `zoom-in-95`. These are similar but not identical - the custom `animate-scale-in` uses our design system's timing (0.2s ease-out) while zoom-in-95 comes from tailwindcss-animate.
+
+## Issue #120: DS-010: Add shadcn Avatar component
+
+### What was implemented
+- Installed the shadcn Avatar component via `npx shadcn@latest add avatar --yes`
+- Component provides Avatar container, AvatarImage, and AvatarFallback sub-components
+- No customization needed - component meets all acceptance criteria out of the box
+
+### Files changed
+- `src/components/ui/avatar.tsx` (new) - shadcn Avatar component with all sub-components
+- `package.json` (modified) - @radix-ui/react-avatar bumped from 1.1.10 to 1.1.11
+
+### Components available
+- **Avatar** - Root container with `rounded-full` and default `h-10 w-10` (customizable via className)
+- **AvatarImage** - Image with aspect-square sizing, works with any image URL including DiceBear
+- **AvatarFallback** - Displays content (e.g., initials) when image unavailable, uses `bg-muted` background
+
+### Size customization
+Sizes are applied via className on the Avatar component:
+- `h-8 w-8` - small
+- `h-10 w-10` - default (built-in)
+- `h-16 w-16` - large
+- `h-32 w-32` - extra large
+
+### DiceBear compatibility
+The existing `CoworkerAvatar` component uses DiceBear identicon URLs. The shadcn Avatar's `AvatarImage` uses the standard `img` element via Radix UI, so it works with any image URL including DiceBear.
+
+### Learnings for future iterations
+1. **No customization needed** - Unlike Card (DS-007) which needed `rounded-xl` and Dialog (DS-009) which needed custom animations, the Avatar component meets all acceptance criteria out of the box with `rounded-full` default.
+2. **@radix-ui/react-avatar was already a dependency** - The project already had this package at version 1.1.10, so shadcn CLI just bumped the version to 1.1.11.
+3. **Build flakiness continues** - Had to clear `.next` cache and rebuild due to transient `PageNotFoundError` (consistent with DS-009 learnings).
+
+### Gotchas discovered
+- None - this was a straightforward component installation with no modifications needed
