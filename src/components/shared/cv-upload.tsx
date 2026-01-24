@@ -46,61 +46,65 @@ export function CVUpload({
     return null;
   };
 
-  const uploadFile = async (file: File) => {
-    const validationError = validateFile(file);
-    if (validationError) {
-      setError(validationError);
-      onError?.(validationError);
-      return;
-    }
-
-    setError(null);
-    setIsUploading(true);
-    setProgress(0);
-
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      if (assessmentId) {
-        formData.append("assessmentId", assessmentId);
+  const uploadFile = useCallback(
+    async (file: File) => {
+      const validationError = validateFile(file);
+      if (validationError) {
+        setError(validationError);
+        onError?.(validationError);
+        return;
       }
 
-      // Simulate progress for better UX (actual progress tracking would need XHR)
-      const progressInterval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return prev;
-          }
-          return prev + 10;
-        });
-      }, 100);
-
-      const response = await fetch("/api/upload/cv", {
-        method: "POST",
-        body: formData,
-      });
-
-      clearInterval(progressInterval);
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Upload failed");
-      }
-
-      const data = await response.json();
-      setProgress(100);
-      setFileName(data.fileName);
-      onUploadComplete?.(data);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Upload failed";
-      setError(errorMessage);
-      onError?.(errorMessage);
+      setError(null);
+      setIsUploading(true);
       setProgress(0);
-    } finally {
-      setIsUploading(false);
-    }
-  };
+
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        if (assessmentId) {
+          formData.append("assessmentId", assessmentId);
+        }
+
+        // Simulate progress for better UX (actual progress tracking would need XHR)
+        const progressInterval = setInterval(() => {
+          setProgress((prev) => {
+            if (prev >= 90) {
+              clearInterval(progressInterval);
+              return prev;
+            }
+            return prev + 10;
+          });
+        }, 100);
+
+        const response = await fetch("/api/upload/cv", {
+          method: "POST",
+          body: formData,
+        });
+
+        clearInterval(progressInterval);
+
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || "Upload failed");
+        }
+
+        const data = await response.json();
+        setProgress(100);
+        setFileName(data.fileName);
+        onUploadComplete?.(data);
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Upload failed";
+        setError(errorMessage);
+        onError?.(errorMessage);
+        setProgress(0);
+      } finally {
+        setIsUploading(false);
+      }
+    },
+    [assessmentId, onError, onUploadComplete]
+  );
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -109,15 +113,18 @@ export function CVUpload({
     }
   };
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragOver(false);
 
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      uploadFile(file);
-    }
-  }, []);
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        uploadFile(file);
+      }
+    },
+    [uploadFile]
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();

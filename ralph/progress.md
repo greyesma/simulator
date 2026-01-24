@@ -85,3 +85,23 @@
 
 - **Verification:**
   - Build passes without the 6 warnings about imports from `@/components/ui/input`, `@/components/ui/button`, `@/components/ui/avatar`, and `@/components/ui/badge`
+
+## Issue #166: Fix missing useCallback dependency in cv-upload.tsx
+
+- **What was implemented:**
+  - Wrapped `uploadFile` function in `useCallback` with proper dependencies (`assessmentId`, `onError`, `onUploadComplete`)
+  - Added `uploadFile` to the `handleDrop` useCallback dependency array
+  - This fixes the `react-hooks/exhaustive-deps` ESLint warning
+
+- **Files changed:**
+  - `src/components/shared/cv-upload.tsx` - Wrapped `uploadFile` in `useCallback` and updated `handleDrop` dependencies
+
+- **Learnings for future iterations:**
+  - When a callback uses a function defined in the same component, that function must either:
+    1. Be wrapped in `useCallback` with its own dependencies
+    2. Then included as a dependency in the callback that uses it
+  - Simply adding the function to the dependency array without wrapping it would cause infinite re-renders
+  - The `uploadFile` function uses props (`assessmentId`, `onError`, `onUploadComplete`) which must be in its dependency array
+
+- **Verification:**
+  - Build passes without the `react-hooks/exhaustive-deps` warning for cv-upload.tsx
