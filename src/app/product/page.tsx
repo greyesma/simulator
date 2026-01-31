@@ -22,7 +22,6 @@ import {
   ChevronDown,
   Send,
   Eye,
-  GitCompare,
 } from "lucide-react";
 import Navigation from "@/components/landing/Navigation";
 import Footer from "@/components/landing/Footer";

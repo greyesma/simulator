@@ -7,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Play,
   MessageSquare,
-  Brain,
   Users,
   ArrowRight,
   Clock,
@@ -22,11 +21,9 @@ import {
   ChevronDown,
   X,
   AlertTriangle,
-  Sparkles,
   Send,
   Eye,
   GitCompare,
-  Award,
 } from "lucide-react";
 import Navigation from "@/components/landing/Navigation";
 import Footer from "@/components/landing/Footer";

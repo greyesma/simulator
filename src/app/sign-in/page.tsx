@@ -25,7 +25,7 @@ function SignInForm() {
     void signIn("google", { redirectTo: callbackUrl });
   };
 
-  const handleLinkedInSignIn = () => {
+  const _handleLinkedInSignIn = () => {
     setIsLoading(true);
     setError("");
     void signIn("linkedin", { redirectTo: callbackUrl });
