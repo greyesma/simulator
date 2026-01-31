@@ -1,5 +1,76 @@
 # Ralph Progress Log
 
+## Issue #179: RF-011 - Create recruiter scenario detail page
+
+### What was implemented
+- Created `/src/app/recruiter/scenarios/[id]/page.tsx` - Server component with recruiter auth
+- Created `/src/app/recruiter/scenarios/[id]/client.tsx` - Client component with scenario detail UI
+
+### Files created
+- `src/app/recruiter/scenarios/[id]/page.tsx` - Server component that:
+  - Requires RECRUITER or ADMIN role via `requireRecruiter()`
+  - Fetches scenario with coworkers and assessment count
+  - Validates scenario ownership (createdById = currentUser.id OR user is ADMIN)
+  - Returns 404 if not found or not authorized
+- `src/app/recruiter/scenarios/[id]/client.tsx` - Client component with:
+  - Header with scenario name, company name, and back link
+  - Prominent shareable link section with copy button and "Share this link" messaging
+  - Scenario details: task description, tech stack badges, repository URL, created date
+  - Coworkers list showing name, role, and voice
+  - Assessments section with count and "View Candidates" link
+
+### Page Sections
+- **Header:** Scenario name, company name, back to scenarios link
+- **Shareable Link Section (prominent):**
+  - Blue-themed card with full URL displayed
+  - Large "Copy Link" button with visual feedback
+  - Helper text: "Share this link with candidates to start their assessment"
+- **Scenario Details:** Task description, tech stack, repository URL, created date
+- **Coworkers Section:** List of configured coworkers with name, role, voice
+- **Assessments Section:** Count with link to view candidates
+
+### Access Control
+- Scenario must belong to current recruiter (`createdById = currentUser.id`)
+- ADMIN users can view any scenario
+- Returns 404 if not found or not authorized
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes
+- E2E tested with agent-browser:
+  - Logged in as recruiter@test.com
+  - Navigated to `/recruiter/scenarios/test-scenario-recruiter`
+  - Verified scenario name, company, shareable link, task description
+  - Verified tech stack badges, coworkers list, assessments count
+  - Copy button functional with visual feedback
+- Screenshots captured: `screenshots/issue-179-scenario-detail.png`, `screenshots/issue-179-copy-clicked.png`
+
+### Learnings for future iterations
+- The scenarios list page (`/recruiter/scenarios`) already links to detail pages via ExternalLink icon
+- Copy-to-clipboard pattern reused from scenarios list - same visual feedback approach
+- Access control pattern: check ownership OR admin role before returning data
+- Prisma `_count` feature used for efficient assessment count
+- For coworkers, `voiceName` may be null - display conditionally
+
+### Gotchas discovered
+- The `params` in Next.js 15 app router is a Promise and needs to be awaited
+- The coworker avatar/icon section uses a generic User icon instead of actual avatars since avatarUrl is typically null
+
+### Acceptance Criteria Status
+- [x] Create `/src/app/recruiter/scenarios/[id]/page.tsx` - server component
+- [x] Create `/src/app/recruiter/scenarios/[id]/client.tsx` - client component
+- [x] Header: Scenario name, company name, back to scenarios link
+- [x] Shareable Link Section: Full URL, large copy button, helper text
+- [x] Scenario Details: Task description, tech stack, repository URL, created date
+- [x] Coworkers Section: List with name, role, voice
+- [x] Assessments Section: Count with link to view candidates
+- [x] Access Control: Verify scenario belongs to recruiter OR user is ADMIN
+- [x] Return 404 if not found or not authorized
+- [x] TypeScript compiles: `npm run typecheck`
+- [x] E2E test with agent-browser
+- [x] Screenshots captured
+
+---
+
 ## Issue #178: RF-010 - Create recruiter scenario builder
 
 ### What was implemented
