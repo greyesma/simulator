@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   // Validate request body using Zod schema
   const validated = await validateRequest(request, RegisterRequestSchema);
   if ("error" in validated) return validated.error;
-  const { email, password, name } = validated.data;
+  const { email, password, name, role } = validated.data;
 
   try {
     // Hash password
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
           email,
           password: hashedPassword,
           name: name || null,
-          role: "USER",
+          role: role ?? "USER", // Default to USER if not specified
           emailVerified: new Date(),
         },
       });

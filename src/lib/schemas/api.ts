@@ -42,6 +42,8 @@ export const RegisterRequestSchema = z.object({
     .string()
     .min(8, "Password must be at least 8 characters"),
   name: z.string().optional(),
+  // Role can only be USER or RECRUITER via signup (never ADMIN)
+  role: z.enum(["USER", "RECRUITER"]).optional(),
 });
 export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
 

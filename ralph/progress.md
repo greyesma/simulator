@@ -1,5 +1,60 @@
 # Ralph Progress Log
 
+## Issue #175: RF-007 - Add recruiter signup page
+
+### What was implemented
+- Created `/src/app/sign-up/recruiter/page.tsx` with dedicated recruiter signup form
+- Updated `src/lib/schemas/api.ts` - Added optional `role` parameter to RegisterRequestSchema (accepts "USER" | "RECRUITER")
+- Updated `src/app/api/auth/register/route.ts` - Now uses role from request body, defaults to "USER"
+
+### Files created
+- `src/app/sign-up/recruiter/page.tsx` - Recruiter-specific signup page with:
+  - Recruiter-focused messaging ("Create your recruiter account", "Start assessing candidates with AI-powered simulations")
+  - Google OAuth support (stores role in localStorage for callback)
+  - Email/password form with firstName, lastName, work email fields
+  - Redirects to `/recruiter/dashboard` after signup
+  - "Sign up as a candidate" link for candidates who land on wrong page
+
+### Files modified
+- `src/lib/schemas/api.ts` - Added `role: z.enum(["USER", "RECRUITER"]).optional()` to RegisterRequestSchema
+- `src/app/api/auth/register/route.ts` - Updated to extract role and use it in user creation
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes
+- Route `/sign-up/recruiter` is accessible and renders correctly
+- API correctly creates users with RECRUITER role when role="RECRUITER"
+- API correctly defaults to USER role when role is not provided
+- API correctly rejects ADMIN role (validation error) - security check passed
+- Screenshots saved to `screenshots/issue-175-recruiter-signup.png` and `screenshots/issue-175-filled-v2.png`
+
+### Learnings for future iterations
+- The existing signup page uses `userType` param from URL (candidate/employer) to determine role, but the API uses `role` field
+- Google OAuth stores role in localStorage (`skillvee_signup_role`) for the callback to pick up
+- The recruiter dashboard route (`/recruiter/dashboard`) doesn't exist yet - will 404 until RF-008/RF-009 creates it
+
+### Gotchas discovered
+- Headless browser (agent-browser) may not render Tailwind CSS properly, but the page works correctly in real browsers
+- React controlled inputs with `fill` command may have state sync issues - `type` command works better for E2E testing
+
+### Acceptance Criteria Status
+- [x] Create `/src/app/sign-up/recruiter/page.tsx`
+- [x] Reuse existing signup form components/styling from `/sign-up`
+- [x] Include email/password fields
+- [x] Include OAuth buttons (Google) - LinkedIn commented out as in original
+- [x] Add "Already have an account? Sign in" link
+- [x] Modify `/src/app/api/auth/register/route.ts` to accept optional `role` parameter
+- [x] Validate role is either `USER` or `RECRUITER` (never `ADMIN` via signup)
+- [x] Default to `USER` if no role provided (backward compatible)
+- [x] When role is `RECRUITER`, set user role accordingly
+- [x] After successful signup, redirect to `/recruiter/dashboard`
+- [x] Show appropriate messaging for recruiters
+- [x] TypeScript compiles: `npm run typecheck`
+- [x] Can navigate to `/sign-up/recruiter`
+- [x] Can fill form and submit
+- [x] User is created with RECRUITER role (verified via API)
+
+---
+
 ## Issue #174: RF-006 - Remove defense page (defense moves to Slack)
 
 ### What was implemented
