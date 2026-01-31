@@ -39,6 +39,10 @@ export type {
   Recommendation,
   AssessmentMetrics,
   AssessmentReport,
+  // Video evaluation result types (for results page)
+  VideoDimension,
+  VideoSkillEvaluation,
+  VideoEvaluationResult,
 } from "./assessment";
 
 // Conversation types

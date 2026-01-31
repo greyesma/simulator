@@ -1,5 +1,111 @@
 # Ralph Progress Log
 
+## Issue #193: RF-025 - Update results page for simplified assessment data
+
+### What was implemented
+- Updated the results page to display new video evaluation data with hiring signals
+- Created new `VideoSkillCard` component for displaying skill evaluation with rationale, green flags, red flags, and timestamps
+- Created `HiringSignalsSection` component with hiring recommendation badge (HIRE/MAYBE/NO_HIRE), rationale, top strengths, and areas to probe
+- Added backward compatibility for legacy assessments without video evaluation data
+- Updated types to include `VideoEvaluationResult` and `VideoSkillEvaluation` in `AssessmentReport`
+- Updated report API to include `videoEvaluation` data in the response
+- Updated seed data with sample video evaluation for E2E testing
+
+### Files modified
+- `src/types/assessment.ts` - Added new types:
+  - `VideoDimension` - The 8 video evaluation dimension names
+  - `VideoSkillEvaluation` - Skill with dimension, score, rationale, greenFlags, redFlags, timestamps
+  - `VideoEvaluationResult` - Full video evaluation result for results page display
+  - Extended `AssessmentReport` with optional `videoEvaluation` field
+- `src/types/index.ts` - Export new types
+- `src/app/api/assessment/report/route.ts` - Added:
+  - `VIDEO_DIMENSIONS` array constant
+  - `convertToVideoEvaluationResult()` function to transform video evaluation to results format
+  - Include `videoEvaluation` in returned `AssessmentReport`
+- `src/app/assessment/[id]/results/client.tsx` - Complete rewrite:
+  - New `VideoSkillCard` component with expandable card showing rationale, green flags, red flags, timestamps
+  - New `HiringSignalsSection` component with recommendation badge and strengths/concerns
+  - Updated `DIMENSION_LABELS` for new video evaluation dimensions
+  - Added `getScoreLevel()` helper for calculating level from score
+  - Added conditional rendering: new format for video evaluation, legacy format for old assessments
+  - Kept `LegacySkillCard` for backward compatibility with old reports
+- `prisma/seed.ts` - Added sample video evaluation data to test assessment:
+  - Full 8-skill video evaluation with rationale, green/red flags, timestamps
+  - Hiring signals with recommendation ("hire"), rationale, and overall flags
+
+### UI Components Added
+
+#### HiringSignalsSection
+- Prominent card at top with hiring recommendation badge
+- Three badge styles: HIRE (green), MAYBE (yellow), NO_HIRE (red)
+- Shows recommendation rationale
+- Two-column grid with Top Strengths (green) and Areas to Probe (amber)
+
+#### VideoSkillCard
+- Expandable card showing skill name, score bar, and level badge
+- Expanded view shows:
+  - Rationale text explaining the score
+  - Green Flags list (positive signals)
+  - Red Flags list (concerns)
+  - Evidence Timestamps as clickable chips
+
+### Data Flow
+1. Video evaluation generates `VideoEvaluationOutput` with 8 dimension scores and hiring signals
+2. Report API converts to `VideoEvaluationResult` format with skills array
+3. Report includes both legacy `skillScores` (backward compat) and new `videoEvaluation`
+4. Results page checks `report.videoEvaluation` to decide which UI to render
+5. Old assessments without video evaluation fall back to legacy skill cards
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes
+- Results page renders without errors
+- All 8 skills display correctly with proper scores and badges
+- Hiring signals section displays with HIRE recommendation badge
+- Skill cards expand to show rationale, flags, and timestamps
+- Responsive design works (tested in browser)
+
+### Screenshots
+- `screenshots/issue-193-results-overview.png` - Hero section with score and hiring recommendation
+- `screenshots/issue-193-skills-section.png` - Session metrics and skill breakdown
+- `screenshots/issue-193-skill-expanded.png` - Communication skill expanded with details
+- `screenshots/issue-193-skill-details.png` - Full skill card with green flags, red flags, timestamps
+- `screenshots/issue-193-more-skills.png` - All 8 skills visible in list
+
+### Acceptance Criteria Status
+- [x] Show 8 skills from video evaluation (not old skill categories)
+- [x] Each skill card shows: skill name and score, rationale, green flags, red flags, timestamps
+- [x] Keep expandable card UI pattern
+- [x] New section for hiring signals with recommendation badge
+- [x] Display overall green flags (strengths) and red flags (concerns)
+- [x] Show hiring recommendation badge: hire (green), maybe (yellow), no_hire (red)
+- [x] Show recommendation rationale
+- [x] Keep large circular score display with overall_score
+- [x] Keep level badges (Exceptional, Strong, etc.)
+- [x] Remove references to old skill categories (handled via conditional rendering)
+- [x] Remove narrative feedback section (replaced by video summary)
+- [x] Remove recommendations section (replaced by hiring signals)
+- [x] Old assessments show graceful fallback (legacy UI)
+- [x] New assessments get new display
+- [x] TypeScript compiles: `npm run typecheck`
+- [x] Results page renders without errors
+- [x] All 8 skills display correctly
+- [x] Hiring signals section displays correctly
+- [x] Responsive design works on mobile
+
+### Learnings for future iterations
+- The `videoEvaluation` field in `AssessmentReport` allows for gradual migration
+- Conditional rendering (`hasVideoEvaluation ? newUI : legacyUI`) is clean for backward compatibility
+- The hiring signals section should be prominent for recruiters (placed right after hero)
+- Timestamps displayed as monospace chips look good and match the video player use case
+
+### Gotchas discovered
+- The video evaluation dimension names are UPPERCASE (COMMUNICATION, PROBLEM_SOLVING, etc.)
+- Need to map them to display labels for the UI
+- The `score` can be null if there's insufficient evidence - handle with `?? 0`
+- Red flags are "concerns" not necessarily dealbreakers - used amber color instead of red for "Areas to Probe"
+
+---
+
 ## Issue #192: RF-024 - Simplify report API to single video evaluation
 
 ### What was implemented

@@ -336,4 +336,50 @@ export interface AssessmentReport {
 
   // Version tracking
   version: string;
+
+  // NEW: Video evaluation data (when available)
+  videoEvaluation?: VideoEvaluationResult;
+}
+
+// ============================================================================
+// Video Evaluation Result (NEW - for results page display)
+// ============================================================================
+
+/**
+ * Dimension names from video evaluation
+ */
+export type VideoDimension =
+  | "COMMUNICATION"
+  | "PROBLEM_SOLVING"
+  | "TECHNICAL_KNOWLEDGE"
+  | "COLLABORATION"
+  | "ADAPTABILITY"
+  | "LEADERSHIP"
+  | "CREATIVITY"
+  | "TIME_MANAGEMENT";
+
+/**
+ * Skill evaluation from video analysis
+ */
+export interface VideoSkillEvaluation {
+  dimension: VideoDimension;
+  score: number | null;
+  rationale: string;
+  greenFlags: string[];
+  redFlags: string[];
+  timestamps: string[];
+}
+
+/**
+ * Video evaluation result for results page display
+ * This is the new simplified format from RF-024
+ */
+export interface VideoEvaluationResult {
+  evaluationVersion: string;
+  overallScore: number;
+  skills: VideoSkillEvaluation[];
+  hiringSignals: HiringSignals;
+  overallSummary: string;
+  evaluationConfidence: "high" | "medium" | "low";
+  insufficientEvidenceNotes?: string;
 }

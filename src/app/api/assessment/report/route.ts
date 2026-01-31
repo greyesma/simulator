@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { db } from "@/server/db";
 import { AssessmentStatus, VideoAssessmentStatus } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
-import type { AssessmentReport, SkillScore, ScoreLevel } from "@/types";
+import type { AssessmentReport, SkillScore, ScoreLevel, VideoEvaluationResult, VideoSkillEvaluation, VideoDimension } from "@/types";
 import { sendReportEmail, isEmailServiceConfigured } from "@/lib/external";
 import { getEvaluationResults, evaluateVideo } from "@/lib/analysis";
 import type { VideoEvaluationOutput } from "@/prompts/analysis/video-evaluation";
@@ -34,6 +34,49 @@ function scoreToLevel(score: number): ScoreLevel {
 }
 
 /**
+ * Dimension names for video evaluation
+ */
+const VIDEO_DIMENSIONS: VideoDimension[] = [
+  "COMMUNICATION",
+  "PROBLEM_SOLVING",
+  "TECHNICAL_KNOWLEDGE",
+  "COLLABORATION",
+  "ADAPTABILITY",
+  "LEADERSHIP",
+  "CREATIVITY",
+  "TIME_MANAGEMENT",
+];
+
+/**
+ * Converts video evaluation output to the new video evaluation result format
+ */
+function convertToVideoEvaluationResult(
+  videoResult: VideoEvaluationOutput
+): VideoEvaluationResult {
+  const skills: VideoSkillEvaluation[] = VIDEO_DIMENSIONS.map(dimension => {
+    const scoreData = videoResult.dimension_scores[dimension];
+    return {
+      dimension,
+      score: scoreData?.score ?? null,
+      rationale: scoreData?.rationale ?? "",
+      greenFlags: scoreData?.greenFlags ?? [],
+      redFlags: scoreData?.redFlags ?? [],
+      timestamps: scoreData?.timestamps ?? [],
+    };
+  });
+
+  return {
+    evaluationVersion: videoResult.evaluation_version,
+    overallScore: videoResult.overall_score,
+    skills,
+    hiringSignals: videoResult.hiringSignals,
+    overallSummary: videoResult.overall_summary,
+    evaluationConfidence: videoResult.evaluation_confidence,
+    insufficientEvidenceNotes: videoResult.insufficient_evidence_notes ?? undefined,
+  };
+}
+
+/**
  * Converts video evaluation output to assessment report format
  */
 function convertVideoEvaluationToReport(
@@ -43,7 +86,7 @@ function convertVideoEvaluationToReport(
   timing?: { totalDurationMinutes: number | null; workingPhaseMinutes: number | null },
   coworkersContacted?: number
 ): AssessmentReport {
-  // Convert dimension scores to skill scores
+  // Convert dimension scores to skill scores (for backward compatibility)
   const skillScores: SkillScore[] = [];
 
   for (const [dimension, scoreData] of Object.entries(videoResult.dimension_scores)) {
@@ -68,6 +111,9 @@ function convertVideoEvaluationToReport(
   // Build narrative from hiring signals
   const { hiringSignals } = videoResult;
 
+  // Create the video evaluation result for new display
+  const videoEvaluation = convertToVideoEvaluationResult(videoResult);
+
   return {
     generatedAt: new Date().toISOString(),
     assessmentId,
@@ -87,7 +133,7 @@ function convertVideoEvaluationToReport(
     recommendations: skillScores
       .filter(s => s.score <= 3)
       .slice(0, 3)
-      .map((skill, index) => ({
+      .map((skill) => ({
         category: skill.category,
         priority: skill.score <= 2 ? "high" : "medium" as const,
         title: `Improve ${skill.category.replace("_", " ")}`,
@@ -106,6 +152,8 @@ function convertVideoEvaluationToReport(
       codeReviewScore: null,
     },
     version: videoResult.evaluation_version,
+    // Include new video evaluation data for results page
+    videoEvaluation,
   };
 }
 

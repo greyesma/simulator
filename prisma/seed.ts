@@ -541,7 +541,8 @@ Acceptance Criteria:
     console.log(`     PR URL: https://github.com/skillvee/test-repo/pull/1`);
     console.log(`     Note: Calls to manager will use defense prompt`);
 
-    // Create test assessment with COMPLETED status and report for results page testing (RF-018)
+    // Create test assessment with COMPLETED status and report for results page testing (RF-018, RF-025)
+    // Updated with new video evaluation data for RF-025
     const sampleReport = {
       generatedAt: new Date().toISOString(),
       assessmentId: TEST_ASSESSMENT_IDS.completed,
@@ -553,56 +554,56 @@ Acceptance Criteria:
           category: "communication",
           score: 4,
           level: "strong",
-          evidence: ["Clear explanations in chat", "Asked good clarifying questions"],
+          evidence: ["+ Clear explanations in chat", "+ Asked good clarifying questions"],
           notes: "Demonstrated effective communication with team members."
         },
         {
           category: "problem_decomposition",
           score: 5,
           level: "exceptional",
-          evidence: ["Broke task into logical steps", "Prioritized effectively"],
+          evidence: ["+ Broke task into logical steps", "+ Prioritized effectively"],
           notes: "Excellent at breaking down complex problems."
         },
         {
           category: "ai_leverage",
           score: 4,
           level: "strong",
-          evidence: ["Used AI tools effectively", "Verified AI suggestions"],
+          evidence: ["+ Used AI tools effectively", "+ Verified AI suggestions"],
           notes: "Good use of AI assistance while maintaining oversight."
         },
         {
           category: "code_quality",
           score: 4,
           level: "strong",
-          evidence: ["Clean code structure", "Good naming conventions"],
+          evidence: ["+ Clean code structure", "+ Good naming conventions"],
           notes: "Produced high-quality, maintainable code."
         },
         {
           category: "xfn_collaboration",
           score: 3,
           level: "adequate",
-          evidence: ["Reached out to coworkers", "Could improve proactive communication"],
+          evidence: ["+ Reached out to coworkers", "- Could improve proactive communication"],
           notes: "Good teamwork, room for more proactive engagement."
         },
         {
           category: "time_management",
           score: 5,
           level: "exceptional",
-          evidence: ["Completed on time", "Efficient task switching"],
+          evidence: ["+ Completed on time", "+ Efficient task switching"],
           notes: "Excellent time management throughout the simulation."
         },
         {
           category: "technical_decision_making",
           score: 4,
           level: "strong",
-          evidence: ["Made sound architectural choices", "Considered trade-offs"],
+          evidence: ["+ Made sound architectural choices", "+ Considered trade-offs"],
           notes: "Strong technical judgment in design decisions."
         },
         {
           category: "presentation",
           score: 4,
           level: "strong",
-          evidence: ["Clear PR description", "Well-structured defense"],
+          evidence: ["+ Clear PR description", "+ Well-structured defense"],
           notes: "Presented work effectively in code review."
         },
       ],
@@ -643,6 +644,138 @@ Acceptance Criteria:
         aiToolsUsed: true,
         testsStatus: "passing",
         codeReviewScore: 4,
+      },
+      version: "1.1.0",
+      // NEW: Video evaluation data for RF-025
+      videoEvaluation: {
+        evaluationVersion: "1.1.0",
+        overallScore: 4.2,
+        skills: [
+          {
+            dimension: "COMMUNICATION",
+            score: 4,
+            rationale: "Candidate demonstrated clear and professional communication throughout the assessment. Asked thoughtful clarifying questions when requirements were ambiguous and explained their technical decisions effectively.",
+            greenFlags: [
+              "Clear explanations of technical decisions",
+              "Asked relevant clarifying questions",
+              "Professional tone in all interactions",
+            ],
+            redFlags: [
+              "Occasionally could be more concise in written communication",
+            ],
+            timestamps: ["02:15", "08:42", "15:30", "32:10"],
+          },
+          {
+            dimension: "PROBLEM_SOLVING",
+            score: 5,
+            rationale: "Excellent systematic approach to breaking down the task. Formed clear hypotheses when debugging and adapted approach when initial solutions didn't work. Documented reasoning throughout.",
+            greenFlags: [
+              "Systematic problem decomposition",
+              "Formed and tested hypotheses effectively",
+              "Adapted approach when blocked",
+              "Documented reasoning",
+            ],
+            redFlags: [],
+            timestamps: ["10:45", "22:30", "45:20"],
+          },
+          {
+            dimension: "TECHNICAL_KNOWLEDGE",
+            score: 4,
+            rationale: "Strong technical foundation in React and TypeScript. Efficiently navigated the codebase and applied best practices. Occasional lookups for edge cases were handled efficiently.",
+            greenFlags: [
+              "Strong React and TypeScript knowledge",
+              "Applied best practices consistently",
+              "Efficient use of documentation",
+            ],
+            redFlags: [
+              "Minor hesitation with some advanced patterns",
+            ],
+            timestamps: ["08:15", "18:00", "25:40", "35:20"],
+          },
+          {
+            dimension: "COLLABORATION",
+            score: 3,
+            rationale: "Good collaboration instincts - reached out to coworkers when stuck and was receptive to suggestions. Could improve on proactive communication and sharing progress updates.",
+            greenFlags: [
+              "Asked for help when appropriate",
+              "Receptive to feedback",
+            ],
+            redFlags: [
+              "Could be more proactive in sharing progress",
+              "Missed opportunities to engage earlier",
+            ],
+            timestamps: ["12:00", "28:15"],
+          },
+          {
+            dimension: "ADAPTABILITY",
+            score: 4,
+            rationale: "Adapted well when requirements were clarified mid-task. Recovered gracefully from initial misunderstanding and adjusted implementation accordingly.",
+            greenFlags: [
+              "Quick adjustment to new information",
+              "Graceful recovery from setbacks",
+              "Flexible in approach",
+            ],
+            redFlags: [],
+            timestamps: ["30:45", "42:00"],
+          },
+          {
+            dimension: "LEADERSHIP",
+            score: 3,
+            rationale: "Showed initiative in some areas but tended to wait for direction on others. Made some decisions independently but could take more ownership.",
+            greenFlags: [
+              "Some initiative shown",
+              "Made good independent decisions",
+            ],
+            redFlags: [
+              "Could take more ownership",
+              "Waited for direction at times",
+            ],
+            timestamps: ["55:00"],
+          },
+          {
+            dimension: "CREATIVITY",
+            score: 4,
+            rationale: "Proposed creative solutions to technical challenges. Explored multiple approaches before settling on implementation.",
+            greenFlags: [
+              "Creative problem-solving",
+              "Explored multiple approaches",
+              "Original ideas for edge cases",
+            ],
+            redFlags: [],
+            timestamps: ["1:05:30", "1:15:00"],
+          },
+          {
+            dimension: "TIME_MANAGEMENT",
+            score: 5,
+            rationale: "Excellent time awareness and prioritization. Balanced speed and quality effectively and met key milestones ahead of schedule.",
+            greenFlags: [
+              "Excellent prioritization",
+              "Efficient use of time",
+              "Balanced speed and quality",
+              "Met milestones early",
+            ],
+            redFlags: [],
+            timestamps: ["05:00", "20:00", "45:00", "1:10:00"],
+          },
+        ],
+        hiringSignals: {
+          overallGreenFlags: [
+            "Strong problem-solving and systematic approach",
+            "Excellent time management and prioritization",
+            "Clear communication and professionalism",
+            "Solid technical knowledge in React/TypeScript",
+            "Creative solutions to technical challenges",
+          ],
+          overallRedFlags: [
+            "Could be more proactive in collaboration",
+            "May benefit from more leadership development",
+          ],
+          recommendation: "hire",
+          recommendationRationale: "This candidate demonstrates strong technical skills and excellent problem-solving abilities. Their systematic approach, time management, and communication skills are notable strengths. While there's room for growth in proactive collaboration and leadership, these are trainable gaps. Recommend moving forward with the hiring process.",
+        },
+        overallSummary: "The candidate showed strong performance across most dimensions, with exceptional problem-solving and time management skills. They communicated clearly, adapted well to feedback, and delivered quality work. Areas for growth include proactive collaboration and taking more ownership in leadership situations.",
+        evaluationConfidence: "high",
+        insufficientEvidenceNotes: undefined,
       },
     };
 
