@@ -1,7 +1,6 @@
 export {
   getAssessmentWithContext,
   getAssessmentForChat,
-  getAssessmentForDefense,
   getAssessmentForWelcome,
   getAssessmentForResults,
   getAssessmentBasic,

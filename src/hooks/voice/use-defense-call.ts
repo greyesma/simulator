@@ -10,6 +10,10 @@ import type { CategorizedError } from "@/lib/core";
 export type { VoiceConnectionState as ConnectionState };
 
 export interface UseDefenseCallOptions extends Omit<VoiceBaseOptions, "maxRetries"> {
+  /** Endpoint to get the call token. Will be configured when integrated with Slack. */
+  tokenEndpoint?: string;
+  /** Endpoint to save the transcript. Will be configured when integrated with Slack. */
+  transcriptEndpoint?: string;
   onCallEnded?: () => void;
 }
 
@@ -38,9 +42,19 @@ export interface UseDefenseCallReturn {
 /**
  * Hook for PR defense voice calls with manager.
  * Uses the base voice hook with defense-specific configuration.
+ *
+ * Note: This hook is preserved for reuse in the Slack integration (RF-012).
+ * The standalone defense page has been removed, and defense calls will
+ * happen within the Slack chat interface.
+ *
+ * To use this hook in Slack integration:
+ * 1. Configure the tokenEndpoint to point to the call token API
+ * 2. Configure the transcriptEndpoint to save defense call transcripts
  */
 export function useDefenseCall({
   assessmentId,
+  tokenEndpoint = "/api/call/token", // Default to generic call endpoint
+  transcriptEndpoint = "/api/call/transcript", // Default to generic transcript endpoint
   onTranscriptUpdate,
   onConnectionStateChange,
   onError,
@@ -58,7 +72,7 @@ export function useDefenseCall({
     onConnectionStateChange,
     onError,
     config: {
-      tokenEndpoint: "/api/defense/token",
+      tokenEndpoint,
       initialGreeting: "Hi, I'm ready to walk you through my PR!",
       enableSessionRecovery: false,
     },
@@ -79,7 +93,7 @@ export function useDefenseCall({
     // Save transcript to server
     if (base.transcriptRef.current.length > 0) {
       try {
-        await fetch("/api/defense/transcript", {
+        await fetch(transcriptEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -95,7 +109,7 @@ export function useDefenseCall({
 
     // Call the onCallEnded callback
     onCallEnded?.();
-  }, [assessmentId, managerId, base, onCallEnded]);
+  }, [assessmentId, managerId, base, onCallEnded, transcriptEndpoint]);
 
   return {
     connectionState: base.connectionState,

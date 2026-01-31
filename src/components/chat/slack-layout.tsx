@@ -14,14 +14,16 @@ interface Coworker {
 }
 
 // Context for managing call state across the layout
+// Note: "defense" call type was removed in RF-006. Defense calls will be
+// reintegrated in RF-012 using a different Slack-based flow.
 interface CallContextValue {
   activeCall: {
     coworkerId: string;
-    callType: "coworker" | "defense";
+    callType: "coworker";
   } | null;
   startCall: (
     coworkerId: string,
-    callType: "coworker" | "defense"
+    callType: "coworker"
   ) => void;
   endCall: () => void;
 }
@@ -100,7 +102,7 @@ function SlackLayoutInner({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeCall, setActiveCall] = useState<{
     coworkerId: string;
-    callType: "coworker" | "defense";
+    callType: "coworker";
   } | null>(null);
 
   // Determine selected coworker from prop override or URL
@@ -109,7 +111,7 @@ function SlackLayoutInner({
 
   const startCall = (
     coworkerId: string,
-    callType: "coworker" | "defense"
+    callType: "coworker"
   ) => {
     setActiveCall({ coworkerId, callType });
   };

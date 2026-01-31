@@ -297,17 +297,17 @@ describe("Analytics Queries", () => {
   describe("getStatusDistribution", () => {
     it("returns status counts with percentages", async () => {
       mockAssessmentGroupBy.mockResolvedValue([
-        { status: "HR_INTERVIEW", _count: 5 },
+        { status: "WELCOME", _count: 5 },
         { status: "WORKING", _count: 3 },
         { status: "COMPLETED", _count: 2 },
       ]);
 
       const result = await getStatusDistribution();
 
-      expect(result).toHaveLength(6); // All 6 statuses
-      expect(result.find((s) => s.status === "HR_INTERVIEW")?.count).toBe(5);
+      expect(result).toHaveLength(3); // WELCOME, WORKING, COMPLETED
+      expect(result.find((s) => s.status === "WELCOME")?.count).toBe(5);
       expect(result.find((s) => s.status === "COMPLETED")?.count).toBe(2);
-      expect(result.find((s) => s.status === "ONBOARDING")?.count).toBe(0);
+      expect(result.find((s) => s.status === "WORKING")?.count).toBe(3);
     });
 
     it("returns zero counts for all statuses when empty", async () => {
@@ -315,7 +315,7 @@ describe("Analytics Queries", () => {
 
       const result = await getStatusDistribution();
 
-      expect(result).toHaveLength(6);
+      expect(result).toHaveLength(3);
       expect(result.every((s) => s.count === 0)).toBe(true);
       expect(result.every((s) => s.percentage === 0)).toBe(true);
     });
@@ -323,27 +323,26 @@ describe("Analytics Queries", () => {
 
   describe("getCompletionFunnel", () => {
     it("returns funnel steps with counts and percentages", async () => {
-      // Mock assessment counts for each status level
+      // Mock assessment counts for the new 3-step funnel:
+      // Started (all) -> Working (WORKING + COMPLETED) -> Completed
       mockAssessmentCount
-        .mockResolvedValueOnce(100) // Total started (HR_INTERVIEW)
-        .mockResolvedValueOnce(80) // Passed HR_INTERVIEW (reached ONBOARDING+)
-        .mockResolvedValueOnce(60) // Reached WORKING+
-        .mockResolvedValueOnce(40) // Reached FINAL_DEFENSE+
+        .mockResolvedValueOnce(100) // Total started
+        .mockResolvedValueOnce(60) // Reached WORKING or COMPLETED
         .mockResolvedValueOnce(30); // COMPLETED
 
       const result = await getCompletionFunnel();
 
-      expect(result).toHaveLength(5);
+      expect(result).toHaveLength(3);
       expect(result[0].step).toBe("Started");
       expect(result[0].count).toBe(100);
       expect(result[0].percentage).toBe(100);
 
-      expect(result[1].step).toBe("HR Interview");
-      expect(result[1].count).toBe(80);
-      expect(result[1].percentage).toBe(80);
+      expect(result[1].step).toBe("Working");
+      expect(result[1].count).toBe(60);
+      expect(result[1].percentage).toBe(60);
 
-      expect(result[4].step).toBe("Completed");
-      expect(result[4].count).toBe(30);
+      expect(result[2].step).toBe("Completed");
+      expect(result[2].count).toBe(30);
     });
 
     it("handles zero counts gracefully", async () => {
@@ -351,7 +350,7 @@ describe("Analytics Queries", () => {
 
       const result = await getCompletionFunnel();
 
-      expect(result).toHaveLength(5);
+      expect(result).toHaveLength(3);
       expect(result.every((s) => s.count === 0)).toBe(true);
     });
   });

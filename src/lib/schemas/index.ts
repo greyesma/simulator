@@ -10,8 +10,6 @@ export {
   type ChatRequest,
   CallTokenRequestSchema,
   type CallTokenRequest,
-  DefenseTokenRequestSchema,
-  type DefenseTokenRequest,
   RegisterRequestSchema,
   type RegisterRequest,
   ScenarioCreateSchema,

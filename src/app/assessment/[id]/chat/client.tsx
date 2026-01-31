@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { SlackLayout, Chat } from "@/components/chat";
 
 interface Coworker {
@@ -16,27 +15,16 @@ interface ChatPageClientProps {
   selectedCoworkerId: string | null;
 }
 
-// Check if a coworker is a manager based on role
-function isManager(coworker: Coworker): boolean {
-  return coworker.role.toLowerCase().includes("manager");
-}
-
 export function ChatPageClient({
   assessmentId,
   coworkers,
   selectedCoworkerId,
 }: ChatPageClientProps) {
-  const router = useRouter();
-
   const selectedCoworker = coworkers.find((c) => c.id === selectedCoworkerId);
 
-  // Check if chatting with manager for PR submission handling
-  const isChattingWithManager = selectedCoworker ? isManager(selectedCoworker) : false;
-
-  const handlePrSubmitted = () => {
-    // Navigate to defense page after PR submission
-    router.push(`/assessment/${assessmentId}/defense`);
-  };
+  // Note: PR submission handling and defense call are now handled within the
+  // Slack interface (RF-012). The candidate will call the manager from within
+  // Slack after submitting a PR, instead of navigating to a separate defense page.
 
   return (
     <SlackLayout assessmentId={assessmentId} coworkers={coworkers}>
@@ -44,7 +32,6 @@ export function ChatPageClient({
         <Chat
           assessmentId={assessmentId}
           coworker={selectedCoworker}
-          onPrSubmitted={isChattingWithManager ? handlePrSubmitted : undefined}
         />
       ) : (
         <div className="flex flex-1 items-center justify-center">

@@ -106,7 +106,7 @@ describe("POST /api/assessment/finalize", () => {
     mockAssessmentFindUnique.mockResolvedValue({
       id: "test-id",
       userId: "other-user", // Different user
-      status: AssessmentStatus.FINAL_DEFENSE,
+      status: AssessmentStatus.WORKING,
       startedAt: new Date(),
       scenario: { taskDescription: "Test task" },
       recordings: [],
@@ -124,14 +124,14 @@ describe("POST /api/assessment/finalize", () => {
     expect(data.error).toBe("Unauthorized to modify this assessment");
   });
 
-  it("should return 400 when assessment is not in FINAL_DEFENSE status", async () => {
+  it("should return 400 when assessment is not in WORKING status", async () => {
     mockAuth.mockResolvedValue({
       user: { id: "user-123" },
     });
     mockAssessmentFindUnique.mockResolvedValue({
       id: "test-id",
       userId: "user-123",
-      status: AssessmentStatus.WORKING, // Wrong status
+      status: AssessmentStatus.WELCOME, // Wrong status
       startedAt: new Date(),
       scenario: { taskDescription: "Test task" },
       recordings: [],
@@ -146,7 +146,7 @@ describe("POST /api/assessment/finalize", () => {
     expect(response.status).toBe(400);
 
     const data = await response.json();
-    expect(data.error).toContain("Must be in FINAL_DEFENSE status");
+    expect(data.error).toContain("Must be in WORKING status");
   });
 
   it("should finalize assessment without PR and return timing info", async () => {
@@ -158,7 +158,7 @@ describe("POST /api/assessment/finalize", () => {
     mockAssessmentFindUnique.mockResolvedValue({
       id: "test-id",
       userId: "user-123",
-      status: AssessmentStatus.FINAL_DEFENSE,
+      status: AssessmentStatus.WORKING,
       startedAt,
       prUrl: null,
       scenario: { taskDescription: "Test task" },
@@ -209,7 +209,7 @@ describe("POST /api/assessment/finalize", () => {
     mockAssessmentFindUnique.mockResolvedValue({
       id: "test-id",
       userId: "user-123",
-      status: AssessmentStatus.FINAL_DEFENSE,
+      status: AssessmentStatus.WORKING,
       startedAt,
       prUrl,
       scenario: { taskDescription: "Test task" },
@@ -278,7 +278,7 @@ describe("POST /api/assessment/finalize", () => {
     mockAssessmentFindUnique.mockResolvedValue({
       id: "test-id",
       userId: "user-123",
-      status: AssessmentStatus.FINAL_DEFENSE,
+      status: AssessmentStatus.WORKING,
       startedAt,
       prUrl,
       scenario: { taskDescription: "Test task" },
@@ -329,7 +329,7 @@ describe("POST /api/assessment/finalize", () => {
     mockAssessmentFindUnique.mockResolvedValue({
       id: "test-id",
       userId: "user-123",
-      status: AssessmentStatus.FINAL_DEFENSE,
+      status: AssessmentStatus.WORKING,
       startedAt,
       prUrl,
       scenario: { taskDescription: "Test task" },
@@ -413,7 +413,7 @@ describe("POST /api/assessment/finalize", () => {
     mockAssessmentFindUnique.mockResolvedValue({
       id: "test-id",
       userId: "user-123",
-      status: AssessmentStatus.FINAL_DEFENSE,
+      status: AssessmentStatus.WORKING,
       startedAt,
       prUrl: null,
       scenario: { taskDescription: "Complete the todo list feature" },
@@ -466,7 +466,7 @@ describe("POST /api/assessment/finalize", () => {
     mockAssessmentFindUnique.mockResolvedValue({
       id: "test-id",
       userId: "user-123",
-      status: AssessmentStatus.FINAL_DEFENSE,
+      status: AssessmentStatus.WORKING,
       startedAt,
       prUrl: null,
       scenario: { taskDescription: "Test task" },
@@ -512,7 +512,7 @@ describe("POST /api/assessment/finalize", () => {
     mockAssessmentFindUnique.mockResolvedValue({
       id: "test-id",
       userId: "user-123",
-      status: AssessmentStatus.FINAL_DEFENSE,
+      status: AssessmentStatus.WORKING,
       startedAt,
       prUrl: null,
       scenario: { taskDescription: "Test task" },

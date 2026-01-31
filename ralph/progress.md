@@ -1,5 +1,53 @@
 # Ralph Progress Log
 
+## Issue #174: RF-006 - Remove defense page (defense moves to Slack)
+
+### What was implemented
+- Deleted `/src/app/assessment/[id]/defense/` directory entirely (page.tsx, client.tsx)
+- Deleted `/src/app/api/defense/` directory (token/route.ts, transcript/route.ts)
+- Updated `src/hooks/voice/use-defense-call.ts` to accept configurable endpoints for Slack integration
+- Updated `src/app/assessment/[id]/chat/client.tsx` to remove redirect to defense page
+- Updated `src/components/chat/chat.tsx` to remove onPrSubmitted prop
+- Updated `src/components/chat/floating-call-bar.tsx` to remove "defense" call type
+- Updated `src/components/chat/slack-layout.tsx` to remove "defense" from call context types
+- Updated `src/server/queries/assessment.ts` and index.ts to remove getAssessmentForDefense
+- Updated `src/lib/schemas/api.ts` and index.ts to remove DefenseTokenRequestSchema
+- Updated `src/app/api/assessment/finalize/route.test.ts` to use WORKING status instead of FINAL_DEFENSE
+- Updated `src/app/api/assessment/complete/route.test.ts` to reflect new status flow
+- Updated `src/lib/core/analytics.test.ts` to match new 3-step funnel (Started → Working → Completed)
+- Updated `src/test/factories/assessment.ts` to update example docstring
+- Updated CLAUDE.md files for hooks, API, and test directories
+
+### Files deleted
+- `src/app/assessment/[id]/defense/page.tsx`
+- `src/app/assessment/[id]/defense/client.tsx`
+- `src/app/api/defense/token/route.ts`
+- `src/app/api/defense/transcript/route.ts`
+
+### Files kept (for Slack integration in RF-012)
+- `src/hooks/voice/use-defense-call.ts` - Updated with configurable endpoints
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes
+- Build succeeds: `npm run build` passes
+- Tests for complete/finalize routes pass: 32/32 tests passing
+- Route `/assessment/[id]/defense` returns 404 (verified with agent-browser)
+- Screenshot saved to `screenshots/issue-174-defense-404.png`
+
+### Learnings for future iterations
+- The useDefenseCall hook was preserved with configurable tokenEndpoint and transcriptEndpoint for reuse in RF-012
+- The Chat component had an onPrSubmitted callback that triggered navigation to defense - removed
+- The slack-layout and floating-call-bar components both had "defense" call type support
+- The finalize route now accepts WORKING status (no more FINAL_DEFENSE intermediate state)
+- The complete route no longer changes status - it only saves the PR URL
+
+### Gotchas discovered
+- The .next directory caches generated types - needed to clear before typecheck after deleting routes
+- Multiple test files referenced old assessment statuses (HR_INTERVIEW, FINAL_DEFENSE) - some were pre-existing failures from earlier RF issues
+- The analytics funnel was reduced from 5 steps to 3 steps (matching new WELCOME → WORKING → COMPLETED flow)
+
+---
+
 ## Issue #173: RF-005 - Remove congratulations and kickoff pages
 
 ### What was implemented

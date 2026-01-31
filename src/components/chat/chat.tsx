@@ -20,13 +20,15 @@ interface Coworker {
 interface ChatProps {
   assessmentId: string;
   coworker: Coworker;
-  onPrSubmitted?: () => void;
 }
+
+// Note: PR submission handling and defense call flow will be implemented
+// in RF-012 (Slack modifications). Defense now happens within the Slack
+// interface - the candidate will call the manager after submitting a PR.
 
 export function Chat({
   assessmentId,
   coworker,
-  onPrSubmitted,
 }: ChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -101,12 +103,8 @@ export function Chat({
       };
       setMessages((prev) => [...prev, modelMessage]);
 
-      // If PR was submitted, notify parent after a brief delay
-      if (data.prSubmitted && onPrSubmitted) {
-        setTimeout(() => {
-          onPrSubmitted();
-        }, 3000); // 3 second delay for natural conversation feel
-      }
+      // Note: PR detection and defense call flow will be handled in RF-012.
+      // The manager will prompt the candidate to call them after PR submission.
     } catch (err) {
       // Remove the optimistic message on error
       setMessages((prev) => prev.slice(0, -1));

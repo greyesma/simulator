@@ -39,10 +39,13 @@ interface Coworker {
 interface FloatingCallBarProps {
   assessmentId: string;
   coworker: Coworker;
-  callType: "coworker" | "defense";
+  callType: "coworker";
   onCallEnd: () => void;
   onError?: (error: string) => void;
 }
+
+// Note: "defense" call type was removed in RF-006. Defense calls will be
+// reintegrated in RF-012 using a different flow within the Slack interface.
 
 /**
  * Slack huddles-style floating call bar that appears at the bottom of the sidebar.
@@ -52,7 +55,7 @@ interface FloatingCallBarProps {
 export function FloatingCallBar({
   assessmentId,
   coworker,
-  callType,
+  callType: _callType, // Currently only "coworker" type; kept for future extensibility
   onCallEnd,
   onError,
 }: FloatingCallBarProps) {
@@ -78,24 +81,16 @@ export function FloatingCallBar({
   // Prevent concurrent connection attempts
   const isConnectingRef = useRef(false);
 
-  // Determine which API endpoint to use based on call type
+  // API endpoints for coworker calls
+  // Note: Defense call endpoints were removed in RF-006. Defense calls
+  // will be reintegrated in RF-012 with a different Slack-based flow.
   const getTokenEndpoint = useCallback(() => {
-    switch (callType) {
-      case "defense":
-        return "/api/defense/token";
-      default:
-        return "/api/call/token";
-    }
-  }, [callType]);
+    return "/api/call/token";
+  }, []);
 
   const getTranscriptEndpoint = useCallback(() => {
-    switch (callType) {
-      case "defense":
-        return "/api/defense/transcript";
-      default:
-        return "/api/call/transcript";
-    }
-  }, [callType]);
+    return "/api/call/transcript";
+  }, []);
 
   // Add message to transcript (for saving, not display)
   const addToTranscript = useCallback(
@@ -247,15 +242,10 @@ export function FloatingCallBar({
 
       // Get ephemeral token from server
       const tokenEndpoint = getTokenEndpoint();
-      const body =
-        callType === "coworker"
-          ? JSON.stringify({ assessmentId, coworkerId: coworker.id })
-          : JSON.stringify({ assessmentId });
-
       const tokenResponse = await fetch(tokenEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body,
+        body: JSON.stringify({ assessmentId, coworkerId: coworker.id }),
       });
 
       if (!tokenResponse.ok) {
@@ -342,7 +332,6 @@ export function FloatingCallBar({
     callState,
     assessmentId,
     coworker.id,
-    callType,
     getTokenEndpoint,
     handleServerMessage,
     initializeAudioCapture,
@@ -385,22 +374,14 @@ export function FloatingCallBar({
     if (transcriptRef.current.length > 0) {
       try {
         const transcriptEndpoint = getTranscriptEndpoint();
-        const body =
-          callType === "coworker"
-            ? JSON.stringify({
-                assessmentId,
-                coworkerId: coworker.id,
-                transcript: transcriptRef.current,
-              })
-            : JSON.stringify({
-                assessmentId,
-                transcript: transcriptRef.current,
-              });
-
         await fetch(transcriptEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body,
+          body: JSON.stringify({
+            assessmentId,
+            coworkerId: coworker.id,
+            transcript: transcriptRef.current,
+          }),
         });
       } catch (err) {
         console.error("Error saving transcript:", err);
@@ -411,7 +392,6 @@ export function FloatingCallBar({
   }, [
     assessmentId,
     coworker.id,
-    callType,
     disconnect,
     getTranscriptEndpoint,
     onCallEnd,

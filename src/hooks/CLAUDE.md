@@ -42,7 +42,11 @@ type VoiceConnectionState =
 | Hook | Token Endpoint | Session Recovery | Retry | Additional Data |
 |------|----------------|------------------|-------|-----------------|
 | `useCoworkerVoice` | `/api/call/token` | Yes | Yes | coworkerId |
-| `useDefenseCall` | `/api/defense/token` | No | Yes | managerName, managerRole, prUrl |
+| `useDefenseCall` | Configurable (for Slack integration) | No | Yes | managerName, managerRole, prUrl |
+
+Note: `useDefenseCall` was updated in RF-006 to accept configurable endpoints.
+The standalone defense page was removed, and defense calls will be integrated
+into the Slack interface in RF-012.
 
 ## Usage
 

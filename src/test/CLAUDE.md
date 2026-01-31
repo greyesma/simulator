@@ -281,11 +281,14 @@ To add more fixed test assessments for different pages/statuses, update `prisma/
 ```typescript
 const TEST_ASSESSMENT_IDS = {
   chat: "test-assessment-chat",        // Status: WORKING
-  defense: "test-assessment-defense",  // Status: FINAL_DEFENSE (add this)
+  welcome: "test-assessment-welcome",  // Status: WELCOME
 };
 ```
 
 Then create the assessment with `prisma.assessment.upsert()` using the fixed ID.
+
+Note: The defense page was removed in RF-006. Defense calls now happen within
+the Slack interface (to be implemented in RF-012).
 
 ## Gotchas
 

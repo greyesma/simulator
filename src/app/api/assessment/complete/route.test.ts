@@ -133,7 +133,7 @@ describe("POST /api/assessment/complete", () => {
     mockAssessmentFindUnique.mockResolvedValue({
       id: "test-id",
       userId: "user-1",
-      status: AssessmentStatus.HR_INTERVIEW,
+      status: AssessmentStatus.WELCOME,
       startedAt: new Date(),
     });
 
@@ -151,7 +151,7 @@ describe("POST /api/assessment/complete", () => {
     expect(data.error).toContain("Cannot complete assessment");
   });
 
-  it("should successfully complete assessment and transition to FINAL_DEFENSE", async () => {
+  it("should successfully record PR URL and stay in WORKING status", async () => {
     const startTime = new Date("2025-01-01T10:00:00Z");
     mockAuth.mockResolvedValue({ user: { id: "user-1" } });
     mockAssessmentFindUnique.mockResolvedValue({
@@ -162,7 +162,7 @@ describe("POST /api/assessment/complete", () => {
     });
     mockAssessmentUpdate.mockResolvedValue({
       id: "test-id",
-      status: AssessmentStatus.FINAL_DEFENSE,
+      status: AssessmentStatus.WORKING, // Status stays WORKING until defense call
       prUrl: "https://github.com/org/repo/pull/123",
       startedAt: startTime,
     });
@@ -180,14 +180,14 @@ describe("POST /api/assessment/complete", () => {
 
     const json = await response.json();
     expect(json.success).toBe(true);
-    expect(json.data.assessment.status).toBe(AssessmentStatus.FINAL_DEFENSE);
+    expect(json.data.assessment.status).toBe(AssessmentStatus.WORKING);
     expect(json.data.assessment.prUrl).toBe("https://github.com/org/repo/pull/123");
     expect(json.data.timing.startedAt).toBeDefined();
     expect(json.data.timing.completedWorkingAt).toBeDefined();
     expect(json.data.timing.workingDurationSeconds).toBeGreaterThanOrEqual(0);
   });
 
-  it("should update assessment with correct data", async () => {
+  it("should update assessment with PR URL only (no status change)", async () => {
     const startTime = new Date("2025-01-01T10:00:00Z");
     mockAuth.mockResolvedValue({ user: { id: "user-1" } });
     mockAssessmentFindUnique.mockResolvedValue({
@@ -198,7 +198,7 @@ describe("POST /api/assessment/complete", () => {
     });
     mockAssessmentUpdate.mockResolvedValue({
       id: "test-id",
-      status: AssessmentStatus.FINAL_DEFENSE,
+      status: AssessmentStatus.WORKING,
       prUrl: "https://gitlab.com/org/repo/-/merge_requests/456",
       startedAt: startTime,
     });
@@ -213,10 +213,10 @@ describe("POST /api/assessment/complete", () => {
 
     await POST(request);
 
+    // Should only update prUrl, not status
     expect(mockAssessmentUpdate).toHaveBeenCalledWith({
       where: { id: "test-id" },
       data: {
-        status: AssessmentStatus.FINAL_DEFENSE,
         prUrl: "https://gitlab.com/org/repo/-/merge_requests/456",
       },
       select: expect.any(Object),
@@ -286,7 +286,7 @@ describe("GET /api/assessment/complete", () => {
     mockAssessmentFindUnique.mockResolvedValue({
       id: "test-id",
       userId: "user-1",
-      status: AssessmentStatus.FINAL_DEFENSE,
+      status: AssessmentStatus.WORKING,
       startedAt: startTime,
       completedAt: null,
       prUrl: "https://github.com/org/repo/pull/123",
@@ -302,7 +302,7 @@ describe("GET /api/assessment/complete", () => {
     const json = await response.json();
     expect(json.success).toBe(true);
     expect(json.data.assessment.id).toBe("test-id");
-    expect(json.data.assessment.status).toBe(AssessmentStatus.FINAL_DEFENSE);
+    expect(json.data.assessment.status).toBe(AssessmentStatus.WORKING);
     expect(json.data.assessment.prUrl).toBe("https://github.com/org/repo/pull/123");
     expect(json.data.timing.startedAt).toBe("2025-01-01T10:00:00.000Z");
     expect(json.data.timing.completedAt).toBeNull();

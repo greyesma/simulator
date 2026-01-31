@@ -116,8 +116,11 @@ return success({ data });
 
 ## Route Groups
 
-- **Assessment flow:** call/, chat/, defense/, assessment/
+- **Assessment flow:** call/, chat/, assessment/
 - **Admin:** admin/\* (protected by `requireAdmin()`)
+
+Note: The `defense/` routes were removed in RF-006. Defense calls will be
+handled within the Slack interface using the call/ routes after RF-012.
 
 ## Gotchas
 

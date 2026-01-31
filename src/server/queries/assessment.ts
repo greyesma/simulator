@@ -48,31 +48,6 @@ export async function getAssessmentForChat(id: string, userId: string) {
 }
 
 /**
- * Get assessment for defense page.
- * Includes scenario with manager coworker for PR defense call.
- */
-export async function getAssessmentForDefense(id: string, userId: string) {
-  return db.assessment.findFirst({
-    where: { id, userId },
-    include: {
-      scenario: {
-        include: {
-          coworkers: {
-            where: {
-              role: {
-                contains: "Manager",
-                mode: "insensitive",
-              },
-            },
-            take: 1,
-          },
-        },
-      },
-    },
-  });
-}
-
-/**
  * Get assessment for welcome page.
  * Includes scenario with coworkers.
  */

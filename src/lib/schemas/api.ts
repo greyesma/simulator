@@ -26,13 +26,9 @@ export const CallTokenRequestSchema = z.object({
 });
 export type CallTokenRequest = z.infer<typeof CallTokenRequestSchema>;
 
-/**
- * POST /api/defense/token - Get token for defense call
- */
-export const DefenseTokenRequestSchema = z.object({
-  assessmentId: z.string().min(1, "Assessment ID is required"),
-});
-export type DefenseTokenRequest = z.infer<typeof DefenseTokenRequestSchema>;
+// Note: Defense token schema was removed in RF-006. Defense calls now happen
+// within the Slack interface using the call token API. The useDefenseCall hook
+// will be reconfigured in RF-012 to work with the Slack call flow.
 
 /**
  * POST /api/auth/register - Register a new user
