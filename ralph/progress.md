@@ -1,5 +1,99 @@
 # Ralph Progress Log
 
+## Issue #181: RF-013 - Create join page for candidates
+
+### What was implemented
+- Created `/src/app/join/[scenarioId]/page.tsx` - Server component (public access)
+- Created `/src/app/join/[scenarioId]/client.tsx` - Client component with combined scenario info + auth
+- Created `/src/app/api/assessment/create/route.ts` - API endpoint to create assessments
+
+### Files created
+- `src/app/join/[scenarioId]/page.tsx` - Server component that:
+  - Fetches scenario by ID (public access)
+  - Returns 404 if scenario not found or not published
+  - Checks for existing assessment if user is logged in
+  - Passes scenario, user, and existing assessment to client
+- `src/app/join/[scenarioId]/client.tsx` - Client component with:
+  - Left/top section: Scenario info (company name, role, tech stack, task overview, what to expect)
+  - Right/bottom section: Auth form (signup/login toggle, Google OAuth, email/password)
+  - Logged-in state: Welcome back, resume/continue button
+  - Task overview expandable text
+  - "What to Expect" section with icons
+- `src/app/api/assessment/create/route.ts` - POST endpoint that:
+  - Requires authentication
+  - Validates scenario exists and is published
+  - Returns existing assessment if one exists (idempotent)
+  - Creates new assessment with WELCOME status
+
+### Page Layout (Combined View)
+- **Left/Top Section - Scenario Info:**
+  - Company name with placeholder icon (Building2)
+  - Role/position from scenario name
+  - Tech stack as blue badge tags
+  - Task overview with expandable text (truncated to 200 chars)
+  - "What to Expect" section:
+    - AI-Powered Simulation
+    - Screen Recording
+    - AI Usage Encouraged
+    - Work at Your Pace
+- **Right/Bottom Section - Auth:**
+  - If not logged in: Toggle between signup/signin mode
+    - Email/password form with first/last name for signup
+    - Google OAuth button
+    - Terms of service link
+  - If logged in:
+    - Welcome back with email
+    - Existing assessment info (if any)
+    - Continue/Resume button
+    - Sign out link
+
+### Authentication Flow
+- On signup: Creates user with role USER (default for candidates)
+- On signup: After registration, signs in and refreshes page
+- On login: Signs in and refreshes page to show logged-in state
+- After auth: User can click "Continue to Assessment" which creates assessment via API
+
+### Handling Existing Assessments
+- If logged in user has assessment for THIS scenario: Shows "Resume Assessment" button
+- If assessment is COMPLETED: Shows "View Results" button
+- API is idempotent - returns existing assessment if one exists
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes
+- E2E tested with agent-browser:
+  - Logged out: Shows scenario info and auth form
+  - Logged in: Shows "Welcome back" with Resume button
+  - Non-existent scenario: Shows 404
+- Screenshots captured:
+  - `screenshots/issue-181-join-logged-out.png`
+  - `screenshots/issue-181-join-logged-in.png`
+  - `screenshots/issue-181-join-404.png`
+
+### Learnings for future iterations
+- The join page is the main entry point for candidates - it needs to be marketing-focused
+- Combined view (scenario info + auth) works well for building trust
+- The `router.refresh()` pattern is effective for refreshing session state after auth
+- Idempotent assessment creation API prevents duplicate assessments
+
+### Gotchas discovered
+- NextAuth session user `id` can be undefined - need to check `user?.id` before using
+- The welcome page now redirects to chat, so the join page creates assessments with WELCOME status which then redirects appropriately
+
+### Acceptance Criteria Status
+- [x] Create `/src/app/join/[scenarioId]/page.tsx` - server component
+- [x] Create `/src/app/join/[scenarioId]/client.tsx` - client component
+- [x] Left/Top Section - Scenario Info: Company name, logo placeholder, role, tech stack tags, task overview, what to expect
+- [x] Right/Bottom Section - Auth: Signup form, OAuth buttons, sign in link
+- [x] If logged in: Show "Welcome back" and continue button
+- [x] Scenario Validation: 404 if not found or unpublished
+- [x] Authentication Flow: On signup creates USER role, on auth redirects to welcome
+- [x] Handling Existing Assessments: Resume if in-progress, View Results if completed
+- [x] TypeScript compiles: `npm run typecheck`
+- [x] E2E verified with agent-browser
+- [x] Screenshots captured
+
+---
+
 ## Issue #180: RF-012 - Create recruiter candidates list page
 
 ### What was implemented
