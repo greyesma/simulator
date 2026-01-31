@@ -189,11 +189,10 @@ export async function POST(request: Request) {
   if (isCoworkerManager && extractedPrUrl) {
     // Check if assessment is in WORKING status
     if (assessment.status === AssessmentStatus.WORKING) {
-      // Valid PR link - update assessment status
+      // Valid PR link - update assessment with PR URL (status stays WORKING)
       await db.assessment.update({
         where: { id: assessmentId },
         data: {
-          status: AssessmentStatus.FINAL_DEFENSE,
           prUrl: extractedPrUrl,
         },
       });
@@ -435,11 +434,11 @@ export async function GET(request: Request) {
     },
   });
 
-  // If no conversation exists and this is a manager in ONBOARDING/WORKING status,
+  // If no conversation exists and this is a manager in WELCOME/WORKING status,
   // generate greeting messages and save them as a new conversation
   if (!conversation && isManager(coworker.role)) {
     if (
-      assessment.status === AssessmentStatus.ONBOARDING ||
+      assessment.status === AssessmentStatus.WELCOME ||
       assessment.status === AssessmentStatus.WORKING
     ) {
       // Generate greeting messages
@@ -462,8 +461,8 @@ export async function GET(request: Request) {
         },
       });
 
-      // Update assessment status to WORKING if currently ONBOARDING
-      if (assessment.status === AssessmentStatus.ONBOARDING) {
+      // Update assessment status to WORKING if currently WELCOME
+      if (assessment.status === AssessmentStatus.WELCOME) {
         await db.assessment.update({
           where: { id: assessmentId },
           data: { status: AssessmentStatus.WORKING },

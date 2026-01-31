@@ -8,9 +8,7 @@ import type {
   AssessmentStatus,
   VideoAssessmentStatus,
 } from "@prisma/client";
-import { ParsedProfileDisplay } from "@/components/candidate";
 import type { AssessmentReport } from "@/lib/analysis";
-import { profileFromPrismaJson } from "@/lib/candidate";
 import { AdminNav, DataDeletionSection } from "@/components/admin";
 import { AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,11 +26,8 @@ interface ExtendedUser {
 
 function getStatusLabel(status: AssessmentStatus): string {
   const labels: Record<AssessmentStatus, string> = {
-    HR_INTERVIEW: "HR Interview",
-    ONBOARDING: "Onboarding",
+    WELCOME: "Welcome",
     WORKING: "Working",
-    FINAL_DEFENSE: "Final Defense",
-    PROCESSING: "Processing",
     COMPLETED: "Completed",
   };
   return labels[status];
@@ -42,8 +37,6 @@ function getStatusColor(status: AssessmentStatus): string {
   switch (status) {
     case "COMPLETED":
       return "bg-green-500/10 text-green-600";
-    case "PROCESSING":
-      return "bg-muted text-muted-foreground";
     default:
       return "bg-primary/10 text-primary";
   }
@@ -87,7 +80,6 @@ interface AssessmentWithReport {
   status: AssessmentStatus;
   startedAt: Date;
   completedAt: Date | null;
-  cvUrl: string | null;
   report: Prisma.JsonValue;
   scenario: {
     name: string;
@@ -292,8 +284,6 @@ export default async function ProfilePage() {
       role: true,
       createdAt: true,
       dataDeleteRequestedAt: true,
-      cvUrl: true,
-      parsedProfile: true,
     },
   });
 
@@ -320,11 +310,6 @@ export default async function ProfilePage() {
     },
     orderBy: { createdAt: "desc" },
   });
-
-  // Get parsed profile from User (not Assessment)
-  const parsedProfile = dbUser.parsedProfile
-    ? profileFromPrismaJson(dbUser.parsedProfile)
-    : null;
 
   return (
     <main className="min-h-screen animate-page-enter bg-background text-foreground">
@@ -383,9 +368,6 @@ export default async function ProfilePage() {
             </CardContent>
           </Card>
         </section>
-
-        {/* Parsed Profile Display - shows when profile exists */}
-        <ParsedProfileDisplay profile={parsedProfile} />
 
         {/* Data & Privacy Section */}
         <DataDeletionSection
@@ -523,17 +505,6 @@ export default async function ProfilePage() {
                       )}
 
                       <div className="mt-4 flex items-center gap-4 border-t border-border pt-4">
-                        {assessment.cvUrl && (
-                          <a
-                            href={assessment.cvUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-primary transition-colors hover:text-primary/80"
-                          >
-                            View Submitted CV
-                          </a>
-                        )}
-
                         {assessment.status === "COMPLETED" &&
                           assessment.report && (
                             <Link
@@ -547,7 +518,7 @@ export default async function ProfilePage() {
                         {assessment.status !== "COMPLETED" && (
                           <Button size="sm" asChild>
                             <Link
-                              href={`/assessment/${assessment.id}/hr-interview`}
+                              href={`/assessment/${assessment.id}/welcome`}
                             >
                               Continue Assessment
                             </Link>

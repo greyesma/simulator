@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { AssessmentStatus } from "@prisma/client";
 import type { CodeReviewData } from "@/lib/analysis";
 import type { PrCiStatus } from "@/lib/external";
 import type { ChatMessage } from "@/types";
@@ -14,7 +13,6 @@ import {
   reportToPrismaJson,
   type AssessmentSignals,
   type AssessmentReport,
-  type HRSignals,
   type RecordingSignals,
   type ConversationSignals,
 } from "@/lib/analysis";
@@ -36,7 +34,6 @@ async function collectAssessmentSignals(
       scenario: {
         select: { id: true, name: true, companyName: true },
       },
-      hrAssessment: true,
       conversations: {
         include: {
           coworker: {
@@ -58,28 +55,6 @@ async function collectAssessmentSignals(
 
   if (!assessment) {
     return null;
-  }
-
-  // Build HR signals
-  let hrSignals: HRSignals | null = null;
-  if (assessment.hrAssessment) {
-    const hr = assessment.hrAssessment;
-    hrSignals = {
-      communicationScore: hr.communicationScore,
-      communicationNotes: hr.communicationNotes,
-      cvConsistencyScore: hr.cvConsistencyScore,
-      cvVerificationNotes: hr.cvVerificationNotes,
-      professionalismScore: hr.professionalismScore,
-      technicalDepthScore: hr.technicalDepthScore,
-      cultureFitNotes: hr.cultureFitNotes,
-      interviewDurationSeconds: hr.interviewDurationSeconds,
-      verifiedClaims:
-        (hr.verifiedClaims as Array<{
-          claim: string;
-          status: "verified" | "unverified" | "inconsistent" | "flagged";
-          notes?: string;
-        }>) || [],
-    };
   }
 
   // Build conversation signals
@@ -224,18 +199,13 @@ async function collectAssessmentSignals(
     (completedAt.getTime() - assessment.startedAt.getTime()) / 1000
   );
 
-  // For working phase, we'd need to track when working started
-  // For now, estimate as total time minus HR interview duration
-  const hrDuration = hrSignals?.interviewDurationSeconds || 0;
-  const workingPhaseSeconds = totalDurationSeconds - hrDuration;
-
   // Build the full signals object
   const signals: AssessmentSignals = {
     assessmentId: assessment.id,
     userId: assessment.userId,
     scenarioName: assessment.scenario.name,
 
-    hrInterview: hrSignals,
+    hrInterview: null,
     conversations: conversationSignals,
     recording: recordingSignals,
 
@@ -247,7 +217,7 @@ async function collectAssessmentSignals(
       startedAt: assessment.startedAt,
       completedAt: assessment.completedAt,
       totalDurationSeconds,
-      workingPhaseSeconds: workingPhaseSeconds > 0 ? workingPhaseSeconds : null,
+      workingPhaseSeconds: totalDurationSeconds,
     },
   };
 
@@ -332,10 +302,6 @@ export async function POST(request: Request) {
       where: { id: assessmentId },
       data: {
         report: reportToPrismaJson(report),
-        // Also update status to COMPLETED if it was PROCESSING
-        ...(assessment.status === AssessmentStatus.PROCESSING && {
-          status: AssessmentStatus.COMPLETED,
-        }),
       },
     });
 

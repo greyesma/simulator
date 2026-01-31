@@ -9,12 +9,6 @@ const userSelectBasic = {
   email: true,
 } as const;
 
-const userSelectWithProfile = {
-  ...userSelectBasic,
-  cvUrl: true,
-  parsedProfile: true,
-} as const;
-
 /**
  * Get basic assessment with scenario context.
  * Use for pages that need assessment verification and basic scenario info.
@@ -24,40 +18,7 @@ export async function getAssessmentWithContext(id: string, userId: string) {
     where: { id, userId },
     include: {
       scenario: true,
-      user: { select: userSelectWithProfile },
-    },
-  });
-}
-
-/**
- * Get assessment for HR interview page.
- * Includes scenario info, user CV data, and HR conversation transcript.
- */
-export async function getAssessmentForHRInterview(id: string, userId: string) {
-  return db.assessment.findFirst({
-    where: { id, userId },
-    include: {
-      scenario: {
-        select: {
-          name: true,
-          companyName: true,
-          companyDescription: true,
-        },
-      },
-      conversations: {
-        where: {
-          coworkerId: null,
-          type: "voice",
-        },
-        select: {
-          transcript: true,
-        },
-      },
-      user: {
-        select: {
-          id: true,
-        },
-      },
+      user: { select: userSelectBasic },
     },
   });
 }

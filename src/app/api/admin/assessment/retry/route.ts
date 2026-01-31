@@ -20,7 +20,6 @@ import {
 // Allowed statuses for reassessment
 const RETRIABLE_STATUSES: AssessmentStatus[] = [
   AssessmentStatus.COMPLETED,
-  AssessmentStatus.PROCESSING,
 ];
 
 export interface RetryAssessmentRequest {
@@ -109,12 +108,8 @@ export async function POST(
       data: {
         userId: originalAssessment.userId,
         scenarioId: originalAssessment.scenarioId,
-        status: AssessmentStatus.PROCESSING,
+        status: AssessmentStatus.WORKING,
         // Copy relevant data from original assessment
-        cvUrl: originalAssessment.cvUrl,
-        parsedProfile: originalAssessment.parsedProfile as
-          | Prisma.InputJsonValue
-          | undefined,
         prUrl: originalAssessment.prUrl,
         prSnapshot: originalAssessment.prSnapshot as
           | Prisma.InputJsonValue

@@ -59,7 +59,6 @@ export interface MockPrismaClientInterface {
   recording: MockPrismaModel;
   recordingSegment: MockPrismaModel;
   segmentAnalysis: MockPrismaModel;
-  hrInterviewAssessment: MockPrismaModel;
   videoAssessment: MockPrismaModel;
   dimensionScore: MockPrismaModel;
   videoAssessmentSummary: MockPrismaModel;
@@ -95,7 +94,6 @@ export function createMockPrismaClient(): MockPrismaClientInterface {
     recording: createMockPrismaModel(),
     recordingSegment: createMockPrismaModel(),
     segmentAnalysis: createMockPrismaModel(),
-    hrInterviewAssessment: createMockPrismaModel(),
     videoAssessment: createMockPrismaModel(),
     dimensionScore: createMockPrismaModel(),
     videoAssessmentSummary: createMockPrismaModel(),
@@ -139,7 +137,6 @@ export class MockPrismaClient implements MockPrismaClientInterface {
   public recording: MockPrismaModel;
   public recordingSegment: MockPrismaModel;
   public segmentAnalysis: MockPrismaModel;
-  public hrInterviewAssessment: MockPrismaModel;
   public videoAssessment: MockPrismaModel;
   public dimensionScore: MockPrismaModel;
   public videoAssessmentSummary: MockPrismaModel;
@@ -166,7 +163,6 @@ export class MockPrismaClient implements MockPrismaClientInterface {
     this.recording = createMockPrismaModel();
     this.recordingSegment = createMockPrismaModel();
     this.segmentAnalysis = createMockPrismaModel();
-    this.hrInterviewAssessment = createMockPrismaModel();
     this.videoAssessment = createMockPrismaModel();
     this.dimensionScore = createMockPrismaModel();
     this.videoAssessmentSummary = createMockPrismaModel();
@@ -203,7 +199,6 @@ export class MockPrismaClient implements MockPrismaClientInterface {
       this.recording,
       this.recordingSegment,
       this.segmentAnalysis,
-      this.hrInterviewAssessment,
       this.videoAssessment,
       this.dimensionScore,
       this.videoAssessmentSummary,

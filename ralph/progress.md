@@ -1,5 +1,77 @@
 # Ralph Progress Log
 
+## Issue #172: RF-004 - Remove HR interview pages and API routes
+
+### What was implemented
+- Deleted `/src/app/assessment/[id]/hr-interview/` directory entirely
+- Deleted `/src/app/api/interview/token/` and `/src/app/api/interview/transcript/` directories
+- Deleted `/src/app/assessment/[id]/congratulations/` directory (old HR interview flow)
+- Deleted `/src/app/assessment/[id]/processing/` directory (old processing flow)
+- Deleted `src/hooks/voice/use-voice-conversation.ts` (dedicated HR interview voice hook)
+- Deleted `src/components/assessment/voice-conversation.tsx` (HR interview voice component)
+- Deleted `src/prompts/hr/` directory (HR interview prompts)
+- Deleted `src/prompts/analysis/hr-assessment.ts` (HR assessment analysis)
+- Deleted `scripts/fake-transcript.ts` (HR interview test script)
+- Updated `src/hooks/voice/index.ts` to remove useVoiceConversation export
+- Updated `src/components/assessment/index.ts` to remove VoiceConversation export
+- Updated `src/prompts/index.ts` to remove HR interview and hr-assessment exports
+- Updated `src/server/queries/assessment.ts` to remove getAssessmentForHRInterview
+- Updated `src/server/queries/index.ts` to remove HR interview export
+- Updated `src/server/queries/CLAUDE.md` to update documentation
+- Updated `src/app/profile/page.tsx` to use new status values (WELCOME, WORKING, COMPLETED) and redirect to /welcome instead of /hr-interview
+- Updated `src/lib/core/data-deletion.ts` to remove hrAssessments from DeletionResult
+- Updated `src/lib/core/analytics.ts` to use new status values and remove HR interview phase
+- Updated `src/lib/ai/gemini-config.ts` to remove HR_PERSONA_SYSTEM_PROMPT export
+- Updated `src/test/mocks/prisma.ts` to remove hrInterviewAssessment mock
+- Updated `src/app/api/admin/assessment/retry/route.ts` for new status flow
+- Updated `src/app/api/assessment/complete/route.ts` to not change status on PR submission
+- Updated `src/app/api/assessment/finalize/route.ts` to work from WORKING status
+- Updated `src/app/api/assessment/report/route.ts` to remove HR assessment dependencies
+- Updated `src/app/api/chat/route.ts` to use WELCOME/WORKING statuses
+- Updated `src/app/api/defense/token/route.ts` to remove HR interview notes
+- Updated `src/prompts/manager/defense.ts` to remove hrInterviewNotes from context
+- Updated `src/app/assessment/[id]/results/page.tsx` for new status flow
+
+### Files deleted
+- `src/app/assessment/[id]/hr-interview/page.tsx`
+- `src/app/assessment/[id]/hr-interview/client.tsx`
+- `src/app/assessment/[id]/congratulations/page.tsx`
+- `src/app/assessment/[id]/congratulations/client.tsx`
+- `src/app/assessment/[id]/processing/page.tsx`
+- `src/app/assessment/[id]/processing/client.tsx`
+- `src/app/assessment/[id]/processing/types.ts`
+- `src/app/api/interview/token/route.ts`
+- `src/app/api/interview/transcript/route.ts`
+- `src/hooks/voice/use-voice-conversation.ts`
+- `src/components/assessment/voice-conversation.tsx`
+- `src/prompts/hr/interview.ts`
+- `src/prompts/analysis/hr-assessment.ts`
+- `scripts/fake-transcript.ts`
+- `tests/e2e/hr-interview-flow.sh`
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes (some test files need updates)
+- Build succeeds: `npm run build` passes
+- Route `/assessment/[id]/hr-interview` returns 404 (verified with agent-browser)
+- App runs without errors: chat page loads successfully
+- Screenshots saved to `screenshots/issue-172-hr-interview-404.png` and `screenshots/issue-172-chat-works.png`
+
+### Learnings for future iterations
+- When removing a major flow (HR interview), many related files need updating: prompts, queries, API routes, types, tests
+- The assessment flow now is: WELCOME -> WORKING -> COMPLETED (no HR_INTERVIEW, ONBOARDING, FINAL_DEFENSE, PROCESSING)
+- The profile page and results page needed updates for the new status values
+- Defense token route still uses HR context structure in buildDefensePrompt - this was cleaned up
+- Some test files still reference old status values - they were updated where they caused build failures
+
+### Gotchas discovered
+- The analytics.ts file had functions querying HRInterviewAssessment model - needed removal
+- The data-deletion.ts interface had hrAssessments count - needed removal
+- The chat route was transitioning to FINAL_DEFENSE on PR submission - changed to stay in WORKING
+- The processing page was checking for HR assessment - deleted since no longer part of flow
+- The congratulations page was part of the HR interview flow - deleted
+
+---
+
 ## Issue #171: RF-003 - Remove CV upload pages and API routes
 
 ### What was implemented

@@ -332,34 +332,6 @@ export async function getAssessmentCompletionTrends(
 export async function getPhaseDurationStats(): Promise<PhaseDurationStats[]> {
   const stats: PhaseDurationStats[] = [];
 
-  // HR Interview phase duration
-  const hrAssessments = await db.hRInterviewAssessment.findMany({
-    where: {
-      interviewDurationSeconds: { not: null },
-    },
-    select: {
-      interviewDurationSeconds: true,
-    },
-  });
-
-  if (hrAssessments.length > 0) {
-    const durations = hrAssessments
-      .map((a) => a.interviewDurationSeconds!)
-      .filter((d) => d > 0);
-
-    if (durations.length > 0) {
-      stats.push({
-        phase: "HR Interview",
-        avgDurationMinutes: Math.round(
-          durations.reduce((a, b) => a + b, 0) / durations.length / 60
-        ),
-        minDurationMinutes: Math.round(Math.min(...durations) / 60),
-        maxDurationMinutes: Math.round(Math.max(...durations) / 60),
-        sampleSize: durations.length,
-      });
-    }
-  }
-
   // Total assessment duration (for completed assessments)
   const completedAssessments = await db.assessment.findMany({
     where: {
@@ -441,11 +413,8 @@ export async function getStatusDistribution(): Promise<StatusDistribution[]> {
 
   // Define order of statuses
   const statusOrder: AssessmentStatus[] = [
-    "HR_INTERVIEW",
-    "ONBOARDING",
+    "WELCOME",
     "WORKING",
-    "FINAL_DEFENSE",
-    "PROCESSING",
     "COMPLETED",
   ];
 
@@ -466,31 +435,11 @@ export async function getStatusDistribution(): Promise<StatusDistribution[]> {
  */
 export async function getCompletionFunnel(): Promise<FunnelStep[]> {
   // Count assessments that reached each status
-  const hrInterview = await db.assessment.count();
-  const onboarding = await db.assessment.count({
-    where: {
-      status: {
-        in: [
-          "ONBOARDING",
-          "WORKING",
-          "FINAL_DEFENSE",
-          "PROCESSING",
-          "COMPLETED",
-        ],
-      },
-    },
-  });
+  const started = await db.assessment.count();
   const working = await db.assessment.count({
     where: {
       status: {
-        in: ["WORKING", "FINAL_DEFENSE", "PROCESSING", "COMPLETED"],
-      },
-    },
-  });
-  const finalDefense = await db.assessment.count({
-    where: {
-      status: {
-        in: ["FINAL_DEFENSE", "PROCESSING", "COMPLETED"],
+        in: ["WORKING", "COMPLETED"],
       },
     },
   });
@@ -503,46 +452,27 @@ export async function getCompletionFunnel(): Promise<FunnelStep[]> {
   const funnel: FunnelStep[] = [
     {
       step: "Started",
-      count: hrInterview,
+      count: started,
       percentage: 100,
       dropoffRate: 0,
     },
     {
-      step: "HR Interview",
-      count: onboarding,
-      percentage:
-        hrInterview > 0 ? Math.round((onboarding / hrInterview) * 100) : 0,
-      dropoffRate:
-        hrInterview > 0
-          ? Math.round(((hrInterview - onboarding) / hrInterview) * 100)
-          : 0,
-    },
-    {
-      step: "Onboarding",
-      count: working,
-      percentage: onboarding > 0 ? Math.round((working / onboarding) * 100) : 0,
-      dropoffRate:
-        onboarding > 0
-          ? Math.round(((onboarding - working) / onboarding) * 100)
-          : 0,
-    },
-    {
       step: "Working",
-      count: finalDefense,
-      percentage: working > 0 ? Math.round((finalDefense / working) * 100) : 0,
+      count: working,
+      percentage: started > 0 ? Math.round((working / started) * 100) : 0,
       dropoffRate:
-        working > 0
-          ? Math.round(((working - finalDefense) / working) * 100)
+        started > 0
+          ? Math.round(((started - working) / started) * 100)
           : 0,
     },
     {
       step: "Completed",
       count: completed,
       percentage:
-        finalDefense > 0 ? Math.round((completed / finalDefense) * 100) : 0,
+        working > 0 ? Math.round((completed / working) * 100) : 0,
       dropoffRate:
-        finalDefense > 0
-          ? Math.round(((finalDefense - completed) / finalDefense) * 100)
+        working > 0
+          ? Math.round(((working - completed) / working) * 100)
           : 0,
     },
   ];

@@ -21,8 +21,8 @@ import {
 
 /**
  * POST /api/assessment/finalize
- * Marks assessment as fully completed after the final defense call
- * - Transitions status from FINAL_DEFENSE to COMPLETED
+ * Marks assessment as fully completed after the defense call
+ * - Transitions status from WORKING to COMPLETED
  * - Records final completion timestamp
  * - Cleans up (closes) the submitted PR to prevent scenario leakage
  * - Preserves PR content in prSnapshot for historical reference
@@ -83,11 +83,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check that assessment is in FINAL_DEFENSE status
-    if (assessment.status !== AssessmentStatus.FINAL_DEFENSE) {
+    // Check that assessment is in WORKING status (after PR submission, before defense)
+    if (assessment.status !== AssessmentStatus.WORKING) {
       return NextResponse.json(
         {
-          error: `Cannot finalize assessment in ${assessment.status} status. Must be in FINAL_DEFENSE status.`,
+          error: `Cannot finalize assessment in ${assessment.status} status. Must be in WORKING status.`,
         },
         { status: 400 }
       );

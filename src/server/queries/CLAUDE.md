@@ -5,10 +5,7 @@ Reusable server-side data fetching utilities for assessment pages.
 ## Available Functions
 
 ### `getAssessmentWithContext(id, userId)`
-Basic assessment + scenario + user profile data. Use when you need full scenario and user info.
-
-### `getAssessmentForHRInterview(id, userId)`
-For HR interview page. Includes scenario (name, company), HR conversation transcript, and user CV URL.
+Basic assessment + scenario + user data. Use when you need full scenario and user info.
 
 ### `getAssessmentForChat(id, userId)`
 For chat page. Includes scenario with all coworkers for sidebar.
@@ -17,7 +14,7 @@ For chat page. Includes scenario with all coworkers for sidebar.
 For PR defense page. Includes scenario with manager coworker (filtered by role).
 
 ### `getAssessmentForWelcome(id, userId)`
-For welcome/onboarding page. Includes scenario with coworkers and HR assessment status.
+For welcome page. Includes scenario with coworkers.
 
 ### `getAssessmentForResults(id, userId)`
 For results page. Includes scenario name/company and user name/email.

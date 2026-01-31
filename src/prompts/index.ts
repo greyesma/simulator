@@ -2,19 +2,10 @@
  * Centralized Prompts Module
  *
  * All AI prompts are organized by domain:
- * - hr/        - HR interview prompts
  * - manager/   - Manager kickoff and defense call prompts
  * - coworker/  - Coworker chat and voice prompts
  * - analysis/  - Code review, CV parsing, recording analysis, assessment prompts
  */
-
-// HR Interview
-export {
-  HR_INTERVIEW_SYSTEM_PROMPT,
-  buildHRInterviewPrompt,
-  formatCVContextForHR,
-  formatBasicCandidateContext,
-} from "./hr/interview";
 
 // Manager Calls
 export {
@@ -62,10 +53,6 @@ export {
   type VideoEvaluationOutput,
   type AssessmentDimensionType,
 } from "./analysis/video-evaluation";
-export {
-  HR_ASSESSMENT_PROMPT,
-  buildHRAssessmentContext,
-} from "./analysis/hr-assessment";
 export {
   FEEDBACK_PARSING_PROMPT,
   buildFeedbackParsingContext,

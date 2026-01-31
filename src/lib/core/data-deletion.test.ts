@@ -287,7 +287,6 @@ describe("data-deletion", () => {
       expect(result.deletedItems.conversations).toBe(10);
       expect(result.deletedItems.recordings).toBe(3);
       expect(result.deletedItems.recordingSegments).toBe(7);
-      expect(result.deletedItems.hrAssessments).toBe(2);
     });
 
     it("returns failure if database operation fails", async () => {

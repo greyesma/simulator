@@ -13,13 +13,6 @@ export type {
 export { useVoiceBase } from "./use-voice-base";
 export type { UseVoiceBaseOptions, UseVoiceBaseReturn } from "./use-voice-base";
 
-// HR Interview hook
-export { useVoiceConversation } from "./use-voice-conversation";
-export type {
-  UseVoiceConversationOptions,
-  UseVoiceConversationReturn,
-} from "./use-voice-conversation";
-
 // Coworker call hook
 export { useCoworkerVoice } from "./use-coworker-voice";
 export type {

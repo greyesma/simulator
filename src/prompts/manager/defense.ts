@@ -16,7 +16,6 @@ export interface DefenseContext {
   prUrl: string;
   conversationSummary: string;
   screenAnalysisSummary: string;
-  hrInterviewNotes: string;
   ciStatusSummary: string;
   codeReviewSummary: string;
 }
@@ -68,9 +67,6 @@ ${context.ciStatusSummary}
 
 ### Code Review Notes
 ${context.codeReviewSummary || "Code review not available."}
-
-### HR Interview Notes
-${context.hrInterviewNotes || "No HR notes available."}
 
 ### How They Worked (Screen Recording)
 ${context.screenAnalysisSummary || "No screen analysis available."}

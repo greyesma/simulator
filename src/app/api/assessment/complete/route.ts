@@ -6,10 +6,10 @@ import { success, error } from "@/lib/api";
 
 /**
  * POST /api/assessment/complete
- * Marks assessment as complete (transitions to FINAL_DEFENSE phase)
+ * Records PR submission for an assessment
  * - Validates PR link
- * - Updates assessment status
- * - Records completion time for time tracking
+ * - Updates assessment with PR URL
+ * - Assessment stays in WORKING status until defense call completes
  */
 export async function POST(request: Request) {
   try {
@@ -69,13 +69,12 @@ export async function POST(request: Request) {
     const workingDurationMs = now.getTime() - assessment.startedAt.getTime();
     const workingDurationSeconds = Math.floor(workingDurationMs / 1000);
 
-    // Update assessment status to FINAL_DEFENSE
+    // Update assessment with PR URL (status stays WORKING until defense call completes)
     const updatedAssessment = await db.assessment.update({
       where: { id: assessmentId },
       data: {
-        status: AssessmentStatus.FINAL_DEFENSE,
         prUrl,
-        // Note: completedAt is set when the entire assessment is done (after final defense)
+        // Note: completedAt is set when the entire assessment is done (after defense call)
         // We track the working phase end time in the response
       },
       select: {

@@ -42,16 +42,16 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
     redirect("/");
   }
 
-  // Check if assessment is completed or processing
-  if (assessment.status !== "COMPLETED" && assessment.status !== "PROCESSING") {
+  // Check if assessment is completed
+  if (assessment.status !== "COMPLETED") {
     // Assessment not ready for results yet
-    redirect(`/assessment/${id}/defense`);
+    redirect(`/assessment/${id}/chat`);
   }
 
   // If no report exists yet, try to generate one
   let report = assessment.report as AssessmentReport | null;
 
-  if (!report && assessment.status === "COMPLETED") {
+  if (!report) {
     // Try to generate the report via API
     // This is a fallback - normally the report is generated during finalization
     try {
@@ -82,7 +82,7 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
       companyName={assessment.scenario.companyName}
       userName={assessment.user?.name || session.user.name || "there"}
       report={report}
-      isProcessing={assessment.status === "PROCESSING"}
+      isProcessing={false}
     />
   );
 }

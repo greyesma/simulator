@@ -65,7 +65,6 @@ export async function POST(request: Request) {
           },
         },
         conversations: true,
-        hrAssessment: true,
         recordings: {
           include: {
             segments: {
@@ -150,17 +149,6 @@ export async function POST(request: Request) {
 - Moments of being stuck: ${analysis.totalStuckMoments || 0}`;
     }
 
-    // Build HR interview notes
-    let hrInterviewNotes = "";
-    if (assessment.hrAssessment) {
-      const hr = assessment.hrAssessment;
-      hrInterviewNotes = `HR Interview Assessment:
-- Communication score: ${hr.communicationScore || "N/A"}/5
-- CV consistency: ${hr.cvConsistencyScore || "N/A"}/5
-- Professionalism: ${hr.professionalismScore || "N/A"}/5
-${hr.communicationNotes ? `- Notes: ${hr.communicationNotes}` : ""}`;
-    }
-
     // Fetch CI status for the PR
     let ciStatusSummary =
       "CI Status: Not available (PR not yet submitted or CI not configured)";
@@ -232,7 +220,6 @@ ${hr.communicationNotes ? `- Notes: ${hr.communicationNotes}` : ""}`;
       prUrl: assessment.prUrl,
       conversationSummary,
       screenAnalysisSummary,
-      hrInterviewNotes,
       ciStatusSummary,
       codeReviewSummary,
     });

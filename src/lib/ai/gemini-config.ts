@@ -8,10 +8,7 @@ export const LIVE_MODEL = "gemini-2.5-flash-native-audio-latest";
 // Model for text-based AI operations (CV parsing, assessments, chat, etc.)
 export const TEXT_MODEL = "gemini-3-flash-preview";
 
-// Re-export HR interview prompt from centralized prompts module
-export { HR_INTERVIEW_SYSTEM_PROMPT as HR_PERSONA_SYSTEM_PROMPT } from "@/prompts/hr/interview";
-
-// Default voice for HR interviews and fallback
+// Default voice for voice calls and fallback
 export const DEFAULT_VOICE = "Aoede";
 
 // Available Gemini Live voices by gender (for UI selection)

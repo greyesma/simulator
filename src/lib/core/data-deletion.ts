@@ -11,7 +11,6 @@ export interface DeletionResult {
     conversations: number;
     recordings: number;
     recordingSegments: number;
-    hrAssessments: number;
     storageFiles: number;
   };
   errors: string[];
@@ -146,7 +145,6 @@ export async function deleteUserData(userId: string): Promise<DeletionResult> {
       conversations: 0,
       recordings: 0,
       recordingSegments: 0,
-      hrAssessments: 0,
       storageFiles: 0,
     },
     errors: [],
@@ -161,7 +159,6 @@ export async function deleteUserData(userId: string): Promise<DeletionResult> {
     // Due to cascade deletes, deleting assessments will also delete:
     // - Conversations (onDelete: Cascade)
     // - Recordings (onDelete: Cascade) -> RecordingSegments (onDelete: Cascade)
-    // - HRInterviewAssessment (onDelete: Cascade)
     const dbCounts = await db.$transaction(async (tx) => {
       // Get counts for reporting (inside transaction for consistency)
       const assessmentCount = await tx.assessment.count({
