@@ -24,7 +24,7 @@ function FAQAccordion({ item }: { item: FAQItem; index: number }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="bg-white border-2 border-gray-100 hover:border-blue-200 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg">
+    <div className="bg-white border-2 border-stone-100 hover:border-blue-200 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-blue-50/50 transition-colors"
@@ -33,17 +33,17 @@ function FAQAccordion({ item }: { item: FAQItem; index: number }) {
           <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
             <span className="text-primary font-bold text-sm">Q</span>
           </div>
-          <h3 className="font-semibold text-gray-900 text-lg pr-4">{item.question}</h3>
+          <h3 className="font-semibold text-stone-900 text-lg pr-4">{item.question}</h3>
         </div>
         {isOpen ? (
-          <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-300" />
+          <ChevronUp className="w-5 h-5 text-stone-400 flex-shrink-0 transition-transform duration-300" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-300" />
+          <ChevronDown className="w-5 h-5 text-stone-400 flex-shrink-0 transition-transform duration-300" />
         )}
       </button>
       {isOpen && (
         <div className="px-6 pb-5 animate-fade-in">
-          <div className="pl-12 text-gray-600 leading-relaxed">{item.answer}</div>
+          <div className="pl-12 text-stone-600 leading-relaxed">{item.answer}</div>
         </div>
       )}
     </div>
@@ -163,11 +163,11 @@ export default function FAQPageContent() {
             </Badge>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-6">
-              <span className="text-gray-900">Questions about </span>
+              <span className="text-stone-900">Questions about </span>
               <span className="text-primary bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">work simulations?</span>
             </h1>
 
-            <p className="text-lg sm:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-stone-600 leading-relaxed max-w-2xl mx-auto">
               Everything you need to know about using Skillvee to hire better
             </p>
           </div>
@@ -175,7 +175,7 @@ export default function FAQPageContent() {
       </section>
 
       {/* FAQ Content */}
-      <section className="py-16 sm:py-20 bg-gray-50">
+      <section className="py-16 sm:py-20 bg-stone-50">
         <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-6">
           <div className="space-y-16">
             {faqSections.map((section, sectionIndex) => (
@@ -192,7 +192,7 @@ export default function FAQPageContent() {
                   <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-4">
                     {section.icon}
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-stone-900">
                     {section.title}
                   </h2>
                 </div>
@@ -248,7 +248,7 @@ export default function FAQPageContent() {
             <Button
               size="lg"
               asChild
-              className="bg-white text-blue-600 hover:bg-gray-50 shadow-xl font-semibold transform hover:scale-105 transition-all duration-300"
+              className="bg-white text-blue-600 hover:bg-stone-50 shadow-xl font-semibold transform hover:scale-105 transition-all duration-300"
             >
               <Link href="/demo">
                 Request Demo

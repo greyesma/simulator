@@ -33,14 +33,14 @@ export default function PricingPage() {
             <h1 className="text-4xl sm:text-5xl font-bold mb-6 leading-tight">
               Simple pricing that scales with you
             </h1>
-            <p className="text-xl text-gray-600 mb-4 max-w-3xl mx-auto">
+            <p className="text-xl text-stone-600 mb-4 max-w-3xl mx-auto">
               Start free, upgrade when you need more. No per-assessment fees, no surprises.
             </p>
           </div>
         </section>
 
         {/* Pricing Cards */}
-        <section className="py-20 bg-gray-50">
+        <section className="py-20 bg-stone-50">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-6">
             <PricingContent />
 
@@ -48,37 +48,37 @@ export default function PricingPage() {
             <div className="mt-16 max-w-4xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                 <div>
-                  <div className="text-2xl font-bold text-gray-900 mb-2">$0</div>
-                  <p className="text-gray-600">Setup fees</p>
+                  <div className="text-2xl font-bold text-stone-900 mb-2">$0</div>
+                  <p className="text-stone-600">Setup fees</p>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-gray-900 mb-2">Cancel</div>
-                  <p className="text-gray-600">Anytime, no contracts</p>
+                  <div className="text-2xl font-bold text-stone-900 mb-2">Cancel</div>
+                  <p className="text-stone-600">Anytime, no contracts</p>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-gray-900 mb-2">14-day</div>
-                  <p className="text-gray-600">Free trial on paid plans</p>
+                  <div className="text-2xl font-bold text-stone-900 mb-2">14-day</div>
+                  <p className="text-stone-600">Free trial on paid plans</p>
                 </div>
               </div>
             </div>
 
             {/* FAQ Teaser */}
-            <div className="mt-16 max-w-3xl mx-auto bg-white rounded-xl p-8 border border-gray-200">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">
+            <div className="mt-16 max-w-3xl mx-auto bg-white rounded-xl p-8 border border-stone-200">
+              <h3 className="text-xl font-bold text-stone-900 mb-4 text-center">
                 Common Questions
               </h3>
               <div className="space-y-4">
                 <div>
-                  <p className="font-medium text-gray-900">What counts as an assessment?</p>
-                  <p className="text-gray-600 text-sm">Each unique candidate who completes a work simulation counts as one assessment. You can send unlimited invitations.</p>
+                  <p className="font-medium text-stone-900">What counts as an assessment?</p>
+                  <p className="text-stone-600 text-sm">Each unique candidate who completes a work simulation counts as one assessment. You can send unlimited invitations.</p>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">What happens if I exceed my monthly limit?</p>
-                  <p className="text-gray-600 text-sm">We&apos;ll notify you when you&apos;re approaching your limit. You can upgrade anytime, or purchase additional assessments at $10 each.</p>
+                  <p className="font-medium text-stone-900">What happens if I exceed my monthly limit?</p>
+                  <p className="text-stone-600 text-sm">We&apos;ll notify you when you&apos;re approaching your limit. You can upgrade anytime, or purchase additional assessments at $10 each.</p>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">Do unused assessments roll over?</p>
-                  <p className="text-gray-600 text-sm">Monthly allocations reset each billing cycle. Annual plans get a 20% bonus and more flexibility.</p>
+                  <p className="font-medium text-stone-900">Do unused assessments roll over?</p>
+                  <p className="text-stone-600 text-sm">Monthly allocations reset each billing cycle. Annual plans get a 20% bonus and more flexibility.</p>
                 </div>
               </div>
               <div className="mt-6 text-center">
@@ -91,10 +91,10 @@ export default function PricingPage() {
             {/* CTA */}
             <div className="mt-16 text-center">
               <div className="mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                <h3 className="text-2xl font-bold text-stone-900 mb-4">
                   Not sure which plan fits?
                 </h3>
-                <p className="text-gray-600 mb-6">
+                <p className="text-stone-600 mb-6">
                   Start with Free and upgrade when you need more capacity.
                 </p>
                 <Link href="/demo">

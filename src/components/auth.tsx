@@ -58,7 +58,7 @@ export function AuthButton({ appearance }: AuthButtonProps) {
       <DropdownMenuContent align="end" className="w-48">
         <div className="px-2 py-1.5 text-sm">
           <p className="font-medium">{user.name}</p>
-          <p className="text-gray-500 text-xs truncate">{user.email}</p>
+          <p className="text-stone-500 text-xs truncate">{user.email}</p>
         </div>
         <DropdownMenuItem asChild>
           <button

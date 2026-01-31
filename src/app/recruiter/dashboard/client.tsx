@@ -45,77 +45,77 @@ export function RecruiterDashboardClient({
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold text-gray-900">Dashboard</h1>
-        <p className="mt-2 text-gray-600">
+        <h1 className="text-3xl font-semibold text-stone-900">Dashboard</h1>
+        <p className="mt-2 text-stone-600">
           Overview of your scenarios and candidate activity
         </p>
       </div>
 
       {/* Stats Cards */}
       <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-gray-200 shadow-sm">
+        <Card className="border-stone-200 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-stone-600">
               Total Scenarios
             </CardTitle>
             <FileText className="h-5 w-5 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">
+            <div className="text-3xl font-bold text-stone-900">
               {stats.scenarioCount}
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-stone-500">
               Active assessment scenarios
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-gray-200 shadow-sm">
+        <Card className="border-stone-200 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-stone-600">
               Total Candidates
             </CardTitle>
             <Users className="h-5 w-5 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">
+            <div className="text-3xl font-bold text-stone-900">
               {stats.candidateCount}
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-stone-500">
               Unique candidates assessed
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-gray-200 shadow-sm">
+        <Card className="border-stone-200 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-stone-600">
               Completed
             </CardTitle>
             <CheckCircle className="h-5 w-5 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">
+            <div className="text-3xl font-bold text-stone-900">
               {stats.completedCount}
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-stone-500">
               Assessments completed
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-gray-200 shadow-sm">
+        <Card className="border-stone-200 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-stone-600">
               Completion Rate
             </CardTitle>
             <TrendingUp className="h-5 w-5 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">
+            <div className="text-3xl font-bold text-stone-900">
               {stats.completionRate}%
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-stone-500">
               Of started assessments
             </p>
           </CardContent>
@@ -124,7 +124,7 @@ export function RecruiterDashboardClient({
 
       {/* Quick Actions */}
       <div className="mb-8">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+        <h2 className="mb-4 text-xl font-semibold text-stone-900">
           Quick Actions
         </h2>
         <div className="flex flex-wrap gap-4">
@@ -140,7 +140,7 @@ export function RecruiterDashboardClient({
           <Button
             asChild
             variant="outline"
-            className="border-gray-200 shadow-sm"
+            className="border-stone-200 shadow-sm"
           >
             <Link href="/recruiter/scenarios">
               View All Scenarios
@@ -150,7 +150,7 @@ export function RecruiterDashboardClient({
           <Button
             asChild
             variant="outline"
-            className="border-gray-200 shadow-sm"
+            className="border-stone-200 shadow-sm"
           >
             <Link href="/recruiter/candidates">
               View All Candidates
@@ -163,7 +163,7 @@ export function RecruiterDashboardClient({
       {/* Recent Activity */}
       <div>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-xl font-semibold text-stone-900">
             Recent Activity
           </h2>
           {recentAssessments.length > 0 && (
@@ -176,15 +176,15 @@ export function RecruiterDashboardClient({
             </Button>
           )}
         </div>
-        <Card className="border-gray-200 shadow-sm">
+        <Card className="border-stone-200 shadow-sm">
           <CardContent className="p-0">
             {recentAssessments.length === 0 ? (
               <div className="p-8 text-center">
-                <FileText className="mx-auto h-12 w-12 text-gray-300" />
-                <h3 className="mt-4 text-lg font-medium text-gray-900">
+                <FileText className="mx-auto h-12 w-12 text-stone-300" />
+                <h3 className="mt-4 text-lg font-medium text-stone-900">
                   No activity yet
                 </h3>
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mt-2 text-sm text-stone-500">
                   Create a scenario and share it with candidates to see
                   activity here.
                 </p>
@@ -201,17 +201,17 @@ export function RecruiterDashboardClient({
             ) : (
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="p-4 text-left text-xs font-medium uppercase text-gray-500">
+                  <tr className="border-b border-stone-200">
+                    <th className="p-4 text-left text-xs font-medium uppercase text-stone-500">
                       Candidate
                     </th>
-                    <th className="p-4 text-left text-xs font-medium uppercase text-gray-500">
+                    <th className="p-4 text-left text-xs font-medium uppercase text-stone-500">
                       Scenario
                     </th>
-                    <th className="p-4 text-left text-xs font-medium uppercase text-gray-500">
+                    <th className="p-4 text-left text-xs font-medium uppercase text-stone-500">
                       Status
                     </th>
-                    <th className="p-4 text-left text-xs font-medium uppercase text-gray-500">
+                    <th className="p-4 text-left text-xs font-medium uppercase text-stone-500">
                       Date
                     </th>
                   </tr>
@@ -220,17 +220,17 @@ export function RecruiterDashboardClient({
                   {recentAssessments.map((assessment) => (
                     <tr
                       key={assessment.id}
-                      className="border-b border-gray-100 last:border-b-0 transition-colors hover:bg-gray-50"
+                      className="border-b border-stone-100 last:border-b-0 transition-colors hover:bg-stone-50"
                     >
                       <td className="p-4">
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-stone-900">
                           {assessment.user.name || "Anonymous"}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-stone-500">
                           {assessment.user.email}
                         </p>
                       </td>
-                      <td className="p-4 text-sm text-gray-700">
+                      <td className="p-4 text-sm text-stone-700">
                         {assessment.scenario.name}
                       </td>
                       <td className="p-4">
@@ -245,13 +245,13 @@ export function RecruiterDashboardClient({
                               ? "bg-green-100 text-green-700 hover:bg-green-100"
                               : assessment.status === "WORKING"
                               ? "bg-blue-100 text-blue-700 hover:bg-blue-100"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-100"
+                              : "bg-stone-100 text-stone-700 hover:bg-stone-100"
                           }
                         >
                           {assessment.status}
                         </Badge>
                       </td>
-                      <td className="p-4 text-sm text-gray-500">
+                      <td className="p-4 text-sm text-stone-500">
                         {new Intl.DateTimeFormat("en-US", {
                           month: "short",
                           day: "numeric",

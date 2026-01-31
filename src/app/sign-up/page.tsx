@@ -120,7 +120,7 @@ function SignUpForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-stone-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         {/* Header with Logo */}
         <div className="text-center">
@@ -134,10 +134,10 @@ function SignUpForm() {
               priority
             />
           </Link>
-          <h2 className="mt-6 text-2xl font-semibold text-gray-900">
+          <h2 className="mt-6 text-2xl font-semibold text-stone-900">
             Create your account
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-stone-600">
             Start practicing interviews with AI
           </p>
         </div>
@@ -150,7 +150,7 @@ function SignUpForm() {
         )}
 
         {/* Sign Up Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+        <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-8">
           {/* Google Sign Up */}
           <Button
             type="button"
@@ -200,10 +200,10 @@ function SignUpForm() {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
+              <div className="w-full border-t border-stone-200" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-4 text-gray-500">
+              <span className="bg-white px-4 text-stone-500">
                 or sign up with email
               </span>
             </div>
@@ -215,7 +215,7 @@ function SignUpForm() {
               <div>
                 <label
                   htmlFor="firstName"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-stone-700 mb-1"
                 >
                   First name
                 </label>
@@ -226,13 +226,13 @@ function SignUpForm() {
                   onChange={(e) => setFirstName(e.target.value)}
                   placeholder="John"
                   disabled={isLoading}
-                  className="h-11 border-gray-200 focus:border-gray-300"
+                  className="h-11 border-stone-200 focus:border-stone-300"
                 />
               </div>
               <div>
                 <label
                   htmlFor="lastName"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-stone-700 mb-1"
                 >
                   Last name
                 </label>
@@ -243,7 +243,7 @@ function SignUpForm() {
                   onChange={(e) => setLastName(e.target.value)}
                   placeholder="Doe"
                   disabled={isLoading}
-                  className="h-11 border-gray-200 focus:border-gray-300"
+                  className="h-11 border-stone-200 focus:border-stone-300"
                 />
               </div>
             </div>
@@ -251,7 +251,7 @@ function SignUpForm() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-stone-700 mb-1"
               >
                 Email address
               </label>
@@ -263,14 +263,14 @@ function SignUpForm() {
                 placeholder="you@example.com"
                 required
                 disabled={isLoading}
-                className="h-11 border-gray-200 focus:border-gray-300"
+                className="h-11 border-stone-200 focus:border-stone-300"
               />
             </div>
 
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-stone-700 mb-1"
               >
                 Password
               </label>
@@ -282,14 +282,14 @@ function SignUpForm() {
                 placeholder="At least 8 characters"
                 required
                 disabled={isLoading}
-                className="h-11 border-gray-200 focus:border-gray-300"
+                className="h-11 border-stone-200 focus:border-stone-300"
               />
             </div>
 
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-stone-700 mb-1"
               >
                 Confirm password
               </label>
@@ -301,7 +301,7 @@ function SignUpForm() {
                 placeholder="Confirm your password"
                 required
                 disabled={isLoading}
-                className="h-11 border-gray-200 focus:border-gray-300"
+                className="h-11 border-stone-200 focus:border-stone-300"
               />
             </div>
 
@@ -315,7 +315,7 @@ function SignUpForm() {
           </form>
 
           {/* Terms */}
-          <p className="mt-4 text-xs text-center text-gray-500">
+          <p className="mt-4 text-xs text-center text-stone-500">
             By signing up, you agree to our{" "}
             <Link href="/terms" className="text-blue-600 hover:underline">
               Terms of Service
@@ -328,7 +328,7 @@ function SignUpForm() {
         </div>
 
         {/* Sign In Link */}
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-center text-sm text-stone-600">
           Already have an account?{" "}
           <Link
             href={`/sign-in${callbackUrl !== "/" ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`}
@@ -344,10 +344,10 @@ function SignUpForm() {
 
 function SignUpLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-stone-50">
       <div className="text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading...</p>
+        <p className="mt-4 text-stone-600">Loading...</p>
       </div>
     </div>
   );

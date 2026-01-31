@@ -63,7 +63,7 @@ export function WelcomePageClient({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-stone-50">
       <div className="max-w-3xl mx-auto px-4 py-8 lg:py-12">
         {/* Header */}
         <div className="text-center mb-8">
@@ -77,26 +77,26 @@ export function WelcomePageClient({
               priority
             />
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-stone-900 mb-2">
             {isResume ? "Welcome Back" : "Welcome to Your Assessment"}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-stone-600">
             {companyName} - {scenarioName}
           </p>
         </div>
 
         {/* Content Sections */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8 space-y-6">
+        <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 lg:p-8 space-y-6">
           {/* What is Skillvee */}
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
               <Briefcase className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-1">
+              <h2 className="text-lg font-semibold text-stone-900 mb-1">
                 What is Skillvee?
               </h2>
-              <p className="text-gray-600">
+              <p className="text-stone-600">
                 Skillvee is a realistic day-at-work simulation. You&apos;ll experience
                 what it&apos;s like to work on a real task, communicate with AI-powered
                 colleagues via Slack, and submit your work for review. This isn&apos;t
@@ -105,7 +105,7 @@ export function WelcomePageClient({
             </div>
           </div>
 
-          <hr className="border-gray-200" />
+          <hr className="border-stone-200" />
 
           {/* Screen Recording */}
           <div className="flex items-start gap-4">
@@ -113,10 +113,10 @@ export function WelcomePageClient({
               <Monitor className="w-6 h-6 text-red-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-1">
+              <h2 className="text-lg font-semibold text-stone-900 mb-1">
                 Screen Recording
               </h2>
-              <p className="text-gray-600">
+              <p className="text-stone-600">
                 Your screen will be recorded during the assessment. This is how
                 we evaluate <strong>how</strong> you work, not just what you produce.
                 We&apos;re looking at your problem-solving approach, communication
@@ -125,7 +125,7 @@ export function WelcomePageClient({
             </div>
           </div>
 
-          <hr className="border-gray-200" />
+          <hr className="border-stone-200" />
 
           {/* AI Usage Encouraged */}
           <div className="flex items-start gap-4">
@@ -133,10 +133,10 @@ export function WelcomePageClient({
               <Bot className="w-6 h-6 text-green-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-1">
+              <h2 className="text-lg font-semibold text-stone-900 mb-1">
                 AI Usage Encouraged
               </h2>
-              <p className="text-gray-600">
+              <p className="text-stone-600">
                 Feel free to use any AI tools you&apos;re comfortable with - GitHub
                 Copilot, ChatGPT, Claude, or any other assistants. This reflects
                 modern development practices and we want to see how you leverage
@@ -145,7 +145,7 @@ export function WelcomePageClient({
             </div>
           </div>
 
-          <hr className="border-gray-200" />
+          <hr className="border-stone-200" />
 
           {/* Intentionally Vague */}
           <div className="flex items-start gap-4">
@@ -153,10 +153,10 @@ export function WelcomePageClient({
               <HelpCircle className="w-6 h-6 text-amber-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-1">
+              <h2 className="text-lg font-semibold text-stone-900 mb-1">
                 Intentionally Vague
               </h2>
-              <p className="text-gray-600">
+              <p className="text-stone-600">
                 The task context is intentionally incomplete. Part of the assessment
                 is seeing how you seek clarification and gather requirements. Don&apos;t
                 hesitate to reach out to your colleagues in Slack for more context -
@@ -167,7 +167,7 @@ export function WelcomePageClient({
         </div>
 
         {/* Consent Section */}
-        <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
+        <div className="mt-8 bg-white rounded-xl shadow-sm border border-stone-200 p-6 lg:p-8">
           {!isResume && (
             <label
               htmlFor="consent"
@@ -178,9 +178,9 @@ export function WelcomePageClient({
                 id="consent"
                 checked={consentChecked}
                 onChange={(e) => setConsentChecked(e.target.checked)}
-                className="mt-1 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="mt-1 h-5 w-5 rounded border-stone-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-gray-700 select-none">
+              <span className="text-stone-700 select-none">
                 I understand and agree to screen recording and the assessment
                 process. I acknowledge that my screen activity will be recorded
                 and reviewed as part of this evaluation.
@@ -214,7 +214,7 @@ export function WelcomePageClient({
           </Button>
 
           {!isResume && !consentChecked && (
-            <p className="text-center text-sm text-gray-500 mt-3">
+            <p className="text-center text-sm text-stone-500 mt-3">
               Please check the box above to continue
             </p>
           )}

@@ -35,7 +35,7 @@ import { Input } from "@/components/ui/input";
 
 ### Typography
 
-- **UI text**: `DM Sans` - clean, humanist sans-serif
+- **UI text**: `Figtree` - clean, humanist sans-serif
 - **Code/system/timestamps**: `Space Mono` - technical, monospace
 - Never use: Inter, Roboto, Arial, system fonts, or other generic choices
 
@@ -109,7 +109,7 @@ Transitions should use `transition-colors`, `transition-all`, or specific proper
 - ✅ Use subtle shadows for elevation (`shadow-sm`, `shadow-md`)
 - ✅ Use smooth transitions (`transition-colors`, `transition-all`)
 - ✅ Use CSS variables from globals.css via Tailwind classes
-- ✅ Use DM Sans for body, Space Mono for code
+- ✅ Use Figtree for body, Space Mono for code
 - ✅ Use animation utilities for entrances (`animate-fade-in`, etc.)
 
 ### MANDATORY DON'Ts
@@ -173,7 +173,7 @@ Implement working code (HTML/CSS/JS, React, Vue, etc.) that is:
 
 Focus on:
 
-- **Typography**: Use DM Sans and Space Mono as specified. Create hierarchy through weight, size, and spacing—not font variety.
+- **Typography**: Use Figtree and Space Mono as specified. Create hierarchy through weight, size, and spacing—not font variety.
 - **Color & Theme**: Use CSS variables via Tailwind. The blue palette with slate accents is the standard.
 - **Motion**: Use the provided animation utilities. Smooth, professional transitions enhance user experience. Avoid jarring instant changes.
 - **Spatial Composition**: Use clean layouts with appropriate negative space. Let content breathe.

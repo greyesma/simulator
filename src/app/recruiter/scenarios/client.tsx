@@ -70,10 +70,10 @@ export function RecruiterScenariosClient({
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-semibold text-gray-900">
+          <h1 className="text-3xl font-semibold text-stone-900">
             Your Scenarios
           </h1>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-stone-600">
             Manage your assessment scenarios and share them with candidates
           </p>
         </div>
@@ -87,13 +87,13 @@ export function RecruiterScenariosClient({
 
       {/* Scenarios List */}
       {scenarios.length === 0 ? (
-        <Card className="border-gray-200 shadow-sm">
+        <Card className="border-stone-200 shadow-sm">
           <CardContent className="p-12 text-center">
-            <FileText className="mx-auto h-16 w-16 text-gray-300" />
-            <h2 className="mt-6 text-xl font-semibold text-gray-900">
+            <FileText className="mx-auto h-16 w-16 text-stone-300" />
+            <h2 className="mt-6 text-xl font-semibold text-stone-900">
               No scenarios yet
             </h2>
-            <p className="mt-2 text-gray-500">
+            <p className="mt-2 text-stone-500">
               Create your first scenario to start assessing candidates with
               AI-powered simulations.
             </p>
@@ -113,14 +113,14 @@ export function RecruiterScenariosClient({
           {scenarios.map((scenario) => (
             <Card
               key={scenario.id}
-              className="border-gray-200 shadow-sm transition-shadow hover:shadow-md"
+              className="border-stone-200 shadow-sm transition-shadow hover:shadow-md"
             >
               <CardContent className="p-6">
                 <div className="flex items-start justify-between gap-6">
                   {/* Scenario Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3">
-                      <h3 className="text-lg font-semibold text-gray-900 truncate">
+                      <h3 className="text-lg font-semibold text-stone-900 truncate">
                         {scenario.name}
                       </h3>
                       <Link
@@ -131,7 +131,7 @@ export function RecruiterScenariosClient({
                         <ExternalLink className="h-4 w-4" />
                       </Link>
                     </div>
-                    <p className="mt-1 text-sm text-gray-600">
+                    <p className="mt-1 text-sm text-stone-600">
                       {scenario.companyName}
                     </p>
 
@@ -151,7 +151,7 @@ export function RecruiterScenariosClient({
                     )}
 
                     {/* Meta Info */}
-                    <div className="mt-4 flex items-center gap-6 text-sm text-gray-500">
+                    <div className="mt-4 flex items-center gap-6 text-sm text-stone-500">
                       <div className="flex items-center gap-1.5">
                         <Users className="h-4 w-4" />
                         <span>
@@ -171,8 +171,8 @@ export function RecruiterScenariosClient({
                   {/* Shareable Link */}
                   <div className="flex-shrink-0">
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
-                        <code className="text-xs text-gray-600 max-w-[200px] truncate">
+                      <div className="flex items-center rounded-lg border border-stone-200 bg-stone-50 px-3 py-2">
+                        <code className="text-xs text-stone-600 max-w-[200px] truncate">
                           /join/{scenario.id.slice(0, 8)}...
                         </code>
                       </div>
@@ -180,7 +180,7 @@ export function RecruiterScenariosClient({
                         variant="outline"
                         size="sm"
                         onClick={() => handleCopyLink(scenario.id)}
-                        className={`border-gray-200 transition-colors ${
+                        className={`border-stone-200 transition-colors ${
                           copiedId === scenario.id
                             ? "bg-green-50 border-green-200 text-green-700"
                             : ""

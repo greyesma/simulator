@@ -53,7 +53,7 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
+        sans: ["var(--font-figtree)", "system-ui", "sans-serif"],
         mono: ["var(--font-space-mono)", "monospace"],
       },
       borderRadius: {

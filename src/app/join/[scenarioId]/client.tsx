@@ -191,7 +191,7 @@ function JoinPageContent({
       : scenario.taskDescription;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-stone-50">
       <div className="max-w-6xl mx-auto px-4 py-8 lg:py-12">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Left Section - Scenario Info */}
@@ -202,16 +202,16 @@ function JoinPageContent({
                 <Building2 className="w-8 h-8 text-blue-600" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold text-stone-900">
                   {scenario.companyName}
                 </h1>
-                <p className="text-lg text-gray-600 mt-1">{scenario.name}</p>
+                <p className="text-lg text-stone-600 mt-1">{scenario.name}</p>
               </div>
             </div>
 
             {/* Tech Stack */}
             <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-2">
+              <h3 className="text-sm font-medium text-stone-500 mb-2">
                 Tech Stack
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -227,12 +227,12 @@ function JoinPageContent({
             </div>
 
             {/* Task Overview */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <div className="bg-white rounded-xl border border-stone-200 p-5">
               <div className="flex items-center gap-2 mb-3">
-                <Code2 className="w-5 h-5 text-gray-600" />
-                <h3 className="font-semibold text-gray-900">Task Overview</h3>
+                <Code2 className="w-5 h-5 text-stone-600" />
+                <h3 className="font-semibold text-stone-900">Task Overview</h3>
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">
+              <p className="text-stone-600 text-sm leading-relaxed whitespace-pre-wrap">
                 {isTaskExpanded ? scenario.taskDescription : truncatedTask}
               </p>
               {scenario.taskDescription.length > 200 && (
@@ -254,8 +254,8 @@ function JoinPageContent({
             </div>
 
             {/* What to Expect */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3 className="font-semibold text-gray-900 mb-4">
+            <div className="bg-white rounded-xl border border-stone-200 p-5">
+              <h3 className="font-semibold text-stone-900 mb-4">
                 What to Expect
               </h3>
               <div className="space-y-4">
@@ -264,10 +264,10 @@ function JoinPageContent({
                     <Bot className="w-4 h-4 text-purple-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900 text-sm">
+                    <h4 className="font-medium text-stone-900 text-sm">
                       AI-Powered Simulation
                     </h4>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-stone-600 text-sm">
                       Work through a realistic day at work with AI teammates
                     </p>
                   </div>
@@ -278,10 +278,10 @@ function JoinPageContent({
                     <MonitorPlay className="w-4 h-4 text-red-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900 text-sm">
+                    <h4 className="font-medium text-stone-900 text-sm">
                       Screen Recording
                     </h4>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-stone-600 text-sm">
                       Your screen will be recorded to assess how you work
                     </p>
                   </div>
@@ -292,10 +292,10 @@ function JoinPageContent({
                     <MessageSquare className="w-4 h-4 text-green-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900 text-sm">
+                    <h4 className="font-medium text-stone-900 text-sm">
                       AI Usage Encouraged
                     </h4>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-stone-600 text-sm">
                       Feel free to use Copilot, ChatGPT, or any AI tools you
                       prefer
                     </p>
@@ -307,10 +307,10 @@ function JoinPageContent({
                     <Clock className="w-4 h-4 text-amber-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900 text-sm">
+                    <h4 className="font-medium text-stone-900 text-sm">
                       Work at Your Pace
                     </h4>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-stone-600 text-sm">
                       Context is intentionally vague - ask questions via chat
                     </p>
                   </div>
@@ -321,7 +321,7 @@ function JoinPageContent({
 
           {/* Right Section - Auth */}
           <div className="lg:sticky lg:top-8 lg:self-start">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
+            <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 lg:p-8">
               {user ? (
                 // Logged in state
                 <div className="space-y-6">
@@ -341,10 +341,10 @@ function JoinPageContent({
                         />
                       </svg>
                     </div>
-                    <h2 className="text-xl font-semibold text-gray-900">
+                    <h2 className="text-xl font-semibold text-stone-900">
                       Welcome back
                     </h2>
-                    <p className="text-gray-600 mt-1">{user.email}</p>
+                    <p className="text-stone-600 mt-1">{user.email}</p>
                   </div>
 
                   {existingAssessment ? (
@@ -379,7 +379,7 @@ function JoinPageContent({
                         : "Continue to Assessment"}
                   </Button>
 
-                  <p className="text-center text-xs text-gray-500">
+                  <p className="text-center text-xs text-stone-500">
                     Not you?{" "}
                     <Link
                       href="/api/auth/signout"
@@ -404,12 +404,12 @@ function JoinPageContent({
                         priority
                       />
                     </Link>
-                    <h2 className="text-xl font-semibold text-gray-900">
+                    <h2 className="text-xl font-semibold text-stone-900">
                       {mode === "signup"
                         ? "Create your account"
                         : "Sign in to continue"}
                     </h2>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-stone-600 mt-1">
                       {mode === "signup"
                         ? "Join to start your assessment"
                         : "Welcome back"}
@@ -455,10 +455,10 @@ function JoinPageContent({
                   {/* Divider */}
                   <div className="relative">
                     <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-200" />
+                      <div className="w-full border-t border-stone-200" />
                     </div>
                     <div className="relative flex justify-center text-sm">
-                      <span className="bg-white px-4 text-gray-500">
+                      <span className="bg-white px-4 text-stone-500">
                         or {mode === "signup" ? "sign up" : "sign in"} with
                         email
                       </span>
@@ -472,7 +472,7 @@ function JoinPageContent({
                         <div>
                           <label
                             htmlFor="firstName"
-                            className="block text-sm font-medium text-gray-700 mb-1"
+                            className="block text-sm font-medium text-stone-700 mb-1"
                           >
                             First name
                           </label>
@@ -483,13 +483,13 @@ function JoinPageContent({
                             onChange={(e) => setFirstName(e.target.value)}
                             placeholder="John"
                             disabled={isLoading}
-                            className="h-11 border-gray-200 focus:border-gray-300"
+                            className="h-11 border-stone-200 focus:border-stone-300"
                           />
                         </div>
                         <div>
                           <label
                             htmlFor="lastName"
-                            className="block text-sm font-medium text-gray-700 mb-1"
+                            className="block text-sm font-medium text-stone-700 mb-1"
                           >
                             Last name
                           </label>
@@ -500,7 +500,7 @@ function JoinPageContent({
                             onChange={(e) => setLastName(e.target.value)}
                             placeholder="Doe"
                             disabled={isLoading}
-                            className="h-11 border-gray-200 focus:border-gray-300"
+                            className="h-11 border-stone-200 focus:border-stone-300"
                           />
                         </div>
                       </div>
@@ -509,7 +509,7 @@ function JoinPageContent({
                     <div>
                       <label
                         htmlFor="email"
-                        className="block text-sm font-medium text-gray-700 mb-1"
+                        className="block text-sm font-medium text-stone-700 mb-1"
                       >
                         Email address
                       </label>
@@ -521,14 +521,14 @@ function JoinPageContent({
                         placeholder="you@example.com"
                         required
                         disabled={isLoading}
-                        className="h-11 border-gray-200 focus:border-gray-300"
+                        className="h-11 border-stone-200 focus:border-stone-300"
                       />
                     </div>
 
                     <div>
                       <label
                         htmlFor="password"
-                        className="block text-sm font-medium text-gray-700 mb-1"
+                        className="block text-sm font-medium text-stone-700 mb-1"
                       >
                         Password
                       </label>
@@ -544,7 +544,7 @@ function JoinPageContent({
                         }
                         required
                         disabled={isLoading}
-                        className="h-11 border-gray-200 focus:border-gray-300"
+                        className="h-11 border-stone-200 focus:border-stone-300"
                       />
                     </div>
 
@@ -552,7 +552,7 @@ function JoinPageContent({
                       <div>
                         <label
                           htmlFor="confirmPassword"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-stone-700 mb-1"
                         >
                           Confirm password
                         </label>
@@ -564,7 +564,7 @@ function JoinPageContent({
                           placeholder="Confirm your password"
                           required
                           disabled={isLoading}
-                          className="h-11 border-gray-200 focus:border-gray-300"
+                          className="h-11 border-stone-200 focus:border-stone-300"
                         />
                       </div>
                     )}
@@ -586,7 +586,7 @@ function JoinPageContent({
 
                   {/* Terms (signup only) */}
                   {mode === "signup" && (
-                    <p className="text-xs text-center text-gray-500">
+                    <p className="text-xs text-center text-stone-500">
                       By signing up, you agree to our{" "}
                       <Link
                         href="/terms"
@@ -605,7 +605,7 @@ function JoinPageContent({
                   )}
 
                   {/* Toggle mode */}
-                  <p className="text-center text-sm text-gray-600">
+                  <p className="text-center text-sm text-stone-600">
                     {mode === "signup"
                       ? "Already have an account? "
                       : "Don't have an account? "}
@@ -631,10 +631,10 @@ function JoinPageContent({
 
 function JoinPageLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-stone-50">
       <div className="text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading...</p>
+        <p className="mt-4 text-stone-600">Loading...</p>
       </div>
     </div>
   );

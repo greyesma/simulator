@@ -75,7 +75,7 @@ export function RecruiterCandidatesClient({
       case "WELCOME":
         return "bg-yellow-100 text-yellow-700 hover:bg-yellow-100";
       default:
-        return "bg-gray-100 text-gray-700 hover:bg-gray-100";
+        return "bg-stone-100 text-stone-700 hover:bg-stone-100";
     }
   };
 
@@ -85,13 +85,13 @@ export function RecruiterCandidatesClient({
       <div className="mb-8">
         <Link
           href="/recruiter/dashboard"
-          className="mb-4 inline-flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          className="mb-4 inline-flex items-center text-sm text-stone-600 hover:text-stone-900 transition-colors"
         >
           <ArrowLeft className="mr-1.5 h-4 w-4" />
           Back to Dashboard
         </Link>
-        <h1 className="text-3xl font-semibold text-gray-900">Candidates</h1>
-        <p className="mt-2 text-gray-600">
+        <h1 className="text-3xl font-semibold text-stone-900">Candidates</h1>
+        <p className="mt-2 text-stone-600">
           View all candidates who have taken your assessments
         </p>
       </div>
@@ -100,13 +100,13 @@ export function RecruiterCandidatesClient({
       {candidates.length > 0 && (
         <div className="mb-6 flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Filters:</span>
+            <Filter className="h-4 w-4 text-stone-500" />
+            <span className="text-sm font-medium text-stone-700">Filters:</span>
           </div>
           <select
             value={scenarioFilter}
             onChange={(e) => setScenarioFilter(e.target.value)}
-            className="rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="rounded-md border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
             <option value="all">All scenarios</option>
             {scenarioOptions.map((scenario) => (
@@ -118,7 +118,7 @@ export function RecruiterCandidatesClient({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="rounded-md border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
             <option value="all">All statuses</option>
             <option value="WELCOME">Welcome</option>
@@ -133,7 +133,7 @@ export function RecruiterCandidatesClient({
                 setScenarioFilter("all");
                 setStatusFilter("all");
               }}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-stone-500 hover:text-stone-700"
             >
               Clear filters
             </Button>
@@ -143,13 +143,13 @@ export function RecruiterCandidatesClient({
 
       {/* Candidates Table/List */}
       {candidates.length === 0 ? (
-        <Card className="border-gray-200 shadow-sm">
+        <Card className="border-stone-200 shadow-sm">
           <CardContent className="p-12 text-center">
-            <Users className="mx-auto h-16 w-16 text-gray-300" />
-            <h2 className="mt-6 text-xl font-semibold text-gray-900">
+            <Users className="mx-auto h-16 w-16 text-stone-300" />
+            <h2 className="mt-6 text-xl font-semibold text-stone-900">
               No candidates yet
             </h2>
-            <p className="mt-2 text-gray-500">
+            <p className="mt-2 text-stone-500">
               Share your scenario link to get started.
             </p>
             <Button
@@ -161,13 +161,13 @@ export function RecruiterCandidatesClient({
           </CardContent>
         </Card>
       ) : filteredCandidates.length === 0 ? (
-        <Card className="border-gray-200 shadow-sm">
+        <Card className="border-stone-200 shadow-sm">
           <CardContent className="p-12 text-center">
-            <Filter className="mx-auto h-16 w-16 text-gray-300" />
-            <h2 className="mt-6 text-xl font-semibold text-gray-900">
+            <Filter className="mx-auto h-16 w-16 text-stone-300" />
+            <h2 className="mt-6 text-xl font-semibold text-stone-900">
               No matching candidates
             </h2>
-            <p className="mt-2 text-gray-500">
+            <p className="mt-2 text-stone-500">
               Try adjusting your filters to see more results.
             </p>
             <Button
@@ -176,35 +176,35 @@ export function RecruiterCandidatesClient({
                 setScenarioFilter("all");
                 setStatusFilter("all");
               }}
-              className="mt-6 border-gray-200"
+              className="mt-6 border-stone-200"
             >
               Clear filters
             </Button>
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-gray-200 shadow-sm overflow-hidden">
+        <Card className="border-stone-200 shadow-sm overflow-hidden">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <th className="p-4 text-left text-xs font-medium uppercase text-gray-500">
+                  <tr className="border-b border-stone-200 bg-stone-50">
+                    <th className="p-4 text-left text-xs font-medium uppercase text-stone-500">
                       Candidate
                     </th>
-                    <th className="p-4 text-left text-xs font-medium uppercase text-gray-500">
+                    <th className="p-4 text-left text-xs font-medium uppercase text-stone-500">
                       Scenario
                     </th>
-                    <th className="p-4 text-left text-xs font-medium uppercase text-gray-500">
+                    <th className="p-4 text-left text-xs font-medium uppercase text-stone-500">
                       Status
                     </th>
-                    <th className="p-4 text-left text-xs font-medium uppercase text-gray-500">
+                    <th className="p-4 text-left text-xs font-medium uppercase text-stone-500">
                       <div className="flex items-center gap-1.5">
                         <Calendar className="h-3.5 w-3.5" />
                         Started
                       </div>
                     </th>
-                    <th className="p-4 text-left text-xs font-medium uppercase text-gray-500">
+                    <th className="p-4 text-left text-xs font-medium uppercase text-stone-500">
                       <div className="flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5" />
                         Completed
@@ -216,13 +216,13 @@ export function RecruiterCandidatesClient({
                   {filteredCandidates.map((candidate) => (
                     <tr
                       key={candidate.id}
-                      className="border-b border-gray-100 last:border-b-0 transition-colors hover:bg-gray-50"
+                      className="border-b border-stone-100 last:border-b-0 transition-colors hover:bg-stone-50"
                     >
                       <td className="p-4">
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-stone-900">
                           {candidate.user.name || "Anonymous"}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-stone-500">
                           {candidate.user.email || "No email"}
                         </p>
                       </td>
@@ -242,10 +242,10 @@ export function RecruiterCandidatesClient({
                           {candidate.status}
                         </Badge>
                       </td>
-                      <td className="p-4 text-sm text-gray-500">
+                      <td className="p-4 text-sm text-stone-500">
                         {formatDateTime(candidate.createdAt)}
                       </td>
-                      <td className="p-4 text-sm text-gray-500">
+                      <td className="p-4 text-sm text-stone-500">
                         {candidate.completedAt
                           ? formatDate(candidate.completedAt)
                           : "—"}
@@ -261,7 +261,7 @@ export function RecruiterCandidatesClient({
 
       {/* Results count */}
       {candidates.length > 0 && (
-        <div className="mt-4 text-sm text-gray-500">
+        <div className="mt-4 text-sm text-stone-500">
           Showing {filteredCandidates.length} of {candidates.length} candidates
         </div>
       )}

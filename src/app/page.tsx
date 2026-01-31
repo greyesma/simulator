@@ -28,11 +28,11 @@ export default function HomePage() {
               {/* Left: Text Content */}
               <SectionReveal>
                 <h1 className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-6">
-                  <span className="text-gray-900">See candidates do the actual job</span>
+                  <span className="text-stone-900">See candidates do the actual job</span>
                   <span className="text-blue-600"> before you hire them.</span>
                 </h1>
 
-                <p className="text-lg sm:text-xl text-gray-600 mb-10">
+                <p className="text-lg sm:text-xl text-stone-600 mb-10">
                   Role-specific work simulations that replace resumes, take-homes, and
                   gut feel. Hiring teams review standardized performance evidence—fast,
                   fair, and comparable.
@@ -52,7 +52,7 @@ export default function HomePage() {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="min-w-[200px] h-14 text-lg border-2 border-gray-300 hover:border-blue-500 hover:text-blue-600 hover:-translate-y-0.5 transition-all duration-300"
+                      className="min-w-[200px] h-14 text-lg border-2 border-stone-300 hover:border-blue-500 hover:text-blue-600 hover:-translate-y-0.5 transition-all duration-300"
                     >
                       See Sample Assessment
                     </Button>
@@ -62,9 +62,9 @@ export default function HomePage() {
 
               {/* Right: GIF/Video Placeholder */}
               <SectionReveal delay="delay-200">
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/80 p-4 lg:p-6 hover:shadow-2xl transition-shadow duration-500">
-                  <div className="aspect-[4/3] bg-gradient-to-br from-blue-50 to-gray-50 rounded-xl flex items-center justify-center">
-                    <div className="text-center text-gray-400">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-stone-200/80 p-4 lg:p-6 hover:shadow-2xl transition-shadow duration-500">
+                  <div className="aspect-[4/3] bg-gradient-to-br from-blue-50 to-stone-50 rounded-xl flex items-center justify-center">
+                    <div className="text-center text-stone-400">
                       <div className="w-16 h-16 bg-blue-100 rounded-xl mx-auto mb-3 flex items-center justify-center">
                         <span className="text-2xl">🎬</span>
                       </div>
@@ -75,18 +75,18 @@ export default function HomePage() {
               </SectionReveal>
             </div>
           </div>
-          <CurveDivider fillColor="fill-slate-50" />
+          <CurveDivider fillColor="fill-stone-50" />
         </section>
 
         {/* Problem Section: The Interview Is Broken */}
-        <section className="relative py-20 sm:py-24 bg-slate-50">
+        <section className="relative py-20 sm:py-24 bg-stone-50">
           <div className="max-w-4xl mx-auto px-6 sm:px-8">
             {/* Header */}
             <SectionReveal className="text-center mb-12">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-stone-900 mb-4">
                 You&apos;ve hired the wrong person before
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-xl text-stone-600">
                 So has everyone. 75% of companies admit it. Here&apos;s why it keeps
                 happening.
               </p>
@@ -119,8 +119,8 @@ export default function HomePage() {
                     {item.stat}
                   </span>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
-                    <p className="text-gray-600 mt-1">{item.desc}</p>
+                    <h3 className="text-lg font-semibold text-stone-900">{item.title}</h3>
+                    <p className="text-stone-600 mt-1">{item.desc}</p>
                   </div>
                 </div>
               ))}
@@ -145,13 +145,13 @@ export default function HomePage() {
 
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-6 relative z-10">
             <SectionReveal className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-stone-900 mb-4">
                 Your algorithm test has a problem:
                 <span className="block text-blue-600 mt-2">
                   it doesn&apos;t work anymore
                 </span>
               </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              <p className="text-xl text-stone-600 max-w-3xl mx-auto">
                 HackerRank, CodeSignal, and TestGorilla were built for a different era.
                 They test what candidates memorized. We show you how they work.
               </p>
@@ -162,12 +162,12 @@ export default function HomePage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Their approach */}
                 <SectionReveal>
-                  <div className="h-full bg-slate-50 rounded-2xl p-8 border border-slate-200 hover:border-slate-300 transition-colors duration-300">
+                  <div className="h-full bg-stone-50 rounded-2xl p-8 border border-stone-200 hover:border-stone-300 transition-colors duration-300">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="w-12 h-12 bg-slate-200 rounded-xl flex items-center justify-center">
-                        <X className="w-6 h-6 text-slate-500" />
+                      <div className="w-12 h-12 bg-stone-200 rounded-xl flex items-center justify-center">
+                        <X className="w-6 h-6 text-stone-500" />
                       </div>
-                      <h3 className="text-xl font-bold text-slate-600">Their approach</h3>
+                      <h3 className="text-xl font-bold text-stone-600">Their approach</h3>
                     </div>
                     <ul className="space-y-4">
                       {[
@@ -178,10 +178,10 @@ export default function HomePage() {
                         "350 random tests from a library",
                       ].map((text, i) => (
                         <li key={i} className="flex items-start gap-4">
-                          <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <X className="w-4 h-4 text-slate-400" />
+                          <div className="w-6 h-6 rounded-full bg-stone-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <X className="w-4 h-4 text-stone-400" />
                           </div>
-                          <span className="text-gray-600">{text}</span>
+                          <span className="text-stone-600">{text}</span>
                         </li>
                       ))}
                     </ul>
@@ -211,7 +211,7 @@ export default function HomePage() {
                           <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                             <CheckCircle className="w-4 h-4 text-blue-600" />
                           </div>
-                          <span className="text-gray-800 font-medium">{text}</span>
+                          <span className="text-stone-800 font-medium">{text}</span>
                         </li>
                       ))}
                     </ul>
@@ -235,10 +235,10 @@ export default function HomePage() {
               ].map((comp, i) => (
                 <div
                   key={i}
-                  className="bg-white rounded-xl p-6 border border-gray-200 hover:border-blue-200 hover:shadow-md transition-all duration-300"
+                  className="bg-white rounded-xl p-6 border border-stone-200 hover:border-blue-200 hover:shadow-md transition-all duration-300"
                 >
-                  <h4 className="font-bold text-gray-900 mb-2">{comp.name}</h4>
-                  <p className="text-gray-500 text-sm">{comp.desc}</p>
+                  <h4 className="font-bold text-stone-900 mb-2">{comp.name}</h4>
+                  <p className="text-stone-500 text-sm">{comp.desc}</p>
                 </div>
               ))}
             </StaggerReveal>
@@ -249,17 +249,17 @@ export default function HomePage() {
               </p>
             </SectionReveal>
           </div>
-          <CurveDivider fillColor="fill-slate-50" />
+          <CurveDivider fillColor="fill-stone-50" />
         </section>
 
         {/* How It Works Section */}
-        <section className="relative py-20 sm:py-28 bg-slate-50">
+        <section className="relative py-20 sm:py-28 bg-stone-50">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-6">
             <SectionReveal className="text-center mb-16 sm:mb-20">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-stone-900 mb-4">
                 How It Works
               </h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              <p className="text-xl text-stone-600 max-w-2xl mx-auto">
                 From job description to hiring decision in three steps.
               </p>
             </SectionReveal>
@@ -271,11 +271,11 @@ export default function HomePage() {
                   <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg">
                     1
                   </div>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  <h3 className="text-2xl sm:text-3xl font-bold text-stone-900">
                     Create Your Simulation
                   </h3>
                 </div>
-                <p className="text-lg text-gray-600 mb-8">
+                <p className="text-lg text-stone-600 mb-8">
                   Paste your job description and we generate a realistic work scenario.
                   No generic tests—your simulation matches the actual role.
                 </p>
@@ -294,17 +294,17 @@ export default function HomePage() {
                     <li key={i} className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                       <div>
-                        <span className="font-semibold text-gray-900">{item.title}</span>
-                        <p className="text-gray-600 text-sm">{item.desc}</p>
+                        <span className="font-semibold text-stone-900">{item.title}</span>
+                        <p className="text-stone-600 text-sm">{item.desc}</p>
                       </div>
                     </li>
                   ))}
                 </ul>
               </SectionReveal>
               <SectionReveal delay="delay-200">
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/80 p-4 lg:p-6 hover:shadow-2xl transition-shadow duration-500">
-                  <div className="aspect-[4/3] bg-gradient-to-br from-blue-50 to-gray-50 rounded-xl flex items-center justify-center">
-                    <div className="text-center text-gray-400">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-stone-200/80 p-4 lg:p-6 hover:shadow-2xl transition-shadow duration-500">
+                  <div className="aspect-[4/3] bg-gradient-to-br from-blue-50 to-stone-50 rounded-xl flex items-center justify-center">
+                    <div className="text-center text-stone-400">
                       <div className="w-16 h-16 bg-blue-100 rounded-xl mx-auto mb-3 flex items-center justify-center">
                         <span className="text-2xl">📝</span>
                       </div>
@@ -318,9 +318,9 @@ export default function HomePage() {
             {/* Step 2 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-20 sm:mb-28">
               <SectionReveal delay="delay-200" className="order-2 lg:order-1">
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/80 p-4 lg:p-6 hover:shadow-2xl transition-shadow duration-500">
-                  <div className="aspect-[4/3] bg-gradient-to-br from-indigo-50 to-gray-50 rounded-xl flex items-center justify-center">
-                    <div className="text-center text-gray-400">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-stone-200/80 p-4 lg:p-6 hover:shadow-2xl transition-shadow duration-500">
+                  <div className="aspect-[4/3] bg-gradient-to-br from-indigo-50 to-stone-50 rounded-xl flex items-center justify-center">
+                    <div className="text-center text-stone-400">
                       <div className="w-16 h-16 bg-indigo-100 rounded-xl mx-auto mb-3 flex items-center justify-center">
                         <span className="text-2xl">💬</span>
                       </div>
@@ -334,11 +334,11 @@ export default function HomePage() {
                   <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg">
                     2
                   </div>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  <h3 className="text-2xl sm:text-3xl font-bold text-stone-900">
                     Candidates Do Real Work
                   </h3>
                 </div>
-                <p className="text-lg text-gray-600 mb-8">
+                <p className="text-lg text-stone-600 mb-8">
                   Send a link. Candidates experience a realistic first day—gathering
                   requirements, making decisions, and delivering work. 30-45 minutes, no
                   scheduling.
@@ -361,8 +361,8 @@ export default function HomePage() {
                     <li key={i} className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                       <div>
-                        <span className="font-semibold text-gray-900">{item.title}</span>
-                        <p className="text-gray-600 text-sm">{item.desc}</p>
+                        <span className="font-semibold text-stone-900">{item.title}</span>
+                        <p className="text-stone-600 text-sm">{item.desc}</p>
                       </div>
                     </li>
                   ))}
@@ -377,11 +377,11 @@ export default function HomePage() {
                   <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg">
                     3
                   </div>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  <h3 className="text-2xl sm:text-3xl font-bold text-stone-900">
                     Review Standardized Evidence
                   </h3>
                 </div>
-                <p className="text-lg text-gray-600 mb-8">
+                <p className="text-lg text-stone-600 mb-8">
                   Compare candidates side-by-side with consistent, objective data. No
                   more gut feel—see exactly what you&apos;re getting.
                 </p>
@@ -403,17 +403,17 @@ export default function HomePage() {
                     <li key={i} className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                       <div>
-                        <span className="font-semibold text-gray-900">{item.title}</span>
-                        <p className="text-gray-600 text-sm">{item.desc}</p>
+                        <span className="font-semibold text-stone-900">{item.title}</span>
+                        <p className="text-stone-600 text-sm">{item.desc}</p>
                       </div>
                     </li>
                   ))}
                 </ul>
               </SectionReveal>
               <SectionReveal delay="delay-200">
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/80 p-4 lg:p-6 hover:shadow-2xl transition-shadow duration-500">
-                  <div className="aspect-[4/3] bg-gradient-to-br from-emerald-50 to-gray-50 rounded-xl flex items-center justify-center">
-                    <div className="text-center text-gray-400">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-stone-200/80 p-4 lg:p-6 hover:shadow-2xl transition-shadow duration-500">
+                  <div className="aspect-[4/3] bg-gradient-to-br from-emerald-50 to-stone-50 rounded-xl flex items-center justify-center">
+                    <div className="text-center text-stone-400">
                       <div className="w-16 h-16 bg-emerald-100 rounded-xl mx-auto mb-3 flex items-center justify-center">
                         <span className="text-2xl">📊</span>
                       </div>
@@ -431,10 +431,10 @@ export default function HomePage() {
         <section className="relative py-20 sm:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-6">
             <SectionReveal className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-stone-900 mb-4">
                 One platform. Any role.
               </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              <p className="text-xl text-stone-600 max-w-3xl mx-auto">
                 Custom simulations tailored to your job description—technical or
                 otherwise.
               </p>
@@ -444,7 +444,7 @@ export default function HomePage() {
               <div className="grid gap-4">
                 <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4">
                   <div className="hidden md:block" />
-                  <div className="text-sm font-semibold text-gray-500 uppercase tracking-wider px-6">
+                  <div className="text-sm font-semibold text-stone-500 uppercase tracking-wider px-6">
                     Sample Simulation
                   </div>
                 </div>
@@ -490,9 +490,9 @@ export default function HomePage() {
                         >
                           <span className="text-lg">{item.icon}</span>
                         </div>
-                        <span className="font-semibold text-gray-900">{item.role}</span>
+                        <span className="font-semibold text-stone-900">{item.role}</span>
                       </div>
-                      <div className="flex items-center text-gray-600 px-2">
+                      <div className="flex items-center text-stone-600 px-2">
                         {item.desc}
                       </div>
                     </div>
@@ -501,7 +501,7 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-          <CurveDivider fillColor="fill-slate-50" />
+          <CurveDivider fillColor="fill-stone-50" />
         </section>
 
         {/* FAQ Section */}

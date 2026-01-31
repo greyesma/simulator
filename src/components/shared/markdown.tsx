@@ -14,7 +14,7 @@ interface MarkdownProps {
 /**
  * Modern styled Markdown renderer with blue theme.
  *
- * Uses DM Sans for prose and Space Mono for code.
+ * Uses Figtree for prose and Space Mono for code.
  * Rounded corners, subtle shadows, blue accents.
  */
 export function Markdown({ children, className = "" }: MarkdownProps) {
@@ -32,7 +32,7 @@ export function Markdown({ children, className = "" }: MarkdownProps) {
 }
 
 const components: Components = {
-  // Headings - bold, DM Sans, no margins on first heading
+  // Headings - bold, Figtree, no margins on first heading
   h1: ({ children }) => (
     <h1 className="mb-4 mt-6 border-b border-border pb-2 text-2xl font-bold first:mt-0">
       {children}

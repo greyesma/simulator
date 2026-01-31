@@ -14,7 +14,7 @@ function FAQAccordion({ item }: { item: FAQItem }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="bg-white border-2 border-gray-100 hover:border-blue-200 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg">
+    <div className="bg-white border-2 border-stone-100 hover:border-blue-200 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-blue-50/50 transition-colors"
@@ -23,17 +23,17 @@ function FAQAccordion({ item }: { item: FAQItem }) {
           <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
             <span className="text-primary font-bold text-sm">Q</span>
           </div>
-          <h3 className="font-semibold text-gray-900 text-lg pr-4">{item.question}</h3>
+          <h3 className="font-semibold text-stone-900 text-lg pr-4">{item.question}</h3>
         </div>
         {isOpen ? (
-          <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-300" />
+          <ChevronUp className="w-5 h-5 text-stone-400 flex-shrink-0 transition-transform duration-300" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-300" />
+          <ChevronDown className="w-5 h-5 text-stone-400 flex-shrink-0 transition-transform duration-300" />
         )}
       </button>
       {isOpen && (
         <div className="px-6 pb-5 animate-fade-in">
-          <div className="pl-12 text-gray-600 leading-relaxed">{item.answer}</div>
+          <div className="pl-12 text-stone-600 leading-relaxed">{item.answer}</div>
         </div>
       )}
     </div>
@@ -77,10 +77,10 @@ export default function HomeFAQ() {
   ];
 
   return (
-    <section className="relative py-20 sm:py-24 bg-slate-50">
+    <section className="relative py-20 sm:py-24 bg-stone-50">
       <div className="max-w-3xl mx-auto px-6 sm:px-8 lg:px-6">
         <SectionReveal className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 mb-4">
             Frequently Asked Questions
           </h2>
         </SectionReveal>

@@ -60,11 +60,11 @@ export default function DemoPage() {
               {/* Left: Content */}
               <SectionReveal>
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-6">
-                  <span className="text-gray-900">See the platform. </span>
+                  <span className="text-stone-900">See the platform. </span>
                   <span className="text-blue-600">Ask the hard questions.</span>
                 </h1>
 
-                <p className="text-lg sm:text-xl text-gray-600 mb-8">
+                <p className="text-lg sm:text-xl text-stone-600 mb-8">
                   20 minutes. No slides. We&apos;ll show you exactly how Skillvee
                   works with your roles—and you&apos;ll see why algorithm tests
                   are dead.
@@ -72,7 +72,7 @@ export default function DemoPage() {
 
                 {/* What you'll get */}
                 <div className="space-y-4 mb-8">
-                  <h3 className="font-semibold text-gray-900">In your demo:</h3>
+                  <h3 className="font-semibold text-stone-900">In your demo:</h3>
                   <ul className="space-y-3">
                     {[
                       "Live walkthrough with your actual job description",
@@ -82,23 +82,23 @@ export default function DemoPage() {
                     ].map((item, i) => (
                       <li key={i} className="flex items-start gap-3">
                         <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-600">{item}</span>
+                        <span className="text-stone-600">{item}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
                 {/* Trust indicators */}
-                <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-gray-200">
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-stone-200">
+                  <div className="flex items-center gap-2 text-sm text-stone-500">
                     <Clock className="w-4 h-4" />
                     <span>20 minutes</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <div className="flex items-center gap-2 text-sm text-stone-500">
                     <Users className="w-4 h-4" />
                     <span>Talk to a founder</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <div className="flex items-center gap-2 text-sm text-stone-500">
                     <Calendar className="w-4 h-4" />
                     <span>Pick your time</span>
                   </div>
@@ -107,10 +107,10 @@ export default function DemoPage() {
 
               {/* Right: Form / Calendar */}
               <SectionReveal delay="delay-200">
-                <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 sm:p-8">
+                <div className="bg-white rounded-2xl shadow-xl border border-stone-200 p-6 sm:p-8">
                   {formState === "form" && (
                     <>
-                      <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                      <h2 className="text-xl font-semibold text-stone-900 mb-6">
                         Request your demo
                       </h2>
                       <form onSubmit={handleSubmit} className="space-y-5">
@@ -190,7 +190,7 @@ export default function DemoPage() {
                           )}
                         </Button>
 
-                        <p className="text-xs text-gray-500 text-center">
+                        <p className="text-xs text-stone-500 text-center">
                           We&apos;ll never share your info. See our{" "}
                           <a href="/privacy" className="text-blue-600 hover:underline">
                             privacy policy
@@ -208,17 +208,17 @@ export default function DemoPage() {
                           <CheckCircle className="w-5 h-5 text-green-600" />
                         </div>
                         <div>
-                          <h2 className="text-lg font-semibold text-gray-900">
+                          <h2 className="text-lg font-semibold text-stone-900">
                             Thanks, {formData.name.split(" ")[0]}!
                           </h2>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-stone-600">
                             Pick a time that works for you.
                           </p>
                         </div>
                       </div>
 
                       {/* Calendly Inline Widget */}
-                      <div className="rounded-xl overflow-hidden border border-gray-200 bg-white">
+                      <div className="rounded-xl overflow-hidden border border-stone-200 bg-white">
                         <InlineWidget
                           url={CALENDLY_URL}
                           styles={{ height: "700px", minWidth: "320px" }}
@@ -240,7 +240,7 @@ export default function DemoPage() {
                         />
                       </div>
 
-                      <p className="text-xs text-gray-500 text-center mt-4">
+                      <p className="text-xs text-stone-500 text-center mt-4">
                         No time that works?{" "}
                         <a
                           href="mailto:hi@skillvee.com"
@@ -257,10 +257,10 @@ export default function DemoPage() {
                       <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                         <CheckCircle className="w-8 h-8 text-green-600" />
                       </div>
-                      <h2 className="text-2xl font-semibold text-gray-900 mb-3">
+                      <h2 className="text-2xl font-semibold text-stone-900 mb-3">
                         You&apos;re all set!
                       </h2>
-                      <p className="text-gray-600 mb-6">
+                      <p className="text-stone-600 mb-6">
                         Check your email for the calendar invite. We&apos;ll send a
                         quick prep guide before your demo.
                       </p>
@@ -276,38 +276,38 @@ export default function DemoPage() {
               </SectionReveal>
             </div>
           </div>
-          <CurveDivider fillColor="fill-slate-50" />
+          <CurveDivider fillColor="fill-stone-50" />
         </section>
 
         {/* Sample Assessment Section */}
-        <section id="sample" className="relative py-20 sm:py-24 bg-slate-50">
+        <section id="sample" className="relative py-20 sm:py-24 bg-stone-50">
           <div className="max-w-4xl mx-auto px-6 sm:px-8">
             <SectionReveal className="text-center mb-12">
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 mb-4">
                 See it before you schedule
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-xl text-stone-600">
                 Explore a sample assessment and candidate results—no demo required.
               </p>
             </SectionReveal>
 
             <SectionReveal delay="delay-200">
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+              <div className="bg-white rounded-2xl shadow-lg border border-stone-200 overflow-hidden">
                 <div className="grid grid-cols-1 md:grid-cols-2">
                   {/* Sample Assessment Preview */}
-                  <div className="p-6 sm:p-8 border-b md:border-b-0 md:border-r border-gray-200">
+                  <div className="p-6 sm:p-8 border-b md:border-b-0 md:border-r border-stone-200">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                         <span className="text-lg">💻</span>
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">
+                        <h3 className="font-semibold text-stone-900">
                           Sample: Frontend Engineer
                         </h3>
-                        <p className="text-sm text-gray-500">30-minute simulation</p>
+                        <p className="text-sm text-stone-500">30-minute simulation</p>
                       </div>
                     </div>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-stone-600 mb-6">
                       See what candidates experience: gathering requirements,
                       building a feature, and defending their approach.
                     </p>
@@ -327,13 +327,13 @@ export default function DemoPage() {
                         <span className="text-lg">📊</span>
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">
+                        <h3 className="font-semibold text-stone-900">
                           Sample: Candidate Results
                         </h3>
-                        <p className="text-sm text-gray-500">Scorecard & artifacts</p>
+                        <p className="text-sm text-stone-500">Scorecard & artifacts</p>
                       </div>
                     </div>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-stone-600 mb-6">
                       Review a completed assessment: structured scores,
                       conversation transcripts, and code review.
                     </p>
@@ -356,7 +356,7 @@ export default function DemoPage() {
         <section className="relative py-20 sm:py-24 bg-white">
           <div className="max-w-4xl mx-auto px-6 sm:px-8">
             <SectionReveal className="text-center mb-12">
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 mb-4">
                 Why teams switch to Skillvee
               </h2>
             </SectionReveal>
@@ -388,13 +388,13 @@ export default function DemoPage() {
                     className="bg-gradient-to-br from-blue-50 to-white rounded-xl p-6 border border-blue-100 hover:border-blue-200 hover:shadow-md transition-all duration-300"
                   >
                     <item.icon className="w-8 h-8 text-blue-600 mb-4" />
-                    <div className="text-3xl font-bold text-gray-900 mb-1">
+                    <div className="text-3xl font-bold text-stone-900 mb-1">
                       {item.stat}
                     </div>
                     <div className="text-sm font-medium text-blue-600 mb-3">
                       {item.label}
                     </div>
-                    <p className="text-sm text-gray-600">{item.desc}</p>
+                    <p className="text-sm text-stone-600">{item.desc}</p>
                   </div>
                 ))}
               </div>

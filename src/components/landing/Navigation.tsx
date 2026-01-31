@@ -26,7 +26,7 @@ export default function Navigation({ currentPage }: NavigationProps) {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 px-6 py-4 backdrop-blur-sm bg-white/95">
+    <nav className="sticky top-0 z-50 bg-white border-b border-stone-200 px-6 py-4 backdrop-blur-sm bg-white/95">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-3">
@@ -48,7 +48,7 @@ export default function Navigation({ currentPage }: NavigationProps) {
             className={`${
               currentPage === "product"
                 ? "text-primary font-medium"
-                : "text-gray-600 hover:text-gray-900"
+                : "text-stone-600 hover:text-stone-900"
             }`}
           >
             Product
@@ -59,7 +59,7 @@ export default function Navigation({ currentPage }: NavigationProps) {
             className={`${
               currentPage === "pricing"
                 ? "text-primary font-medium"
-                : "text-gray-600 hover:text-gray-900"
+                : "text-stone-600 hover:text-stone-900"
             }`}
           >
             Pricing
@@ -70,7 +70,7 @@ export default function Navigation({ currentPage }: NavigationProps) {
             className={`${
               currentPage === "faq"
                 ? "text-primary font-medium"
-                : "text-gray-600 hover:text-gray-900"
+                : "text-stone-600 hover:text-stone-900"
             }`}
           >
             FAQ
@@ -108,7 +108,7 @@ export default function Navigation({ currentPage }: NavigationProps) {
         <div className="md:hidden">
           <button
             onClick={toggleMenu}
-            className="p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:text-gray-900 focus:ring-2 focus:ring-primary rounded-lg"
+            className="p-2 text-stone-600 hover:text-stone-900 focus:outline-none focus:text-stone-900 focus:ring-2 focus:ring-primary rounded-lg"
             aria-label="Toggle mobile menu"
             aria-expanded={isOpen}
           >
@@ -119,14 +119,14 @@ export default function Navigation({ currentPage }: NavigationProps) {
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200">
+        <div className="md:hidden bg-white border-t border-stone-200">
           <div className="px-6 py-4 space-y-4">
             <Link
               href="/product"
               className={`block py-2 px-2 text-lg rounded-lg transition-colors ${
                 currentPage === "product"
                   ? "text-primary font-medium bg-primary/5"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
               }`}
               onClick={() => setIsOpen(false)}
             >
@@ -138,7 +138,7 @@ export default function Navigation({ currentPage }: NavigationProps) {
               className={`block py-2 px-2 text-lg rounded-lg transition-colors ${
                 currentPage === "pricing"
                   ? "text-primary font-medium bg-primary/5"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
               }`}
               onClick={() => setIsOpen(false)}
             >
@@ -150,14 +150,14 @@ export default function Navigation({ currentPage }: NavigationProps) {
               className={`block py-2 px-2 text-lg rounded-lg transition-colors ${
                 currentPage === "faq"
                   ? "text-primary font-medium bg-primary/5"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
               }`}
               onClick={() => setIsOpen(false)}
             >
               FAQ
             </Link>
 
-            <div className="pt-4 border-t border-gray-200 space-y-4">
+            <div className="pt-4 border-t border-stone-200 space-y-4">
               {isSignedIn ? (
                 <div className="space-y-4">
                   <Link href="/dashboard" onClick={() => setIsOpen(false)}>

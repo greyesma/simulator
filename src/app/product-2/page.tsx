@@ -47,11 +47,11 @@ export default function ProductPage2() {
             <div className="text-sm font-semibold text-red-600 mb-4 uppercase tracking-wide">
               The Problem
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 text-gray-900">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 text-stone-900">
               Technical interviews are{" "}
               <span className="text-red-500">broken</span>
             </h1>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto mb-12">
+            <p className="text-lg sm:text-xl text-stone-600 max-w-3xl mx-auto mb-12">
               Algorithm puzzles test memorization. Take-homes get ghosted. Live coding creates anxiety.
               None of them show you how someone actually works.
             </p>
@@ -63,8 +63,8 @@ export default function ProductPage2() {
               <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mb-4">
                 <X className="w-5 h-5 text-red-500" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Algorithm tests</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="font-bold text-stone-900 mb-2">Algorithm tests</h3>
+              <p className="text-stone-600 text-sm">
                 LeetCode performance doesn&apos;t predict job performance. You&apos;re filtering for interview prep, not ability.
               </p>
             </div>
@@ -73,8 +73,8 @@ export default function ProductPage2() {
               <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mb-4">
                 <AlertTriangle className="w-5 h-5 text-red-500" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Take-home projects</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="font-bold text-stone-900 mb-2">Take-home projects</h3>
+              <p className="text-stone-600 text-sm">
                 50% of candidates ghost. The ones who complete it? You have no idea if they did it alone or how long it took.
               </p>
             </div>
@@ -83,8 +83,8 @@ export default function ProductPage2() {
               <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mb-4">
                 <Clock className="w-5 h-5 text-red-500" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Live interviews</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="font-bold text-stone-900 mb-2">Live interviews</h3>
+              <p className="text-stone-600 text-sm">
                 Hours of engineer time per candidate. Inconsistent evaluation. Anxiety kills performance. Still mostly guessing.
               </p>
             </div>
@@ -93,17 +93,17 @@ export default function ProductPage2() {
       </section>
 
       {/* Hero Section - The Solution */}
-      <section className="relative py-20 sm:py-24 bg-gradient-to-b from-slate-50 to-white overflow-hidden">
+      <section className="relative py-20 sm:py-24 bg-gradient-to-b from-stone-50 to-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-6 relative z-10">
           <SectionReveal className="text-center max-w-4xl mx-auto mb-12">
             <div className="text-sm font-semibold text-blue-600 mb-4 uppercase tracking-wide">
               The Solution
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-6 text-gray-900">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-6 text-stone-900">
               Watch candidates do{" "}
               <span className="text-blue-600">real work</span>
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-stone-600 max-w-3xl mx-auto">
               Skillvee simulates a realistic day at work. Candidates gather requirements,
               build something, and defend their decisions. You watch the recording and review the evidence.
             </p>
@@ -111,8 +111,8 @@ export default function ProductPage2() {
 
           {/* Product Demo Video */}
           <SectionReveal delay="delay-200" className="max-w-5xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-3 sm:p-4">
-              <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl flex items-center justify-center relative overflow-hidden group cursor-pointer">
+            <div className="bg-white rounded-2xl shadow-2xl border border-stone-200 p-3 sm:p-4">
+              <div className="aspect-video bg-gradient-to-br from-stone-900 to-stone-800 rounded-xl flex items-center justify-center relative overflow-hidden group cursor-pointer">
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
                 <div className="relative z-10 flex flex-col items-center">
                   <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
@@ -136,10 +136,10 @@ export default function ProductPage2() {
       <section className="relative py-20 sm:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-6">
           <SectionReveal className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 mb-4">
               Your workflow: 5 minutes to set up, zero time to proctor
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-stone-600 max-w-3xl mx-auto">
               Create once. Send to many. Review the evidence. Make better hires.
             </p>
           </SectionReveal>
@@ -157,8 +157,8 @@ export default function ProductPage2() {
                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
                       <FileText className="w-5 h-5 text-blue-600" />
                     </div>
-                    <h3 className="font-bold text-gray-900 mb-2">Paste your JD</h3>
-                    <p className="text-gray-600 text-sm">
+                    <h3 className="font-bold text-stone-900 mb-2">Paste your JD</h3>
+                    <p className="text-stone-600 text-sm">
                       AI generates a realistic simulation based on your job description.
                     </p>
                   </div>
@@ -176,8 +176,8 @@ export default function ProductPage2() {
                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
                       <Send className="w-5 h-5 text-blue-600" />
                     </div>
-                    <h3 className="font-bold text-gray-900 mb-2">Send the link</h3>
-                    <p className="text-gray-600 text-sm">
+                    <h3 className="font-bold text-stone-900 mb-2">Send the link</h3>
+                    <p className="text-stone-600 text-sm">
                       Candidates complete it on their own time. No scheduling required.
                     </p>
                   </div>
@@ -195,8 +195,8 @@ export default function ProductPage2() {
                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
                       <Eye className="w-5 h-5 text-blue-600" />
                     </div>
-                    <h3 className="font-bold text-gray-900 mb-2">Review results</h3>
-                    <p className="text-gray-600 text-sm">
+                    <h3 className="font-bold text-stone-900 mb-2">Review results</h3>
+                    <p className="text-stone-600 text-sm">
                       Watch recordings, read transcripts, see AI-generated insights.
                     </p>
                   </div>
@@ -214,8 +214,8 @@ export default function ProductPage2() {
                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
                       <GitCompare className="w-5 h-5 text-blue-600" />
                     </div>
-                    <h3 className="font-bold text-gray-900 mb-2">Compare & decide</h3>
-                    <p className="text-gray-600 text-sm">
+                    <h3 className="font-bold text-stone-900 mb-2">Compare & decide</h3>
+                    <p className="text-stone-600 text-sm">
                       Side-by-side comparison. Evidence-based hiring decisions.
                     </p>
                   </div>
@@ -224,17 +224,17 @@ export default function ProductPage2() {
             </div>
           </SectionReveal>
         </div>
-        <CurveDivider fillColor="fill-slate-50" />
+        <CurveDivider fillColor="fill-stone-50" />
       </section>
 
       {/* The Simulation Experience - Candidate View */}
-      <section className="relative py-20 sm:py-24 bg-slate-50">
+      <section className="relative py-20 sm:py-24 bg-stone-50">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-6">
           <SectionReveal className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 mb-4">
               What candidates experience
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-stone-600 max-w-3xl mx-auto">
               A realistic day at work—not algorithm puzzles. They show you how they actually work.
             </p>
           </SectionReveal>
@@ -244,16 +244,16 @@ export default function ProductPage2() {
             <StaggerReveal className="space-y-6" staggerMs={150}>
               {/* Stage 1 */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
-                <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                <div className="bg-white rounded-xl p-6 border border-stone-200 shadow-sm">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
                       <span className="text-xl font-bold text-blue-600">1</span>
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-2">
+                      <h3 className="text-lg font-bold text-stone-900 mb-2">
                         Gather requirements
                       </h3>
-                      <p className="text-gray-600 mb-4">
+                      <p className="text-stone-600 mb-4">
                         Candidate joins a kickoff call with their AI manager, then chats
                         with stakeholders to clarify the task. Great candidates ask smart
                         questions. Others dive in blind.
@@ -269,9 +269,9 @@ export default function ProductPage2() {
                     </div>
                   </div>
                 </div>
-                <div className="bg-white rounded-xl border border-gray-200 p-3">
-                  <div className="aspect-[16/10] bg-gradient-to-br from-blue-50 to-gray-50 rounded-lg flex items-center justify-center">
-                    <div className="text-center text-gray-400">
+                <div className="bg-white rounded-xl border border-stone-200 p-3">
+                  <div className="aspect-[16/10] bg-gradient-to-br from-blue-50 to-stone-50 rounded-lg flex items-center justify-center">
+                    <div className="text-center text-stone-400">
                       <div className="w-12 h-12 bg-blue-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
                         <MessageSquare className="w-6 h-6 text-blue-600" />
                       </div>
@@ -285,9 +285,9 @@ export default function ProductPage2() {
 
               {/* Stage 2 */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
-                <div className="bg-white rounded-xl border border-gray-200 p-3 order-2 lg:order-1">
-                  <div className="aspect-[16/10] bg-gradient-to-br from-emerald-50 to-gray-50 rounded-lg flex items-center justify-center">
-                    <div className="text-center text-gray-400">
+                <div className="bg-white rounded-xl border border-stone-200 p-3 order-2 lg:order-1">
+                  <div className="aspect-[16/10] bg-gradient-to-br from-emerald-50 to-stone-50 rounded-lg flex items-center justify-center">
+                    <div className="text-center text-stone-400">
                       <div className="w-12 h-12 bg-emerald-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
                         <Zap className="w-6 h-6 text-emerald-600" />
                       </div>
@@ -297,16 +297,16 @@ export default function ProductPage2() {
                     </div>
                   </div>
                 </div>
-                <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm order-1 lg:order-2">
+                <div className="bg-white rounded-xl p-6 border border-stone-200 shadow-sm order-1 lg:order-2">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
                       <span className="text-xl font-bold text-emerald-600">2</span>
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-2">
+                      <h3 className="text-lg font-bold text-stone-900 mb-2">
                         Do the actual work
                       </h3>
-                      <p className="text-gray-600 mb-4">
+                      <p className="text-stone-600 mb-4">
                         Build the feature, analyze the data, create the roadmap—whatever
                         the role requires. Screen is recorded. AI tools are encouraged.
                       </p>
@@ -328,16 +328,16 @@ export default function ProductPage2() {
 
               {/* Stage 3 */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
-                <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                <div className="bg-white rounded-xl p-6 border border-stone-200 shadow-sm">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
                       <span className="text-xl font-bold text-amber-600">3</span>
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-2">
+                      <h3 className="text-lg font-bold text-stone-900 mb-2">
                         Present and defend
                       </h3>
-                      <p className="text-gray-600 mb-4">
+                      <p className="text-stone-600 mb-4">
                         Submit the work and face questions. The AI pushes back on
                         decisions. Do they defend good ideas? Accept valid criticism?
                       </p>
@@ -352,9 +352,9 @@ export default function ProductPage2() {
                     </div>
                   </div>
                 </div>
-                <div className="bg-white rounded-xl border border-gray-200 p-3">
-                  <div className="aspect-[16/10] bg-gradient-to-br from-amber-50 to-gray-50 rounded-lg flex items-center justify-center">
-                    <div className="text-center text-gray-400">
+                <div className="bg-white rounded-xl border border-stone-200 p-3">
+                  <div className="aspect-[16/10] bg-gradient-to-br from-amber-50 to-stone-50 rounded-lg flex items-center justify-center">
+                    <div className="text-center text-stone-400">
                       <div className="w-12 h-12 bg-amber-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
                         <Users className="w-6 h-6 text-amber-600" />
                       </div>
@@ -375,20 +375,20 @@ export default function ProductPage2() {
       <section className="relative py-20 sm:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-6">
           <SectionReveal className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 mb-4">
               Evidence, not guesswork
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-stone-600 max-w-3xl mx-auto">
               Everything you need to make a confident hiring decision.
             </p>
           </SectionReveal>
 
           <StaggerReveal className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto" staggerMs={100}>
             {/* Deliverable 1: Scorecard */}
-            <Card className="border-2 border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300">
+            <Card className="border-2 border-stone-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300">
               <CardContent className="p-0">
-                <div className="aspect-[4/3] bg-gradient-to-br from-blue-50 to-gray-50 rounded-t-lg flex items-center justify-center border-b">
-                  <div className="text-center text-gray-400">
+                <div className="aspect-[4/3] bg-gradient-to-br from-blue-50 to-stone-50 rounded-t-lg flex items-center justify-center border-b">
+                  <div className="text-center text-stone-400">
                     <div className="w-12 h-12 bg-blue-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
                       <BarChart3 className="w-6 h-6 text-blue-600" />
                     </div>
@@ -398,30 +398,30 @@ export default function ProductPage2() {
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">
+                  <h3 className="text-lg font-bold text-stone-900 mb-3">
                     Structured Scorecard
                   </h3>
-                  <p className="text-gray-600 text-sm mb-4">
+                  <p className="text-stone-600 text-sm mb-4">
                     AI-generated ratings across key dimensions. Compare candidates consistently.
                   </p>
                   <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-stone-600">
                       <CheckCircle className="w-4 h-4 text-blue-500" />
                       <span>Requirement gathering</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-stone-600">
                       <CheckCircle className="w-4 h-4 text-blue-500" />
                       <span>Execution quality</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-stone-600">
                       <CheckCircle className="w-4 h-4 text-blue-500" />
                       <span>AI tool usage</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-stone-600">
                       <CheckCircle className="w-4 h-4 text-blue-500" />
                       <span>Communication</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-stone-600">
                       <CheckCircle className="w-4 h-4 text-blue-500" />
                       <span>Handling feedback</span>
                     </div>
@@ -431,10 +431,10 @@ export default function ProductPage2() {
             </Card>
 
             {/* Deliverable 2: Transcripts */}
-            <Card className="border-2 border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300">
+            <Card className="border-2 border-stone-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300">
               <CardContent className="p-0">
-                <div className="aspect-[4/3] bg-gradient-to-br from-purple-50 to-gray-50 rounded-t-lg flex items-center justify-center border-b">
-                  <div className="text-center text-gray-400">
+                <div className="aspect-[4/3] bg-gradient-to-br from-purple-50 to-stone-50 rounded-t-lg flex items-center justify-center border-b">
+                  <div className="text-center text-stone-400">
                     <div className="w-12 h-12 bg-purple-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
                       <MessageSquare className="w-6 h-6 text-purple-600" />
                     </div>
@@ -444,26 +444,26 @@ export default function ProductPage2() {
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">
+                  <h3 className="text-lg font-bold text-stone-900 mb-3">
                     Full Transcripts
                   </h3>
-                  <p className="text-gray-600 text-sm mb-4">
+                  <p className="text-stone-600 text-sm mb-4">
                     Every conversation with AI stakeholders. AI-highlighted key moments.
                   </p>
                   <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-stone-600">
                       <CheckCircle className="w-4 h-4 text-purple-500" />
                       <span>Questions they asked</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-stone-600">
                       <CheckCircle className="w-4 h-4 text-purple-500" />
                       <span>How they clarified ambiguity</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-stone-600">
                       <CheckCircle className="w-4 h-4 text-purple-500" />
                       <span>How they handled pushback</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-stone-600">
                       <CheckCircle className="w-4 h-4 text-purple-500" />
                       <span>Decision justifications</span>
                     </div>
@@ -473,10 +473,10 @@ export default function ProductPage2() {
             </Card>
 
             {/* Deliverable 3: Recording */}
-            <Card className="border-2 border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300">
+            <Card className="border-2 border-stone-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300">
               <CardContent className="p-0">
-                <div className="aspect-[4/3] bg-gradient-to-br from-emerald-50 to-gray-50 rounded-t-lg flex items-center justify-center border-b">
-                  <div className="text-center text-gray-400">
+                <div className="aspect-[4/3] bg-gradient-to-br from-emerald-50 to-stone-50 rounded-t-lg flex items-center justify-center border-b">
+                  <div className="text-center text-stone-400">
                     <div className="w-12 h-12 bg-emerald-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
                       <Video className="w-6 h-6 text-emerald-600" />
                     </div>
@@ -486,26 +486,26 @@ export default function ProductPage2() {
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">
+                  <h3 className="text-lg font-bold text-stone-900 mb-3">
                     Screen Recording
                   </h3>
-                  <p className="text-gray-600 text-sm mb-4">
+                  <p className="text-stone-600 text-sm mb-4">
                     Watch their entire process. See how they really work.
                   </p>
                   <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-stone-600">
                       <CheckCircle className="w-4 h-4 text-emerald-500" />
                       <span>How they used AI tools</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-stone-600">
                       <CheckCircle className="w-4 h-4 text-emerald-500" />
                       <span>Debugging approach</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-stone-600">
                       <CheckCircle className="w-4 h-4 text-emerald-500" />
                       <span>Problem-solving process</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-stone-600">
                       <CheckCircle className="w-4 h-4 text-emerald-500" />
                       <span>Skip to key moments</span>
                     </div>
@@ -518,102 +518,102 @@ export default function ProductPage2() {
           {/* Additional deliverables */}
           <SectionReveal className="mt-8 max-w-6xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-4">
+              <div className="flex items-center gap-3 bg-stone-50 rounded-lg p-4">
                 <FileText className="w-5 h-5 text-blue-600" />
                 <div>
-                  <p className="font-medium text-gray-900">Work Artifacts</p>
-                  <p className="text-sm text-gray-500">Code, docs, or deliverables</p>
+                  <p className="font-medium text-stone-900">Work Artifacts</p>
+                  <p className="text-sm text-stone-500">Code, docs, or deliverables</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-4">
+              <div className="flex items-center gap-3 bg-stone-50 rounded-lg p-4">
                 <Clock className="w-5 h-5 text-blue-600" />
                 <div>
-                  <p className="font-medium text-gray-900">Time Analysis</p>
-                  <p className="text-sm text-gray-500">How they allocated their time</p>
+                  <p className="font-medium text-stone-900">Time Analysis</p>
+                  <p className="text-sm text-stone-500">How they allocated their time</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-4">
+              <div className="flex items-center gap-3 bg-stone-50 rounded-lg p-4">
                 <GitCompare className="w-5 h-5 text-blue-600" />
                 <div>
-                  <p className="font-medium text-gray-900">Side-by-Side Compare</p>
-                  <p className="text-sm text-gray-500">Stack rank your candidates</p>
+                  <p className="font-medium text-stone-900">Side-by-Side Compare</p>
+                  <p className="text-sm text-stone-500">Stack rank your candidates</p>
                 </div>
               </div>
             </div>
           </SectionReveal>
         </div>
-        <CurveDivider fillColor="fill-slate-50" />
+        <CurveDivider fillColor="fill-stone-50" />
       </section>
 
       {/* Comparison Table */}
-      <section className="relative py-20 sm:py-24 bg-slate-50">
+      <section className="relative py-20 sm:py-24 bg-stone-50">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-6">
           <SectionReveal className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 mb-4">
               Why not just use...
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-stone-600 max-w-3xl mx-auto">
               See how Skillvee compares to traditional assessment methods.
             </p>
           </SectionReveal>
 
           <SectionReveal>
             <div className="max-w-5xl mx-auto overflow-x-auto">
-              <table className="w-full bg-white rounded-xl border border-gray-200 shadow-sm">
+              <table className="w-full bg-white rounded-xl border border-stone-200 shadow-sm">
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left p-4 font-semibold text-gray-900"></th>
-                    <th className="text-center p-4 font-semibold text-gray-400">Algorithm Tests</th>
-                    <th className="text-center p-4 font-semibold text-gray-400">Take-homes</th>
-                    <th className="text-center p-4 font-semibold text-gray-400">Live Interviews</th>
+                  <tr className="border-b border-stone-200">
+                    <th className="text-left p-4 font-semibold text-stone-900"></th>
+                    <th className="text-center p-4 font-semibold text-stone-400">Algorithm Tests</th>
+                    <th className="text-center p-4 font-semibold text-stone-400">Take-homes</th>
+                    <th className="text-center p-4 font-semibold text-stone-400">Live Interviews</th>
                     <th className="text-center p-4 font-semibold text-blue-600 bg-blue-50">Skillvee</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b border-gray-100">
-                    <td className="p-4 font-medium text-gray-900">Predicts job performance</td>
+                  <tr className="border-b border-stone-100">
+                    <td className="p-4 font-medium text-stone-900">Predicts job performance</td>
                     <td className="p-4 text-center"><X className="w-5 h-5 text-red-400 mx-auto" /></td>
-                    <td className="p-4 text-center"><span className="text-gray-400">~</span></td>
-                    <td className="p-4 text-center"><span className="text-gray-400">~</span></td>
+                    <td className="p-4 text-center"><span className="text-stone-400">~</span></td>
+                    <td className="p-4 text-center"><span className="text-stone-400">~</span></td>
                     <td className="p-4 text-center bg-blue-50"><CheckCircle className="w-5 h-5 text-blue-600 mx-auto" /></td>
                   </tr>
-                  <tr className="border-b border-gray-100">
-                    <td className="p-4 font-medium text-gray-900">Respects candidate time</td>
+                  <tr className="border-b border-stone-100">
+                    <td className="p-4 font-medium text-stone-900">Respects candidate time</td>
                     <td className="p-4 text-center"><X className="w-5 h-5 text-red-400 mx-auto" /></td>
                     <td className="p-4 text-center"><X className="w-5 h-5 text-red-400 mx-auto" /></td>
                     <td className="p-4 text-center"><X className="w-5 h-5 text-red-400 mx-auto" /></td>
                     <td className="p-4 text-center bg-blue-50"><CheckCircle className="w-5 h-5 text-blue-600 mx-auto" /></td>
                   </tr>
-                  <tr className="border-b border-gray-100">
-                    <td className="p-4 font-medium text-gray-900">No engineer time to proctor</td>
+                  <tr className="border-b border-stone-100">
+                    <td className="p-4 font-medium text-stone-900">No engineer time to proctor</td>
                     <td className="p-4 text-center"><CheckCircle className="w-5 h-5 text-green-500 mx-auto" /></td>
                     <td className="p-4 text-center"><CheckCircle className="w-5 h-5 text-green-500 mx-auto" /></td>
                     <td className="p-4 text-center"><X className="w-5 h-5 text-red-400 mx-auto" /></td>
                     <td className="p-4 text-center bg-blue-50"><CheckCircle className="w-5 h-5 text-blue-600 mx-auto" /></td>
                   </tr>
-                  <tr className="border-b border-gray-100">
-                    <td className="p-4 font-medium text-gray-900">Assesses communication</td>
+                  <tr className="border-b border-stone-100">
+                    <td className="p-4 font-medium text-stone-900">Assesses communication</td>
                     <td className="p-4 text-center"><X className="w-5 h-5 text-red-400 mx-auto" /></td>
                     <td className="p-4 text-center"><X className="w-5 h-5 text-red-400 mx-auto" /></td>
                     <td className="p-4 text-center"><CheckCircle className="w-5 h-5 text-green-500 mx-auto" /></td>
                     <td className="p-4 text-center bg-blue-50"><CheckCircle className="w-5 h-5 text-blue-600 mx-auto" /></td>
                   </tr>
-                  <tr className="border-b border-gray-100">
-                    <td className="p-4 font-medium text-gray-900">Consistent evaluation</td>
+                  <tr className="border-b border-stone-100">
+                    <td className="p-4 font-medium text-stone-900">Consistent evaluation</td>
                     <td className="p-4 text-center"><CheckCircle className="w-5 h-5 text-green-500 mx-auto" /></td>
-                    <td className="p-4 text-center"><span className="text-gray-400">~</span></td>
+                    <td className="p-4 text-center"><span className="text-stone-400">~</span></td>
                     <td className="p-4 text-center"><X className="w-5 h-5 text-red-400 mx-auto" /></td>
                     <td className="p-4 text-center bg-blue-50"><CheckCircle className="w-5 h-5 text-blue-600 mx-auto" /></td>
                   </tr>
-                  <tr className="border-b border-gray-100">
-                    <td className="p-4 font-medium text-gray-900">See how they use AI tools</td>
+                  <tr className="border-b border-stone-100">
+                    <td className="p-4 font-medium text-stone-900">See how they use AI tools</td>
                     <td className="p-4 text-center"><X className="w-5 h-5 text-red-400 mx-auto" /></td>
                     <td className="p-4 text-center"><X className="w-5 h-5 text-red-400 mx-auto" /></td>
                     <td className="p-4 text-center"><X className="w-5 h-5 text-red-400 mx-auto" /></td>
                     <td className="p-4 text-center bg-blue-50"><CheckCircle className="w-5 h-5 text-blue-600 mx-auto" /></td>
                   </tr>
                   <tr>
-                    <td className="p-4 font-medium text-gray-900">High completion rate</td>
+                    <td className="p-4 font-medium text-stone-900">High completion rate</td>
                     <td className="p-4 text-center"><CheckCircle className="w-5 h-5 text-green-500 mx-auto" /></td>
                     <td className="p-4 text-center"><X className="w-5 h-5 text-red-400 mx-auto" /></td>
                     <td className="p-4 text-center"><CheckCircle className="w-5 h-5 text-green-500 mx-auto" /></td>
@@ -634,7 +634,7 @@ export default function ProductPage2() {
             <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-4">
               Trusted by hiring teams
             </p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 mb-4">
               Companies using Skillvee
             </h2>
           </SectionReveal>
@@ -645,13 +645,13 @@ export default function ProductPage2() {
               {[1, 2, 3, 4, 5].map((i) => (
                 <div
                   key={i}
-                  className="w-32 h-12 bg-gray-200 rounded flex items-center justify-center"
+                  className="w-32 h-12 bg-stone-200 rounded flex items-center justify-center"
                 >
-                  <span className="text-xs text-gray-400">Logo {i}</span>
+                  <span className="text-xs text-stone-400">Logo {i}</span>
                 </div>
               ))}
             </div>
-            <p className="text-center text-sm text-gray-400 mt-4">
+            <p className="text-center text-sm text-stone-400 mt-4">
               Placeholder: Add customer logos when available
             </p>
           </SectionReveal>
@@ -662,16 +662,16 @@ export default function ProductPage2() {
               <div className="flex items-start gap-4">
                 <div className="text-5xl text-blue-300">&ldquo;</div>
                 <div>
-                  <p className="text-lg sm:text-xl text-gray-700 mb-6 italic">
+                  <p className="text-lg sm:text-xl text-stone-700 mb-6 italic">
                     Placeholder: Add a compelling customer quote here. Something like
                     &ldquo;We reduced bad hires by 40% and our engineering managers
                     actually enjoy reviewing candidates now.&rdquo;
                   </p>
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gray-300 rounded-full" />
+                    <div className="w-12 h-12 bg-stone-300 rounded-full" />
                     <div>
-                      <p className="font-semibold text-gray-900">Customer Name</p>
-                      <p className="text-sm text-gray-500">Title, Company</p>
+                      <p className="font-semibold text-stone-900">Customer Name</p>
+                      <p className="text-sm text-stone-500">Title, Company</p>
                     </div>
                   </div>
                 </div>
@@ -686,7 +686,7 @@ export default function ProductPage2() {
       <section className="py-20 sm:py-24 bg-white">
         <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-6">
           <SectionReveal className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 mb-4">
               Common questions
             </h2>
           </SectionReveal>
@@ -754,13 +754,13 @@ export default function ProductPage2() {
       </section>
 
       {/* Security & Enterprise Section - Moved to end */}
-      <section className="relative py-20 sm:py-24 bg-gray-900">
+      <section className="relative py-20 sm:py-24 bg-stone-900">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-6">
           <SectionReveal className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
               Enterprise-ready from day one
             </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            <p className="text-xl text-stone-400 max-w-3xl mx-auto">
               Your candidate data is secure. Your compliance needs are met.
             </p>
           </SectionReveal>
@@ -772,7 +772,7 @@ export default function ProductPage2() {
                   <Shield className="w-8 h-8 text-blue-400" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2">SOC 2 Type II</h3>
-                <p className="text-gray-400 text-sm">
+                <p className="text-stone-400 text-sm">
                   Audited security controls. Your data is protected by industry-standard
                   practices.
                 </p>
@@ -783,7 +783,7 @@ export default function ProductPage2() {
                   <Lock className="w-8 h-8 text-blue-400" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2">GDPR Compliant</h3>
-                <p className="text-gray-400 text-sm">
+                <p className="text-stone-400 text-sm">
                   Full data privacy compliance for EU candidates. Automatic data retention
                   policies.
                 </p>
@@ -794,7 +794,7 @@ export default function ProductPage2() {
                   <Globe className="w-8 h-8 text-blue-400" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2">SSO & Integrations</h3>
-                <p className="text-gray-400 text-sm">
+                <p className="text-stone-400 text-sm">
                   SAML SSO, Greenhouse, Lever, and Workday integrations available for
                   Enterprise.
                 </p>
@@ -861,7 +861,7 @@ function ProductFAQ() {
       {faqs.map((faq, index) => (
         <div
           key={index}
-          className="bg-white border-2 border-gray-100 hover:border-blue-200 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg"
+          className="bg-white border-2 border-stone-100 hover:border-blue-200 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg"
         >
           <button
             className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-blue-50/50 transition-colors"
@@ -871,17 +871,17 @@ function ProductFAQ() {
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                 <span className="text-blue-600 font-bold text-sm">Q</span>
               </div>
-              <h3 className="font-semibold text-gray-900 text-lg pr-4">{faq.question}</h3>
+              <h3 className="font-semibold text-stone-900 text-lg pr-4">{faq.question}</h3>
             </div>
             <ChevronDown
-              className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-300 ${
+              className={`w-5 h-5 text-stone-400 flex-shrink-0 transition-transform duration-300 ${
                 openIndex === index ? "rotate-180" : ""
               }`}
             />
           </button>
           {openIndex === index && (
             <div className="px-6 pb-5 animate-fade-in">
-              <div className="pl-12 text-gray-600 leading-relaxed">{faq.answer}</div>
+              <div className="pl-12 text-stone-600 leading-relaxed">{faq.answer}</div>
             </div>
           )}
         </div>

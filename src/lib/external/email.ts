@@ -140,7 +140,7 @@ export function generateReportEmailHtml(params: SendReportEmailParams): string {
   <title>Your Assessment Report is Ready</title>
   <style>
     body {
-      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       line-height: 1.6;
       color: #000000;
       margin: 0;

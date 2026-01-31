@@ -12,9 +12,9 @@ export default async function RecruiterLayout({
   const user = await requireRecruiter();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-stone-50">
       {/* Recruiter Header */}
-      <header className="border-b border-gray-200 bg-white">
+      <header className="border-b border-stone-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center">
@@ -36,30 +36,30 @@ export default async function RecruiterLayout({
           <nav className="flex items-center gap-6">
             <Link
               href="/recruiter/dashboard"
-              className="text-sm text-gray-600 transition-colors hover:text-gray-900"
+              className="text-sm text-stone-600 transition-colors hover:text-stone-900"
             >
               Dashboard
             </Link>
             <Link
               href="/recruiter/scenarios"
-              className="text-sm text-gray-600 transition-colors hover:text-gray-900"
+              className="text-sm text-stone-600 transition-colors hover:text-stone-900"
             >
               Scenarios
             </Link>
             <Link
               href="/recruiter/candidates"
-              className="text-sm text-gray-600 transition-colors hover:text-gray-900"
+              className="text-sm text-stone-600 transition-colors hover:text-stone-900"
             >
               Candidates
             </Link>
-            <span className="text-gray-300">|</span>
+            <span className="text-stone-300">|</span>
             <Link
               href="/"
-              className="text-sm text-gray-600 transition-colors hover:text-gray-900"
+              className="text-sm text-stone-600 transition-colors hover:text-stone-900"
             >
               Exit
             </Link>
-            <span className="text-xs text-gray-400">{user.email}</span>
+            <span className="text-xs text-stone-400">{user.email}</span>
           </nav>
         </div>
       </header>

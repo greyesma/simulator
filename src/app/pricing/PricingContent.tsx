@@ -28,13 +28,13 @@ export default function PricingContent() {
     <>
       {/* Billing Toggle */}
       <div className="flex justify-center mb-10">
-        <div className="inline-flex items-center bg-gray-100 rounded-full p-1">
+        <div className="inline-flex items-center bg-stone-100 rounded-full p-1">
           <button
             onClick={() => setIsAnnual(false)}
             className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
               !isAnnual
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-white text-stone-900 shadow-sm"
+                : "text-stone-600 hover:text-stone-900"
             }`}
           >
             Monthly
@@ -43,8 +43,8 @@ export default function PricingContent() {
             onClick={() => setIsAnnual(true)}
             className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
               isAnnual
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-white text-stone-900 shadow-sm"
+                : "text-stone-600 hover:text-stone-900"
             }`}
           >
             Annual
@@ -58,39 +58,39 @@ export default function PricingContent() {
       {/* Pricing Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
         {/* Free Tier */}
-        <Card className="bg-white hover:shadow-lg transition-shadow border-2 border-transparent hover:border-gray-200 relative">
+        <Card className="bg-white hover:shadow-lg transition-shadow border-2 border-transparent hover:border-stone-200 relative">
           <CardContent className="p-6">
             <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold mb-3 text-gray-900">Free</h3>
+              <h3 className="text-2xl font-bold mb-3 text-stone-900">Free</h3>
               <div className="mb-3">
-                <span className="text-4xl font-bold text-gray-900">$0</span>
-                <span className="text-gray-500 text-sm ml-1">/month</span>
+                <span className="text-4xl font-bold text-stone-900">$0</span>
+                <span className="text-stone-500 text-sm ml-1">/month</span>
               </div>
-              <p className="text-gray-600 text-sm">Try before you commit</p>
+              <p className="text-stone-600 text-sm">Try before you commit</p>
             </div>
 
             <div className="space-y-3 mb-6">
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">
+                <span className="text-stone-700 text-sm">
                   <strong>{isAnnual ? "36 assessments" : "3 assessments"}</strong> per {isAnnual ? "year" : "month"}
                 </span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Role-specific work simulations</span>
+                <span className="text-stone-700 text-sm">Role-specific work simulations</span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">AI-powered evaluation</span>
+                <span className="text-stone-700 text-sm">AI-powered evaluation</span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Shareable assessment links</span>
+                <span className="text-stone-700 text-sm">Shareable assessment links</span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Community support</span>
+                <span className="text-stone-700 text-sm">Community support</span>
               </div>
             </div>
 
@@ -106,36 +106,36 @@ export default function PricingContent() {
         <Card className="bg-white hover:shadow-lg transition-shadow border-2 border-transparent hover:border-blue-100 relative">
           <CardContent className="p-6">
             <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold mb-3 text-gray-900">Starter</h3>
+              <h3 className="text-2xl font-bold mb-3 text-stone-900">Starter</h3>
               <div className="mb-3">
-                <span className="text-4xl font-bold text-gray-900">${starterPrice}</span>
-                <span className="text-gray-500 text-sm ml-1">/month</span>
+                <span className="text-4xl font-bold text-stone-900">${starterPrice}</span>
+                <span className="text-stone-500 text-sm ml-1">/month</span>
               </div>
-              <p className="text-gray-600 text-sm">For small hiring teams</p>
+              <p className="text-stone-600 text-sm">For small hiring teams</p>
             </div>
 
             <div className="space-y-3 mb-6">
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">
+                <span className="text-stone-700 text-sm">
                   <strong>{isAnnual ? "180 assessments" : "15 assessments"}</strong> per {isAnnual ? "year" : "month"}
                 </span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Everything in Free</span>
+                <span className="text-stone-700 text-sm">Everything in Free</span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Candidate comparison dashboard</span>
+                <span className="text-stone-700 text-sm">Candidate comparison dashboard</span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Assessment analytics</span>
+                <span className="text-stone-700 text-sm">Assessment analytics</span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Email support</span>
+                <span className="text-stone-700 text-sm">Email support</span>
               </div>
             </div>
 
@@ -154,36 +154,36 @@ export default function PricingContent() {
           </div>
           <CardContent className="p-6">
             <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold mb-3 text-gray-900">Pro</h3>
+              <h3 className="text-2xl font-bold mb-3 text-stone-900">Pro</h3>
               <div className="mb-3">
-                <span className="text-4xl font-bold text-gray-900">${proPrice}</span>
-                <span className="text-gray-500 text-sm ml-1">/month</span>
+                <span className="text-4xl font-bold text-stone-900">${proPrice}</span>
+                <span className="text-stone-500 text-sm ml-1">/month</span>
               </div>
-              <p className="text-gray-600 text-sm">For growing teams</p>
+              <p className="text-stone-600 text-sm">For growing teams</p>
             </div>
 
             <div className="space-y-3 mb-6">
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">
+                <span className="text-stone-700 text-sm">
                   <strong>{isAnnual ? "600 assessments" : "50 assessments"}</strong> per {isAnnual ? "year" : "month"}
                 </span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Everything in Starter</span>
+                <span className="text-stone-700 text-sm">Everything in Starter</span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Custom simulation scenarios</span>
+                <span className="text-stone-700 text-sm">Custom simulation scenarios</span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Team collaboration tools</span>
+                <span className="text-stone-700 text-sm">Team collaboration tools</span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Priority support</span>
+                <span className="text-stone-700 text-sm">Priority support</span>
               </div>
             </div>
 
@@ -196,38 +196,38 @@ export default function PricingContent() {
         </Card>
 
         {/* Enterprise Tier */}
-        <Card className="bg-white hover:shadow-lg transition-shadow border-2 border-transparent hover:border-gray-200 relative">
+        <Card className="bg-white hover:shadow-lg transition-shadow border-2 border-transparent hover:border-stone-200 relative">
           <CardContent className="p-6">
             <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold mb-3 text-gray-900">Enterprise</h3>
+              <h3 className="text-2xl font-bold mb-3 text-stone-900">Enterprise</h3>
               <div className="mb-3">
-                <span className="text-4xl font-bold text-gray-900">Custom</span>
+                <span className="text-4xl font-bold text-stone-900">Custom</span>
               </div>
-              <p className="text-gray-600 text-sm">For teams hiring at scale</p>
+              <p className="text-stone-600 text-sm">For teams hiring at scale</p>
             </div>
 
             <div className="space-y-3 mb-6">
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">
+                <span className="text-stone-700 text-sm">
                   <strong>Unlimited</strong> assessments
                 </span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Everything in Pro</span>
+                <span className="text-stone-700 text-sm">Everything in Pro</span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">ATS integration</span>
+                <span className="text-stone-700 text-sm">ATS integration</span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Dedicated success manager</span>
+                <span className="text-stone-700 text-sm">Dedicated success manager</span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">SSO & advanced security</span>
+                <span className="text-stone-700 text-sm">SSO & advanced security</span>
               </div>
             </div>
 
