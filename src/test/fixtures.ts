@@ -61,7 +61,7 @@ export const TEST_SCENARIO_IDS = {
 
 /** Fixed test assessment IDs for E2E testing */
 export const TEST_ASSESSMENT_IDS = {
-  /** Welcome/resume upload flow (status: ONBOARDING, TODO: WELCOME after RF-002) */
+  /** Welcome page flow (status: WELCOME) */
   welcome: "test-assessment-welcome",
   /** Working state for recruiter flow testing */
   working: "test-assessment-working-recruiter",

@@ -77,7 +77,7 @@ describe("Scenario → Assessment Cascade Delete", () => {
         id: `${TEST_PREFIX}-assessment-1`,
         userId: testUserId,
         scenarioId: scenario.id,
-        status: AssessmentStatus.HR_INTERVIEW,
+        status: AssessmentStatus.WELCOME,
       },
     });
 
@@ -170,16 +170,6 @@ describe("Scenario → Assessment Cascade Delete", () => {
       },
     });
 
-    // Create an HR assessment
-    const hrAssessment = await prisma.hRInterviewAssessment.create({
-      data: {
-        id: `${TEST_PREFIX}-hr-assessment`,
-        assessmentId: assessment.id,
-        communicationScore: 4,
-        professionalismScore: 5,
-      },
-    });
-
     // Create an assessment log
     await prisma.assessmentLog.create({
       data: {
@@ -206,11 +196,6 @@ describe("Scenario → Assessment Cascade Delete", () => {
     expect(
       await prisma.recording.findUnique({ where: { id: recording.id } })
     ).not.toBeNull();
-    expect(
-      await prisma.hRInterviewAssessment.findUnique({
-        where: { id: hrAssessment.id },
-      })
-    ).not.toBeNull();
 
     // Delete the scenario (should cascade to assessment → nested relations)
     await prisma.scenario.delete({
@@ -226,11 +211,6 @@ describe("Scenario → Assessment Cascade Delete", () => {
     ).toBeNull();
     expect(
       await prisma.recording.findUnique({ where: { id: recording.id } })
-    ).toBeNull();
-    expect(
-      await prisma.hRInterviewAssessment.findUnique({
-        where: { id: hrAssessment.id },
-      })
     ).toBeNull();
   });
 
@@ -587,7 +567,7 @@ describe("Conversation → Coworker SetNull Behavior", () => {
         id: `${TEST_PREFIX_SETNULL}-assessment-3`,
         userId: testUserId,
         scenarioId: testScenarioId,
-        status: AssessmentStatus.HR_INTERVIEW,
+        status: AssessmentStatus.WELCOME,
       },
     });
 

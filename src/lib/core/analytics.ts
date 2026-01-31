@@ -599,13 +599,7 @@ export async function getOverviewMetrics(period: TimePeriod): Promise<{
       where: {
         ...assessmentWhere,
         status: {
-          in: [
-            "HR_INTERVIEW",
-            "ONBOARDING",
-            "WORKING",
-            "FINAL_DEFENSE",
-            "PROCESSING",
-          ],
+          in: ["WELCOME", "WORKING"],
         },
       },
     }),

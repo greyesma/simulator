@@ -89,7 +89,6 @@ async function collectUserStorageFiles(userId: string): Promise<{
   const assessments = await db.assessment.findMany({
     where: { userId },
     select: {
-      cvUrl: true,
       recordings: {
         select: {
           storageUrl: true,
@@ -109,11 +108,6 @@ async function collectUserStorageFiles(userId: string): Promise<{
   const screenshotPaths: string[] = [];
 
   for (const assessment of assessments) {
-    // Collect CV URLs
-    if (assessment.cvUrl) {
-      resumePaths.push(assessment.cvUrl);
-    }
-
     // Collect recording storage URLs and segment paths
     for (const recording of assessment.recordings) {
       if (recording.storageUrl) {
@@ -186,10 +180,6 @@ export async function deleteUserData(userId: string): Promise<DeletionResult> {
         where: { recording: { assessment: { userId } } },
       });
 
-      const hrAssessmentCount = await tx.hRInterviewAssessment.count({
-        where: { assessment: { userId } },
-      });
-
       // Delete all assessments (cascades to related records)
       await tx.assessment.deleteMany({
         where: { userId },
@@ -214,7 +204,6 @@ export async function deleteUserData(userId: string): Promise<DeletionResult> {
         conversationCount,
         recordingCount,
         segmentCount,
-        hrAssessmentCount,
       };
     });
 
@@ -223,7 +212,6 @@ export async function deleteUserData(userId: string): Promise<DeletionResult> {
     result.deletedItems.conversations = dbCounts.conversationCount;
     result.deletedItems.recordings = dbCounts.recordingCount;
     result.deletedItems.recordingSegments = dbCounts.segmentCount;
-    result.deletedItems.hrAssessments = dbCounts.hrAssessmentCount;
 
     // Step 3: Delete storage files from Supabase AFTER successful DB transaction
     // This ensures we don't delete files if DB operations fail

@@ -190,9 +190,7 @@ export function AssessmentTimelineClient({
 
   // Check if assessment can be retried
   const canRetry =
-    (assessment.status === "COMPLETED" ||
-      assessment.status === "PROCESSING" ||
-      hasErrors) &&
+    (assessment.status === "COMPLETED" || hasErrors) &&
     !assessment.supersededBy;
 
   return (

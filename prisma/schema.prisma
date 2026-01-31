@@ -59,6 +59,7 @@ model VerificationToken {
 enum UserRole {
   USER
   ADMIN
+  RECRUITER
 }
 
 model User {
@@ -77,14 +78,11 @@ model User {
   // Data deletion request tracking
   dataDeleteRequestedAt DateTime?
 
-  // CV/Resume data (stored at user level, not assessment level)
-  cvUrl         String?   // Signed URL to uploaded CV
-  parsedProfile Json?     // Parsed CV content (summary, experience, education, skills)
-
   accounts         Account[]
   sessions         Session[]
   assessments      Assessment[]
   videoAssessments VideoAssessment[]
+  createdScenarios Scenario[] @relation("CreatedScenarios")
 }
 
 // ============================================================================
@@ -100,6 +98,10 @@ model Scenario {
   repoUrl         String
   techStack       String[] // e.g., ["typescript", "react", "node"]
   isPublished     Boolean  @default(false)
+
+  // Recruiter ownership (RF-002)
+  createdById     String?
+  createdBy       User?    @relation("CreatedScenarios", fields: [createdById], references: [id], onDelete: SetNull)
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -130,27 +132,22 @@ model Coworker {
 // ============================================================================
 
 enum AssessmentStatus {
-  HR_INTERVIEW
-  ONBOARDING
-  WORKING
-  FINAL_DEFENSE
-  PROCESSING
-  COMPLETED
+  WELCOME    // After auth, on welcome page
+  WORKING    // In Slack, working on task
+  COMPLETED  // Assessment finished
 }
 
 model Assessment {
   id            String           @id @default(cuid())
   userId        String
   scenarioId    String
-  status        AssessmentStatus @default(HR_INTERVIEW)
+  status        AssessmentStatus @default(WELCOME)
 
   // Timing
   startedAt     DateTime         @default(now())
   completedAt   DateTime?
 
   // Deliverables
-  cvUrl         String?
-  parsedProfile Json?            // Parsed CV content (summary, experience, education, skills)
   prUrl         String?
   prSnapshot    Json?            // PR content snapshot for historical reference
   ciStatus      Json?            // CI test pass/fail status from GitHub Actions
@@ -171,7 +168,6 @@ model Assessment {
   scenario        Scenario         @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
   conversations   Conversation[]
   recordings      Recording[]
-  hrAssessment    HRInterviewAssessment?
   logs            AssessmentLog[]
   apiCalls        AssessmentApiCall[]
   videoAssessment VideoAssessment? // Auto-triggered video evaluation
@@ -260,42 +256,6 @@ model SegmentAnalysis {
   updatedAt        DateTime @updatedAt
 
   segment          RecordingSegment @relation(fields: [segmentId], references: [id], onDelete: Cascade)
-}
-
-// ============================================================================
-// HR INTERVIEW ASSESSMENT
-// ============================================================================
-
-model HRInterviewAssessment {
-  id              String   @id @default(cuid())
-  assessmentId    String   @unique // One HR assessment per assessment
-
-  // Communication Clarity Scoring (1-5 scale)
-  communicationScore       Int?      // Overall communication clarity score
-  communicationNotes       String?   @db.Text // Detailed notes on communication
-
-  // CV Verification
-  cvVerificationNotes      String?   @db.Text // Notes on CV claim verification
-  cvConsistencyScore       Int?      // How consistent CV claims were (1-5)
-  verifiedClaims           Json?     // Array of verified/flagged CV claims
-
-  // Interview Analytics Timestamps
-  interviewStartedAt       DateTime?
-  interviewEndedAt         DateTime?
-  interviewDurationSeconds Int?      // Total duration in seconds
-
-  // Additional Assessment Signals
-  professionalismScore     Int?      // Professional demeanor (1-5)
-  technicalDepthScore      Int?      // Technical knowledge depth (1-5)
-  cultureFitNotes          String?   @db.Text
-
-  // AI Analysis
-  aiAnalysis               Json?     // Full AI analysis of the interview
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  assessment    Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
 }
 
 // ============================================================================

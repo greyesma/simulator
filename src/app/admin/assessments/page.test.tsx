@@ -102,7 +102,7 @@ const mockAssessments = [
     id: "assess-3",
     userId: "user-3",
     scenarioId: "scenario-2",
-    status: "HR_INTERVIEW" as const,
+    status: "WELCOME" as const,
     startedAt: new Date("2024-01-17T08:00:00Z"),
     completedAt: null,
     createdAt: new Date("2024-01-17T08:00:00Z"),
@@ -287,11 +287,11 @@ describe("AssessmentsClient", () => {
     // Use getAllByText since status badges may appear in both row and expanded details
     const completedBadges = screen.getAllByText("COMPLETED");
     const workingBadges = screen.getAllByText("WORKING");
-    const interviewBadges = screen.getAllByText("HR_INTERVIEW");
+    const welcomeBadges = screen.getAllByText("WELCOME");
 
     expect(completedBadges.length).toBeGreaterThan(0);
     expect(workingBadges.length).toBeGreaterThan(0);
-    expect(interviewBadges.length).toBeGreaterThan(0);
+    expect(welcomeBadges.length).toBeGreaterThan(0);
   });
 
   describe("Search functionality", () => {

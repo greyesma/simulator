@@ -42,8 +42,6 @@ export function createMockUser(overrides?: Partial<User>): User {
     updatedAt: now,
     deletedAt: null,
     dataDeleteRequestedAt: null,
-    cvUrl: null,
-    parsedProfile: null,
     ...overrides,
   };
 }

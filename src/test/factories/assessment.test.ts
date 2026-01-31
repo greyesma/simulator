@@ -27,7 +27,7 @@ describe("createMockAssessment", () => {
 
     expect(typeof assessment.id).toBe("string");
     expect(assessment.id.length).toBeGreaterThan(0);
-    expect(assessment.status).toBe(AssessmentStatus.HR_INTERVIEW);
+    expect(assessment.status).toBe(AssessmentStatus.WELCOME);
     expect(assessment.startedAt).toBeInstanceOf(Date);
     expect(assessment.createdAt).toBeInstanceOf(Date);
     expect(assessment.updatedAt).toBeInstanceOf(Date);
@@ -50,7 +50,7 @@ describe("createMockAssessment", () => {
     const assessment = createMockAssessment({ id: "custom-id" });
 
     expect(assessment.id).toBe("custom-id");
-    expect(assessment.status).toBe(AssessmentStatus.HR_INTERVIEW); // default preserved
+    expect(assessment.status).toBe(AssessmentStatus.WELCOME); // default preserved
     expect(assessment.userId).toBeDefined();
   });
 

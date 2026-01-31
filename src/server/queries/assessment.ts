@@ -55,7 +55,7 @@ export async function getAssessmentForHRInterview(id: string, userId: string) {
       },
       user: {
         select: {
-          cvUrl: true,
+          id: true,
         },
       },
     },
@@ -112,8 +112,8 @@ export async function getAssessmentForDefense(id: string, userId: string) {
 }
 
 /**
- * Get assessment for welcome/onboarding page.
- * Includes scenario with coworkers and HR assessment status.
+ * Get assessment for welcome page.
+ * Includes scenario with coworkers.
  */
 export async function getAssessmentForWelcome(id: string, userId: string) {
   const assessment = await db.assessment.findUnique({
@@ -124,7 +124,6 @@ export async function getAssessmentForWelcome(id: string, userId: string) {
           coworkers: true,
         },
       },
-      hrAssessment: true,
     },
   });
 

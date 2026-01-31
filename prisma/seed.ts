@@ -35,8 +35,7 @@ const TEST_USERS = {
     email: "recruiter@test.com",
     password: "testpassword123",
     name: "Test Recruiter",
-    // TODO: Change to "RECRUITER" after RF-002 schema changes
-    role: "USER" as const,
+    role: "RECRUITER" as const,
   },
   candidate: {
     email: "candidate@test.com",
@@ -50,7 +49,7 @@ const TEST_USERS = {
 const TEST_ASSESSMENT_IDS = {
   chat: "test-assessment-chat", // Status: WORKING - for chat/sidebar testing
   // Recruiter-focused flow test assessments (RF-001)
-  welcome: "test-assessment-welcome", // TODO: Change to WELCOME status after RF-002 schema changes
+  welcome: "test-assessment-welcome", // Status: WELCOME - for welcome page testing
   workingRecruiter: "test-assessment-working-recruiter", // Status: WORKING - for recruiter flow testing
 };
 
@@ -196,192 +195,18 @@ Acceptance Criteria:
   });
 
   if (testUser) {
-    // Create or update assessment with parsed profile for Test User
-    const testParsedProfile = {
-      name: "Test User",
-      email: "user@test.com",
-      phone: "+1 (555) 123-4567",
-      location: "San Francisco, CA",
-      linkedIn: "https://linkedin.com/in/testuser",
-      github: "https://github.com/testuser",
-      website: "https://testuser.dev",
-      summary:
-        "Senior software engineer with 7+ years of experience building scalable web applications. Passionate about clean code, developer experience, and mentoring junior engineers.",
-      workExperience: [
-        {
-          company: "TechCorp Inc.",
-          title: "Senior Software Engineer",
-          startDate: "Jan 2021",
-          duration: "3 years",
-          location: "San Francisco, CA",
-          description:
-            "Led development of real-time collaboration features serving 100K+ users.",
-          highlights: [
-            "Architected and shipped WebSocket-based real-time sync, reducing latency by 60%",
-            "Mentored team of 4 junior engineers",
-            "Improved CI/CD pipeline, cutting deploy time from 30min to 5min",
-          ],
-          technologies: [
-            "TypeScript",
-            "React",
-            "Node.js",
-            "PostgreSQL",
-            "Redis",
-          ],
-        },
-        {
-          company: "StartupXYZ",
-          title: "Full Stack Developer",
-          startDate: "Mar 2018",
-          endDate: "Dec 2020",
-          duration: "2 years 10 months",
-          location: "Remote",
-          description: "Built core product features from MVP to Series A.",
-          highlights: [
-            "Implemented payment system processing $2M+ monthly",
-            "Built admin dashboard used by 50+ customer success reps",
-          ],
-          technologies: ["JavaScript", "Vue.js", "Python", "Django", "MySQL"],
-        },
-        {
-          company: "BigTech Co.",
-          title: "Software Engineer",
-          startDate: "Jun 2016",
-          endDate: "Feb 2018",
-          duration: "1 year 8 months",
-          location: "Seattle, WA",
-          highlights: [
-            "Developed internal tools used by 1000+ employees",
-            "Participated in on-call rotation for critical services",
-          ],
-          technologies: ["Java", "Spring Boot", "AWS", "Kubernetes"],
-        },
-      ],
-      education: [
-        {
-          institution: "University of California, Berkeley",
-          degree: "Bachelor of Science",
-          field: "Computer Science",
-          startDate: "2012",
-          endDate: "2016",
-          gpa: "3.7",
-          honors: [
-            "Dean's List",
-            "ACM Programming Contest - Regional Finalist",
-          ],
-        },
-      ],
-      skills: [
-        {
-          name: "TypeScript",
-          category: "programming_language" as const,
-          proficiencyLevel: "expert" as const,
-        },
-        {
-          name: "JavaScript",
-          category: "programming_language" as const,
-          proficiencyLevel: "expert" as const,
-        },
-        {
-          name: "Python",
-          category: "programming_language" as const,
-          proficiencyLevel: "advanced" as const,
-        },
-        {
-          name: "Java",
-          category: "programming_language" as const,
-          proficiencyLevel: "intermediate" as const,
-        },
-        {
-          name: "React",
-          category: "framework" as const,
-          proficiencyLevel: "expert" as const,
-        },
-        {
-          name: "Node.js",
-          category: "framework" as const,
-          proficiencyLevel: "expert" as const,
-        },
-        {
-          name: "Next.js",
-          category: "framework" as const,
-          proficiencyLevel: "advanced" as const,
-        },
-        {
-          name: "Vue.js",
-          category: "framework" as const,
-          proficiencyLevel: "advanced" as const,
-        },
-        {
-          name: "PostgreSQL",
-          category: "database" as const,
-          proficiencyLevel: "expert" as const,
-        },
-        {
-          name: "Redis",
-          category: "database" as const,
-          proficiencyLevel: "advanced" as const,
-        },
-        {
-          name: "MongoDB",
-          category: "database" as const,
-          proficiencyLevel: "intermediate" as const,
-        },
-        {
-          name: "AWS",
-          category: "cloud" as const,
-          proficiencyLevel: "advanced" as const,
-        },
-        {
-          name: "Docker",
-          category: "tool" as const,
-          proficiencyLevel: "advanced" as const,
-        },
-        {
-          name: "Git",
-          category: "tool" as const,
-          proficiencyLevel: "expert" as const,
-        },
-        { name: "Agile/Scrum", category: "methodology" as const },
-        { name: "Technical Leadership", category: "soft_skill" as const },
-        { name: "Mentoring", category: "soft_skill" as const },
-      ],
-      certifications: [
-        {
-          name: "AWS Solutions Architect - Associate",
-          issuer: "Amazon Web Services",
-          dateObtained: "Mar 2022",
-        },
-        {
-          name: "Professional Scrum Master I",
-          issuer: "Scrum.org",
-          dateObtained: "Jan 2021",
-        },
-      ],
-      languages: [
-        { language: "English", proficiency: "native" as const },
-        { language: "Spanish", proficiency: "conversational" as const },
-      ],
-      totalYearsOfExperience: 7,
-      seniorityLevel: "senior" as const,
-      parsedAt: new Date().toISOString(),
-      parseQuality: "high" as const,
-    };
-
     // Create test assessment with fixed ID for visual testing
     // Uses WORKING status so chat/sidebar pages are accessible
     await prisma.assessment.upsert({
       where: { id: TEST_ASSESSMENT_IDS.chat },
       update: {
         status: "WORKING",
-        parsedProfile: testParsedProfile as unknown as Prisma.InputJsonValue,
       },
       create: {
         id: TEST_ASSESSMENT_IDS.chat,
         userId: testUser.id,
         scenarioId: defaultScenario.id,
         status: "WORKING",
-        parsedProfile: testParsedProfile as unknown as Prisma.InputJsonValue,
       },
     });
     console.log(
@@ -563,6 +388,11 @@ Acceptance Criteria:
 
   console.log("\n🎯 Creating recruiter-focused flow test data...");
 
+  // Get the test recruiter user for scenario ownership
+  const testRecruiter = await prisma.user.findUnique({
+    where: { email: TEST_USERS.recruiter.email },
+  });
+
   // Create test scenario for recruiter flow
   const recruiterScenario = await prisma.scenario.upsert({
     where: { id: TEST_SCENARIO_IDS.recruiter },
@@ -590,6 +420,7 @@ Acceptance Criteria:
       repoUrl: "https://github.com/skillvee/frontend-task",
       techStack: ["TypeScript", "React", "Next.js", "Tailwind CSS"],
       isPublished: true,
+      createdById: testRecruiter?.id ?? null,
     },
     create: {
       id: TEST_SCENARIO_IDS.recruiter,
@@ -616,6 +447,7 @@ Acceptance Criteria:
       repoUrl: "https://github.com/skillvee/frontend-task",
       techStack: ["TypeScript", "React", "Next.js", "Tailwind CSS"],
       isPublished: true,
+      createdById: testRecruiter?.id ?? null,
     },
   });
 
@@ -651,22 +483,21 @@ Acceptance Criteria:
 
   if (testCandidate) {
     // Create test assessment for welcome/resume flow
-    // TODO: Change to WELCOME status after RF-002 schema changes
     await prisma.assessment.upsert({
       where: { id: TEST_ASSESSMENT_IDS.welcome },
       update: {
-        status: "ONBOARDING", // TODO: Change to WELCOME after RF-002
+        status: "WELCOME",
         scenarioId: recruiterScenario.id,
       },
       create: {
         id: TEST_ASSESSMENT_IDS.welcome,
         userId: testCandidate.id,
         scenarioId: recruiterScenario.id,
-        status: "ONBOARDING", // TODO: Change to WELCOME after RF-002
+        status: "WELCOME",
       },
     });
     console.log(`  ✅ Welcome assessment: ${TEST_ASSESSMENT_IDS.welcome}`);
-    console.log(`     Status: ONBOARDING (TODO: change to WELCOME)`);
+    console.log(`     Status: WELCOME`);
 
     // Create test assessment in working state for recruiter flow
     await prisma.assessment.upsert({

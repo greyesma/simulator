@@ -38,6 +38,7 @@ export function createMockScenario(overrides?: Partial<Scenario>): Scenario {
     repoUrl: "https://github.com/test/repo",
     techStack: ["typescript", "react", "node"],
     isPublished: false,
+    createdById: null,
     createdAt: now,
     updatedAt: now,
     ...overrides,

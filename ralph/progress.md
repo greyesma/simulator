@@ -1,5 +1,51 @@
 # Ralph Progress Log
 
+## Issue #170: RF-002 - Update database schema for recruiter-focused flow
+
+### What was implemented
+- Added `RECRUITER` to `UserRole` enum in Prisma schema
+- Simplified `AssessmentStatus` enum to `WELCOME`, `WORKING`, `COMPLETED` (removed HR_INTERVIEW, ONBOARDING, FINAL_DEFENSE, PROCESSING)
+- Added `createdById` field to `Scenario` model with User relation for recruiter ownership
+- Removed `cvUrl` and `parsedProfile` from both `User` and `Assessment` models
+- Removed `HRInterviewAssessment` model entirely
+- Created and applied database migration (`20250130000000_recruiter_focused_flow`)
+- Updated seed script with new status values and recruiter role
+- Updated test factories for new schema
+
+### Files changed
+- `prisma/schema.prisma` - All schema changes (enum updates, model changes)
+- `prisma/migrations/20250130000000_recruiter_focused_flow/migration.sql` - Database migration
+- `prisma/seed.ts` - Updated for new status values, recruiter role, and scenario ownership
+- `src/test/factories/assessment.ts` - Use WELCOME instead of HR_INTERVIEW
+- `src/test/factories/user.ts` - Removed cvUrl and parsedProfile
+- `src/test/factories/scenario.ts` - Added createdById field
+- `src/test/factories/assessment.test.ts` - Updated status expectations
+- `src/lib/core/data-deletion.ts` - Removed CV and HR assessment references
+- `src/lib/core/analytics.ts` - Updated status filters
+- `src/server/queries/assessment.ts` - Removed hrAssessment include
+- `src/app/admin/assessments/client.tsx` - Updated status options
+- `src/app/admin/assessments/[id]/client.tsx` - Removed PROCESSING status check
+- `src/app/admin/assessments/page.test.tsx` - Updated test data
+- `src/server/cascade-delete.integration.test.ts` - Removed HR assessment references
+
+### Learnings for future iterations
+- Breaking schema changes with enum value removals require careful migration with value mapping
+- Existing assessments with old status values need to be mapped: HR_INTERVIEW/ONBOARDING -> WORKING, FINAL_DEFENSE/PROCESSING -> COMPLETED
+- Prisma's `db push` won't work with enum changes when data exists; use raw SQL migration instead
+- Migration was applied step-by-step via `prisma db execute --stdin`
+
+### Gotchas discovered
+- Many files still reference old status values and removed fields - these are in pages that will be removed in subsequent RF issues (start, hr-interview, cv-upload, defense, processing)
+- The `hRInterviewAssessment` Prisma client method is PascalCase with lowercase 'h' at start
+
+### TypeScript Errors Remaining
+The following files have TypeScript errors that will be resolved when pages are removed in subsequent RF issues:
+- Pages to be removed: `/start`, `/assessment/[id]/hr-interview`, `/assessment/[id]/cv-upload`, `/assessment/[id]/defense`, `/assessment/[id]/processing`
+- API routes to be removed: `/api/interview/token`, `/api/interview/transcript`, `/api/interview/assessment`, `/api/upload/cv`, `/api/defense/token`, `/api/kickoff/*`
+- The TypeScript errors in these files are expected as they reference removed schema fields
+
+---
+
 ## Issue #169: RF-001 - Set up testing infrastructure for recruiter-focused flow
 
 ### What was implemented
