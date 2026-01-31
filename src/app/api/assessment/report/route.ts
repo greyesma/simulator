@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import { AssessmentStatus, VideoAssessmentStatus } from "@prisma/client";
+import { VideoAssessmentStatus } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
 import type { AssessmentReport, SkillScore, ScoreLevel, VideoEvaluationResult, VideoSkillEvaluation, VideoDimension } from "@/types";
 import { sendReportEmail, isEmailServiceConfigured } from "@/lib/external";

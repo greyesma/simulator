@@ -1,5 +1,85 @@
 # Ralph Progress Log
 
+## Issue #188: RF-020 - End-to-end flow verification
+
+### What was verified
+Comprehensive E2E testing of the complete recruiter-focused flow using agent-browser:
+
+**Recruiter Flow:**
+- ✅ Recruiter signup at `/sign-up/recruiter` works correctly
+- ✅ Redirect to `/recruiter/dashboard` after signup
+- ✅ Scenario builder at `/recruiter/scenarios/new` loads and works with AI chat
+- ✅ Scenario list at `/recruiter/scenarios` shows scenarios with shareable links
+- ✅ Candidates list at `/recruiter/candidates` shows candidates with status and filters
+
+**Candidate Flow:**
+- ✅ Join page at `/join/[scenarioId]` shows scenario info and auth form
+- ✅ Candidate signup creates account and redirects to join page
+- ✅ "Continue to Assessment" button creates assessment and redirects to welcome page
+- ✅ Welcome page shows consent checkbox and "Start Simulation" button
+- ✅ Checking consent enables the start button
+- ✅ Clicking start redirects to `/assessment/[id]/chat`
+- ✅ Chat page shows manager welcome messages automatically
+- ✅ Manager sends task context, repo link, and instructions
+- ✅ Candidate can send messages including PR URLs
+- ✅ Manager responds to PR submission
+- ✅ Call button is available to initiate defense call (call fails in headless browser - expected)
+
+**Recruiter Verification:**
+- ✅ New candidate appears in recruiter's candidates list
+- ✅ Status shows correctly (WORKING while in progress)
+
+**Old Routes Removed:**
+- ✅ `/start` returns 404
+- ✅ `/assessment/*/cv-upload` returns 404
+- ✅ `/assessment/*/hr-interview` returns 404
+- ✅ `/assessment/*/congratulations` returns 404
+- ✅ `/assessment/*/kickoff` returns 404
+- ✅ `/assessment/*/defense` returns 404
+
+**Build Verification:**
+- ✅ TypeScript compiles: `npm run typecheck`
+- ✅ Build succeeds: `npm run build`
+
+### Files modified
+- `src/app/api/assessment/report/route.ts` - Removed unused `AssessmentStatus` import (lint fix)
+
+### Screenshots captured
+All screenshots saved to `screenshots/` folder:
+- `rf-020-recruiter-signup.png` - Recruiter signup page
+- `rf-020-recruiter-signup-filled.png` - Filled signup form
+- `rf-020-recruiter-dashboard.png` - Dashboard after signup
+- `rf-020-scenario-builder.png` - Scenario builder in progress
+- `rf-020-scenarios-list.png` - Scenarios list with shareable link
+- `rf-020-join-page.png` - Join page for candidates
+- `rf-020-welcome-page.png` - Welcome page with consent
+- `rf-020-chat-page.png` - Initial chat page
+- `rf-020-chat-with-messages.png` - Chat with manager messages
+- `rf-020-pr-submitted.png` - After submitting PR URL
+- `rf-020-call-attempted.png` - After attempting call
+- `rf-020-recruiter-candidates.png` - Recruiter's candidates view
+- `rf-020-404-start.png` - 404 for removed /start route
+
+### Learnings
+1. **E2E_TEST_MODE required**: The dev server must be started with `E2E_TEST_MODE=true NEXT_PUBLIC_E2E_TEST_MODE=true` to bypass screen recording in headless browser tests
+
+2. **Voice calls don't work in headless**: The voice call functionality (WebRTC) requires real audio hardware and fails with "Not supported" in agent-browser. This is expected behavior.
+
+3. **Join page flow**: After candidate signup, the page refreshes and shows "Continue to Assessment" button. The button then creates the assessment and redirects to welcome page.
+
+4. **Manager auto-messages**: The manager sends initial messages automatically when the candidate enters the chat, including task description, repo link, and instructions.
+
+5. **Session handling in agent-browser**: Using `--session` flag is critical to maintain login state across multiple commands.
+
+6. **Tests timeout**: The vitest tests may take very long to run due to the number of test files. Consider running specific test files or using `--bail` flag.
+
+### Gotchas discovered
+- The join page "Loading..." state can hang if there's an API issue - refresh the page to get a fresh state
+- Voice calls will show "Call Failed - Not supported" in headless browser (expected)
+- The scenario builder requires multiple chat exchanges to collect all required info
+
+---
+
 ## Issue #193: RF-025 - Update results page for simplified assessment data
 
 ### What was implemented
