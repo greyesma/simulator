@@ -1,5 +1,68 @@
 # Ralph Progress Log
 
+## Issue #186: RF-018 - Update results page for new status flow
+
+### What was implemented
+- Updated results page to work with simplified status flow (WELCOME → WORKING → COMPLETED)
+- Added proper status-based redirects:
+  - WELCOME → `/assessment/[id]/welcome`
+  - WORKING → `/assessment/[id]/chat`
+  - COMPLETED → show results (no redirect)
+- Removed `isProcessing` prop from ResultsClient component (PROCESSING status no longer exists)
+- Removed `ProcessingState` component (no longer needed)
+- Updated `NoReportState` component to show loading state during report generation
+- Added test assessment with COMPLETED status and sample report to seed file
+
+### Page Access Control Flow
+1. User navigates to `/assessment/[id]/results`
+2. Server verifies authentication and assessment ownership
+3. Status check:
+   - WELCOME → redirect to `/assessment/[id]/welcome`
+   - WORKING → redirect to `/assessment/[id]/chat`
+   - COMPLETED → render results page
+4. If no report exists, try to generate it inline
+5. If generation fails, show "Generate Report" button for user to retry
+
+### Files modified
+- `src/app/assessment/[id]/results/page.tsx` - Added status-based redirects, removed isProcessing prop
+- `src/app/assessment/[id]/results/client.tsx` - Removed ProcessingState component, updated NoReportState with loading state, removed unused imports
+- `prisma/seed.ts` - Added COMPLETED test assessment with sample report
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes
+- E2E tested with agent-browser:
+  - Results page loads correctly for COMPLETED assessment
+  - Shows overall score, skill breakdown, metrics
+  - WORKING assessment redirects to /chat
+  - WELCOME assessment redirects to /welcome
+- Screenshots captured:
+  - `screenshots/issue-186-results-page.png` - Main results view
+  - `screenshots/issue-186-results-skills.png` - Skill breakdown
+
+### Learnings for future iterations
+- The `VideoAssessmentStatus` enum still has PROCESSING (for video evaluation) - separate from `AssessmentStatus` enum
+- Report generation is handled both server-side (in page.tsx) and client-side (via NoReportState component)
+- The seed script uses fixed IDs (`TEST_ASSESSMENT_IDS`) for consistent E2E testing
+
+### Gotchas discovered
+- The results client was importing `useEffect` and `useRouter` but they were no longer needed after removing the polling logic
+- The `_isLoading` state variable was renamed to `isGenerating` for clarity
+
+### Acceptance Criteria Status
+- [x] Update Status Checks: Remove checks for PROCESSING status
+- [x] Results page works for COMPLETED status
+- [x] Redirect WELCOME → /welcome
+- [x] Redirect WORKING → /chat
+- [x] Report Generation: If COMPLETED but no report exists, generate it
+- [x] Show loading state while generating
+- [x] Display report once ready
+- [x] Only allow access for COMPLETED assessments
+- [x] TypeScript compiles: `npm run typecheck`
+- [x] Navigate to results for COMPLETED assessment
+- [x] Report displays or generates
+
+---
+
 ## Issue #185: RF-017 - Implement defense call flow in Slack
 
 ### What was implemented

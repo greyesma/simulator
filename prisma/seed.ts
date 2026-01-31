@@ -53,6 +53,8 @@ const TEST_ASSESSMENT_IDS = {
   workingRecruiter: "test-assessment-working-recruiter", // Status: WORKING - for recruiter flow testing
   // Defense call testing (RF-017)
   defense: "test-assessment-defense", // Status: WORKING with prUrl set - for defense call testing
+  // Results page testing (RF-018)
+  completed: "test-assessment-completed", // Status: COMPLETED - for results page testing
 };
 
 // Fixed test scenario ID for recruiter-focused flow (RF-001)
@@ -538,6 +540,133 @@ Acceptance Criteria:
     console.log(`     URL: /assessment/${TEST_ASSESSMENT_IDS.defense}/chat`);
     console.log(`     PR URL: https://github.com/skillvee/test-repo/pull/1`);
     console.log(`     Note: Calls to manager will use defense prompt`);
+
+    // Create test assessment with COMPLETED status and report for results page testing (RF-018)
+    const sampleReport = {
+      generatedAt: new Date().toISOString(),
+      assessmentId: TEST_ASSESSMENT_IDS.completed,
+      candidateName: "Test Candidate",
+      overallScore: 4.2,
+      overallLevel: "strong",
+      skillScores: [
+        {
+          category: "communication",
+          score: 4,
+          level: "strong",
+          evidence: ["Clear explanations in chat", "Asked good clarifying questions"],
+          notes: "Demonstrated effective communication with team members."
+        },
+        {
+          category: "problem_decomposition",
+          score: 5,
+          level: "exceptional",
+          evidence: ["Broke task into logical steps", "Prioritized effectively"],
+          notes: "Excellent at breaking down complex problems."
+        },
+        {
+          category: "ai_leverage",
+          score: 4,
+          level: "strong",
+          evidence: ["Used AI tools effectively", "Verified AI suggestions"],
+          notes: "Good use of AI assistance while maintaining oversight."
+        },
+        {
+          category: "code_quality",
+          score: 4,
+          level: "strong",
+          evidence: ["Clean code structure", "Good naming conventions"],
+          notes: "Produced high-quality, maintainable code."
+        },
+        {
+          category: "xfn_collaboration",
+          score: 3,
+          level: "adequate",
+          evidence: ["Reached out to coworkers", "Could improve proactive communication"],
+          notes: "Good teamwork, room for more proactive engagement."
+        },
+        {
+          category: "time_management",
+          score: 5,
+          level: "exceptional",
+          evidence: ["Completed on time", "Efficient task switching"],
+          notes: "Excellent time management throughout the simulation."
+        },
+        {
+          category: "technical_decision_making",
+          score: 4,
+          level: "strong",
+          evidence: ["Made sound architectural choices", "Considered trade-offs"],
+          notes: "Strong technical judgment in design decisions."
+        },
+        {
+          category: "presentation",
+          score: 4,
+          level: "strong",
+          evidence: ["Clear PR description", "Well-structured defense"],
+          notes: "Presented work effectively in code review."
+        },
+      ],
+      narrative: {
+        overallSummary: "This candidate demonstrated strong technical skills and excellent problem-solving abilities throughout the simulation. They showed great time management and adaptability while maintaining professional communication.\n\nKey highlights include their systematic approach to breaking down the task, effective use of AI tools, and clear communication with team members. The candidate delivered quality code on time and presented their work professionally.",
+        strengths: [
+          "Excellent problem decomposition and systematic approach",
+          "Strong time management and task prioritization",
+          "Effective use of AI tools while maintaining code ownership",
+          "Clear and professional communication",
+        ],
+        areasForImprovement: [
+          "Could be more proactive in seeking feedback early",
+          "Consider reaching out to more team members for diverse perspectives",
+        ],
+        notableObservations: [
+          "Adapted well when requirements were clarified",
+          "Showed initiative in testing edge cases",
+        ],
+      },
+      recommendations: [
+        {
+          category: "xfn_collaboration",
+          priority: "medium",
+          title: "Increase Proactive Communication",
+          description: "While collaboration was good, being more proactive in sharing progress and seeking input could enhance teamwork.",
+          actionableSteps: [
+            "Share progress updates regularly without being asked",
+            "Ask for feedback earlier in the development process",
+            "Reach out to multiple team members for diverse perspectives",
+          ],
+        },
+      ],
+      metrics: {
+        totalDurationMinutes: 75,
+        workingPhaseMinutes: 60,
+        coworkersContacted: 3,
+        aiToolsUsed: true,
+        testsStatus: "passing",
+        codeReviewScore: 4,
+      },
+    };
+
+    await prisma.assessment.upsert({
+      where: { id: TEST_ASSESSMENT_IDS.completed },
+      update: {
+        status: "COMPLETED",
+        scenarioId: recruiterScenario.id,
+        prUrl: "https://github.com/skillvee/test-repo/pull/2",
+        report: sampleReport as unknown as Prisma.InputJsonValue,
+        completedAt: new Date(),
+      },
+      create: {
+        id: TEST_ASSESSMENT_IDS.completed,
+        userId: testCandidate.id,
+        scenarioId: recruiterScenario.id,
+        status: "COMPLETED",
+        prUrl: "https://github.com/skillvee/test-repo/pull/2",
+        report: sampleReport as unknown as Prisma.InputJsonValue,
+        completedAt: new Date(),
+      },
+    });
+    console.log(`  ✅ Completed assessment: ${TEST_ASSESSMENT_IDS.completed}`);
+    console.log(`     URL: /assessment/${TEST_ASSESSMENT_IDS.completed}/results`);
   } else {
     console.log("  ⚠️ Test candidate user not found, skipping recruiter flow assessments");
   }

@@ -1,14 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Award,
   ChevronDown,
   ChevronUp,
-  RefreshCw,
   Target,
   TrendingUp,
   Clock,
@@ -31,7 +29,6 @@ interface ResultsClientProps {
   companyName: string;
   userName: string;
   report: AssessmentReport | null;
-  isProcessing: boolean;
 }
 
 function SkillScoreBar({
@@ -258,43 +255,35 @@ function MetricsGrid({ metrics }: { metrics: AssessmentReport["metrics"] }) {
   );
 }
 
-function ProcessingState({ onRetry }: { onRetry: () => void }) {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-8">
-      <Card className="max-w-md p-12 text-center shadow-lg">
-        <div className="mx-auto mb-6 h-16 w-16 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-        <h2 className="mb-4 text-2xl font-semibold">Processing Your Assessment</h2>
-        <p className="mb-6 text-muted-foreground">
-          We&apos;re analyzing your performance and generating your personalized
-          report. This usually takes less than a minute.
-        </p>
-        <button
-          onClick={onRetry}
-          className="mx-auto flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Refresh
-        </button>
-      </Card>
-    </div>
-  );
-}
 
-function NoReportState({ onGenerate }: { onGenerate: () => void }) {
+function NoReportState({ onGenerate, isGenerating }: { onGenerate: () => void; isGenerating: boolean }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-8">
       <Card className="max-w-md p-12 text-center shadow-lg">
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-          <AlertCircle className="h-8 w-8 text-primary" />
-        </div>
-        <h2 className="mb-4 text-2xl font-semibold">Report Not Ready</h2>
-        <p className="mb-6 text-muted-foreground">
-          Your assessment report is still being generated. Click below to check
-          again.
-        </p>
-        <Button onClick={onGenerate}>
-          Generate Report
-        </Button>
+        {isGenerating ? (
+          <>
+            <div className="mx-auto mb-6 h-16 w-16 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+            <h2 className="mb-4 text-2xl font-semibold">Generating Report</h2>
+            <p className="mb-6 text-muted-foreground">
+              We&apos;re analyzing your performance and generating your personalized
+              report. This may take a moment.
+            </p>
+          </>
+        ) : (
+          <>
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+              <AlertCircle className="h-8 w-8 text-primary" />
+            </div>
+            <h2 className="mb-4 text-2xl font-semibold">Report Not Ready</h2>
+            <p className="mb-6 text-muted-foreground">
+              Your assessment report hasn&apos;t been generated yet. Click below to
+              generate it now.
+            </p>
+            <Button onClick={onGenerate}>
+              Generate Report
+            </Button>
+          </>
+        )}
       </Card>
     </div>
   );
@@ -306,39 +295,13 @@ export function ResultsClient({
   companyName,
   userName,
   report: initialReport,
-  isProcessing,
 }: ResultsClientProps) {
-  const router = useRouter();
   const [report, setReport] = useState<AssessmentReport | null>(initialReport);
   const [expandedSkills, setExpandedSkills] = useState<Set<string>>(new Set());
-  const [_isLoading, setIsLoading] = useState(false);
-
-  // Poll for report if processing
-  useEffect(() => {
-    if (!isProcessing || report) return;
-
-    const pollInterval = setInterval(async () => {
-      try {
-        const response = await fetch(
-          `/api/assessment/report?assessmentId=${assessmentId}`
-        );
-        if (response.ok) {
-          const data = await response.json();
-          if (data.report) {
-            setReport(data.report);
-            clearInterval(pollInterval);
-          }
-        }
-      } catch (error) {
-        console.error("Error polling for report:", error);
-      }
-    }, 3000);
-
-    return () => clearInterval(pollInterval);
-  }, [assessmentId, isProcessing, report]);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleGenerateReport = async () => {
-    setIsLoading(true);
+    setIsGenerating(true);
     try {
       const response = await fetch("/api/assessment/report", {
         method: "POST",
@@ -353,12 +316,8 @@ export function ResultsClient({
     } catch (error) {
       console.error("Error generating report:", error);
     } finally {
-      setIsLoading(false);
+      setIsGenerating(false);
     }
-  };
-
-  const handleRetry = () => {
-    router.refresh();
   };
 
   const toggleSkill = (category: string) => {
@@ -383,14 +342,9 @@ export function ResultsClient({
     setExpandedSkills(new Set());
   };
 
-  // Show processing state
-  if (isProcessing && !report) {
-    return <ProcessingState onRetry={handleRetry} />;
-  }
-
-  // Show no report state
+  // Show no report state with generate option
   if (!report) {
-    return <NoReportState onGenerate={handleGenerateReport} />;
+    return <NoReportState onGenerate={handleGenerateReport} isGenerating={isGenerating} />;
   }
 
   const formattedDate = new Date(report.generatedAt).toLocaleDateString(

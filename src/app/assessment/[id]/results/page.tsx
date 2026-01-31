@@ -42,9 +42,17 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
     redirect("/");
   }
 
-  // Check if assessment is completed
+  // Redirect based on status
+  if (assessment.status === "WELCOME") {
+    redirect(`/assessment/${id}/welcome`);
+  }
+
+  if (assessment.status === "WORKING") {
+    redirect(`/assessment/${id}/chat`);
+  }
+
+  // Only COMPLETED assessments can view results
   if (assessment.status !== "COMPLETED") {
-    // Assessment not ready for results yet
     redirect(`/assessment/${id}/chat`);
   }
 
@@ -82,7 +90,6 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
       companyName={assessment.scenario.companyName}
       userName={assessment.user?.name || session.user.name || "there"}
       report={report}
-      isProcessing={false}
     />
   );
 }
