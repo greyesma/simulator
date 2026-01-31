@@ -1,5 +1,80 @@
 # Ralph Progress Log
 
+## Issue #178: RF-010 - Create recruiter scenario builder
+
+### What was implemented
+- Created `/src/app/recruiter/scenarios/new/page.tsx` - Server component with recruiter auth
+- Created `/src/app/recruiter/scenarios/new/client.tsx` - Client component reusing admin builder pattern
+- Created `/src/app/api/recruiter/scenarios/route.ts` - API to create scenarios with `createdById` set securely
+- Created `/src/app/api/recruiter/scenarios/builder/route.ts` - AI chat API for scenario building
+- Created `/src/app/api/recruiter/scenarios/[id]/coworkers/route.ts` - API to create coworkers for recruiter scenarios
+
+### Files created
+- `src/app/recruiter/scenarios/new/page.tsx` - Server component that:
+  - Requires RECRUITER or ADMIN role via `requireRecruiter()`
+  - Renders the scenario builder client component
+- `src/app/recruiter/scenarios/new/client.tsx` - Client component with:
+  - Chat interface with AI Scenario Builder assistant
+  - Preview panel showing scenario data as it's collected
+  - Save Scenario button that creates scenario + coworkers
+  - Cancel link back to `/recruiter/scenarios`
+- `src/app/api/recruiter/scenarios/route.ts` - POST endpoint that:
+  - Validates user has RECRUITER or ADMIN role
+  - Auto-sets `createdById` from session (not request body - security)
+  - Auto-sets `isPublished: true` for recruiter scenarios
+- `src/app/api/recruiter/scenarios/builder/route.ts` - GET/POST endpoints:
+  - GET: Returns initial AI greeting
+  - POST: Processes chat messages and extracts scenario data
+  - Uses same Gemini Flash model as admin builder
+- `src/app/api/recruiter/scenarios/[id]/coworkers/route.ts` - POST endpoint:
+  - Creates coworkers for a scenario
+  - Security: Validates scenario ownership (createdById matches session user or admin)
+
+### Recruiter-Specific Changes
+- **No `isPublished` toggle:** Recruiter scenarios are always active (`isPublished: true`)
+- **Auto-set ownership:** `createdById` set from session, not request body
+- **Ownership validation:** Coworker creation checks scenario ownership
+- **Redirect after save:** Goes to `/recruiter/scenarios` instead of admin page
+
+### Security Implementation
+- `createdById` is set from authenticated session, not from request body
+- Coworker API validates that the scenario belongs to the current user (or user is admin)
+- All endpoints require RECRUITER or ADMIN role
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes
+- Build succeeds: `npm run build` passes
+- Page accessible at `/recruiter/scenarios/new` when logged in as recruiter
+- Unauthenticated access redirects to `/sign-in?callbackUrl=/recruiter/dashboard`
+- Screenshot captured: `screenshots/issue-178-scenario-builder.png`
+
+### Learnings for future iterations
+- The admin scenario builder pattern (chat interface + preview panel) is reusable
+- The key difference is where to redirect after save and ownership handling
+- API routes can share the same Gemini model and scenario builder utilities
+- Security: Always set `createdById` from session, never trust client input for ownership
+
+### Gotchas discovered
+- The recruiter layout already handles auth via `requireRecruiter()` - page auth is redundant but harmless
+- Headless browser (agent-browser) can navigate and screenshot but React controlled inputs need CSS selectors, not ref IDs
+
+### Acceptance Criteria Status
+- [x] Create `/src/app/recruiter/scenarios/new/page.tsx`
+- [x] Create `/src/app/recruiter/scenarios/new/client.tsx`
+- [x] Reuse admin builder pattern for scenario creation
+- [x] Builder includes: Company name, description, task, repo URL, tech stack, coworkers
+- [x] Remove `isPublished` toggle - all recruiter scenarios are active by default
+- [x] Auto-set `createdById` to current user's ID (from session, not request)
+- [x] Auto-set `isPublished: true` when creating
+- [x] API validates user has RECRUITER or ADMIN role
+- [x] After creating scenario, redirect to `/recruiter/scenarios`
+- [x] TypeScript compiles: `npm run typecheck`
+- [x] Login as recruiter, navigate to `/recruiter/scenarios/new`
+- [x] Can see scenario form and interact with AI
+- [x] Screenshots captured
+
+---
+
 ## Issue #177: RF-009 - Create recruiter scenarios list page
 
 ### What was implemented
