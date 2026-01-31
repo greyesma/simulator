@@ -1,77 +1,111 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/server/db";
-import type { CodeReviewData, AssessmentReport, ChatMessage } from "@/types";
-import type { PrCiStatus } from "@/lib/external";
-import { sendReportEmail, isEmailServiceConfigured } from "@/lib/external";
+import { AssessmentStatus, VideoAssessmentStatus } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
-
-// Note: The old assessment aggregation was removed in RF-022.
-// Report generation will be reimplemented using video evaluation in subsequent issues.
-// For now, this route provides placeholder implementations.
+import type { AssessmentReport, SkillScore, ScoreLevel } from "@/types";
+import { sendReportEmail, isEmailServiceConfigured } from "@/lib/external";
+import { getEvaluationResults, evaluateVideo } from "@/lib/analysis";
+import type { VideoEvaluationOutput } from "@/prompts/analysis/video-evaluation";
 
 /**
- * Conversation signals from chat/voice interactions
+ * Maps video evaluation dimension names to skill categories for the report
  */
-interface ConversationSignals {
-  coworkerChats: Array<{
-    coworkerName: string;
-    coworkerRole: string;
-    messages: ChatMessage[];
-    type: "text" | "voice";
-  }>;
-  defenseTranscript: ChatMessage[];
-  totalCoworkerInteractions: number;
-  uniqueCoworkersContacted: number;
+const DIMENSION_TO_CATEGORY: Record<string, string> = {
+  COMMUNICATION: "communication",
+  PROBLEM_SOLVING: "problem_decomposition",
+  TECHNICAL_KNOWLEDGE: "code_quality",
+  COLLABORATION: "xfn_collaboration",
+  ADAPTABILITY: "technical_decision_making",
+  LEADERSHIP: "presentation",
+  CREATIVITY: "ai_leverage",
+  TIME_MANAGEMENT: "time_management",
+};
+
+/**
+ * Maps a score (1-5) to a level label
+ */
+function scoreToLevel(score: number): ScoreLevel {
+  if (score >= 4.5) return "exceptional";
+  if (score >= 3.5) return "strong";
+  if (score >= 2.5) return "adequate";
+  if (score >= 1.5) return "developing";
+  return "needs_improvement";
 }
 
 /**
- * All collected assessment signals (simplified)
+ * Converts video evaluation output to assessment report format
  */
-interface AssessmentSignals {
-  assessmentId: string;
-  userId: string;
-  scenarioName: string;
-  hrInterview: null;
-  conversations: ConversationSignals;
-  recording: null;
-  codeReview: CodeReviewData | null;
-  ciStatus: PrCiStatus | null;
-  prUrl: string | null;
-  timing: {
-    startedAt: Date;
-    completedAt: Date | null;
-    totalDurationSeconds: number | null;
-    workingPhaseSeconds: number | null;
-  };
-}
+function convertVideoEvaluationToReport(
+  videoResult: VideoEvaluationOutput,
+  assessmentId: string,
+  candidateName?: string,
+  timing?: { totalDurationMinutes: number | null; workingPhaseMinutes: number | null },
+  coworkersContacted?: number
+): AssessmentReport {
+  // Convert dimension scores to skill scores
+  const skillScores: SkillScore[] = [];
 
-/**
- * Placeholder: Generate assessment report
- * TODO: Implement using video evaluation in subsequent issues (RF-023+)
- */
-async function generateAssessmentReport(
-  signals: AssessmentSignals,
-  candidateName?: string
-): Promise<AssessmentReport> {
-  // Placeholder implementation - returns a minimal report
-  // This will be replaced with video-based evaluation in subsequent issues
+  for (const [dimension, scoreData] of Object.entries(videoResult.dimension_scores)) {
+    const category = DIMENSION_TO_CATEGORY[dimension];
+    if (!category || scoreData.score === null) continue;
+
+    // Combine green flags and red flags as evidence
+    const evidence: string[] = [
+      ...scoreData.greenFlags.map(f => `+ ${f}`),
+      ...scoreData.redFlags.map(f => `- ${f}`),
+    ];
+
+    skillScores.push({
+      category: category as SkillScore["category"],
+      score: scoreData.score,
+      level: scoreToLevel(scoreData.score),
+      evidence,
+      notes: scoreData.rationale,
+    });
+  }
+
+  // Build narrative from hiring signals
+  const { hiringSignals } = videoResult;
+
   return {
     generatedAt: new Date().toISOString(),
-    assessmentId: signals.assessmentId,
+    assessmentId,
     candidateName,
-    overallScore: 3,
-    overallLevel: "adequate",
-    skillScores: [],
+    overallScore: videoResult.overall_score,
+    overallLevel: scoreToLevel(videoResult.overall_score),
+    skillScores,
     narrative: {
-      overallSummary:
-        "Assessment report generation is being updated. Please check back later.",
-      strengths: [],
-      areasForImprovement: [],
-      notableObservations: [],
+      overallSummary: videoResult.overall_summary,
+      strengths: hiringSignals.overallGreenFlags,
+      areasForImprovement: hiringSignals.overallRedFlags,
+      notableObservations: videoResult.key_highlights
+        .filter(h => h.type === "positive")
+        .slice(0, 3)
+        .map(h => `[${h.timestamp}] ${h.description}`),
     },
-    recommendations: [],
-    version: "2.0.0-placeholder",
+    recommendations: skillScores
+      .filter(s => s.score <= 3)
+      .slice(0, 3)
+      .map((skill, index) => ({
+        category: skill.category,
+        priority: skill.score <= 2 ? "high" : "medium" as const,
+        title: `Improve ${skill.category.replace("_", " ")}`,
+        description: skill.notes,
+        actionableSteps: skill.evidence
+          .filter(e => e.startsWith("- "))
+          .map(e => `Address: ${e.slice(2)}`)
+          .slice(0, 3),
+      })),
+    metrics: {
+      totalDurationMinutes: timing?.totalDurationMinutes ?? null,
+      workingPhaseMinutes: timing?.workingPhaseMinutes ?? null,
+      coworkersContacted: coworkersContacted ?? 0,
+      aiToolsUsed: true, // Assumed for simulation context
+      testsStatus: "unknown",
+      codeReviewScore: null,
+    },
+    version: videoResult.evaluation_version,
   };
 }
 
@@ -83,101 +117,8 @@ function reportToPrismaJson(report: AssessmentReport): Prisma.InputJsonValue {
 }
 
 /**
- * Collects assessment signals from the database (simplified)
- */
-async function collectAssessmentSignals(
-  assessmentId: string
-): Promise<AssessmentSignals | null> {
-  const assessment = await db.assessment.findUnique({
-    where: { id: assessmentId },
-    include: {
-      user: {
-        select: { id: true, name: true, email: true },
-      },
-      scenario: {
-        select: { id: true, name: true, companyName: true },
-      },
-      conversations: {
-        include: {
-          coworker: {
-            select: { id: true, name: true, role: true },
-          },
-        },
-      },
-    },
-  });
-
-  if (!assessment) {
-    return null;
-  }
-
-  // Build conversation signals
-  const conversationSignals: ConversationSignals = {
-    coworkerChats: [],
-    defenseTranscript: [],
-    totalCoworkerInteractions: 0,
-    uniqueCoworkersContacted: 0,
-  };
-
-  const uniqueCoworkerIds = new Set<string>();
-
-  for (const conv of assessment.conversations) {
-    const messages = (conv.transcript as unknown as ChatMessage[]) || [];
-    const convType = conv.type as "text" | "voice" | "defense";
-
-    if (convType === "defense") {
-      conversationSignals.defenseTranscript = messages;
-    } else if (conv.coworkerId && conv.coworker) {
-      conversationSignals.coworkerChats.push({
-        coworkerName: conv.coworker.name,
-        coworkerRole: conv.coworker.role,
-        messages,
-        type: convType === "voice" ? "voice" : "text",
-      });
-      uniqueCoworkerIds.add(conv.coworkerId);
-      conversationSignals.totalCoworkerInteractions += messages.length;
-    }
-  }
-
-  conversationSignals.uniqueCoworkersContacted = uniqueCoworkerIds.size;
-
-  // Parse code review and CI status from JSON fields
-  const codeReview = assessment.codeReview
-    ? (assessment.codeReview as unknown as CodeReviewData)
-    : null;
-  const ciStatus = assessment.ciStatus
-    ? (assessment.ciStatus as unknown as PrCiStatus)
-    : null;
-
-  // Calculate timing
-  const now = new Date();
-  const completedAt = assessment.completedAt || now;
-  const totalDurationSeconds = Math.floor(
-    (completedAt.getTime() - assessment.startedAt.getTime()) / 1000
-  );
-
-  return {
-    assessmentId: assessment.id,
-    userId: assessment.userId,
-    scenarioName: assessment.scenario.name,
-    hrInterview: null,
-    conversations: conversationSignals,
-    recording: null, // Screenshot analysis removed in RF-022
-    codeReview,
-    ciStatus,
-    prUrl: assessment.prUrl,
-    timing: {
-      startedAt: assessment.startedAt,
-      completedAt: assessment.completedAt,
-      totalDurationSeconds,
-      workingPhaseSeconds: totalDurationSeconds,
-    },
-  };
-}
-
-/**
  * POST /api/assessment/report
- * Generates the final assessment report
+ * Generates the final assessment report from video evaluation
  */
 export async function POST(request: Request) {
   try {
@@ -204,8 +145,22 @@ export async function POST(request: Request) {
         userId: true,
         status: true,
         report: true,
+        startedAt: true,
+        completedAt: true,
         user: {
           select: { name: true, email: true },
+        },
+        conversations: {
+          select: { coworkerId: true },
+          where: { coworkerId: { not: null } },
+        },
+        recordings: {
+          where: { type: "screen" },
+          select: { storageUrl: true },
+          take: 1,
+        },
+        scenario: {
+          select: { taskDescription: true },
         },
       },
     });
@@ -233,19 +188,120 @@ export async function POST(request: Request) {
       });
     }
 
-    // Collect all signals
-    const signals = await collectAssessmentSignals(assessmentId);
-    if (!signals) {
+    // Check if video recording exists
+    const videoUrl = assessment.recordings[0]?.storageUrl;
+    if (!videoUrl) {
       return NextResponse.json(
-        { error: "Failed to collect assessment signals" },
+        { error: "No video recording found for this assessment. Video evaluation cannot proceed without a recording." },
+        { status: 400 }
+      );
+    }
+
+    // Check if video assessment exists and get results
+    const videoAssessment = await db.videoAssessment.findUnique({
+      where: { assessmentId },
+      select: {
+        id: true,
+        status: true,
+        summary: {
+          select: { rawAiResponse: true },
+        },
+      },
+    });
+
+    let videoResult: VideoEvaluationOutput | null = null;
+
+    if (videoAssessment?.status === VideoAssessmentStatus.COMPLETED && videoAssessment.summary?.rawAiResponse) {
+      // Use existing video evaluation result
+      videoResult = videoAssessment.summary.rawAiResponse as unknown as VideoEvaluationOutput;
+    } else if (!videoAssessment || videoAssessment.status === VideoAssessmentStatus.PENDING ||
+               videoAssessment.status === VideoAssessmentStatus.FAILED) {
+      // Trigger video evaluation and wait for it
+      try {
+        // Create video assessment record if it doesn't exist
+        let videoAssessmentId: string;
+
+        if (!videoAssessment) {
+          const newVideoAssessment = await db.videoAssessment.create({
+            data: {
+              candidateId: session.user.id,
+              assessmentId,
+              videoUrl,
+              status: VideoAssessmentStatus.PENDING,
+            },
+          });
+          videoAssessmentId = newVideoAssessment.id;
+        } else {
+          videoAssessmentId = videoAssessment.id;
+          // Reset status for retry
+          await db.videoAssessment.update({
+            where: { id: videoAssessmentId },
+            data: { status: VideoAssessmentStatus.PENDING },
+          });
+        }
+
+        // Run evaluation synchronously
+        const evalResult = await evaluateVideo({
+          assessmentId: videoAssessmentId,
+          videoUrl,
+          taskDescription: assessment.scenario.taskDescription,
+        });
+
+        if (!evalResult.success) {
+          return NextResponse.json(
+            { error: `Video evaluation failed: ${evalResult.error}` },
+            { status: 500 }
+          );
+        }
+
+        // Fetch the results
+        const results = await getEvaluationResults(videoAssessmentId);
+        if (results.summary?.rawAiResponse) {
+          videoResult = results.summary.rawAiResponse as VideoEvaluationOutput;
+        }
+      } catch (error) {
+        console.error("Error running video evaluation:", error);
+        return NextResponse.json(
+          { error: "Failed to evaluate video" },
+          { status: 500 }
+        );
+      }
+    } else if (videoAssessment.status === VideoAssessmentStatus.PROCESSING) {
+      return NextResponse.json(
+        { error: "Video evaluation is still in progress. Please try again later." },
+        { status: 202 }
+      );
+    }
+
+    if (!videoResult) {
+      return NextResponse.json(
+        { error: "Could not retrieve video evaluation results" },
         { status: 500 }
       );
     }
 
-    // Generate the report
-    const report = await generateAssessmentReport(
-      signals,
-      assessment.user?.name || undefined
+    // Calculate timing
+    const completedAt = assessment.completedAt || new Date();
+    const totalDurationMs = completedAt.getTime() - assessment.startedAt.getTime();
+    const totalDurationMinutes = Math.floor(totalDurationMs / 60000);
+
+    // Count unique coworkers contacted
+    const uniqueCoworkerIds = new Set(
+      assessment.conversations
+        .map(c => c.coworkerId)
+        .filter((id): id is string => id !== null)
+    );
+
+    // Convert video evaluation to report format
+    const report = convertVideoEvaluationToReport(
+      videoResult,
+      assessmentId,
+      assessment.user?.name || undefined,
+      {
+        totalDurationMinutes,
+        workingPhaseMinutes: totalDurationMinutes,
+      },
+      uniqueCoworkerIds.size
     );
 
     // Store the report in the database

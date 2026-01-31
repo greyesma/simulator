@@ -1,5 +1,93 @@
 # Ralph Progress Log
 
+## Issue #192: RF-024 - Simplify report API to single video evaluation
+
+### What was implemented
+- Completely rewrote `/api/assessment/report` route to use video evaluation directly
+- Removed all signal collection from multiple sources (HR interview, code review, recording analysis, conversation aggregation)
+- Added conversion function `convertVideoEvaluationToReport()` to transform video evaluation output to `AssessmentReport` format
+- Created dimension-to-category mapping for video evaluation dimensions to report skill categories
+- Updated tests to reflect new architecture using video evaluation mocks
+
+### Files modified
+- `src/app/api/assessment/report/route.ts` - Complete rewrite:
+  - Removed `collectAssessmentSignals()` function and `AssessmentSignals` interface
+  - Removed `ConversationSignals` interface
+  - Removed placeholder `generateAssessmentReport()` function
+  - Added `convertVideoEvaluationToReport()` function
+  - Added `DIMENSION_TO_CATEGORY` mapping
+  - Added `scoreToLevel()` helper function
+  - Added logic to check for existing video evaluation and use it
+  - Added logic to trigger video evaluation if not present
+  - Added proper error handling for missing video, processing state, etc.
+- `src/app/api/assessment/report/route.test.ts` - Updated tests:
+  - Removed mocks for old analysis functions
+  - Added mocks for `evaluateVideo()` and `getEvaluationResults()`
+  - Added mock for `videoAssessment` database queries
+  - Added comprehensive sample `VideoEvaluationOutput` for testing
+  - Added tests for new edge cases (no video, processing, completed evaluation)
+
+### New Report Generation Flow
+1. Check if cached report exists (return if `forceRegenerate` is false)
+2. Check if video recording exists (error if not)
+3. Check if video assessment exists and its status:
+   - COMPLETED: Use existing `rawAiResponse` from video assessment summary
+   - PROCESSING: Return 202 (try again later)
+   - PENDING/FAILED/None: Create video assessment and run evaluation synchronously
+4. Convert video evaluation output to `AssessmentReport` format
+5. Store report in `assessment.report`
+6. Send email notification if configured
+
+### Dimension to Category Mapping
+| Video Dimension | Report Category |
+|----------------|-----------------|
+| COMMUNICATION | communication |
+| PROBLEM_SOLVING | problem_decomposition |
+| TECHNICAL_KNOWLEDGE | code_quality |
+| COLLABORATION | xfn_collaboration |
+| ADAPTABILITY | technical_decision_making |
+| LEADERSHIP | presentation |
+| CREATIVITY | ai_leverage |
+| TIME_MANAGEMENT | time_management |
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes
+- Tests pass: 15/15 tests passing
+- Dev server starts without errors
+
+### Learnings for future iterations
+- The video evaluation output (`VideoEvaluationOutput`) contains all the data needed for the report
+- The `rawAiResponse` in `videoAssessmentSummary` preserves the full evaluation for later conversion
+- Error handling needs to distinguish between "no video" (400) vs "processing" (202) vs "failed" (500)
+- The finalize route already triggers video assessment asynchronously - the report route just needs to check the result
+
+### Gotchas discovered
+- The `VideoAssessmentStatus` enum has PENDING, PROCESSING, COMPLETED, FAILED states
+- Video assessment is linked to the main assessment via `assessmentId` (unique constraint)
+- The results page expects `AssessmentReport` type with `skillScores`, `narrative`, `recommendations`, `metrics`
+- Green flags become strengths, red flags become areas for improvement in the narrative
+
+### Acceptance Criteria Status
+- [x] Remove signal collection from multiple sources (no HR, code review, recording, conversation signals)
+- [x] Call video evaluation directly with the recorded video URL
+- [x] Return video evaluation result as the assessment report
+- [x] Store video evaluation result in `assessment.assessmentReport` (via report field)
+- [x] Ensure the new schema matches what the results page expects
+- [x] Handle cases where video URL is missing (error state - 400)
+- [x] Remove imports from deleted analysis files
+- [x] Remove imports from deleted prompt files (none needed)
+- [x] Clean up any helper functions that are no longer used
+- [x] If assessment is already COMPLETED with a report, return cached report
+- [x] If no video recording exists, return appropriate error
+- [x] If video evaluation fails, return error state (don't crash)
+- [x] Check if `/api/assessment/finalize` needs updates (no changes needed - already correct)
+- [x] Check if any other routes call the deleted analysis functions (none found)
+- [x] Update imports throughout the codebase (test file updated)
+- [x] TypeScript compiles: `npm run typecheck`
+- [x] Start dev server without errors
+
+---
+
 ## Issue #191: RF-023 - Update video evaluation prompt with hiring signals
 
 ### What was implemented

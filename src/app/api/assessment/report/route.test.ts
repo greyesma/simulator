@@ -1,22 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { POST, GET } from "./route";
+import { VideoAssessmentStatus } from "@prisma/client";
 
 // Define mocks before vi.mock calls (required for hoisting)
 const mockAuthFn = vi.fn();
 const mockFindUnique = vi.fn();
+const mockFindUniqueVideoAssessment = vi.fn();
+const mockCreateVideoAssessment = vi.fn();
+const mockUpdateVideoAssessment = vi.fn();
 const mockUpdate = vi.fn();
-const mockGenerateReport = vi.fn();
-const mockReportToPrismaJson = vi.fn((report) => report);
-const mockAggregateSegments = vi.fn(() => ({
-  activityTimeline: [],
-  toolUsage: [],
-  stuckMoments: [],
-  totalActiveTime: 0,
-  totalIdleTime: 0,
-  overallFocusScore: 3,
-  aiToolsUsed: false,
-  keyObservations: [],
-}));
+const mockEvaluateVideo = vi.fn();
+const mockGetEvaluationResults = vi.fn();
 
 // Mock auth
 vi.mock("@/auth", () => ({
@@ -30,21 +24,123 @@ vi.mock("@/server/db", () => ({
       findUnique: (...args: unknown[]) => mockFindUnique(...args),
       update: (...args: unknown[]) => mockUpdate(...args),
     },
+    videoAssessment: {
+      findUnique: (...args: unknown[]) => mockFindUniqueVideoAssessment(...args),
+      create: (...args: unknown[]) => mockCreateVideoAssessment(...args),
+      update: (...args: unknown[]) => mockUpdateVideoAssessment(...args),
+    },
   },
 }));
 
-// Mock analysis module (assessment-aggregation + recording-analysis)
+// Mock analysis module
 vi.mock("@/lib/analysis", () => ({
-  generateAssessmentReport: (...args: unknown[]) => mockGenerateReport(...args),
-  reportToPrismaJson: (report: unknown) => mockReportToPrismaJson(report),
-  aggregateSegmentAnalyses: () => mockAggregateSegments(),
+  evaluateVideo: (...args: unknown[]) => mockEvaluateVideo(...args),
+  getEvaluationResults: (...args: unknown[]) => mockGetEvaluationResults(...args),
 }));
 
-// Mock email module (now in @/lib/external)
+// Mock email module
 vi.mock("@/lib/external", () => ({
   sendReportEmail: vi.fn().mockResolvedValue({ success: true }),
   isEmailServiceConfigured: vi.fn().mockReturnValue(false),
 }));
+
+// Sample video evaluation output
+const sampleVideoEvaluationOutput = {
+  evaluation_version: "1.1.0",
+  overall_score: 4.0,
+  dimension_scores: {
+    COMMUNICATION: {
+      score: 4,
+      rationale: "Clear communication throughout",
+      greenFlags: ["Articulate explanations"],
+      redFlags: [],
+      observable_behaviors: "Spoke clearly",
+      timestamps: ["00:30"],
+      trainable_gap: false,
+    },
+    PROBLEM_SOLVING: {
+      score: 4,
+      rationale: "Good analytical approach",
+      greenFlags: ["Systematic debugging"],
+      redFlags: [],
+      observable_behaviors: "Broke down the problem",
+      timestamps: ["01:00"],
+      trainable_gap: false,
+    },
+    TECHNICAL_KNOWLEDGE: {
+      score: 3,
+      rationale: "Solid fundamentals",
+      greenFlags: [],
+      redFlags: ["Some gaps in advanced topics"],
+      observable_behaviors: "Used basic patterns",
+      timestamps: ["02:00"],
+      trainable_gap: true,
+    },
+    COLLABORATION: {
+      score: 4,
+      rationale: "Good teamwork",
+      greenFlags: ["Sought feedback"],
+      redFlags: [],
+      observable_behaviors: "Asked questions",
+      timestamps: ["03:00"],
+      trainable_gap: false,
+    },
+    ADAPTABILITY: {
+      score: 4,
+      rationale: "Handled changes well",
+      greenFlags: ["Quick pivots"],
+      redFlags: [],
+      observable_behaviors: "Adjusted approach",
+      timestamps: ["04:00"],
+      trainable_gap: false,
+    },
+    LEADERSHIP: {
+      score: 3,
+      rationale: "Showed some initiative",
+      greenFlags: [],
+      redFlags: ["Could be more proactive"],
+      observable_behaviors: "Followed guidance",
+      timestamps: ["05:00"],
+      trainable_gap: true,
+    },
+    CREATIVITY: {
+      score: 4,
+      rationale: "Creative solutions",
+      greenFlags: ["Novel approach"],
+      redFlags: [],
+      observable_behaviors: "Tried different methods",
+      timestamps: ["06:00"],
+      trainable_gap: false,
+    },
+    TIME_MANAGEMENT: {
+      score: 4,
+      rationale: "Good time usage",
+      greenFlags: ["Prioritized well"],
+      redFlags: [],
+      observable_behaviors: "Stayed focused",
+      timestamps: ["07:00"],
+      trainable_gap: false,
+    },
+  },
+  hiringSignals: {
+    overallGreenFlags: ["Strong communicator", "Collaborative"],
+    overallRedFlags: ["Technical gaps in advanced areas"],
+    recommendation: "hire" as const,
+    recommendationRationale: "Strong candidate with good fundamentals",
+  },
+  key_highlights: [
+    {
+      timestamp: "00:30",
+      type: "positive" as const,
+      dimension: "COMMUNICATION",
+      description: "Clear explanation of approach",
+      quote: null,
+    },
+  ],
+  overall_summary: "Strong candidate with good communication and problem-solving skills.",
+  evaluation_confidence: "high" as const,
+  insufficient_evidence_notes: null,
+};
 
 describe("Assessment Report API", () => {
   beforeEach(() => {
@@ -114,7 +210,12 @@ describe("Assessment Report API", () => {
         userId: "user-2", // Different user
         status: "COMPLETED",
         report: null,
-        user: { name: "Other User" },
+        user: { name: "Other User", email: "other@test.com" },
+        startedAt: new Date(),
+        completedAt: new Date(),
+        conversations: [],
+        recordings: [],
+        scenario: { taskDescription: "Test task" },
       });
 
       const request = new Request(
@@ -143,7 +244,12 @@ describe("Assessment Report API", () => {
         userId: "user-1",
         status: "COMPLETED",
         report: cachedReport,
-        user: { name: "Test User" },
+        user: { name: "Test User", email: "test@example.com" },
+        startedAt: new Date(),
+        completedAt: new Date(),
+        conversations: [],
+        recordings: [{ storageUrl: "https://example.com/video.mp4" }],
+        scenario: { taskDescription: "Test task" },
       });
 
       const request = new Request(
@@ -161,116 +267,60 @@ describe("Assessment Report API", () => {
       expect(data.success).toBe(true);
       expect(data.cached).toBe(true);
       expect(data.report).toEqual(cachedReport);
-      // Should not call generate function
-      expect(mockGenerateReport).not.toHaveBeenCalled();
+      // Should not call video evaluation
+      expect(mockEvaluateVideo).not.toHaveBeenCalled();
     });
 
-    it("should regenerate report if forceRegenerate is true", async () => {
+    it("should return 400 if no video recording exists", async () => {
       mockAuthFn.mockResolvedValue({ user: { id: "user-1" } });
-      const existingReport = { overallScore: 3 };
-      const newReport = {
-        generatedAt: "2024-01-16T10:00:00.000Z",
-        overallScore: 4,
-      };
-
-      // First findUnique for validation
-      mockFindUnique
-        .mockResolvedValueOnce({
-          id: "assessment-1",
-          userId: "user-1",
-          status: "COMPLETED",
-          report: existingReport,
-          user: { name: "Test User" },
-        })
-        // Second findUnique for collectAssessmentSignals
-        .mockResolvedValueOnce({
-          id: "assessment-1",
-          userId: "user-1",
-          status: "COMPLETED",
-          report: existingReport,
-          user: { id: "user-1", name: "Test User", email: "test@example.com" },
-          scenario: {
-            id: "scenario-1",
-            name: "Test Scenario",
-            companyName: "Test Co",
-          },
-          hrAssessment: null,
-          conversations: [],
-          recordings: [],
-          prUrl: null,
-          codeReview: null,
-          ciStatus: null,
-          startedAt: new Date(),
-          completedAt: null,
-        });
-
-      mockGenerateReport.mockResolvedValue(newReport);
-      mockUpdate.mockResolvedValue({
+      mockFindUnique.mockResolvedValue({
         id: "assessment-1",
-        report: newReport,
+        userId: "user-1",
+        status: "COMPLETED",
+        report: null,
+        user: { name: "Test User", email: "test@example.com" },
+        startedAt: new Date(),
+        completedAt: new Date(),
+        conversations: [],
+        recordings: [], // No recordings
+        scenario: { taskDescription: "Test task" },
       });
 
       const request = new Request(
         "http://localhost:3000/api/assessment/report",
         {
           method: "POST",
-          body: JSON.stringify({
-            assessmentId: "assessment-1",
-            forceRegenerate: true,
-          }),
+          body: JSON.stringify({ assessmentId: "assessment-1" }),
         }
       );
 
       const response = await POST(request);
       const data = await response.json();
 
-      expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
-      expect(data.cached).toBe(false);
-      expect(mockGenerateReport).toHaveBeenCalled();
+      expect(response.status).toBe(400);
+      expect(data.error).toContain("No video recording found");
     });
 
-    it("should generate new report if none exists", async () => {
+    it("should use existing video evaluation if completed", async () => {
       mockAuthFn.mockResolvedValue({ user: { id: "user-1" } });
-      const newReport = {
-        generatedAt: "2024-01-16T10:00:00.000Z",
-        overallScore: 4,
-      };
-
-      mockFindUnique
-        .mockResolvedValueOnce({
-          id: "assessment-1",
-          userId: "user-1",
-          status: "COMPLETED",
-          report: null,
-          user: { name: "Test User" },
-        })
-        .mockResolvedValueOnce({
-          id: "assessment-1",
-          userId: "user-1",
-          status: "COMPLETED",
-          report: null,
-          user: { id: "user-1", name: "Test User", email: "test@example.com" },
-          scenario: {
-            id: "scenario-1",
-            name: "Test Scenario",
-            companyName: "Test Co",
-          },
-          hrAssessment: null,
-          conversations: [],
-          recordings: [],
-          prUrl: null,
-          codeReview: null,
-          ciStatus: null,
-          startedAt: new Date(),
-          completedAt: null,
-        });
-
-      mockGenerateReport.mockResolvedValue(newReport);
-      mockUpdate.mockResolvedValue({
+      mockFindUnique.mockResolvedValue({
         id: "assessment-1",
-        report: newReport,
+        userId: "user-1",
+        status: "COMPLETED",
+        report: null,
+        user: { name: "Test User", email: "test@example.com" },
+        startedAt: new Date(),
+        completedAt: new Date(),
+        conversations: [],
+        recordings: [{ storageUrl: "https://example.com/video.mp4" }],
+        scenario: { taskDescription: "Test task" },
       });
+      mockFindUniqueVideoAssessment.mockResolvedValue({
+        id: "video-assessment-1",
+        status: VideoAssessmentStatus.COMPLETED,
+        summary: { rawAiResponse: sampleVideoEvaluationOutput },
+      });
+      mockUpdate.mockResolvedValue({ id: "assessment-1" });
 
       const request = new Request(
         "http://localhost:3000/api/assessment/report",
@@ -286,7 +336,89 @@ describe("Assessment Report API", () => {
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
       expect(data.cached).toBe(false);
-      expect(mockUpdate).toHaveBeenCalled();
+      expect(data.report.overallScore).toBe(4.0);
+      // Should not trigger new evaluation
+      expect(mockEvaluateVideo).not.toHaveBeenCalled();
+    });
+
+    it("should return 202 if video evaluation is still processing", async () => {
+      mockAuthFn.mockResolvedValue({ user: { id: "user-1" } });
+      mockFindUnique.mockResolvedValue({
+        id: "assessment-1",
+        userId: "user-1",
+        status: "COMPLETED",
+        report: null,
+        user: { name: "Test User", email: "test@example.com" },
+        startedAt: new Date(),
+        completedAt: new Date(),
+        conversations: [],
+        recordings: [{ storageUrl: "https://example.com/video.mp4" }],
+        scenario: { taskDescription: "Test task" },
+      });
+      mockFindUniqueVideoAssessment.mockResolvedValue({
+        id: "video-assessment-1",
+        status: VideoAssessmentStatus.PROCESSING,
+        summary: null,
+      });
+
+      const request = new Request(
+        "http://localhost:3000/api/assessment/report",
+        {
+          method: "POST",
+          body: JSON.stringify({ assessmentId: "assessment-1" }),
+        }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(202);
+      expect(data.error).toContain("still in progress");
+    });
+
+    it("should trigger video evaluation if no video assessment exists", async () => {
+      mockAuthFn.mockResolvedValue({ user: { id: "user-1" } });
+      mockFindUnique.mockResolvedValue({
+        id: "assessment-1",
+        userId: "user-1",
+        status: "COMPLETED",
+        report: null,
+        user: { name: "Test User", email: "test@example.com" },
+        startedAt: new Date(),
+        completedAt: new Date(),
+        conversations: [],
+        recordings: [{ storageUrl: "https://example.com/video.mp4" }],
+        scenario: { taskDescription: "Test task" },
+      });
+      mockFindUniqueVideoAssessment.mockResolvedValue(null);
+      mockCreateVideoAssessment.mockResolvedValue({
+        id: "new-video-assessment-1",
+      });
+      mockEvaluateVideo.mockResolvedValue({
+        success: true,
+        assessmentId: "new-video-assessment-1",
+        overallScore: 4.0,
+      });
+      mockGetEvaluationResults.mockResolvedValue({
+        summary: { rawAiResponse: sampleVideoEvaluationOutput },
+      });
+      mockUpdate.mockResolvedValue({ id: "assessment-1" });
+
+      const request = new Request(
+        "http://localhost:3000/api/assessment/report",
+        {
+          method: "POST",
+          body: JSON.stringify({ assessmentId: "assessment-1" }),
+        }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(mockEvaluateVideo).toHaveBeenCalled();
+      expect(data.report.overallScore).toBe(4.0);
     });
   });
 
@@ -360,7 +492,7 @@ describe("Assessment Report API", () => {
       mockFindUnique.mockResolvedValue({
         id: "assessment-1",
         userId: "user-1",
-        status: "PROCESSING",
+        status: "COMPLETED",
         report: null,
         user: { name: "Test User" },
       });
