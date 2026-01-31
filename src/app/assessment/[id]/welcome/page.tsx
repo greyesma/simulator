@@ -1,15 +1,12 @@
-import { redirect } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
 import { auth } from "@/auth";
-import { db } from "@/server/db";
+import { getAssessmentForWelcome } from "@/server/queries/assessment";
+import { WelcomePageClient } from "./client";
 
 interface WelcomePageProps {
   params: Promise<{ id: string }>;
 }
 
-/**
- * Backwards compatibility redirect - the welcome page now redirects to /chat.
- * This maintains backwards compatibility for any direct links to /welcome.
- */
 export default async function WelcomePage({ params }: WelcomePageProps) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -18,31 +15,27 @@ export default async function WelcomePage({ params }: WelcomePageProps) {
 
   const { id } = await params;
 
-  const assessment = await db.assessment.findUnique({
-    where: { id },
-    include: {
-      scenario: {
-        include: {
-          coworkers: true,
-        },
-      },
-    },
-  });
+  const assessment = await getAssessmentForWelcome(id, session.user.id);
 
-  if (!assessment || assessment.userId !== session.user.id) {
-    redirect("/profile");
+  // Page guard: assessment not found or belongs to someone else
+  if (!assessment) {
+    notFound();
   }
 
-  // Find manager coworker
-  const manager = assessment.scenario.coworkers.find((c) =>
-    c.role.toLowerCase().includes("manager")
+  // If assessment is already COMPLETED: Redirect to results
+  if (assessment.status === "COMPLETED") {
+    redirect(`/assessment/${id}/results`);
+  }
+
+  // Determine if this is a resume (assessment already started)
+  const isResume = assessment.status === "WORKING";
+
+  return (
+    <WelcomePageClient
+      assessmentId={id}
+      scenarioName={assessment.scenario.name}
+      companyName={assessment.scenario.companyName}
+      isResume={isResume}
+    />
   );
-
-  // Redirect to chat with manager, or fallback to profile
-  if (manager) {
-    redirect(`/assessment/${id}/chat?coworkerId=${manager.id}`);
-  } else {
-    // Fallback if no manager found - shouldn't happen in normal flow
-    redirect("/profile");
-  }
 }

@@ -1,5 +1,93 @@
 # Ralph Progress Log
 
+## Issue #182: RF-014 - Create welcome page with consent
+
+### What was implemented
+- Repurposed `/src/app/assessment/[id]/welcome/page.tsx` - Server component with page guard
+- Created `/src/app/assessment/[id]/welcome/client.tsx` - Client component with consent UI
+- Created `/src/app/api/assessment/start/route.ts` - API endpoint to start assessments
+
+### Files created/modified
+- `src/app/assessment/[id]/welcome/page.tsx` - Server component that:
+  - Requires authentication
+  - Verifies assessment belongs to current user (returns 404 if not)
+  - Redirects to results if assessment is COMPLETED
+  - Determines if this is a resume (status=WORKING) or new start (status=WELCOME)
+- `src/app/assessment/[id]/welcome/client.tsx` - Client component with:
+  - **What is Skillvee:** Day-at-work simulation explanation
+  - **Screen Recording:** Notice that screen will be recorded
+  - **AI Usage Encouraged:** Users can use Copilot, ChatGPT, Claude, etc.
+  - **Intentionally Vague:** Task context is incomplete, seek clarification via Slack
+  - Consent checkbox (required for new assessments)
+  - Start Simulation / Resume Simulation button (disabled until consent)
+- `src/app/api/assessment/start/route.ts` - POST endpoint that:
+  - Requires authentication
+  - Validates assessment exists and belongs to user
+  - Updates status from WELCOME to WORKING
+  - Idempotent - returns success if already WORKING
+  - Returns error if assessment is COMPLETED
+
+### Page Layout
+- **Header:** SkillVee logo, title, company/scenario name
+- **Content Sections:** 4 info cards with icons
+  - Blue briefcase icon: What is Skillvee
+  - Red monitor icon: Screen Recording
+  - Green bot icon: AI Usage Encouraged
+  - Amber question mark icon: Intentionally Vague
+- **Consent Section:**
+  - Checkbox with consent text
+  - "Start Simulation" button (disabled until checked)
+  - "Please check the box above to continue" helper text
+- **Resume Flow:** If resuming (status=WORKING), checkbox not shown, button says "Resume Simulation"
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes
+- E2E tested with agent-browser:
+  - Logged in as candidate@test.com
+  - Navigated to `/assessment/test-assessment-welcome/welcome`
+  - Verified all 4 content sections display correctly
+  - Verified button is disabled until checkbox is checked
+  - Checked the consent checkbox
+  - Verified button becomes enabled
+  - Clicked Start Simulation
+  - Verified redirect to `/assessment/test-assessment-welcome/chat`
+- Screenshots captured:
+  - `screenshots/issue-182-welcome-page.png`
+  - `screenshots/issue-182-checkbox-checked.png`
+  - `screenshots/issue-182-redirected-to-chat.png`
+
+### Learnings for future iterations
+- The `notFound()` function from Next.js is the clean way to return 404 for page guards
+- Using native HTML checkbox with Tailwind styling works well when shadcn Checkbox isn't available
+- The assessment status update API should be idempotent for reliability
+- Recording consent is handled separately in the chat page via `AssessmentScreenWrapper`
+
+### Gotchas discovered
+- The project doesn't have a shadcn Checkbox component - used native HTML input with Tailwind styling
+- Resume flow skips the consent checkbox since user already consented on first visit
+- The screen recording prompt appears on the chat page, not the welcome page
+
+### Acceptance Criteria Status
+- [x] Create/update `/src/app/assessment/[id]/welcome/page.tsx`
+- [x] Create client component with welcome content
+- [x] **What is Skillvee:** Brief explanation of day-at-work simulation
+- [x] **Screen Recording:** Clear statement that screen will be recorded
+- [x] **AI Usage Encouraged:** Users can use AI tools
+- [x] **Intentionally Vague:** Context is incomplete, seek clarification via Slack
+- [x] Single consent checkbox
+- [x] "Start Simulation" button - DISABLED until checkbox is checked
+- [x] If resuming: Show "Resume Simulation" instead of "Start"
+- [x] On Start/Resume: Update status from WELCOME to WORKING
+- [x] Redirect to `/assessment/[id]/chat`
+- [x] Page Guard: Verify assessment belongs to current user
+- [x] If assessment doesn't exist or belongs to someone else: 404
+- [x] If assessment is COMPLETED: Redirect to results
+- [x] TypeScript compiles: `npm run typecheck`
+- [x] E2E verified with agent-browser
+- [x] Screenshots captured
+
+---
+
 ## Issue #181: RF-013 - Create join page for candidates
 
 ### What was implemented
