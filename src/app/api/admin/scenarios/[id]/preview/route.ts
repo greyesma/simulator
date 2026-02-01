@@ -56,7 +56,7 @@ export async function POST(request: Request, context: RouteContext) {
 
   // Determine starting status and URL based on skipTo
   // Default: start at chat page (consolidated flow - no separate welcome page)
-  const status: "WORKING" = "WORKING";
+  const status = "WORKING" as const;
   const urlSuffix = "/chat";
 
   // Note: skipTo parameter is now unused since welcome page was removed

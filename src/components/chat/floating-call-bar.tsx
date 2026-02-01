@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Mic, MicOff, PhoneOff, Volume2 } from "lucide-react";
+import { Mic, MicOff, PhoneOff } from "lucide-react";
 import {
   GoogleGenAI,
   Modality,
@@ -19,7 +19,6 @@ import {
 import type { TranscriptMessage } from "@/lib/ai";
 import { CoworkerAvatar } from "./coworker-avatar";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 export type CallState =
   | "idle"

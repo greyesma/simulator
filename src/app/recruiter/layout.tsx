@@ -11,7 +11,7 @@ export default async function RecruiterLayout({
 
   return (
     <div className="flex h-screen bg-stone-50">
-      <RecruiterSidebar user={{ name: user.name, email: user.email }} />
+      <RecruiterSidebar user={{ name: user.name ?? null, email: user.email ?? null }} />
       <main className="flex h-full flex-1 flex-col overflow-hidden">{children}</main>
     </div>
   );

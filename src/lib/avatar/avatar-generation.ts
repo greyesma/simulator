@@ -11,14 +11,13 @@
  * - Pricing: ~$0.04 per image
  */
 
-import { GoogleGenAI, Modality } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { env } from "@/lib/core";
 import { supabaseAdmin } from "@/lib/external/supabase";
 import { db } from "@/server/db";
 
 // Constants
 const AVATAR_BUCKET = "avatars";
-const AVATAR_SIZE = 128;
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 1000; // 1 second base delay for exponential backoff
 
