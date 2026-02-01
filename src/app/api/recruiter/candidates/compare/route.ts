@@ -36,7 +36,7 @@ interface DimensionScoreComparison {
  * Candidate summary for comparison view
  */
 interface CandidateComparison {
-  candidateId: string;
+  assessmentId: string;
   candidateName: string | null;
   overallScore: number;
   overallPercentile: number;
@@ -238,7 +238,7 @@ export async function GET(request: Request) {
       const biggestGap = findBiggestGap(dimensionScores, trainableGaps);
 
       return {
-        candidateId: assessment.user.id,
+        assessmentId: assessment.id,
         candidateName: assessment.user.name,
         overallScore,
         overallPercentile,
