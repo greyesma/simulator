@@ -1,5 +1,44 @@
 # Ralph Progress Log
 
+## Issue #194: BUG: Post-login/signup redirects to landing page instead of intended destination
+
+### What was implemented
+- Added `redirect` callback to NextAuth configuration in `src/auth.ts`
+- The callback handles three cases:
+  1. Relative URLs (e.g., `/recruiter/dashboard`) - prepends baseUrl
+  2. Same-origin URLs - allows as-is
+  3. External URLs - rejects and returns baseUrl (security: prevents open redirect attacks)
+
+### Root Cause
+NextAuth's OAuth providers (like Google) ignore the `redirectTo` parameter passed from the client unless a `redirect` callback is explicitly defined. Without this callback, the default behavior falls back to redirecting to `/`.
+
+### Files modified
+- `src/auth.ts` - Added redirect callback (~12 lines)
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes
+- ESLint passes for modified file
+
+### Learnings for future iterations
+- NextAuth callbacks are order-independent, but `redirect` is often placed first by convention
+- Credentials auth worked because it uses `redirect: false` + manual `router.push(callbackUrl)`, bypassing NextAuth's redirect handling
+- The `redirect` callback is called for ALL auth-related redirects (sign-in, sign-out, error pages)
+
+### Gotchas discovered
+- The `redirect` callback receives `{ url, baseUrl }` - `url` is the requested destination, `baseUrl` is the app origin
+- Must check `url.startsWith(baseUrl)` AFTER checking `url.startsWith("/")` because relative URLs don't start with baseUrl
+- Always validate URLs to prevent open redirect attacks - external URLs should be rejected
+
+### Acceptance Criteria Status
+- [x] Add `redirect` callback to `src/auth.ts` NextAuth config
+- [x] Google OAuth redirects to `callbackUrl` after sign-in (logic implemented)
+- [x] Google OAuth redirects to `callbackUrl` after sign-up (logic implemented)
+- [x] External URLs are rejected (security: prevents open redirect attacks)
+- [x] Existing credentials auth flow continues to work (unchanged, uses separate flow)
+- [x] TypeScript compiles: `npm run typecheck`
+
+---
+
 ## Issue #201: US-003 - API endpoint for candidate comparison data
 
 ### What was implemented
