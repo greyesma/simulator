@@ -1,5 +1,74 @@
 # Ralph Progress Log
 
+## Issue #201: US-003 - API endpoint for candidate comparison data
+
+### What was implemented
+- Created `src/app/api/recruiter/candidates/compare/route.ts` with GET endpoint
+- Returns array of candidate summaries for side-by-side comparison view
+- Supports up to 4 candidates per comparison (UI constraint)
+- Data includes for each candidate:
+  - candidateId, candidateName
+  - overallScore, overallPercentile
+  - strengthLevel (Exceptional/Strong/Proficient/Developing)
+  - dimensionScores with percentile for each dimension
+  - topStrength (highest percentile dimension)
+  - biggestGap (lowest percentile dimension marked as trainableGap)
+
+### Authorization
+- Validates recruiter owns ALL simulations via `scenario.createdById` check
+- Returns 403 if any assessment's simulation not owned by recruiter
+- Returns 404 if any assessment not found
+- Returns 400 if more than 4 assessmentIds provided
+- Admin role bypasses ownership check
+
+### Files created
+- `src/app/api/recruiter/candidates/compare/route.ts` - Main endpoint implementation
+
+### API Design
+```typescript
+// GET /api/recruiter/candidates/compare?assessmentIds=id1,id2,id3
+// Returns array of CandidateComparison:
+[{
+  candidateId: string;
+  candidateName: string | null;
+  overallScore: number;
+  overallPercentile: number;
+  strengthLevel: "Exceptional" | "Strong" | "Proficient" | "Developing";
+  dimensionScores: [{
+    dimension: string;
+    score: number;
+    percentile: number;
+  }];
+  topStrength: string | null;  // Highest percentile dimension
+  biggestGap: string | null;   // Lowest percentile trainable gap dimension
+}]
+```
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes
+
+### Learnings for future iterations
+- Reused `getStoredPercentiles` from US-001 for efficient percentile lookup
+- Used `Promise.all` for parallel percentile lookups across multiple candidates
+- The `trainableGap` field in DimensionScore identifies skills that can be improved with training
+- Kept response focused on comparison-relevant data (no video URLs, flags, etc. - those are in the detail endpoint)
+
+### Gotchas discovered
+- The path uses `/candidates/compare` (plural) vs `/candidate/[assessmentId]` (singular) for REST consistency
+- Query params with comma-separated IDs work well for comparison use case (vs POST body)
+- Need to verify ALL assessments belong to recruiter before returning any data (security)
+
+### Acceptance Criteria Status
+- [x] Create `src/app/api/recruiter/candidates/compare/route.ts`
+- [x] GET endpoint accepts query param: `assessmentIds` (comma-separated, max 4)
+- [x] Returns array of candidate summaries with required fields
+- [x] Validates all assessments belong to simulations owned by recruiter
+- [x] Returns 400 if more than 4 assessmentIds provided
+- [x] Returns 403 if any assessment's simulation not owned by recruiter
+- [x] Typecheck passes
+
+---
+
 ## Issue #200: US-002 - API endpoint for recruiter candidate detail data
 
 ### What was implemented
