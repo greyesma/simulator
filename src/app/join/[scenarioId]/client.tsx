@@ -143,6 +143,7 @@ function JoinPageContent({
           return;
         }
 
+        setIsLoading(false);
         router.refresh();
       } catch {
         setError("An error occurred. Please try again.");
@@ -159,6 +160,7 @@ function JoinPageContent({
         setError("Invalid email or password");
         setIsLoading(false);
       } else {
+        setIsLoading(false);
         router.refresh();
       }
     }
