@@ -1,5 +1,76 @@
 # Ralph Progress Log
 
+## Issue #199: US-001 - Add percentile calculation for candidate scores
+
+### What was implemented
+- Created `src/lib/candidate/percentile-calculator.ts` with `calculatePercentiles()` function
+- Percentiles calculated per dimension (1-5 score → percentile rank against all completed assessments)
+- Percentiles calculated for overall score (average across all dimensions)
+- Function accepts `assessmentId` and returns `{ dimension: percentile }` map
+- Percentiles stored in `Assessment.report.percentiles` JSON field (no schema change needed)
+- Helper function `getPercentileDescription()` for human-readable descriptions
+- Bulk recalculation function `recalculateAllPercentiles()` for pool updates
+
+### Files created
+- `src/lib/candidate/percentile-calculator.ts` - Main calculator implementation
+- `src/lib/candidate/percentile-calculator.test.ts` - 31 unit tests with 100% coverage
+
+### Files modified
+- `src/lib/candidate/index.ts` - Export new module
+
+### API Design
+```typescript
+// Calculate percentiles for a specific assessment
+const result = await calculatePercentiles(assessmentId);
+// Returns: { dimensions: Record<AssessmentDimension, number>, overall: number, metadata: {...} }
+
+// Calculate and store in assessment report
+await calculateAndStorePercentiles(assessmentId);
+// Stores in Assessment.report.percentiles JSON field
+
+// Get stored percentiles
+const percentiles = await getStoredPercentiles(assessmentId);
+// Returns: { COMMUNICATION: 75, PROBLEM_SOLVING: 60, overall: 70 }
+
+// Human-readable description
+getPercentileDescription(85); // "Top 25%"
+```
+
+### Percentile Formula
+`percentile = (candidates_below / total_candidates) * 100`
+
+- Counts how many completed assessments scored strictly lower
+- Ties are not counted as "below"
+- Missing dimensions default to 50th percentile
+- Overall percentile based on average score across all dimensions
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes
+- Tests pass: 31/31 tests passing
+- Lint passes: No ESLint warnings or errors
+
+### Learnings for future iterations
+- The `VideoAssessment` model stores dimension scores separately from `Assessment`
+- `DimensionScore` records are linked to `VideoAssessment`, not `Assessment` directly
+- Percentiles should be cached in the report JSON to avoid recalculating on every view
+- Consider adding a scheduled job to recalculate percentiles when pool size changes significantly
+
+### Gotchas discovered
+- The `AssessmentDimension` enum is from Prisma (`@prisma/client`), not from `@/types`
+- Video assessments must be in COMPLETED status to be included in percentile calculations
+- When only one assessment exists, percentile is always 0 (no one scored below)
+- The `report` field is Json type, so need to cast when reading/writing
+
+### Acceptance Criteria Status
+- [x] Create `src/lib/candidate/percentile-calculator.ts` with `calculatePercentiles()` function
+- [x] Percentiles calculated per dimension (1-5 score → percentile rank against all completed assessments)
+- [x] Percentiles calculated for overall score
+- [x] Function accepts `assessmentId` and returns `{ dimension: percentile }` map
+- [x] Percentiles stored in `Assessment.report.percentiles` JSON field (no schema change needed)
+- [x] Typecheck passes
+
+---
+
 ## Issue #198: RF-026 - Consolidate welcome page into join page
 
 ### What was implemented

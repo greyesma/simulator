@@ -1,7 +1,10 @@
-// Candidate utilities - archetype-weights, candidate-search, cv-parser, embeddings, entity-extraction, feedback-parsing, seniority-thresholds
+// Candidate utilities - archetype-weights, candidate-search, cv-parser, embeddings, entity-extraction, feedback-parsing, percentile-calculator, seniority-thresholds
 
 // archetype-weights exports (DimensionScoreInput defined here - canonical source)
 export * from "./archetype-weights";
+
+// percentile-calculator exports
+export * from "./percentile-calculator";
 
 // candidate-search exports
 export * from "./candidate-search";
