@@ -4,13 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
   LayoutDashboard,
   FolderOpen,
   Users,
-  Settings,
-  LogOut,
   PanelLeftClose,
   PanelLeft,
   FileText,
@@ -48,7 +45,7 @@ export function RecruiterSidebar({ user }: RecruiterSidebarProps) {
       } flex flex-col border-r border-stone-200 bg-white transition-all duration-300`}
     >
       {/* Logo */}
-      <div className="flex h-16 items-center justify-between px-4 border-b border-stone-200">
+      <div className="flex h-[72px] items-center justify-between px-4 border-b border-stone-200">
         {sidebarOpen && (
           <Link href="/recruiter/dashboard" className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center">
@@ -110,22 +107,10 @@ export function RecruiterSidebar({ user }: RecruiterSidebarProps) {
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-stone-200 p-3">
-        {sidebarOpen && (
-          <Button
-            asChild
-            variant="ghost"
-            className="w-full justify-start gap-2 text-stone-600 mb-2"
-          >
-            <Link href="/">
-              <LogOut className="h-4 w-4" />
-              Exit to Home
-            </Link>
-          </Button>
-        )}
+      <div className="flex h-[72px] items-center border-t border-stone-200 px-3">
         {sidebarOpen ? (
-          <div className="flex items-center gap-3 p-2 rounded-lg bg-stone-50">
-            <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center">
+          <div className="flex items-center gap-3 p-2 rounded-lg bg-stone-50 w-full">
+            <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
               <span className="text-sm font-medium text-blue-700">
                 {user.name?.charAt(0) || user.email?.charAt(0) || "U"}
               </span>
@@ -138,12 +123,7 @@ export function RecruiterSidebar({ user }: RecruiterSidebarProps) {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-2">
-            <Button asChild variant="ghost" size="icon" className="h-9 w-9">
-              <Link href="/">
-                <LogOut className="h-4 w-4" />
-              </Link>
-            </Button>
+          <div className="flex w-full justify-center">
             <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center">
               <span className="text-sm font-medium text-blue-700">
                 {user.name?.charAt(0) || user.email?.charAt(0) || "U"}

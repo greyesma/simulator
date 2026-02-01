@@ -6,7 +6,7 @@ export default async function RecruiterScenarioBuilderPage() {
   await requireRecruiter();
 
   return (
-    <div className="flex h-[calc(100vh-73px)] flex-col">
+    <div className="flex h-full flex-col">
       <RecruiterScenarioBuilderClient />
     </div>
   );

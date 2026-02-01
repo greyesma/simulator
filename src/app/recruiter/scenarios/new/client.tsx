@@ -237,7 +237,7 @@ export function RecruiterScenarioBuilderClient() {
       {/* Chat Panel */}
       <div className="flex flex-1 flex-col border-r border-border">
         {/* Header */}
-        <header className="flex items-center gap-3 border-b border-border bg-background px-4 py-3">
+        <header className="flex h-[72px] items-center gap-3 border-b border-border bg-background px-4">
           <Avatar>
             <AvatarFallback className="bg-primary text-primary-foreground">
               AI
@@ -262,15 +262,6 @@ export function RecruiterScenarioBuilderClient() {
             </div>
           ) : (
             <div className="mx-auto max-w-3xl space-y-4">
-              {/* Date divider */}
-              <div className="mb-6 flex items-center gap-4">
-                <div className="h-px flex-1 bg-border" />
-                <Badge variant="outline" className="bg-background">
-                  Today
-                </Badge>
-                <div className="h-px flex-1 bg-border" />
-              </div>
-
               {messages.map((message, index) => (
                 <div key={index} className="flex gap-3">
                   {/* Avatar */}
@@ -333,8 +324,8 @@ export function RecruiterScenarioBuilderClient() {
         )}
 
         {/* Input area */}
-        <footer className="border-t border-border bg-background px-4 py-3">
-          <div className="mx-auto flex max-w-3xl gap-2">
+        <footer className="flex h-[72px] items-center border-t border-border bg-background px-4">
+          <div className="mx-auto flex w-full max-w-3xl gap-2">
             <Input
               ref={inputRef}
               type="text"
@@ -359,7 +350,7 @@ export function RecruiterScenarioBuilderClient() {
 
       {/* Preview Panel */}
       <div className="flex w-96 flex-col bg-muted/20">
-        <header className="border-b border-border bg-background px-4 py-3">
+        <header className="flex h-[72px] flex-col justify-center border-b border-border bg-background px-4">
           <h2 className="text-lg font-semibold">Preview</h2>
           <p className="text-sm text-muted-foreground">
             Scenario data collected so far
@@ -370,7 +361,7 @@ export function RecruiterScenarioBuilderClient() {
           <ScenarioPreview data={scenarioData} />
         </div>
 
-        <footer className="border-t border-border bg-background p-4">
+        <footer className="flex h-[72px] flex-col justify-center border-t border-border bg-background px-4">
           <Button
             onClick={saveScenario}
             disabled={!isReadyToSave || isSaving}
