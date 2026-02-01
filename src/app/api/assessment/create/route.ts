@@ -78,12 +78,12 @@ export async function POST(request: Request) {
     });
   }
 
-  // Create new assessment with WELCOME status
+  // Create new assessment with WORKING status (skips welcome page)
   const assessment = await db.assessment.create({
     data: {
       userId,
       scenarioId,
-      status: "WELCOME",
+      status: "WORKING",
     },
   });
 

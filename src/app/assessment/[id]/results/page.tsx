@@ -42,15 +42,6 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
     redirect("/");
   }
 
-  // Redirect based on status
-  if (assessment.status === "WELCOME") {
-    redirect(`/assessment/${id}/welcome`);
-  }
-
-  if (assessment.status === "WORKING") {
-    redirect(`/assessment/${id}/chat`);
-  }
-
   // Only COMPLETED assessments can view results
   if (assessment.status !== "COMPLETED") {
     redirect(`/assessment/${id}/chat`);

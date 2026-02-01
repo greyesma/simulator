@@ -518,7 +518,7 @@ export default async function ProfilePage() {
                         {assessment.status !== "COMPLETED" && (
                           <Button size="sm" asChild>
                             <Link
-                              href={`/assessment/${assessment.id}/welcome`}
+                              href={`/assessment/${assessment.id}/chat`}
                             >
                               Continue Assessment
                             </Link>

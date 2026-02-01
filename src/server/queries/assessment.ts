@@ -48,30 +48,6 @@ export async function getAssessmentForChat(id: string, userId: string) {
 }
 
 /**
- * Get assessment for welcome page.
- * Includes scenario with coworkers.
- */
-export async function getAssessmentForWelcome(id: string, userId: string) {
-  const assessment = await db.assessment.findUnique({
-    where: { id },
-    include: {
-      scenario: {
-        include: {
-          coworkers: true,
-        },
-      },
-    },
-  });
-
-  // Verify ownership
-  if (!assessment || assessment.userId !== userId) {
-    return null;
-  }
-
-  return assessment;
-}
-
-/**
  * Get assessment for results page.
  * Includes scenario name and user info for report display.
  */

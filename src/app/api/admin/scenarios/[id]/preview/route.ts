@@ -55,15 +55,12 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   // Determine starting status and URL based on skipTo
-  // Default: start at welcome page (new recruiter-focused flow)
-  let status: "WELCOME" | "WORKING" = "WELCOME";
-  let urlSuffix = "/welcome";
+  // Default: start at chat page (consolidated flow - no separate welcome page)
+  const status: "WORKING" = "WORKING";
+  const urlSuffix = "/chat";
 
-  if (skipTo === "coworkers") {
-    // Skip directly to the working/coworker chat phase
-    status = "WORKING";
-    urlSuffix = "/chat";
-  }
+  // Note: skipTo parameter is now unused since welcome page was removed
+  void skipTo;
 
   // Create a preview assessment for this admin
   const assessment = await db.assessment.create({
