@@ -1,5 +1,66 @@
 # Ralph Progress Log
 
+## Issue #204: US-006 - Video evidence player with timestamp seeking
+
+### What was implemented
+- Created `src/components/recruiter/VideoEvidencePlayer.tsx` (pure UI component)
+- Component features:
+  - HTML5 video element with native controls
+  - `seekTo(seconds)` method exposed via React ref (`forwardRef`/`useImperativeHandle`)
+  - MM:SS timestamp overlay on the video
+  - Sticky positioning for visibility while scrolling
+  - Fallback message when `videoUrl` is null
+  - Responsive: full width on mobile, fixed 400px on desktop
+- Extracted timestamp utilities to `src/lib/utils/timestamp.ts`:
+  - `parseTimestampToSeconds()` - Converts "2:34" or "1:23:45" to seconds
+  - `formatSecondsToTimestamp()` - Converts seconds to MM:SS or HH:MM:SS format
+
+### Props interface
+```typescript
+interface VideoEvidencePlayerProps {
+  videoUrl: string | null;
+  currentTime?: number;
+  onTimeUpdate?: (seconds: number) => void;
+  className?: string;
+}
+
+// Ref handle for external control
+interface VideoEvidencePlayerHandle {
+  seekTo: (seconds: number) => void;
+}
+```
+
+### Files created
+- `src/components/recruiter/VideoEvidencePlayer.tsx`
+- `src/lib/utils/timestamp.ts`
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes
+
+### Learnings for future iterations
+- `forwardRef` with `useImperativeHandle` is the pattern for exposing methods to parent components
+- The video controls overlap with the bottom area, so timestamp overlay is positioned at `bottom-12` to avoid overlap
+- Sticky positioning with `z-10` ensures video stays visible while scrolling dimension cards
+- Extracted timestamp utilities can be reused across components (DimensionScoreCard, VideoEvidencePlayer, candidate detail page)
+
+### Gotchas discovered
+- The existing candidate detail page (`src/app/candidate/[id]/client.tsx`) has similar `parseTimestampToSeconds` and `formatTime` functions - consolidating to shared utility prevents duplication
+- Video `currentTime` property needs to be synced carefully - only update if difference > 0.5s to prevent jitter
+- The native video element's timestamp display overlaps with a custom overlay, so custom overlay is positioned above the controls
+
+### Acceptance Criteria Status
+- [x] Create `src/components/recruiter/VideoEvidencePlayer.tsx`
+- [x] Component props: `{ videoUrl, currentTime, onTimeUpdate }`
+- [x] Uses native HTML5 video element
+- [x] `seekTo(seconds)` method exposed via ref
+- [x] Displays current timestamp as MM:SS overlay
+- [x] Sticky positioning when scrolling
+- [x] Fallback message if videoUrl is null
+- [x] Responsive: full width on mobile, fixed 400px on desktop
+- [x] Typecheck passes
+
+---
+
 ## Issue #203: US-005 - Dimension score card with evidence timeline
 
 ### What was implemented
