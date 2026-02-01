@@ -2551,3 +2551,67 @@ The client code was incorrectly destructuring `scenario` directly from the JSON 
 - The `success()` helper wraps all successful responses - need to destructure from `data` property first
 - TypeScript doesn't catch this error because `json()` returns `Promise<any>`
 
+---
+
+## Issue #211: US-013 - Quick decision panel on candidate detail page
+
+### What was implemented
+- Created `src/components/recruiter/QuickDecisionPanel.tsx` (pure UI component)
+- Component provides a TL;DR summary for busy hiring managers with:
+  - Large strength level badge (Exceptional/Strong/Proficient/Developing) with contextual styling
+  - Overall score + percentile (prominent display)
+  - "Where they shined" - top 2 dimensions by percentile with brief behavior quote
+  - "Areas to probe" - dimensions with score < 3 or trainableGap = true
+  - "Jump to evidence" - clickable timestamp links to video player
+  - "Compare" button linking to comparison page
+
+### Props interface
+```typescript
+interface QuickDecisionPanelProps {
+  assessmentId: string;
+  overallScore: number;
+  overallPercentile: number | null;
+  strengthLevel: "Exceptional" | "Strong" | "Proficient" | "Developing";
+  dimensionScores: DimensionData[];
+  onTimestampClick: (seconds: number) => void;
+  className?: string;
+}
+```
+
+### Files created
+- `src/components/recruiter/QuickDecisionPanel.tsx`
+
+### Design Features
+- **Desktop**: Sticky sidebar (`lg:sticky lg:top-6`) for persistent visibility
+- **Mobile**: Collapsible header with toggle button (strength badge + score visible when collapsed)
+- **Strength level styling**:
+  - Exceptional: Gold gradient background (`from-amber-400 to-yellow-500`)
+  - Strong: Green background (`bg-green-50`)
+  - Proficient: Blue background (`bg-blue-50`)
+  - Developing: Gray background (`bg-stone-50`)
+- **Border colors** match strength level for container
+- **Timestamp chips** with blue styling and hover underline effect
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes
+
+### Learnings for future iterations
+- The `parseTimestampToSeconds` function from `@/lib/utils/timestamp` returns `number | null`, so null check is required before calling callbacks
+- Top dimensions are determined by percentile (not score) for "Where they shined" section
+- Brief behavior quotes are extracted from first sentence or truncated to ~80 characters
+- Sticky positioning with `lg:self-start` prevents the panel from stretching in flex layouts
+
+### Gotchas discovered
+- The `DimensionData` interface uses `observableBehaviors: string` (single string) unlike the `DimensionScoreCard` which uses `string[]` - parent component needs to provide appropriate format
+- Areas to probe only shows if there are dimensions with score < 3 OR trainableGap = true, otherwise the section is hidden
+- The component is a pure UI component - integration with the candidate detail page is a separate task
+
+### Acceptance Criteria Status
+- [x] Create `src/components/recruiter/QuickDecisionPanel.tsx`
+- [x] Panel appears as sticky sidebar (desktop) or collapsible header (mobile)
+- [x] Contains: Large strength level, Overall score + percentile, "Where they shined", "Areas to probe", "Jump to evidence", "Compare" button
+- [x] "Where they shined" shows dimension name + one-line behavior quote
+- [x] "Areas to probe" only shows if score < 3 or trainableGap = true
+- [x] Timestamps in "Jump to evidence" link to video player (via onTimestampClick callback)
+- [x] Typecheck passes
+
