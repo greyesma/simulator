@@ -1,5 +1,47 @@
 # Ralph Progress Log
 
+## Issue #210: US-012 - Add scores and ranking to recruiter candidates list
+
+### What was implemented
+- Updated `src/app/recruiter/candidates/page.tsx` to fetch video assessment scores
+- Updated `src/app/recruiter/candidates/client.tsx` to display score data
+
+### Features added
+- **Score column**: Shows overall score as filled/empty circles (1-5 scale)
+- **Percentile column**: Shows percentile badge with "Top X%" format
+- **Strength level column**: Badge styled per level (Exceptional=gold, Strong=green, Proficient=blue, Developing=gray)
+- **Sort options**: "Highest score" (default), "Most recent", "Name A-Z"
+- **Clickable rows**: Completed assessments navigate to candidate detail page
+- **Non-completed handling**: Shows "—" for score columns on non-completed assessments
+
+### Files changed
+- `src/app/recruiter/candidates/page.tsx` - Fetch video assessment scores and percentiles
+- `src/app/recruiter/candidates/client.tsx` - Display score columns, add sorting
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes
+
+### Learnings for future iterations
+- Prisma includes scalar fields (like `report`) by default, no need to explicitly select them
+- `VideoAssessmentStatus.COMPLETED` must be imported from `@prisma/client`
+- Row click handlers should skip navigation in compare mode
+- Links inside clickable rows need `e.stopPropagation()` to prevent row click
+
+### Gotchas discovered
+- Percentile is stored in `assessment.report.percentiles.overall` after US-001
+- Score calculation requires averaging dimension scores from `videoAssessment.scores`
+- Sort by highest score should put completed assessments with scores first, then fall back to most recent for non-scored items
+
+### Acceptance Criteria Status
+- [x] Update `src/app/recruiter/candidates/client.tsx` to show additional columns (overall score, percentile, strength level)
+- [x] Sort options: "Highest score", "Most recent", "Name A-Z"
+- [x] Default sort by highest score for completed assessments
+- [x] Clicking row navigates to candidate detail page (`/recruiter/candidates/[assessmentId]`)
+- [x] Only show score columns for COMPLETED assessments (others show "-")
+- [x] Typecheck passes
+
+---
+
 ## Issue #207: US-009 - Side-by-side candidate comparison page
 
 ### What was implemented
