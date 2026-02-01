@@ -1,5 +1,76 @@
 # Ralph Progress Log
 
+## Issue #200: US-002 - API endpoint for recruiter candidate detail data
+
+### What was implemented
+- Created `src/app/api/recruiter/candidate/[assessmentId]/route.ts` with GET endpoint
+- Returns comprehensive candidate assessment data for recruiter scorecard view
+- Data includes:
+  - Candidate info (name, email)
+  - All 8 dimension scores with observableBehaviors and timestamps
+  - Video URL from VideoAssessment
+  - Percentiles (from US-001 via `getStoredPercentiles`)
+  - Candidate strength level (Exceptional/Strong/Proficient/Developing based on 4.5/3.5/2.5 thresholds)
+  - Green flags and red flags arrays (from hiringSignals)
+  - Overall summary narrative
+  - Code review data (if exists)
+  - PR URL (if exists)
+  - Full hiring signals object
+
+### Authorization
+- Validates recruiter owns the simulation via `scenario.createdById` check
+- Returns 403 if recruiter doesn't own the simulation
+- Returns 404 if assessment not found
+- Admin role bypasses ownership check
+
+### Files created
+- `src/app/api/recruiter/candidate/[assessmentId]/route.ts` - Main endpoint implementation
+
+### API Design
+```typescript
+// GET /api/recruiter/candidate/[assessmentId]
+// Returns CandidateDetailResponse with:
+{
+  assessmentId: string;
+  candidate: { name: string | null; email: string | null };
+  overallScore: number;
+  strengthLevel: "Exceptional" | "Strong" | "Proficient" | "Developing";
+  dimensionScores: DimensionScoreData[];
+  percentiles: Record<string, number> | null;
+  videoUrl: string | null;
+  greenFlags: string[];
+  redFlags: string[];
+  overallSummary: string;
+  codeReview: CodeReviewData | null;
+  prUrl: string | null;
+  hiringSignals: HiringSignals | null;
+}
+```
+
+### Verification
+- TypeScript compiles: `npm run typecheck` passes
+
+### Learnings for future iterations
+- The `VideoAssessment` model stores dimension scores in `DimensionScore` table, not in JSON
+- The `rawAiResponse` in VideoAssessmentSummary contains the full video evaluation output including hiringSignals
+- Percentiles are stored separately in the Assessment.report JSON field and accessed via `getStoredPercentiles`
+- The scenario's `createdById` field links recruiters to their assessments for authorization
+
+### Gotchas discovered
+- The `timestamps` field in DimensionScore is stored as Json type, needs casting to string[]
+- Green/red flags are nested under `hiringSignals.overallGreenFlags` and `hiringSignals.overallRedFlags` in rawAiResponse
+- Overall summary can come from either `rawAiResponse.overall_summary` or `summary.overallSummary`
+
+### Acceptance Criteria Status
+- [x] Create `src/app/api/recruiter/candidate/[assessmentId]/route.ts`
+- [x] GET endpoint returns assessment with all required data
+- [x] Endpoint validates recruiter owns the simulation (createdById check)
+- [x] Returns 403 if recruiter doesn't own the simulation
+- [x] Returns 404 if assessment not found
+- [x] Typecheck passes
+
+---
+
 ## Issue #199: US-001 - Add percentile calculation for candidate scores
 
 ### What was implemented
