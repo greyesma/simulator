@@ -25,10 +25,13 @@ import {
   Calendar,
   Clock,
   Filter,
-  ExternalLink,
   GitCompare,
   X,
+  ArrowUpDown,
+  TrendingUp,
 } from "lucide-react";
+
+type StrengthLevel = "Exceptional" | "Strong" | "Proficient" | "Developing";
 
 interface CandidateData {
   id: string;
@@ -43,6 +46,10 @@ interface CandidateData {
     id: string;
     name: string;
   };
+  // Score data for completed assessments (null for non-completed)
+  overallScore: number | null;
+  overallPercentile: number | null;
+  strengthLevel: StrengthLevel | null;
 }
 
 interface ScenarioOption {
@@ -57,6 +64,53 @@ interface RecruiterCandidatesClientProps {
 
 const MAX_COMPARE_CANDIDATES = 4;
 
+type SortOption = "highest_score" | "most_recent" | "name_az";
+
+/**
+ * Get strength level badge styling
+ */
+function getStrengthBadgeStyles(level: StrengthLevel): string {
+  switch (level) {
+    case "Exceptional":
+      return "bg-gradient-to-r from-amber-400 to-yellow-500 text-amber-950 border-0";
+    case "Strong":
+      return "bg-green-100 text-green-700 border-0";
+    case "Proficient":
+      return "bg-blue-100 text-blue-700 border-0";
+    case "Developing":
+      return "bg-stone-100 text-stone-600 border-0";
+  }
+}
+
+/**
+ * Get percentile badge color based on percentile value
+ */
+function getPercentileBadgeColor(percentile: number): string {
+  if (percentile >= 90) return "bg-green-100 text-green-700";
+  if (percentile >= 75) return "bg-blue-100 text-blue-700";
+  if (percentile >= 50) return "bg-stone-100 text-stone-600";
+  return "bg-red-100 text-red-700";
+}
+
+/**
+ * Render score as filled/empty circles (1-5 scale)
+ */
+function ScoreCircles({ score }: { score: number }) {
+  const roundedScore = Math.round(score);
+  return (
+    <div className="flex items-center gap-0.5" title={`${score.toFixed(1)}/5`}>
+      {[1, 2, 3, 4, 5].map((i) => (
+        <span
+          key={i}
+          className={i <= roundedScore ? "text-blue-600" : "text-stone-300"}
+        >
+          {i <= roundedScore ? "●" : "○"}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function RecruiterCandidatesClient({
   candidates,
   scenarioOptions,
@@ -66,6 +120,7 @@ export function RecruiterCandidatesClient({
 
   const [scenarioFilter, setScenarioFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sortOption, setSortOption] = useState<SortOption>("highest_score");
   const [compareMode, setCompareMode] = useState(false);
   const [selectedCandidates, setSelectedCandidates] = useState<Set<string>>(
     new Set()
@@ -129,14 +184,41 @@ export function RecruiterCandidatesClient({
   const canSelectMore = selectedCandidates.size < MAX_COMPARE_CANDIDATES;
 
   const filteredCandidates = useMemo(() => {
-    return candidates.filter((candidate) => {
+    // Filter first
+    const filtered = candidates.filter((candidate) => {
       const matchesScenario =
         scenarioFilter === "all" || candidate.scenario.id === scenarioFilter;
       const matchesStatus =
         statusFilter === "all" || candidate.status === statusFilter;
       return matchesScenario && matchesStatus;
     });
-  }, [candidates, scenarioFilter, statusFilter]);
+
+    // Then sort
+    return [...filtered].sort((a, b) => {
+      switch (sortOption) {
+        case "highest_score":
+          // Completed with scores first, then by score descending
+          if (a.overallScore !== null && b.overallScore !== null) {
+            return b.overallScore - a.overallScore;
+          }
+          if (a.overallScore !== null) return -1;
+          if (b.overallScore !== null) return 1;
+          // For non-scored items, fall back to most recent
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+
+        case "most_recent":
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+
+        case "name_az":
+          const nameA = a.user.name?.toLowerCase() ?? "";
+          const nameB = b.user.name?.toLowerCase() ?? "";
+          return nameA.localeCompare(nameB);
+
+        default:
+          return 0;
+      }
+    });
+  }, [candidates, scenarioFilter, statusFilter, sortOption]);
 
   const formatDate = (dateString: string) => {
     return new Intl.DateTimeFormat("en-US", {
@@ -194,6 +276,21 @@ export function RecruiterCandidatesClient({
             <option value="WORKING">Working</option>
             <option value="COMPLETED">Completed</option>
           </select>
+
+          <div className="flex items-center gap-2 ml-4">
+            <ArrowUpDown className="h-4 w-4 text-stone-500" />
+            <span className="text-sm font-medium text-stone-700">Sort:</span>
+          </div>
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value as SortOption)}
+            className="rounded-md border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="highest_score">Highest score</option>
+            <option value="most_recent">Most recent</option>
+            <option value="name_az">Name A-Z</option>
+          </select>
+
           {(scenarioFilter !== "all" || statusFilter !== "all") && (
             <Button
               variant="ghost"
@@ -285,6 +382,9 @@ export function RecruiterCandidatesClient({
                   <TableHead>Candidate</TableHead>
                   <TableHead>Scenario</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Score</TableHead>
+                  <TableHead>Percentile</TableHead>
+                  <TableHead>Strength</TableHead>
                   <TableHead>
                     <div className="flex items-center gap-1.5">
                       <Calendar className="h-3.5 w-3.5" />
@@ -297,7 +397,6 @@ export function RecruiterCandidatesClient({
                       Completed
                     </div>
                   </TableHead>
-                  <TableHead className="w-[80px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -306,10 +405,21 @@ export function RecruiterCandidatesClient({
                   const isSelected = selectedCandidates.has(candidate.id);
                   const canSelect = isCompleted && (isSelected || canSelectMore);
 
+                  const handleRowClick = () => {
+                    if (!compareMode && isCompleted) {
+                      router.push(`/recruiter/candidates/${candidate.id}`);
+                    }
+                  };
+
                   return (
                     <TableRow
                       key={candidate.id}
-                      className={`hover:bg-stone-50 ${
+                      onClick={handleRowClick}
+                      className={`${
+                        !compareMode && isCompleted
+                          ? "cursor-pointer hover:bg-stone-100"
+                          : "hover:bg-stone-50"
+                      } ${
                         compareMode && isSelected
                           ? "bg-blue-50 hover:bg-blue-50"
                           : ""
@@ -379,6 +489,7 @@ export function RecruiterCandidatesClient({
                       <Link
                         href={`/recruiter/scenarios/${candidate.scenario.id}`}
                         className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         {candidate.scenario.name}
                       </Link>
@@ -394,6 +505,37 @@ export function RecruiterCandidatesClient({
                         {candidate.status}
                       </Badge>
                     </TableCell>
+                    {/* Score column */}
+                    <TableCell>
+                      {candidate.overallScore !== null ? (
+                        <ScoreCircles score={candidate.overallScore} />
+                      ) : (
+                        <span className="text-stone-400">—</span>
+                      )}
+                    </TableCell>
+                    {/* Percentile column */}
+                    <TableCell>
+                      {candidate.overallPercentile !== null ? (
+                        <Badge
+                          className={`text-xs ${getPercentileBadgeColor(candidate.overallPercentile)}`}
+                        >
+                          <TrendingUp className="mr-1 h-3 w-3" />
+                          Top {Math.round(100 - candidate.overallPercentile)}%
+                        </Badge>
+                      ) : (
+                        <span className="text-stone-400">—</span>
+                      )}
+                    </TableCell>
+                    {/* Strength level column */}
+                    <TableCell>
+                      {candidate.strengthLevel !== null ? (
+                        <Badge className={`text-xs ${getStrengthBadgeStyles(candidate.strengthLevel)}`}>
+                          {candidate.strengthLevel}
+                        </Badge>
+                      ) : (
+                        <span className="text-stone-400">—</span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-sm text-stone-500">
                       {formatDateTime(candidate.createdAt)}
                     </TableCell>
@@ -401,17 +543,6 @@ export function RecruiterCandidatesClient({
                       {candidate.completedAt
                         ? formatDate(candidate.completedAt)
                         : "—"}
-                    </TableCell>
-                    <TableCell>
-                      {candidate.status === "COMPLETED" && (
-                        <Link
-                          href={`/recruiter/candidates/${candidate.id}`}
-                          className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
-                        >
-                          View
-                          <ExternalLink className="h-3.5 w-3.5" />
-                        </Link>
-                      )}
                     </TableCell>
                     </TableRow>
                   );
