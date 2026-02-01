@@ -1,5 +1,38 @@
 # Ralph Progress Log
 
+## Issue #198: RF-026 - Consolidate welcome page into join page
+
+### What was implemented
+- Removed separate `/assessment/[id]/welcome` page
+- Redesigned join page with v19-style split-panel layout and 4-step onboarding
+- Step 1: Welcome - company intro with "YOUR NEXT ROLE" typography
+- Step 2: The Experience - AI teammates, screen recording, AI tools (gray icons)
+- Step 3: Your Mission - "THE CASE", tech stack, intentionally vague context tip
+- Step 4: Ready/Auth - "READY. GO." in blue, Google + email auth with consent
+- Returning users skip directly to step 4
+
+### Files changed
+- `src/app/join/[scenarioId]/client.tsx` - Complete redesign with framer-motion animations
+- `src/app/api/assessment/create/route.ts` - Set WORKING status instead of WELCOME
+- `src/app/api/admin/scenarios/[id]/preview/route.ts` - Update default to WORKING/chat
+- `src/app/assessment/[id]/results/page.tsx` - Remove WELCOME redirect
+- `src/app/profile/page.tsx` - Update link to /chat
+- `src/server/queries/assessment.ts` - Remove getAssessmentForWelcome
+
+### Files deleted
+- `src/app/assessment/[id]/welcome/page.tsx`
+- `src/app/assessment/[id]/welcome/client.tsx`
+- `src/app/api/assessment/start/route.ts`
+- `src/app/ui-tester/current-test/*`
+
+### Learnings
+- framer-motion AnimatePresence with mode="wait" creates smooth step transitions
+- v19 design pattern: dark left panel (narrative), white right panel (interaction)
+- Consolidating flows reduces user friction (fewer clicks to start assessment)
+- When removing a status (WELCOME), update all redirects and initial status creation
+
+---
+
 ## Issue #188: RF-020 - End-to-end flow verification
 
 ### What was verified
