@@ -180,34 +180,42 @@ export const DECORATIVE_TEAM_MEMBERS: DecorativeTeamMember[] = [
   {
     name: "Maya Torres",
     role: "Product Designer",
+    avatarUrl: "/avatars/maya-torres.jpg",
   },
   {
     name: "Derek Washington",
     role: "Data Scientist",
+    avatarUrl: "/avatars/derek-washington.jpg",
   },
   {
     name: "Priya Sharma",
     role: "DevOps Engineer",
+    avatarUrl: "/avatars/priya-sharma.jpg",
   },
   {
     name: "Marcus Lee",
     role: "Frontend Engineer",
+    avatarUrl: "/avatars/marcus-lee.jpg",
   },
   {
     name: "Sofia Andersson",
     role: "UX Researcher",
+    avatarUrl: "/avatars/sofia-andersson.jpg",
   },
   {
     name: "James O'Brien",
     role: "Backend Engineer",
+    avatarUrl: "/avatars/james-obrien.jpg",
   },
   {
     name: "Nina Volkov",
     role: "Engineering Manager",
+    avatarUrl: "/avatars/nina-volkov.jpg",
   },
   {
     name: "Carlos Mendez",
     role: "Machine Learning Engineer",
+    avatarUrl: "/avatars/carlos-mendez.jpg",
   },
 ];
 
