@@ -2801,3 +2801,26 @@ if (extraction.newCoworker) {
 - [x] Typography is readable with proper contrast ratios
 - [x] Colors only affect simulation chat interface (scoped with .slack-theme)
 - [x] Typecheck passes
+
+## Issue #213: US-301: Redesign chat interface with dark Slack-inspired theme using our dark blue
+
+**What was implemented:**
+- Added scoped Slack-themed CSS variables to globals.css using `.slack-theme` class
+- Updated sidebar background to dark navy (HSL 217 25% 12%)
+- Updated main chat panel to slightly lighter dark (HSL 217 20% 16%)
+- Replaced ring/shadow highlights with blue left-border for selected state
+- Applied dark theme colors across all chat components
+
+**Files changed:**
+- src/app/globals.css - Added .slack-theme CSS variables
+- src/components/chat/slack-layout.tsx - Applied dark theme with inline styles
+- src/components/chat/chat.tsx - Updated chat panel and message styling
+- src/components/chat/floating-call-bar.tsx - Updated call bar theming
+- src/components/chat/coworker-avatar.tsx - No changes needed (already dark-compatible)
+
+**Learnings for future iterations:**
+- Use inline styles with HSL values for component-scoped theming to avoid affecting global styles
+- Always combine duplicate style props in JSX to avoid TypeScript errors (e.g., merge animationDelay into single style object)
+- Screenshots are essential for UI tasks - use agent-browser skill with E2E_TEST_MODE
+- The dark theme is scoped only to the simulation interface, not the entire app
+- Slack uses sharp corners for main panels, not rounded corners
