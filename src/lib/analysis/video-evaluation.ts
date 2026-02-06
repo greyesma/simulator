@@ -2,10 +2,11 @@
  * Video Evaluation Service
  *
  * Server-side service that sends simulation videos to Gemini 3 Pro for evaluation.
- * Produces dimension scores with evidence and timestamps.
+ * Produces dimension scores with evidence and timestamps using data-driven rubrics.
  * Includes comprehensive logging for all assessment events (US-020).
  *
  * @since 2026-01-16
+ * @updated 2026-02-06 - Migrated to data-driven rubric system
  */
 
 import { gemini } from "@/lib/ai/gemini";
@@ -13,20 +14,24 @@ import { db } from "@/server/db";
 import { withRetry } from "@/lib/core";
 import { createVideoAssessmentLogger } from "@/lib/analysis";
 import { generateAndStoreEmbeddings } from "@/lib/candidate";
+import { loadRubricForRoleFamily } from "@/lib/rubric";
 import {
-  buildVideoEvaluationPrompt,
-  type VideoEvaluationOutput,
-  type AssessmentDimensionType,
-} from "@/prompts/analysis/video-evaluation";
+  buildRubricEvaluationPrompt,
+  RUBRIC_EVALUATION_PROMPT_VERSION,
+  type RubricPromptInput,
+} from "@/prompts/analysis/rubric-evaluation";
 import {
-  AssessmentDimension,
   AssessmentLogEventType,
   VideoAssessmentStatus,
 } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
+import type { RubricAssessmentOutput } from "@/types";
 
 // Model for video evaluation (Gemini 3 Pro)
 const VIDEO_EVALUATION_MODEL = "gemini-3-pro-preview";
+
+// Default role family when none is specified
+const DEFAULT_ROLE_FAMILY_SLUG = "engineering";
 
 // ============================================================================
 // Types
@@ -36,7 +41,7 @@ export interface VideoEvaluationResult {
   success: boolean;
   assessmentId: string;
   overallScore: number | null;
-  dimensionScores: Map<AssessmentDimension, number | null>;
+  dimensionScores: Map<string, number | null>;
   summary: string | null;
   error?: string;
 }
@@ -47,6 +52,8 @@ export interface EvaluateVideoOptions {
   videoDurationMinutes?: number;
   taskDescription?: string;
   expectedOutcomes?: string[];
+  /** Role family slug for rubric selection (defaults to "engineering") */
+  roleFamilySlug?: string;
 }
 
 // ============================================================================
@@ -74,9 +81,9 @@ function cleanJsonResponse(response: string): string {
 }
 
 /**
- * Parses and validates the Gemini evaluation response
+ * Parses and validates the Gemini evaluation response against the rubric output schema
  */
-function parseEvaluationResponse(responseText: string): VideoEvaluationOutput {
+function parseEvaluationResponse(responseText: string): RubricAssessmentOutput {
   const cleaned = cleanJsonResponse(responseText);
   const parsed = JSON.parse(cleaned);
 
@@ -93,26 +100,42 @@ function parseEvaluationResponse(responseText: string): VideoEvaluationOutput {
     throw new Error("Missing or invalid overall_summary in response");
   }
 
-  return parsed as VideoEvaluationOutput;
-}
+  // Map the raw response to RubricAssessmentOutput
+  const dimensionScores = Object.entries(parsed.dimension_scores).map(
+    ([slug, data]: [string, Record<string, unknown>]) => ({
+      dimensionSlug: slug,
+      dimensionName: slug, // Will be enriched from rubric data
+      score: (data.score as number | null) ?? null,
+      confidence: (data.confidence as string) ?? "medium",
+      rationale: (data.rationale as string) ?? "",
+      observableBehaviors: (data.observable_behaviors as string[]) ?? [],
+      timestamps: (data.timestamps as string[]) ?? [],
+      trainableGap: (data.trainable_gap as boolean) ?? false,
+      greenFlags: (data.green_flags as string[]) ?? [],
+      redFlags: (data.red_flags as string[]) ?? [],
+    })
+  );
 
-/**
- * Maps string dimension name to Prisma AssessmentDimension enum
- */
-function mapDimensionToEnum(
-  dimension: AssessmentDimensionType
-): AssessmentDimension {
-  const mapping: Record<AssessmentDimensionType, AssessmentDimension> = {
-    COMMUNICATION: AssessmentDimension.COMMUNICATION,
-    PROBLEM_SOLVING: AssessmentDimension.PROBLEM_SOLVING,
-    TECHNICAL_KNOWLEDGE: AssessmentDimension.TECHNICAL_KNOWLEDGE,
-    COLLABORATION: AssessmentDimension.COLLABORATION,
-    ADAPTABILITY: AssessmentDimension.ADAPTABILITY,
-    LEADERSHIP: AssessmentDimension.LEADERSHIP,
-    CREATIVITY: AssessmentDimension.CREATIVITY,
-    TIME_MANAGEMENT: AssessmentDimension.TIME_MANAGEMENT,
+  const detectedRedFlags = (parsed.detected_red_flags ?? []).map(
+    (rf: Record<string, unknown>) => ({
+      slug: rf.slug as string,
+      name: rf.slug as string,
+      description: "",
+      evidence: (rf.evidence as string) ?? "",
+      timestamps: (rf.timestamps as string[]) ?? [],
+    })
+  );
+
+  return {
+    evaluationVersion: parsed.evaluation_version ?? RUBRIC_EVALUATION_PROMPT_VERSION,
+    roleFamilySlug: parsed.role_family_slug ?? DEFAULT_ROLE_FAMILY_SLUG,
+    overallScore: parsed.overall_score,
+    dimensionScores,
+    detectedRedFlags,
+    overallSummary: parsed.overall_summary,
+    evaluationConfidence: parsed.evaluation_confidence ?? "medium",
+    insufficientEvidenceNotes: parsed.insufficient_evidence_notes ?? null,
   };
-  return mapping[dimension];
 }
 
 /**
@@ -120,7 +143,6 @@ function mapDimensionToEnum(
  * Ensures timestamps are in MM:SS or HH:MM:SS format
  */
 function formatTimestamps(timestamps: string[]): Prisma.InputJsonValue {
-  // Validate timestamp format
   const timestampRegex = /^(\d{1,2}:)?\d{1,2}:\d{2}$/;
   const validTimestamps = timestamps.filter((ts) => timestampRegex.test(ts));
   return validTimestamps as unknown as Prisma.InputJsonValue;
@@ -133,9 +155,8 @@ function formatTimestamps(timestamps: string[]): Prisma.InputJsonValue {
 /**
  * Evaluates a video using Gemini 3 Pro
  *
- * Sends the video to Gemini for evaluation against the 8-dimension rubric.
- * Stores results in DimensionScore and VideoAssessmentSummary tables.
- * Logs all events to VideoAssessmentLog and VideoAssessmentApiCall tables.
+ * Loads the rubric for the specified role family, builds a dynamic evaluation prompt,
+ * sends the video to Gemini, and stores results with dimension slug-based scores.
  *
  * @param options - Evaluation options including assessmentId and videoUrl
  * @returns Evaluation result with scores and summary
@@ -149,6 +170,7 @@ export async function evaluateVideo(
     videoDurationMinutes,
     taskDescription,
     expectedOutcomes,
+    roleFamilySlug = DEFAULT_ROLE_FAMILY_SLUG,
   } = options;
 
   // Generate a unique job ID for this evaluation run
@@ -157,7 +179,7 @@ export async function evaluateVideo(
   // Create logger for this assessment
   const logger = createVideoAssessmentLogger(assessmentId);
 
-  // Log: Job started (event_type: started, include job_id in metadata)
+  // Log: Job started
   await logger.logEvent(AssessmentLogEventType.STARTED, { job_id: jobId });
 
   // Update status to PROCESSING
@@ -167,16 +189,33 @@ export async function evaluateVideo(
   });
 
   try {
-    // Build the evaluation prompt with optional context
-    const prompt = buildVideoEvaluationPrompt({
-      videoDurationMinutes,
-      taskDescription,
-      expectedOutcomes,
-    });
+    // Load rubric data from the database
+    let rubricInput: RubricPromptInput;
+    try {
+      rubricInput = await loadRubricForRoleFamily(db, roleFamilySlug);
+    } catch {
+      console.warn(
+        `[VideoEvaluation] Role family "${roleFamilySlug}" not found, falling back to "${DEFAULT_ROLE_FAMILY_SLUG}"`
+      );
+      rubricInput = await loadRubricForRoleFamily(db, DEFAULT_ROLE_FAMILY_SLUG);
+    }
 
-    // Log: Prompt sent (event_type: prompt_sent, include prompt_length in metadata)
+    // Add video context if provided
+    if (videoDurationMinutes || taskDescription || expectedOutcomes) {
+      rubricInput.videoContext = {
+        videoDurationMinutes,
+        taskDescription,
+        expectedOutcomes,
+      };
+    }
+
+    // Build the evaluation prompt dynamically from rubric data
+    const prompt = buildRubricEvaluationPrompt(rubricInput);
+
+    // Log: Prompt sent
     await logger.logEvent(AssessmentLogEventType.PROMPT_SENT, {
       prompt_length: prompt.length,
+      role_family: roleFamilySlug,
     });
 
     // Start API call tracking
@@ -184,7 +223,6 @@ export async function evaluateVideo(
 
     let responseText: string;
     try {
-      // Call Gemini with retry logic (max 3 attempts, exponential backoff)
       responseText = await withRetry(
         async () => {
           const result = await gemini.models.generateContent({
@@ -196,7 +234,7 @@ export async function evaluateVideo(
                   {
                     fileData: {
                       fileUri: videoUrl,
-                      mimeType: "video/mp4", // Assuming MP4, could be made configurable
+                      mimeType: "video/mp4",
                     },
                   },
                   {
@@ -225,108 +263,86 @@ export async function evaluateVideo(
         }
       );
 
-      // Log: Response received (event_type: response_received, include response_length and status_code)
       await logger.logEvent(AssessmentLogEventType.RESPONSE_RECEIVED, {
         response_length: responseText.length,
         status_code: 200,
       });
 
-      // Complete API call logging with response details
       await apiCallTracker.complete({
         responseText,
         statusCode: 200,
       });
     } catch (apiError) {
-      // Log API call failure
       await apiCallTracker.fail(
         apiError instanceof Error ? apiError : new Error(String(apiError))
       );
       throw apiError;
     }
 
-    // Log: Parsing started (event_type: parsing_started)
     await logger.logEvent(AssessmentLogEventType.PARSING_STARTED);
 
     // Parse the response
     const evaluation = parseEvaluationResponse(responseText);
 
-    // Count non-null dimension scores
-    const dimensionCount = Object.values(evaluation.dimension_scores).filter(
+    const dimensionCount = evaluation.dimensionScores.filter(
       (d) => d.score !== null
     ).length;
 
-    // Log: Parsing completed (event_type: parsing_completed, include parsed dimension count)
     await logger.logEvent(AssessmentLogEventType.PARSING_COMPLETED, {
       parsed_dimension_count: dimensionCount,
     });
 
-    // Store dimension scores, summary, and update status atomically
-    const dimensionScores = new Map<AssessmentDimension, number | null>();
-
-    // Build dimension scores map first (no DB operations yet)
-    for (const [dimensionName, scoreData] of Object.entries(
-      evaluation.dimension_scores
-    )) {
-      const dimension = mapDimensionToEnum(
-        dimensionName as AssessmentDimensionType
-      );
-      dimensionScores.set(dimension, scoreData.score);
+    // Store results
+    const dimensionScores = new Map<string, number | null>();
+    for (const dimScore of evaluation.dimensionScores) {
+      dimensionScores.set(dimScore.dimensionSlug, dimScore.score);
     }
 
-    // Wrap all database writes in a transaction for atomicity
-    // This ensures either all scores are saved or none are (no partial scores)
     await db.$transaction(async (tx) => {
-      // Upsert dimension scores
-      for (const [dimensionName, scoreData] of Object.entries(
-        evaluation.dimension_scores
-      )) {
-        const dimension = mapDimensionToEnum(
-          dimensionName as AssessmentDimensionType
-        );
-        const score = scoreData.score;
-
-        // Only create score record if we have a score (not null)
-        if (score !== null) {
+      for (const dimScore of evaluation.dimensionScores) {
+        if (dimScore.score !== null) {
           await tx.dimensionScore.upsert({
             where: {
               assessmentId_dimension: {
                 assessmentId,
-                dimension,
+                dimension: dimScore.dimensionSlug,
               },
             },
             create: {
               assessmentId,
-              dimension,
-              score,
-              observableBehaviors: scoreData.observable_behaviors,
-              timestamps: formatTimestamps(scoreData.timestamps),
-              trainableGap: scoreData.trainable_gap,
+              dimension: dimScore.dimensionSlug,
+              score: dimScore.score,
+              confidence: dimScore.confidence,
+              observableBehaviors: dimScore.observableBehaviors.join("\n"),
+              timestamps: formatTimestamps(dimScore.timestamps),
+              trainableGap: dimScore.trainableGap,
+              rationale: dimScore.rationale,
             },
             update: {
-              score,
-              observableBehaviors: scoreData.observable_behaviors,
-              timestamps: formatTimestamps(scoreData.timestamps),
-              trainableGap: scoreData.trainable_gap,
+              score: dimScore.score,
+              confidence: dimScore.confidence,
+              observableBehaviors: dimScore.observableBehaviors.join("\n"),
+              timestamps: formatTimestamps(dimScore.timestamps),
+              trainableGap: dimScore.trainableGap,
+              rationale: dimScore.rationale,
             },
           });
         }
       }
 
-      // Store assessment summary with raw AI response
       await tx.videoAssessmentSummary.upsert({
         where: { assessmentId },
         create: {
           assessmentId,
-          overallSummary: evaluation.overall_summary,
+          overallSummary: evaluation.overallSummary,
           rawAiResponse: evaluation as unknown as Prisma.InputJsonValue,
         },
         update: {
-          overallSummary: evaluation.overall_summary,
+          overallSummary: evaluation.overallSummary,
           rawAiResponse: evaluation as unknown as Prisma.InputJsonValue,
         },
       });
 
-      // Update assessment status to COMPLETED
       await tx.videoAssessment.update({
         where: { id: assessmentId },
         data: {
@@ -336,11 +352,9 @@ export async function evaluateVideo(
       });
     });
 
-    // Log: Assessment completed successfully (event_type: completed)
     await logger.logEvent(AssessmentLogEventType.COMPLETED);
 
-    // Generate and store embeddings for semantic search (US-011)
-    // This runs asynchronously to not block the completion response
+    // Generate and store embeddings for semantic search (async)
     generateAndStoreEmbeddings(assessmentId)
       .then((embeddingResult) => {
         if (embeddingResult.success) {
@@ -363,16 +377,15 @@ export async function evaluateVideo(
     return {
       success: true,
       assessmentId,
-      overallScore: evaluation.overall_score,
+      overallScore: evaluation.overallScore,
       dimensionScores,
-      summary: evaluation.overall_summary,
+      summary: evaluation.overallSummary,
     };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
     console.error("[VideoEvaluation] Evaluation failed:", error);
 
-    // Log: Error event with full error message and stack trace (event_type: error)
     const errorObj = error instanceof Error ? error : new Error(String(error));
     await logger.logEvent(AssessmentLogEventType.ERROR, {
       error_message: errorObj.message,
@@ -380,7 +393,6 @@ export async function evaluateVideo(
       stack_trace: errorObj.stack,
     });
 
-    // Get current retry count
     const currentAssessment = await db.videoAssessment.findUnique({
       where: { id: assessmentId },
       select: { retryCount: true },
@@ -389,8 +401,6 @@ export async function evaluateVideo(
     const currentRetryCount = currentAssessment?.retryCount ?? 0;
     const newRetryCount = currentRetryCount + 1;
 
-    // Update assessment with failure details
-    // Mark as FAILED after 3 total attempts (acceptance criteria)
     await db.videoAssessment.update({
       where: { id: assessmentId },
       data: {
@@ -400,7 +410,6 @@ export async function evaluateVideo(
       },
     });
 
-    // Send console alert for failures (acceptance criteria: alert/notification for MVP)
     console.error(
       `[ASSESSMENT FAILURE ALERT] Video assessment ${assessmentId} failed ` +
         `(attempt ${newRetryCount}/3). Reason: ${errorMessage}`
@@ -467,7 +476,7 @@ export async function getEvaluationResults(assessmentId: string): Promise<{
     completedAt: Date | null;
   };
   scores: Array<{
-    dimension: AssessmentDimension;
+    dimension: string;
     score: number;
     observableBehaviors: string;
     timestamps: string[];
@@ -475,7 +484,7 @@ export async function getEvaluationResults(assessmentId: string): Promise<{
   }>;
   summary: {
     overallSummary: string;
-    rawAiResponse: VideoEvaluationOutput | null;
+    rawAiResponse: RubricAssessmentOutput | null;
   } | null;
 }> {
   const assessment = await db.videoAssessment.findUnique({
@@ -507,7 +516,7 @@ export async function getEvaluationResults(assessmentId: string): Promise<{
       ? {
           overallSummary: assessment.summary.overallSummary,
           rawAiResponse: assessment.summary
-            .rawAiResponse as unknown as VideoEvaluationOutput | null,
+            .rawAiResponse as unknown as RubricAssessmentOutput | null,
         }
       : null,
   };
@@ -518,14 +527,11 @@ export async function getEvaluationResults(assessmentId: string): Promise<{
 // ============================================================================
 
 export interface TriggerVideoAssessmentOptions {
-  /** The work simulation assessment ID */
   assessmentId: string;
-  /** The user/candidate ID */
   candidateId: string;
-  /** The video URL from the recording */
   videoUrl: string;
-  /** Optional task description for context */
   taskDescription?: string;
+  roleFamilySlug?: string;
 }
 
 export interface TriggerVideoAssessmentResult {
@@ -536,27 +542,13 @@ export interface TriggerVideoAssessmentResult {
 
 /**
  * Triggers a video assessment for a completed simulation.
- * Creates the VideoAssessment record and starts the evaluation asynchronously.
- *
- * This is designed to be called from the finalize endpoint when a simulation completes.
- * The evaluation runs in the background - the function returns immediately after creating
- * the VideoAssessment record with PENDING status.
- *
- * Uses upsert to prevent race conditions where concurrent requests could both try to
- * create a VideoAssessment for the same simulation.
- *
- * @param options - Options including assessment IDs and video URL
- * @returns Result with the created VideoAssessment ID
  */
 export async function triggerVideoAssessment(
   options: TriggerVideoAssessmentOptions
 ): Promise<TriggerVideoAssessmentResult> {
-  const { assessmentId, candidateId, videoUrl, taskDescription } = options;
+  const { assessmentId, candidateId, videoUrl, taskDescription, roleFamilySlug } = options;
 
   try {
-    // Use upsert to atomically create or get existing VideoAssessment
-    // This prevents race conditions where concurrent requests both pass findUnique
-    // and both try to create, causing unique constraint violations
     const videoAssessment = await db.videoAssessment.upsert({
       where: { assessmentId },
       create: {
@@ -565,25 +557,21 @@ export async function triggerVideoAssessment(
         videoUrl,
         status: VideoAssessmentStatus.PENDING,
       },
-      update: {
-        // No-op update if exists (preserves existing state)
-        // We'll handle FAILED status re-triggering separately below
-      },
+      update: {},
       select: { id: true, status: true },
     });
 
-    // If it exists and failed, allow re-triggering by resetting status
     if (videoAssessment.status === VideoAssessmentStatus.FAILED) {
       await db.videoAssessment.update({
         where: { id: videoAssessment.id },
         data: { status: VideoAssessmentStatus.PENDING },
       });
 
-      // Start evaluation asynchronously (fire and forget)
       evaluateVideo({
         assessmentId: videoAssessment.id,
         videoUrl,
         taskDescription,
+        roleFamilySlug,
       }).catch((error) => {
         console.error(
           `[VideoEvaluation] Background evaluation failed for ${videoAssessment.id}:`,
@@ -591,29 +579,21 @@ export async function triggerVideoAssessment(
         );
       });
 
-      return {
-        success: true,
-        videoAssessmentId: videoAssessment.id,
-      };
+      return { success: true, videoAssessmentId: videoAssessment.id };
     }
 
-    // If already in progress or completed, don't restart evaluation
     if (
       videoAssessment.status === VideoAssessmentStatus.PROCESSING ||
       videoAssessment.status === VideoAssessmentStatus.COMPLETED
     ) {
-      return {
-        success: true,
-        videoAssessmentId: videoAssessment.id,
-      };
+      return { success: true, videoAssessmentId: videoAssessment.id };
     }
 
-    // Status is PENDING - start evaluation asynchronously (fire and forget)
-    // This ensures the finalize endpoint returns quickly
     evaluateVideo({
       assessmentId: videoAssessment.id,
       videoUrl,
       taskDescription,
+      roleFamilySlug,
     }).catch((error) => {
       console.error(
         `[VideoEvaluation] Background evaluation failed for ${videoAssessment.id}:`,
@@ -621,15 +601,9 @@ export async function triggerVideoAssessment(
       );
     });
 
-    return {
-      success: true,
-      videoAssessmentId: videoAssessment.id,
-    };
+    return { success: true, videoAssessmentId: videoAssessment.id };
   } catch (error) {
-    console.error(
-      "[VideoEvaluation] Failed to trigger video assessment:",
-      error
-    );
+    console.error("[VideoEvaluation] Failed to trigger video assessment:", error);
     return {
       success: false,
       videoAssessmentId: null,
@@ -638,13 +612,6 @@ export async function triggerVideoAssessment(
   }
 }
 
-/**
- * Gets the video assessment status for a simulation assessment.
- * Used by the processing page to show "Assessment in progress" status.
- *
- * @param assessmentId - The work simulation assessment ID (NOT the VideoAssessment ID)
- * @returns The video assessment status or null if not found
- */
 export async function getVideoAssessmentStatusByAssessment(
   assessmentId: string
 ): Promise<{
@@ -652,26 +619,12 @@ export async function getVideoAssessmentStatusByAssessment(
   status: VideoAssessmentStatus;
   completedAt: Date | null;
 } | null> {
-  const videoAssessment = await db.videoAssessment.findUnique({
+  return db.videoAssessment.findUnique({
     where: { assessmentId },
-    select: {
-      id: true,
-      status: true,
-      completedAt: true,
-    },
+    select: { id: true, status: true, completedAt: true },
   });
-
-  return videoAssessment;
 }
 
-/**
- * Retries a failed video assessment.
- * Only works for assessments with FAILED status and fewer than 3 retry attempts.
- * If an assessment has failed 3 times, use `forceRetryVideoAssessment` for admin override.
- *
- * @param videoAssessmentId - The VideoAssessment ID to retry
- * @returns Result indicating success or failure
- */
 export async function retryVideoAssessment(
   videoAssessmentId: string
 ): Promise<TriggerVideoAssessmentResult> {
@@ -682,73 +635,49 @@ export async function retryVideoAssessment(
         id: true,
         status: true,
         videoUrl: true,
-        assessmentId: true,
         retryCount: true,
         assessment: {
-          select: {
-            scenario: {
-              select: {
-                taskDescription: true,
-              },
-            },
-          },
+          select: { scenario: { select: { taskDescription: true } } },
         },
       },
     });
 
     if (!videoAssessment) {
-      return {
-        success: false,
-        videoAssessmentId: null,
-        error: "Video assessment not found",
-      };
+      return { success: false, videoAssessmentId: null, error: "Video assessment not found" };
     }
 
     if (videoAssessment.status !== VideoAssessmentStatus.FAILED) {
       return {
         success: false,
-        videoAssessmentId: videoAssessmentId,
-        error: `Cannot retry assessment with status ${videoAssessment.status}. Only FAILED assessments can be retried.`,
+        videoAssessmentId,
+        error: `Cannot retry assessment with status ${videoAssessment.status}.`,
       };
     }
 
-    // Check if max retries reached (3 attempts total)
     if (videoAssessment.retryCount >= 3) {
       return {
         success: false,
-        videoAssessmentId: videoAssessmentId,
-        error: `Assessment has already failed 3 times. Use admin manual reassessment via Supabase dashboard.`,
+        videoAssessmentId,
+        error: "Assessment has already failed 3 times.",
       };
     }
 
-    // Reset status to PENDING
     await db.videoAssessment.update({
       where: { id: videoAssessmentId },
       data: { status: VideoAssessmentStatus.PENDING },
     });
 
-    // Get task description from linked assessment if available
-    const taskDescription =
-      videoAssessment.assessment?.scenario?.taskDescription;
-
-    // Start evaluation asynchronously
     evaluateVideo({
       assessmentId: videoAssessmentId,
       videoUrl: videoAssessment.videoUrl,
-      taskDescription,
+      taskDescription: videoAssessment.assessment?.scenario?.taskDescription,
     }).catch((error) => {
-      console.error(
-        `[VideoEvaluation] Retry evaluation failed for ${videoAssessmentId}:`,
-        error
-      );
+      console.error(`[VideoEvaluation] Retry failed for ${videoAssessmentId}:`, error);
     });
 
-    return {
-      success: true,
-      videoAssessmentId,
-    };
+    return { success: true, videoAssessmentId };
   } catch (error) {
-    console.error("[VideoEvaluation] Failed to retry video assessment:", error);
+    console.error("[VideoEvaluation] Failed to retry:", error);
     return {
       success: false,
       videoAssessmentId,
@@ -757,14 +686,6 @@ export async function retryVideoAssessment(
   }
 }
 
-/**
- * Force retries a video assessment regardless of retry count.
- * This is intended for admin use via Supabase dashboard to manually trigger reassessment.
- * Resets the retryCount to 0 and starts fresh.
- *
- * @param videoAssessmentId - The VideoAssessment ID to retry
- * @returns Result indicating success or failure
- */
 export async function forceRetryVideoAssessment(
   videoAssessmentId: string
 ): Promise<TriggerVideoAssessmentResult> {
@@ -773,68 +694,35 @@ export async function forceRetryVideoAssessment(
       where: { id: videoAssessmentId },
       select: {
         id: true,
-        status: true,
         videoUrl: true,
-        assessmentId: true,
         assessment: {
-          select: {
-            scenario: {
-              select: {
-                taskDescription: true,
-              },
-            },
-          },
+          select: { scenario: { select: { taskDescription: true } } },
         },
       },
     });
 
     if (!videoAssessment) {
-      return {
-        success: false,
-        videoAssessmentId: null,
-        error: "Video assessment not found",
-      };
+      return { success: false, videoAssessmentId: null, error: "Video assessment not found" };
     }
 
-    // Reset status to PENDING and clear retry count for fresh start
     await db.videoAssessment.update({
       where: { id: videoAssessmentId },
-      data: {
-        status: VideoAssessmentStatus.PENDING,
-        retryCount: 0,
-        lastFailureReason: null,
-      },
+      data: { status: VideoAssessmentStatus.PENDING, retryCount: 0, lastFailureReason: null },
     });
 
-    console.log(
-      `[VideoEvaluation] Admin force-retry initiated for assessment ${videoAssessmentId}`
-    );
+    console.log(`[VideoEvaluation] Admin force-retry for ${videoAssessmentId}`);
 
-    // Get task description from linked assessment if available
-    const taskDescription =
-      videoAssessment.assessment?.scenario?.taskDescription;
-
-    // Start evaluation asynchronously
     evaluateVideo({
       assessmentId: videoAssessmentId,
       videoUrl: videoAssessment.videoUrl,
-      taskDescription,
+      taskDescription: videoAssessment.assessment?.scenario?.taskDescription,
     }).catch((error) => {
-      console.error(
-        `[VideoEvaluation] Force retry evaluation failed for ${videoAssessmentId}:`,
-        error
-      );
+      console.error(`[VideoEvaluation] Force retry failed for ${videoAssessmentId}:`, error);
     });
 
-    return {
-      success: true,
-      videoAssessmentId,
-    };
+    return { success: true, videoAssessmentId };
   } catch (error) {
-    console.error(
-      "[VideoEvaluation] Failed to force retry video assessment:",
-      error
-    );
+    console.error("[VideoEvaluation] Failed to force retry:", error);
     return {
       success: false,
       videoAssessmentId,
@@ -843,5 +731,4 @@ export async function forceRetryVideoAssessment(
   }
 }
 
-// Export model constant for testing/configuration
 export { VIDEO_EVALUATION_MODEL };

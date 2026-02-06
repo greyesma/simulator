@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { db } from "@/server/db";
 import { success, error } from "@/lib/api";
 import { VideoAssessmentStatus } from "@prisma/client";
-import type { CodeReviewData, VideoEvaluationResult, HiringSignals } from "@/types";
+import type { CodeReviewData, HiringSignals } from "@/types";
 import { getStoredPercentiles } from "@/lib/candidate/percentile-calculator";
 
 /**

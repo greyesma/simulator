@@ -4,7 +4,7 @@
  * All AI prompts are organized by domain:
  * - manager/   - Manager defense call and PR submission prompts
  * - coworker/  - Coworker chat and voice prompts
- * - analysis/  - Video evaluation, CV parsing, feedback/entity extraction prompts
+ * - analysis/  - Rubric evaluation, CV parsing, feedback/entity extraction prompts
  */
 
 // Manager Calls
@@ -29,13 +29,13 @@ export {
 // Analysis Prompts
 export { CV_PARSING_PROMPT } from "./analysis/cv-parser";
 export {
-  VIDEO_EVALUATION_PROMPT,
-  EVALUATION_PROMPT_VERSION,
-  ASSESSMENT_DIMENSIONS,
-  buildVideoEvaluationPrompt,
-  type VideoEvaluationOutput,
-  type AssessmentDimensionType,
-} from "./analysis/video-evaluation";
+  RUBRIC_EVALUATION_PROMPT_VERSION,
+  buildRubricEvaluationPrompt,
+  type RubricPromptInput,
+  type DimensionWithRubric,
+  type RubricLevelData,
+  type RedFlagData,
+} from "./analysis/rubric-evaluation";
 export {
   FEEDBACK_PARSING_PROMPT,
   buildFeedbackParsingContext,
