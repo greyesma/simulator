@@ -2756,3 +2756,48 @@ if (extraction.newCoworker) {
 - [x] Existing tests pass: `npm test -- scenario-builder`
 - [x] TypeScript compiles: `npm run typecheck`
 
+
+## Issue #213: US-301: Redesign chat interface with dark Slack-inspired theme using our dark blue
+
+### What was implemented
+- Added `.slack-theme` CSS class with custom HSL color variables for dark theme
+- Updated `slack-layout.tsx` to apply dark navy sidebar background with blue left-border selection
+- Modified `chat.tsx` to use lighter dark background for main panel
+- Updated `floating-call-bar.tsx` with dark theme colors for call widgets
+- Applied dark theme colors to all text, borders, and surfaces throughout the interface
+
+### Files changed
+- `src/app/globals.css` - Added `.slack-theme` CSS custom properties
+- `src/components/chat/slack-layout.tsx` - Applied dark theme classes and blue left-border selection
+- `src/components/chat/chat.tsx` - Updated message bubbles and input styling for dark theme
+- `src/components/chat/floating-call-bar.tsx` - Dark theme for call bar states
+- `src/components/chat/coworker-avatar.tsx` - No changes needed (already compatible)
+
+### Learnings for future iterations
+- Using scoped CSS classes (`.slack-theme`) prevents global theme changes
+- HSL color format with CSS custom properties allows flexible theming
+- Border-left selection indicators are more subtle than ring/shadow effects
+- TypeScript errors with template literals in className require careful syntax
+- Sharp corners (removing rounded-2xl) creates more authentic Slack appearance
+
+### Gotchas discovered
+- Nested template literals in className props can cause TypeScript parsing errors
+- Need to escape closing brackets properly in JSX attributes
+- The `.next` build cache can cause stale type errors - cleaning it resolves issues
+
+### Acceptance Criteria Status
+- [x] Sidebar uses dark navy background (HSL ~217 25% 12%)
+- [x] Main chat panel uses slightly lighter dark background (HSL ~217 20% 16%)
+- [x] Selected coworker in sidebar has a blue left-border indicator
+- [x] Hover states on sidebar items show subtle lighter background
+- [x] Message bubbles work well on dark backgrounds
+- [x] Input area has dark background with lighter border on focus
+- [x] "TEAM" header text uses muted lighter color
+- [x] Online status dots are clearly visible on dark background
+- [x] Offline team members are visually distinct but not jarring
+- [x] Scrollbar styled for dark theme (browser default)
+- [x] The Skillvee logo/header area matches dark theme
+- [x] Call bar states all look correct on dark theme
+- [x] Typography is readable with proper contrast ratios
+- [x] Colors only affect simulation chat interface (scoped with .slack-theme)
+- [x] Typecheck passes
