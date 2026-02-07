@@ -1,7 +1,4 @@
-// Candidate utilities - archetype-weights, candidate-search, cv-parser, embeddings, entity-extraction, feedback-parsing, percentile-calculator, seniority-thresholds
-
-// archetype-weights exports (DimensionScoreInput defined here - canonical source)
-export * from "./archetype-weights";
+// Candidate utilities - candidate-search, cv-parser, embeddings, entity-extraction, feedback-parsing, percentile-calculator
 
 // percentile-calculator exports
 export * from "./percentile-calculator";
@@ -40,22 +37,3 @@ export * from "./entity-extraction";
 
 // feedback-parsing exports
 export * from "./feedback-parsing";
-
-// seniority-thresholds exports
-// SeniorityLevel here is FilterSeniorityLevel ("JUNIOR" | "MID" | "SENIOR") from @/types
-// Used for candidate filtering thresholds
-// We exclude DimensionScoreInput since archetype-weights already exports it
-export {
-  type SeniorityLevel,
-  type ArchetypeKeyDimensions,
-  type ThresholdCheckResult,
-  type FilterResult,
-  SENIORITY_THRESHOLDS,
-  ARCHETYPE_KEY_DIMENSIONS,
-  getKeyDimensionsForArchetype,
-  meetsThreshold,
-  filterCandidatesBySeniority,
-  getSeniorityDisplayName,
-  getAllSeniorityLevels,
-  verifyKeyDimensionsAlignment,
-} from "./seniority-thresholds";

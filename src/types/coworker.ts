@@ -57,4 +57,6 @@ export interface DecorativeTeamMember {
   role: string;
   /** Avatar initials (derived from name if not provided) */
   initials?: string;
+  /** Optional avatar URL */
+  avatarUrl?: string;
 }

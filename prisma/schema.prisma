@@ -273,17 +273,6 @@ enum VideoAssessmentStatus {
   FAILED
 }
 
-enum AssessmentDimension {
-  COMMUNICATION
-  PROBLEM_SOLVING
-  TECHNICAL_KNOWLEDGE
-  COLLABORATION
-  ADAPTABILITY
-  LEADERSHIP
-  CREATIVITY
-  TIME_MANAGEMENT
-}
-
 model VideoAssessment {
   id            String                @id @default(cuid())
   candidateId   String                // References User.id
@@ -321,11 +310,13 @@ model VideoAssessment {
 model DimensionScore {
   id                  String              @id @default(cuid())
   assessmentId        String
-  dimension           AssessmentDimension
-  score               Int                 // 1-5 scale
+  dimension           String              // Dimension slug from Dimension table (e.g., "communication", "problem_solving")
+  score               Int                 // 1-4 scale (Foundational, Competent, Advanced, Expert)
+  confidence          String              @default("medium") // "high" | "medium" | "low"
   observableBehaviors String              @db.Text // Description of observed behaviors
   timestamps          Json                // Array of timestamps where behavior was observed
   trainableGap        Boolean             @default(false) // Whether this is a trainable skill gap
+  rationale           String?             @db.Text // Why this score was given
 
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt

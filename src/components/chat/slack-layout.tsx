@@ -3,7 +3,7 @@
 import { useState, Suspense, createContext, useContext } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Menu, X, Headphones } from "lucide-react";
-import { DECORATIVE_TEAM_MEMBERS, getInitials } from "@/lib/ai";
+import { DECORATIVE_TEAM_MEMBERS } from "@/lib/ai";
 import { FloatingCallBar } from "./floating-call-bar";
 import { CoworkerAvatar } from "./coworker-avatar";
 
@@ -222,6 +222,7 @@ function SlackLayoutInner({
                     key={member.name}
                     name={member.name}
                     role={member.role}
+                    avatarUrl={member.avatarUrl}
                   />
                 ))}
               </div>
@@ -340,22 +341,22 @@ function CoworkerItem({
 interface OfflineTeamMemberProps {
   name: string;
   role: string;
+  avatarUrl?: string;
 }
 
-function OfflineTeamMember({ name, role }: OfflineTeamMemberProps) {
-  const initials = getInitials(name);
-
+function OfflineTeamMember({ name, role, avatarUrl }: OfflineTeamMemberProps) {
   return (
     <div
       className="flex items-center gap-3 px-3 py-2 cursor-default opacity-50 border-l-2 border-transparent"
       title="Unavailable"
     >
       <div className="relative">
-        <div className="h-8 w-8 rounded-full shadow-sm flex items-center justify-center" style={{background: "hsl(var(--slack-bg-surface))", border: "2px solid hsl(var(--slack-border))"}}>
-          <span className="text-xs font-medium" style={{color: "hsl(var(--slack-text-muted))"}}>
-            {initials}
-          </span>
-        </div>
+        <CoworkerAvatar
+          name={name}
+          avatarUrl={avatarUrl}
+          size="sm"
+          className="border-2 border-background shadow-sm"
+        />
         {/* Offline status indicator - gray dot */}
         <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full" style={{background: "hsl(var(--slack-text-muted))", border: "2px solid hsl(var(--slack-bg-sidebar))"}} />
       </div>
