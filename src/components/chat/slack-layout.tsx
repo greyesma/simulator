@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense, createContext, useContext } from "react";
+import { useState, Suspense, createContext, useContext, cloneElement, isValidElement } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Menu, X, Headphones } from "lucide-react";
 import { DECORATIVE_TEAM_MEMBERS } from "@/lib/ai";
@@ -111,6 +111,7 @@ function SlackLayoutInner({
     coworkerId: string;
     callType: "coworker";
   } | null>(null);
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
 
   // Determine selected coworker from prop override or URL
   const selectedCoworkerId =
@@ -127,6 +128,26 @@ function SlackLayoutInner({
     setActiveCall(null);
   };
 
+  // Increment unread count for a coworker
+  const incrementUnread = (coworkerId: string) => {
+    // Don't increment if the coworker is currently selected
+    if (coworkerId === selectedCoworkerId) return;
+
+    setUnreadCounts((prev) => ({
+      ...prev,
+      [coworkerId]: (prev[coworkerId] || 0) + 1,
+    }));
+  };
+
+  // Clear unread count for a coworker
+  const clearUnread = (coworkerId: string) => {
+    setUnreadCounts((prev) => {
+      const newCounts = { ...prev };
+      delete newCounts[coworkerId];
+      return newCounts;
+    });
+  };
+
   const handleSelectCoworker = (
     coworkerId: string,
     action: "chat" | "call"
@@ -135,6 +156,8 @@ function SlackLayoutInner({
     setIsSidebarOpen(false);
 
     if (action === "chat") {
+      // Clear unread count when selecting a coworker
+      clearUnread(coworkerId);
       router.push(`/assessments/${assessmentId}/work?coworkerId=${coworkerId}`);
     } else {
       // Start call in-place instead of navigating to a separate page
@@ -211,6 +234,7 @@ function SlackLayoutInner({
                     coworker={coworker}
                     isSelected={selectedCoworkerId === coworker.id}
                     isInCall={activeCall?.coworkerId === coworker.id}
+                    unreadCount={unreadCounts[coworker.id] || 0}
                     onChat={() => handleSelectCoworker(coworker.id, "chat")}
                     onCall={() => handleSelectCoworker(coworker.id, "call")}
                   />
@@ -245,7 +269,13 @@ function SlackLayoutInner({
 
         {/* Main content area */}
         <main className="flex flex-1 flex-col p-4 min-h-0 overflow-hidden" style={{background: "hsl(var(--slack-bg-main))"}}>
-          {children}
+          {/* Pass incrementUnread function to children if they're Chat components */}
+          {isValidElement(children) && children.type && (children.type as any).name === 'Chat'
+            ? cloneElement(children as React.ReactElement<any>, {
+                onNewMessage: incrementUnread
+              })
+            : children
+          }
         </main>
       </div>
     </CallContext.Provider>
@@ -256,6 +286,7 @@ interface CoworkerItemProps {
   coworker: Coworker;
   isSelected: boolean;
   isInCall?: boolean;
+  unreadCount: number;
   onChat: () => void;
   onCall: () => void;
 }
@@ -264,6 +295,7 @@ function CoworkerItem({
   coworker,
   isSelected,
   isInCall,
+  unreadCount,
   onChat,
   onCall,
 }: CoworkerItemProps) {
@@ -308,7 +340,7 @@ function CoworkerItem({
         />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-semibold truncate" style={{color: "hsl(var(--slack-text))"}}>{coworker.name}</div>
+        <div className={`text-sm truncate ${unreadCount > 0 ? "font-bold" : "font-semibold"}`} style={{color: "hsl(var(--slack-text))"}}>{coworker.name}</div>
         <div className="text-[10px] truncate" style={{color: "hsl(var(--slack-text-muted))"}}>
           {isInCall ? (
             <span className="text-green-600 dark:text-green-400 font-medium">In call</span>
@@ -317,6 +349,12 @@ function CoworkerItem({
           )}
         </div>
       </div>
+      {/* Unread badge */}
+      {unreadCount > 0 && (
+        <span className="flex-shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
+          {unreadCount > 9 ? "9+" : unreadCount}
+        </span>
+      )}
       {/* Call button */}
       <button
         onClick={(e) => {
