@@ -20,6 +20,7 @@ interface Coworker {
 interface ChatProps {
   assessmentId: string;
   coworker: Coworker;
+  onNewMessage?: (coworkerId: string) => void;
 }
 
 // Note: PR submission handling and defense call flow will be implemented
@@ -29,6 +30,7 @@ interface ChatProps {
 export function Chat({
   assessmentId,
   coworker,
+  onNewMessage,
 }: ChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -46,7 +48,13 @@ export function Chat({
   // Callbacks for manager auto-start messages
   const handleManagerMessages = useCallback((newMessages: ChatMessage[]) => {
     setMessages((prev) => [...prev, ...newMessages]);
-  }, []);
+    // Notify parent component about new messages for unread count
+    if (onNewMessage && newMessages.length > 0) {
+      // Only count model messages (from the coworker)
+      const modelMessages = newMessages.filter(msg => msg.role === 'model');
+      modelMessages.forEach(() => onNewMessage(coworker.id));
+    }
+  }, [coworker.id, onNewMessage]);
 
   const handleTypingStart = useCallback(() => {
     setIsManagerTyping(true);
@@ -132,6 +140,11 @@ export function Chat({
         timestamp: data.timestamp,
       };
       setMessages((prev) => [...prev, modelMessage]);
+
+      // Notify parent component about new message for unread count
+      if (onNewMessage) {
+        onNewMessage(coworker.id);
+      }
 
       // Note: PR detection and defense call flow will be handled in RF-012.
       // The manager will prompt the candidate to call them after PR submission.

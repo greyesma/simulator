@@ -1,5 +1,47 @@
 # Ralph Progress Log
 
+## Issue #215: US-303 - Add unread message notification badges to sidebar
+
+### What was implemented
+- Added unread count state management to SlackLayout component
+- Implemented increment and clear unread functions
+- Updated CoworkerItem to display unread badges and bold names when unread
+- Integrated Chat component with onNewMessage callback for tracking new messages
+- Manager auto-start messages properly trigger unread counts
+
+### Files changed
+- `src/components/chat/slack-layout.tsx` - Added unread state management and badge rendering
+- `src/components/chat/chat.tsx` - Added onNewMessage prop to notify parent about new messages
+
+### Features
+- Unread count badge appears on coworker items when they have new messages
+- Badge shows actual count (1, 2, 3...) up to 9, then "9+"
+- Badge is a small rounded pill with blue/white color scheme (bg-primary text-primary-foreground)
+- Coworker's name becomes bold (font-bold) when they have unread messages
+- Badge disappears when user clicks on that coworker (opens their chat)
+- Badge positioned between the name/role div and the call button
+- Manager auto-start messages increment unread count when user is viewing a different coworker
+
+### Implementation approach
+- Used React's cloneElement to pass incrementUnread function from SlackLayout to Chat component
+- Chat component calls onNewMessage when model responses arrive or manager sends auto-messages
+- SlackLayout checks if message is for currently selected coworker; if not, increments unread
+- Clear unread when coworker is selected via handleSelectCoworker
+
+### Learnings for future iterations
+- The Chat component is rendered as a child of SlackLayout, requiring prop passing via cloneElement
+- Manager auto-start messages use useManagerAutoStart hook which already had callback support
+- Unread badges follow Slack-like UI patterns with pill-shaped badges and bold text
+- The implementation properly handles both regular chat responses and manager auto-messages
+- TypeScript compilation has pre-existing errors unrelated to this feature
+
+### Screenshots
+- `screenshots/issue-215-01-initial-manager.png` - Initial state with manager selected
+- `screenshots/issue-215-02-unread-badge.png` - Unread badge visible after switching coworker
+- `screenshots/issue-215-03-badge-cleared.png` - Badge cleared after clicking back on manager
+
+---
+
 ## Issue #213: US-301 - Dark theme verification (Already Complete)
 
 ### Status
